@@ -1,0 +1,30 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "name": "Korve",
+  "theme": "mint",
+  "colors": {
+    "primary": "#7c6cf0",
+    "light": "#9d90f5",
+    "dark": "#5b4ee0"
+  },
+  "appearance": {
+    "default": "dark"
+  },
+  "navigation": {
+    "groups": [
+      {
+        "group": "Getting started",
+        "pages": ["introduction", "quickstart", "pricing"]
+      },
+      {
+        "group": "Platform",
+        "pages": ["deploys", "environment-variables", "infrastructure-as-code"]
+      }
+    ]
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/korve-dev"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+---
+title: "Deploys"
+description: "How code becomes a running app."
+---
+
+Every deploy moves through a state machine: `queued → building →
+deploying → ready` (or `failed`, with the build log attached).
+
+- **Builds** run on ephemeral, isolated build runners.
+- **scale-to-zero** projects ship as edge isolates behind
+  `your-slug.korve.app`.
+- **always-on** projects ship as dedicated machines behind the same
+  managed hostname.
+- Build logs stream into the deploy detail view; failed deploys keep the
+  full log tail for diagnosis.

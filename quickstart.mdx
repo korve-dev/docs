@@ -1,0 +1,27 @@
+---
+title: "Quickstart"
+description: "From zero to a deployed app on your-app.korve.app."
+---
+
+## 1. Create your account
+
+Sign up at [korve.dev/register](https://korve.dev/register). Korve is
+paid-only: after verifying your email you'll add a payment method —
+the platform minimum is $5/month, credited against usage.
+
+## 2. Create a project
+
+In the dashboard, **New Project** → pick a name, a slug (it becomes
+`your-slug.korve.app`), and a runtime class.
+
+## 3. Deploy
+
+Point the project at a GitHub repository (`owner/repo`) and deploy. The
+build runner clones your repo, builds it for your runtime class, and your
+app goes live with TLS on its managed subdomain.
+
+## 4. Configure
+
+Set environment variables in the dashboard (values are encrypted at rest
+and applied on the next deploy), watch live build logs, and set a monthly
+budget cap with optional hard-stop.
