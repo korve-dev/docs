@@ -47,11 +47,11 @@ states which contract applies.
 Organization roles are `owner > admin > member`. Each operation declares a
 minimum role, enforced once in the API layer:
 
-| Role     | Typical scope                                                      |
-| -------- | ------------------------------------------------------------------ |
-| `member` | Read resources, deploy, query logs and usage, record usage         |
-| `admin`  | Create projects, manage env vars, domains, budgets, databases      |
-| `owner`  | Deletions of last resort (projects, databases, the org), billing   |
+| Role     | Typical scope                                                    |
+| -------- | ---------------------------------------------------------------- |
+| `member` | Read resources, deploy, query logs and usage, record usage       |
+| `admin`  | Create projects, manage env vars, domains, budgets, databases    |
+| `owner`  | Deletions of last resort (projects, databases, the org), billing |
 
 A `403` means your role is too low; a `404` can also mean you're not a
 member of the addressed organization.
@@ -61,7 +61,12 @@ member of the addressed organization.
 Every error uses one envelope:
 
 ```json
-{ "error": { "code": "PAYMENT_REQUIRED", "message": "Activate billing for this organization first." } }
+{
+  "error": {
+    "code": "PAYMENT_REQUIRED",
+    "message": "Activate billing for this organization first."
+  }
+}
 ```
 
 `code` is a stable machine-readable string (e.g. `VALIDATION`,
@@ -70,16 +75,16 @@ change.
 
 ## Status codes
 
-| Status | Meaning                                                                  |
-| ------ | ------------------------------------------------------------------------ |
-| `200` / `201` / `202` | Success — `202` means accepted and processing (deploys)   |
-| `401`  | Missing/invalid credentials, or an API key on a session-only operation   |
-| `402`  | **Billing not active.** Korve is paid-only — operations that provision or consume resources require the organization's billing status to be `active`. Activate via checkout, then retry. |
-| `403`  | Authenticated, but your role doesn't meet the operation's minimum        |
-| `404`  | Doesn't exist — or you can't see it (non-members and cross-org keys get `404`, never confirmation) |
-| `409`  | Conflict — slug or hostname already taken, resource already exists       |
-| `422`  | Validation failed — the message says which field                         |
-| `5xx`  | Platform-side failure; for gateway-style `502`s the response says whether anything changed |
+| Status                | Meaning                                                                                                                                                                                  |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `200` / `201` / `202` | Success — `202` means accepted and processing (deploys)                                                                                                                                  |
+| `401`                 | Missing/invalid credentials, or an API key on a session-only operation                                                                                                                   |
+| `402`                 | **Billing not active.** Korve is paid-only — operations that provision or consume resources require the organization's billing status to be `active`. Activate via checkout, then retry. |
+| `403`                 | Authenticated, but your role doesn't meet the operation's minimum                                                                                                                        |
+| `404`                 | Doesn't exist — or you can't see it (non-members and cross-org keys get `404`, never confirmation)                                                                                       |
+| `409`                 | Conflict — slug or hostname already taken, resource already exists                                                                                                                       |
+| `422`                 | Validation failed — the message says which field                                                                                                                                         |
+| `5xx`                 | Platform-side failure; for gateway-style `502`s the response says whether anything changed                                                                                               |
 
 ## Rate guidance
 

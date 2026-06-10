@@ -21,9 +21,9 @@ GET /v1/orgs/{orgId}/projects/{projectId}/storage
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `prefix` | string | No | — |
+| Name     | Type   | Required | Description |
+| -------- | ------ | -------- | ----------- |
+| `prefix` | string | No       | —           |
 
 ### Example
 
@@ -34,19 +34,19 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/storage?prefix=
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Objects with tenant-relative keys. |
-| `404` | No such project in this organization. |
+| Status | Description                           |
+| ------ | ------------------------------------- |
+| `200`  | Objects with tenant-relative keys.    |
+| `404`  | No such project in this organization. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `objects` | object[] | — |
-| `objects[].key` | string | Tenant-relative object key. |
-| `objects[].size` | integer | Object size in bytes. |
-| `objects[].uploadedAt` | string | Format: `date-time`. |
+| Field                  | Type     | Description                 |
+| ---------------------- | -------- | --------------------------- |
+| `objects`              | object[] | —                           |
+| `objects[].key`        | string   | Tenant-relative object key. |
+| `objects[].size`       | integer  | Object size in bytes.       |
+| `objects[].uploadedAt` | string   | Format: `date-time`.        |
 
 ## storage.createUpload
 
@@ -63,11 +63,11 @@ POST /v1/orgs/{orgId}/projects/{projectId}/storage/uploads
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `filename` | string | Yes | — |
-| `contentType` | string | Yes | — |
-| `byteLength` | integer | Yes | Exact size of the upload in bytes. |
+| Field         | Type    | Required | Description                        |
+| ------------- | ------- | -------- | ---------------------------------- |
+| `filename`    | string  | Yes      | —                                  |
+| `contentType` | string  | Yes      | —                                  |
+| `byteLength`  | integer | Yes      | Exact size of the upload in bytes. |
 
 ### Example
 
@@ -84,22 +84,22 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/storage
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `201` | Signed upload. PUT the object bytes to the URL before it expires. |
-| `402` | Organization billing is not active. |
-| `404` | No such project in this organization. |
-| `422` | Invalid filename, content type, or byte length. |
+| Status | Description                                                       |
+| ------ | ----------------------------------------------------------------- |
+| `201`  | Signed upload. PUT the object bytes to the URL before it expires. |
+| `402`  | Organization billing is not active.                               |
+| `404`  | No such project in this organization.                             |
+| `422`  | Invalid filename, content type, or byte length.                   |
 
 ### Response body (201)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `key` | string | Tenant-relative key the object lands under. |
-| `url` | string | — |
-| `method` | string | One of: `PUT`. |
-| `headers` | object | Headers that must accompany the upload request. Map of string values. |
-| `expiresAt` | string | Format: `date-time`. |
+| Field       | Type   | Description                                                           |
+| ----------- | ------ | --------------------------------------------------------------------- |
+| `key`       | string | Tenant-relative key the object lands under.                           |
+| `url`       | string | —                                                                     |
+| `method`    | string | One of: `PUT`.                                                        |
+| `headers`   | object | Headers that must accompany the upload request. Map of string values. |
+| `expiresAt` | string | Format: `date-time`.                                                  |
 
 ## storage.getDownload
 
@@ -115,9 +115,9 @@ POST /v1/orgs/{orgId}/projects/{projectId}/storage/downloads
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `key` | string | Yes | Tenant-relative object key. |
+| Field | Type   | Required | Description                 |
+| ----- | ------ | -------- | --------------------------- |
+| `key` | string | Yes      | Tenant-relative object key. |
 
 ### Example
 
@@ -132,17 +132,17 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/storage
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Signed download. |
-| `404` | No such project in this organization. |
-| `422` | Missing or invalid key. |
+| Status | Description                           |
+| ------ | ------------------------------------- |
+| `200`  | Signed download.                      |
+| `404`  | No such project in this organization. |
+| `422`  | Missing or invalid key.               |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `url` | string | — |
+| Field       | Type   | Description          |
+| ----------- | ------ | -------------------- |
+| `url`       | string | —                    |
 | `expiresAt` | string | Format: `date-time`. |
 
 ## storage.delete
@@ -159,9 +159,9 @@ DELETE /v1/orgs/{orgId}/projects/{projectId}/storage/objects/{key}
 
 ### Path parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `key` | string | Yes | — |
+| Name  | Type   | Required | Description |
+| ----- | ------ | -------- | ----------- |
+| `key` | string | Yes      | —           |
 
 ### Example
 
@@ -172,7 +172,7 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/stora
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Object deleted (idempotent). |
-| `404` | No such project in this organization. |
+| Status | Description                           |
+| ------ | ------------------------------------- |
+| `200`  | Object deleted (idempotent).          |
+| `404`  | No such project in this organization. |

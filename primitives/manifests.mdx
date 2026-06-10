@@ -11,24 +11,24 @@ reported as orphaned and left alone.
 ## Full reference: `korve.yaml`
 
 ```yaml
-version: 1                  # required, always 1
-organization: acme          # required — the org slug this manifest targets
+version: 1 # required, always 1
+organization: acme # required — the org slug this manifest targets
 
 projects:
-  - name: Storefront        # required — display name
-    slug: storefront        # required — permanent; becomes storefront.korve.app
-    runtimeClass: scale-to-zero   # required — scale-to-zero | always-on
-    git:                    # optional — push-to-deploy + PR previews
+  - name: Storefront # required — display name
+    slug: storefront # required — permanent; becomes storefront.korve.app
+    runtimeClass: scale-to-zero # required — scale-to-zero | always-on
+    git: # optional — push-to-deploy + PR previews
       repo: acme/storefront # required inside git
-      ref: main             # optional — production branch
-    env:                    # optional — KEY: value map
+      ref: main # optional — production branch
+    env: # optional — KEY: value map
       NODE_ENV: production
       API_BASE_URL: https://api.example.com
-    domains:                # optional — custom hostnames
+    domains: # optional — custom hostnames
       - app.acme.com
-    storage:                # optional — named storage resources
+    storage: # optional — named storage resources
       - name: uploads
-    queues:                 # optional — named queues
+    queues: # optional — named queues
       - name: jobs
 ```
 

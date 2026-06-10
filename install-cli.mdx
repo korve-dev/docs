@@ -42,12 +42,12 @@ permissions. `korve logout` deletes the file.
 
 Every setting resolves the same way — explicit beats ambient:
 
-| Setting  | Resolution order                                                  |
-| -------- | ----------------------------------------------------------------- |
-| API key  | `$KORVE_API_KEY` → config file                                    |
-| Org      | `$KORVE_ORG` → config file                                        |
-| API URL  | `--api-url` / `$KORVE_API_URL` → config file → `https://api.korve.dev` |
-| Project  | `--project` → `$KORVE_PROJECT` → `.korve.toml` (written by `korve link`) |
+| Setting | Resolution order                                                         |
+| ------- | ------------------------------------------------------------------------ |
+| API key | `$KORVE_API_KEY` → config file                                           |
+| Org     | `$KORVE_ORG` → config file                                               |
+| API URL | `--api-url` / `$KORVE_API_URL` → config file → `https://api.korve.dev`   |
+| Project | `--project` → `$KORVE_PROJECT` → `.korve.toml` (written by `korve link`) |
 
 For CI and agents, skip `login` entirely and set `KORVE_API_KEY` +
 `KORVE_ORG` in the environment.

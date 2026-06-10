@@ -43,7 +43,8 @@ Over MCP:
 
 ```js
 const { url, headers } = await korve.storage.createUpload({
-  orgId, projectId,
+  orgId,
+  projectId,
   body: { filename: "report.pdf", contentType: "application/pdf", byteLength: 24576 },
 });
 ```

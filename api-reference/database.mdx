@@ -28,20 +28,20 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/database" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | The database. |
-| `404` | No database provisioned for this project. |
+| Status | Description                               |
+| ------ | ----------------------------------------- |
+| `200`  | The database.                             |
+| `404`  | No database provisioned for this project. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `status` | string | One of: `provisioning`, `ready`, `failed`. |
-| `host` | string | Managed database endpoint ("db.korve.app"). |
-| `port` | integer | — |
-| `dbName` | string | — |
-| `user` | string | — |
+| Field    | Type    | Description                                 |
+| -------- | ------- | ------------------------------------------- |
+| `status` | string  | One of: `provisioning`, `ready`, `failed`.  |
+| `host`   | string  | Managed database endpoint ("db.korve.app"). |
+| `port`   | integer | —                                           |
+| `dbName` | string  | —                                           |
+| `user`   | string  | —                                           |
 
 ## database.provision
 
@@ -65,18 +65,18 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databas
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `201` | Database provisioned. The connection string is shown once; store it securely. Rotate to obtain a new one. |
-| `402` | Organization billing is not active. |
-| `404` | No such project in this organization. |
-| `409` | The project already has a database. |
+| Status | Description                                                                                               |
+| ------ | --------------------------------------------------------------------------------------------------------- |
+| `201`  | Database provisioned. The connection string is shown once; store it securely. Rotate to obtain a new one. |
+| `402`  | Organization billing is not active.                                                                       |
+| `404`  | No such project in this organization.                                                                     |
+| `409`  | The project already has a database.                                                                       |
 
 ### Response body (201)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `status` | string | One of: `provisioning`, `ready`, `failed`. |
+| Field              | Type   | Description                                                                                                    |
+| ------------------ | ------ | -------------------------------------------------------------------------------------------------------------- |
+| `status`           | string | One of: `provisioning`, `ready`, `failed`.                                                                     |
 | `connectionString` | string | Full postgres:// connection string including the password. Shown exactly once — it is never retrievable later. |
 
 ## database.rotatePassword
@@ -100,15 +100,15 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databas
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | New credentials issued. The connection string is shown once; store it securely. Rotate to obtain a new one. |
-| `404` | No database provisioned for this project. |
+| Status | Description                                                                                                 |
+| ------ | ----------------------------------------------------------------------------------------------------------- |
+| `200`  | New credentials issued. The connection string is shown once; store it securely. Rotate to obtain a new one. |
+| `404`  | No database provisioned for this project.                                                                   |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field              | Type   | Description                                                                                                    |
+| ------------------ | ------ | -------------------------------------------------------------------------------------------------------------- |
 | `connectionString` | string | Full postgres:// connection string including the password. Shown exactly once — it is never retrievable later. |
 
 ## database.delete
@@ -132,7 +132,7 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/datab
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Database deleted. |
-| `404` | No database provisioned for this project. |
+| Status | Description                               |
+| ------ | ----------------------------------------- |
+| `200`  | Database deleted.                         |
+| `404`  | No database provisioned for this project. |

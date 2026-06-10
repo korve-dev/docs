@@ -25,10 +25,10 @@ korve login --org <org-id> --api-key korve_...
 echo "$KEY" | korve login --org <org-id>   # stdin works too
 ```
 
-| Flag        | Notes                                                       |
-| ----------- | ----------------------------------------------------------- |
-| `--org`     | Organization id (or `$KORVE_ORG`). Required.                |
-| `--api-key` | The key; falls back to `$KORVE_API_KEY`, then stdin.        |
+| Flag        | Notes                                                |
+| ----------- | ---------------------------------------------------- |
+| `--org`     | Organization id (or `$KORVE_ORG`). Required.         |
+| `--api-key` | The key; falls back to `$KORVE_API_KEY`, then stdin. |
 
 ### `korve logout`
 
@@ -95,13 +95,13 @@ korve projects create \
   --repo acme/storefront --ref main    # optional: queue a first deploy
 ```
 
-| Flag              | Notes                                              |
-| ----------------- | -------------------------------------------------- |
-| `--name`          | Display name. Required.                            |
+| Flag              | Notes                                                          |
+| ----------------- | -------------------------------------------------------------- |
+| `--name`          | Display name. Required.                                        |
 | `--slug`          | Managed subdomain label, globally unique, permanent. Required. |
-| `--runtime-class` | `scale-to-zero` or `always-on`. Required.          |
-| `--repo`          | Also queue an initial deploy from `owner/repo`.    |
-| `--ref`           | Git ref for that deploy (requires `--repo`).       |
+| `--runtime-class` | `scale-to-zero` or `always-on`. Required.                      |
+| `--repo`          | Also queue an initial deploy from `owner/repo`.                |
+| `--ref`           | Git ref for that deploy (requires `--repo`).                   |
 
 ### `korve projects get [<project>]` (project-scoped)
 
@@ -166,11 +166,11 @@ korve logs --level error --limit 500
 korve logs --since 2026-06-01T00:00:00Z --until 2026-06-01T06:00:00Z
 ```
 
-| Flag      | Notes                                          |
-| --------- | ---------------------------------------------- |
+| Flag                  | Notes                               |
+| --------------------- | ----------------------------------- |
 | `--since` / `--until` | RFC 3339; defaults to the last hour |
-| `--limit` | 1-500, default 100                             |
-| `--level` | `info`, `warn`, `error`, `debug`               |
+| `--limit`             | 1-500, default 100                  |
+| `--level`             | `info`, `warn`, `error`, `debug`    |
 
 ## Environment variables
 

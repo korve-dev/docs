@@ -25,10 +25,10 @@ failure mode is a helpful pointer to the dashboard rather than a mystery.
 
 ## Global flags
 
-| Flag        | Effect                                                         |
-| ----------- | -------------------------------------------------------------- |
-| `--json`    | Print the raw JSON API response instead of human output        |
-| `--api-url` | Override the API base URL (also `$KORVE_API_URL`)              |
+| Flag        | Effect                                                  |
+| ----------- | ------------------------------------------------------- |
+| `--json`    | Print the raw JSON API response instead of human output |
+| `--api-url` | Override the API base URL (also `$KORVE_API_URL`)       |
 
 `--json` is the agent/scripting mode: stdout is the API payload, status
 chatter goes to stderr. Shown-once secrets print bare on stdout so they
@@ -51,14 +51,14 @@ or a UUID.
 
 ## Exit codes
 
-| Code | Meaning                                                 |
-| ---- | ------------------------------------------------------- |
-| `0`  | Success                                                 |
-| `1`  | Generic failure (API 409/422/5xx, I/O, failed deploy)   |
+| Code | Meaning                                                         |
+| ---- | --------------------------------------------------------------- |
+| `0`  | Success                                                         |
+| `1`  | Generic failure (API 409/422/5xx, I/O, failed deploy)           |
 | `2`  | Usage error — bad flags, malformed `KEY=VALUE`, missing project |
-| `3`  | Authentication/authorization (API 401/403, not logged in) |
-| `4`  | Not found (API 404)                                     |
-| `5`  | Payment required (API 402 — activate billing)           |
+| `3`  | Authentication/authorization (API 401/403, not logged in)       |
+| `4`  | Not found (API 404)                                             |
+| `5`  | Payment required (API 402 — activate billing)                   |
 
 API errors print as `error (CODE): message` on stderr, preserving the
 [error envelope](/api-reference/overview#errors)'s machine-readable code.

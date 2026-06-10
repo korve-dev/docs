@@ -6,12 +6,12 @@ description: "Runtime logs from your deployed app — uniform, queryable, retain
 Whatever your deployed app prints becomes queryable log entries. Entries
 look the same regardless of runtime class:
 
-| Field       | Values                                              |
-| ----------- | --------------------------------------------------- |
-| `timestamp` | RFC 3339                                            |
-| `level`     | `info`, `warn`, `error`, `debug`                    |
-| `message`   | The line your app (or the platform) emitted          |
-| `source`    | `app` — your code; `platform` — Korve itself        |
+| Field       | Values                                       |
+| ----------- | -------------------------------------------- |
+| `timestamp` | RFC 3339                                     |
+| `level`     | `info`, `warn`, `error`, `debug`             |
+| `message`   | The line your app (or the platform) emitted  |
+| `source`    | `app` — your code; `platform` — Korve itself |
 
 **Retention is 7 days.** Queries return the most recent matching entries,
 oldest first; the window defaults to the last hour.
@@ -40,7 +40,10 @@ deployed yet. Full contract in the [Logs API](/api-reference/logs).
 
 ```js
 const { entries } = await korve.logs.query({
-  orgId, projectId, level: "error", since: "2026-06-01T00:00:00Z",
+  orgId,
+  projectId,
+  level: "error",
+  since: "2026-06-01T00:00:00Z",
 });
 ```
 

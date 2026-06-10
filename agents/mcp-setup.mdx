@@ -23,11 +23,11 @@ exactly two tools that compose into everything the platform can do.
 
 Free discovery over the public API spec. No API key required.
 
-| Call                          | Returns                                        |
-| ----------------------------- | ---------------------------------------------- |
-| `search` with no arguments    | Compact index of every operation, by resource  |
-| `search {"query": "deploy"}`  | Matching operations with their full contracts  |
-| `search {"resource": "logs"}` | Every operation on one resource                |
+| Call                          | Returns                                       |
+| ----------------------------- | --------------------------------------------- |
+| `search` with no arguments    | Compact index of every operation, by resource |
+| `search {"query": "deploy"}`  | Matching operations with their full contracts |
+| `search {"resource": "logs"}` | Every operation on one resource               |
 
 Each match includes the operation id, method, path, description, auth
 requirement, minimum org role, risk classification, parameters, and request
@@ -46,7 +46,7 @@ const deploy = await korve.deploys.create({
   projectId: projects[0].id,
   body: { gitRef: "main" },
 });
-deploy
+deploy;
 ```
 
 Pass path and query parameters as named fields and the request body as
@@ -68,7 +68,7 @@ const { entries } = await korve.logs.query({
   level: "error",
   limit: 50,
 });
-entries.map((e) => `${e.timestamp} ${e.message}`).join("\n")
+entries.map((e) => `${e.timestamp} ${e.message}`).join("\n");
 ```
 
 3. Spot a failed deploy? `search {"query": "diagnose"}` →

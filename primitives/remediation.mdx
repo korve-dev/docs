@@ -50,13 +50,13 @@ agent only knows which keys exist (enough to notice a missing
 }
 ```
 
-| Field                  | Values                                                  |
-| ---------------------- | ------------------------------------------------------- |
-| `summary`              | 1-2 sentences, plain language                           |
-| `probableCause`        | The specific thing that broke                           |
-| `suggestedFix.kind`    | `env`, `code`, `config`, or `retry`                     |
-| `suggestedFix.commands`| Optional shell commands that apply the fix as-is        |
-| `confidence`           | `low`, `medium`, `high`                                 |
+| Field                   | Values                                           |
+| ----------------------- | ------------------------------------------------ |
+| `summary`               | 1-2 sentences, plain language                    |
+| `probableCause`         | The specific thing that broke                    |
+| `suggestedFix.kind`     | `env`, `code`, `config`, or `retry`              |
+| `suggestedFix.commands` | Optional shell commands that apply the fix as-is |
+| `confidence`            | `low`, `medium`, `high`                          |
 
 The shape is strict and validated — agents can branch on `kind` and
 `confidence` without defensive parsing. A `retry` kind with decent
