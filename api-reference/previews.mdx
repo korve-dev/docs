@@ -1,0 +1,76 @@
+---
+title: "Previews"
+description: "Pull-request preview environments. Each preview runs on its own managed subdomain."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Pull-request preview environments. Each preview runs on its own managed subdomain.
+
+## previews.list
+
+List the project's preview environments, newest first.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/previews
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/previews" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | Preview environments with their public URLs. |
+| `404` | No such project in this organization. |
+
+### Response body (200)
+
+An array of objects with these fields:
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `prNumber` | integer | Pull request number at the connected repository. |
+| `slug` | string | Managed subdomain label — "&lt;project-slug>-pr-&lt;n>". |
+| `url` | string | Public preview URL ("https://&lt;slug>.korve.app"). |
+| `status` | string | One of: `active`, `removed`. |
+| `deploymentId` | string or null | Latest deployment released to this preview. |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
+
+## previews.remove
+
+Tear down a preview environment — its app and subdomain are released. Closing the pull request does this automatically.
+
+```text
+DELETE /v1/orgs/{orgId}/projects/{projectId}/previews/{previewId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `destructive` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/previews/$PREVIEW_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | Preview removed. |
+| `404` | No such preview in this project. |
+| `502` | Releasing the preview's compute failed. Nothing was deleted — try again. |

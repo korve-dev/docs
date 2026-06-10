@@ -1,0 +1,100 @@
+---
+title: "Usage"
+description: "Metered usage per project. Internal meters and agents report quantities against rate-card meter ids; reads aggregate the current calendar month."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Metered usage per project. Internal meters and agents report quantities against rate-card meter ids; reads aggregate the current calendar month.
+
+## usage.record
+
+Record a usage quantity against a rate-card meter.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/usage
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `write`
+
+### Request body
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `meterId` | string | Yes | A known rate-card meter id. |
+| `quantity` | number | Yes | Quantity in the meter's unit. Must be > 0. |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/usage" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "meterId": "network.egress",
+  "quantity": 2.5
+}'
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `202` | Usage recorded. Includes budget standing when a budget exists. |
+| `404` | No such project in this organization. |
+| `422` | Unknown meter id or invalid quantity. |
+
+### Response body (202)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `ok` | boolean | — |
+| `budget` | object | Present when the project has a budget configured. |
+| `budget.capUsd` | number | — |
+| `budget.spendUsd` | number | — |
+| `budget.exceeded` | boolean | True once month-to-date spend has reached the monthly cap. |
+
+## usage.get
+
+Aggregated usage and cost per meter, current calendar month by default.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/usage
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `since` | string | No | Format: `date-time`. |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/usage?since=2026-06-01T12%3A00%3A00Z" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | Aggregated meters at rate-card prices. |
+| `404` | No such project in this organization. |
+| `422` | Invalid since timestamp. |
+
+### Response body (200)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `meters` | object[] | — |
+| `meters[].meterId` | string | — |
+| `meters[].quantity` | number | — |
+| `meters[].costUsd` | number | — |
+| `totalUsd` | number | — |

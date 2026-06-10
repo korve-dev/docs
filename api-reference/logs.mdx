@@ -1,0 +1,55 @@
+---
+title: "Logs"
+description: "Runtime logs from the project's deployed app. Entries are retained for 7 days."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Runtime logs from the project's deployed app. Entries are retained for 7 days.
+
+## logs.query
+
+Runtime logs for the project's deployed app; 7-day retention. Returns the most recent matching entries, oldest first. The window defaults to the last hour.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/logs
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `since` | string | No | Format: `date-time`. |
+| `until` | string | No | Format: `date-time`. |
+| `limit` | integer | No | — |
+| `level` | string | No | One of: `info`, `warn`, `error`, `debug`. |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/logs?since=2026-06-01T12%3A00%3A00Z" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | Log entries, oldest first. |
+| `404` | No such project in this organization. |
+| `422` | Invalid since, until, limit, or level. |
+
+### Response body (200)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `entries` | object[] | — |
+| `entries[].timestamp` | string | Format: `date-time`. |
+| `entries[].level` | string | One of: `info`, `warn`, `error`, `debug`. |
+| `entries[].message` | string | — |
+| `entries[].source` | string | Whether the app emitted the line or the platform did. One of: `app`, `platform`. |
+| `note` | string | Present when there is context worth surfacing — for example the project has no runtime yet because nothing was deployed. |

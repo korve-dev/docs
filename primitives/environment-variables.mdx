@@ -1,0 +1,46 @@
+---
+title: "Environment variables"
+description: "Encrypted configuration, applied on the next deploy."
+---
+
+Per-project environment variables are **encrypted at rest** and injected
+into your app's environment on the next deploy. Keys follow the usual
+shape: `^[A-Z][A-Z0-9_]{0,63}$`.
+
+## CLI
+
+```bash
+korve env set API_BASE_URL=https://api.example.com SENTRY_DSN=...
+korve env set --from-file .env        # dotenv-style; args win on duplicates
+korve env list                        # admin only — values are decrypted
+korve env unset SENTRY_DSN
+```
+
+## API / MCP
+
+Variables are set in batches; existing keys are overwritten:
+
+```bash
+curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/env" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{"vars": [{"key": "API_BASE_URL", "value": "https://api.example.com"}]}'
+```
+
+```js
+await korve.env.set({ orgId, projectId, body: { vars: [...] } });
+```
+
+Full contracts in the [Environment variables API](/api-reference/env).
+
+## Behavior to know
+
+- **Apply-on-deploy.** Changing a variable does not restart anything;
+  values take effect on the next deploy. Set vars, then `korve deploy`.
+- **Admin-gated both ways.** Reading decrypted values and writing them both
+  require the `admin` role — a `member` key can't exfiltrate secrets.
+- **Manifests mask values.** `korve manifest export` writes `********` for
+  every value, and masked values are ignored on apply — your secrets never
+  round-trip through git. See [Manifests](/primitives/manifests).
+- The dashboard's **Environment** tab supports pasting a whole `.env` file
+  for bulk import.

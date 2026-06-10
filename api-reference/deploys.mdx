@@ -1,0 +1,182 @@
+---
+title: "Deploys"
+description: "Deployments — build and release a project from a git ref."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Deployments — build and release a project from a git ref.
+
+## deploys.create
+
+Queue a new deployment of the project.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/deploys
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write`
+
+### Request body (optional)
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `gitRepo` | string | No | Source repository as "owner/repo". Pattern: `^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$`. |
+| `gitRef` | string | No | Branch, tag, or commit. Defaults to main. |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/deploys" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "gitRepo": "acme/storefront",
+  "gitRef": "main"
+}'
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `202` | Deployment accepted. |
+| `402` | Organization billing is not active. |
+| `404` | No such project in this organization. |
+| `422` | Invalid gitRepo or gitRef. |
+
+### Response body (202)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `status` | string | One of: `queued`, `building`, `deploying`, `ready`, `failed`. |
+
+## deploys.list
+
+List the project's deployments, newest first.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/deploys
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/deploys" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | Deployments. |
+| `404` | No such project in this organization. |
+
+### Response body (200)
+
+An array of objects with these fields:
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `status` | string | One of: `queued`, `building`, `deploying`, `ready`, `failed`. |
+| `gitRepo` | string or null | Source repository as "owner/repo"; null for non-git deploys. |
+| `gitRef` | string | — |
+| `commitSha` | string or null | — |
+| `createdAt` | string | Format: `date-time`. |
+| `finishedAt` | string or null | Format: `date-time`. |
+| `error` | string or null | — |
+
+## deploys.get
+
+Get one deployment including its build log.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/deploys/{deployId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/deploys/$DEPLOY_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | The deployment. |
+| `404` | No such deployment in this project. |
+
+### Response body (200)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `status` | string | One of: `queued`, `building`, `deploying`, `ready`, `failed`. |
+| `gitRepo` | string or null | Source repository as "owner/repo"; null for non-git deploys. |
+| `gitRef` | string | — |
+| `commitSha` | string or null | — |
+| `createdAt` | string | Format: `date-time`. |
+| `finishedAt` | string or null | Format: `date-time`. |
+| `error` | string or null | — |
+| `buildLog` | string | Accumulated build output. |
+
+## deploys.diagnose
+
+Ask the platform agent to diagnose a failed deployment. The diagnosis is cached after the first call; only failed deployments are diagnosable.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/deploys/{deployId}/diagnosis
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write`
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/deploys/$DEPLOY_ID/diagnosis" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | The diagnosis — freshly produced or served from the cache. |
+| `402` | Organization billing is not active. |
+| `404` | No such deployment in this project. |
+| `409` | The deployment did not fail, so there is nothing to diagnose. |
+| `502` | The platform agent could not analyze this deploy — try again. |
+
+### Response body (200)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `diagnosis` | object | Structured failure diagnosis produced by the platform agent. |
+| `diagnosis.summary` | string | 1-2 sentence plain-language explanation of what went wrong. |
+| `diagnosis.probableCause` | string | — |
+| `diagnosis.suggestedFix` | object | — |
+| `diagnosis.suggestedFix.kind` | string | One of: `env`, `code`, `config`, `retry`. |
+| `diagnosis.suggestedFix.title` | string | — |
+| `diagnosis.suggestedFix.detail` | string | — |
+| `diagnosis.suggestedFix.commands` | string[] | Optional shell commands to apply the fix. |
+| `diagnosis.confidence` | string | One of: `low`, `medium`, `high`. |
+| `cached` | boolean | True when a previously stored diagnosis was returned. |

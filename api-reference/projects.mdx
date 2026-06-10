@@ -1,0 +1,277 @@
+---
+title: "Projects"
+description: "Deployable apps. Each project gets a managed subdomain and isolated runtime."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Deployable apps. Each project gets a managed subdomain and isolated runtime.
+
+## projects.list
+
+List the organization's projects.
+
+```text
+GET /v1/orgs/{orgId}/projects
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | Projects with their public URLs. |
+
+### Response body (200)
+
+An array of objects with these fields:
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | — |
+| `slug` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `runtimeClass` | string | One of: `scale-to-zero`, `always-on`. |
+| `gitRepo` | string or null | Connected repository as "owner/repo" — pushes and pull requests there drive deploys and previews; null when no repository is connected. |
+| `gitRef` | string | Production branch — pushes to it deploy automatically. |
+| `url` | string | Public URL on the managed domain ("https://&lt;slug>.korve.app"). |
+| `createdAt` | string | Format: `date-time`. |
+
+## projects.create
+
+Create a project and provision its runtime.
+
+```text
+POST /v1/orgs/{orgId}/projects
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write`
+
+### Request body
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `name` | string | Yes | — |
+| `slug` | string | Yes | Managed subdomain label — globally unique. Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `runtimeClass` | string | Yes | One of: `scale-to-zero`, `always-on`. |
+| `gitRepo` | string | No | Repository to connect as "owner/repo" — enables push-to-deploy and pull-request previews. Pattern: `^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$`. |
+| `gitRef` | string | No | Production branch for push-to-deploy. Defaults to main. |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "Storefront",
+  "slug": "storefront",
+  "runtimeClass": "scale-to-zero",
+  "gitRepo": "acme/storefront",
+  "gitRef": "main"
+}'
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `201` | Project created. |
+| `402` | Organization billing is not active. |
+| `409` | Slug already taken. |
+| `422` | Invalid name, slug, or runtime class. |
+
+### Response body (201)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | — |
+| `slug` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `runtimeClass` | string | One of: `scale-to-zero`, `always-on`. |
+| `gitRepo` | string or null | Connected repository as "owner/repo" — pushes and pull requests there drive deploys and previews; null when no repository is connected. |
+| `gitRef` | string | Production branch — pushes to it deploy automatically. |
+| `url` | string | Public URL on the managed domain ("https://&lt;slug>.korve.app"). |
+| `createdAt` | string | Format: `date-time`. |
+
+## projects.get
+
+Get one project with its latest deployment.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | The project. |
+| `404` | No such project in this organization. |
+
+### Response body (200)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | — |
+| `slug` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `runtimeClass` | string | One of: `scale-to-zero`, `always-on`. |
+| `gitRepo` | string or null | Connected repository as "owner/repo" — pushes and pull requests there drive deploys and previews; null when no repository is connected. |
+| `gitRef` | string | Production branch — pushes to it deploy automatically. |
+| `url` | string | Public URL on the managed domain ("https://&lt;slug>.korve.app"). |
+| `createdAt` | string | Format: `date-time`. |
+| `latestDeployment` | object or null | — |
+| `latestDeployment.id` | string | — |
+| `latestDeployment.status` | string | One of: `queued`, `building`, `deploying`, `ready`, `failed`. |
+| `latestDeployment.gitRepo` | string or null | Source repository as "owner/repo"; null for non-git deploys. |
+| `latestDeployment.gitRef` | string | — |
+| `latestDeployment.commitSha` | string or null | — |
+| `latestDeployment.createdAt` | string | Format: `date-time`. |
+| `latestDeployment.finishedAt` | string or null | Format: `date-time`. |
+| `latestDeployment.error` | string or null | — |
+
+## projects.update
+
+Update project settings: rename it, connect or disconnect a repository, or change the production branch. Renaming never changes the slug or the public URL.
+
+```text
+PATCH /v1/orgs/{orgId}/projects/{projectId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `write`
+
+### Request body
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `name` | string | No | New display name, 1-100 characters. |
+| `gitRepo` | string or null | No | Repository to connect as "owner/repo" — pushes and pull requests there drive deploys and previews. Send null to disconnect. Pattern: `^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$`. |
+| `gitRef` | string | No | Production branch for push-to-deploy, 1-100 characters. |
+
+### Example
+
+```bash
+curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "Storefront",
+  "gitRepo": "acme/storefront",
+  "gitRef": "main"
+}'
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | The updated project. |
+| `404` | No such project in this organization. |
+| `422` | Invalid name, gitRepo, or gitRef — or no fields to update. |
+
+### Response body (200)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | — |
+| `slug` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `runtimeClass` | string | One of: `scale-to-zero`, `always-on`. |
+| `gitRepo` | string or null | Connected repository as "owner/repo" — pushes and pull requests there drive deploys and previews; null when no repository is connected. |
+| `gitRef` | string | Production branch — pushes to it deploy automatically. |
+| `url` | string | Public URL on the managed domain ("https://&lt;slug>.korve.app"). |
+| `createdAt` | string | Format: `date-time`. |
+
+## projects.checkRepoAccess
+
+Check whether the platform can reach a repository for deploys and previews. Answers that are not accessible include the URL where access can be granted.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/repo-access
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `repo` | string | Yes | Pattern: `^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$`. |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/repo-access?repo=acme%2Fstorefront" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | The access check result. |
+| `404` | No such project in this organization. |
+
+### Response body (200)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `accessible` | boolean | — |
+| `reason` | string | Present when not accessible: the Korve GitHub App is not installed on that repository, or repo is not a valid "owner/repo" value. One of: `not_installed`, `invalid`. |
+| `installUrl` | string | Where to grant the platform access to repositories. |
+
+## projects.delete
+
+Delete a project, its deployments, env vars, and runtime.
+
+```text
+DELETE /v1/orgs/{orgId}/projects/{projectId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `owner`
+- **Risk:** `destructive` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | Project deleted. |
+| `404` | No such project in this organization. |
+| `502` | Runtime teardown failed; the project was kept. |

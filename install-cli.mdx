@@ -1,0 +1,65 @@
+---
+title: "Install the CLI"
+description: "One command to install korve; one command to authenticate."
+---
+
+## Install
+
+```bash
+curl -fsSL https://korve.dev/install.sh | sh
+```
+
+The installer puts the binary in `~/.korve/bin/korve` (override with
+`KORVE_INSTALL_DIR`) and tells you if that directory needs adding to your
+`PATH`.
+
+**Platforms:** macOS on Apple Silicon (`darwin-arm64`) is published today;
+more platforms are coming. The installer fails with a clear message on
+anything else.
+
+Verify:
+
+```bash
+korve --version
+korve health   # checks API liveness, no auth needed
+```
+
+## Authenticate
+
+The CLI authenticates with an org-scoped API key
+([minted in the dashboard](/quickstart#2-mint-an-api-key)):
+
+```bash
+korve login --org <org-id>
+```
+
+The key is read from `--api-key`, then `$KORVE_API_KEY`, then prompted on
+stdin. Login validates the key against your organization before storing
+`{api_key, org_id, api_url}` in `~/.config/korve/config.toml` with `0600`
+permissions. `korve logout` deletes the file.
+
+## Configuration precedence
+
+Every setting resolves the same way — explicit beats ambient:
+
+| Setting  | Resolution order                                                  |
+| -------- | ----------------------------------------------------------------- |
+| API key  | `$KORVE_API_KEY` → config file                                    |
+| Org      | `$KORVE_ORG` → config file                                        |
+| API URL  | `--api-url` / `$KORVE_API_URL` → config file → `https://api.korve.dev` |
+| Project  | `--project` → `$KORVE_PROJECT` → `.korve.toml` (written by `korve link`) |
+
+For CI and agents, skip `login` entirely and set `KORVE_API_KEY` +
+`KORVE_ORG` in the environment.
+
+## Shell completions
+
+```bash
+korve completions zsh > ~/.zfunc/_korve    # also: bash, fish, elvish, powershell
+```
+
+## Next
+
+- [CLI reference](/cli/overview) — global flags, exit codes, and the parity
+  promise.
+- [All commands](/cli/commands).

@@ -1,0 +1,73 @@
+---
+title: "Databases"
+description: "One managed Postgres database per project, credentials shown once, rotatable on demand."
+---
+
+Every project can provision exactly one managed Postgres database. It lives
+at the branded endpoint `db.korve.app`; you never see (or manage) the
+machinery behind it.
+
+## Provision
+
+```bash
+korve database provision
+```
+
+```text
+postgres://u_4f2a...:••••@db.korve.app:5432/p_storefront
+```
+
+The full connection string — **including the password — is shown exactly
+once** and is never retrievable later. Store it immediately, typically as a
+project [environment variable](/primitives/environment-variables):
+
+```bash
+korve env set DATABASE_URL='postgres://...'
+```
+
+API: `POST /v1/orgs/{orgId}/projects/{projectId}/database` (`admin` role,
+active billing). MCP: `await korve.database.provision({ orgId, projectId })`.
+See the [Database API](/api-reference/database).
+
+## Inspect
+
+```bash
+korve database show
+```
+
+Returns status (`provisioning | ready | failed`), host, port, database
+name, and user — never the password.
+
+## Rotate
+
+```bash
+korve database rotate
+```
+
+Issues a new password and prints the new connection string once. **The old
+password stops working immediately** — update `DATABASE_URL` and redeploy
+in the same breath.
+
+## Delete
+
+```bash
+korve database delete    # prompts; owner role required
+```
+
+Deletes the database and all of its data. This cannot be undone.
+
+## Connecting
+
+Connect with any standard Postgres client using the connection string.
+
+- **Today:** connect from `always-on` apps and from anywhere outside the
+  platform (local dev, CI, external services).
+- **Coming:** direct connections from `scale-to-zero` apps. Until then,
+  scale-to-zero projects should reach their data through an API layer or
+  an always-on companion project.
+
+## Billing
+
+The project database meters `database.compute` (per month) and
+`database.storage` (per GB-month) — exact prices on the
+[rate card](/primitives/budgets-and-usage#the-rate-card).

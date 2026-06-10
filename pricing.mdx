@@ -4,8 +4,18 @@ description: "Usage-based, to the cent. No seats. No free tier."
 ---
 
 Korve bills pure usage against a public rate card — see
-[korve.dev/pricing](https://korve.dev/pricing) for current rates and
-worked examples. The $5/month platform minimum is credited against usage.
+[korve.dev/pricing](https://korve.dev/pricing) for current rates and worked
+examples, and [Budgets & usage](/primitives/budgets-and-usage) for the full
+meter table with exact ids and prices.
 
-Budgets let you cap monthly spend per project, with alerts and an
-optional hard stop.
+- **$5/month platform minimum**, credited against usage.
+- **No seats, no tiers.** Invite your whole team; pay only for what runs.
+- **Paid-only.** Operations that provision or consume resources return
+  `402` until the organization's billing is active.
+
+The rate card is also machine-readable: `GET /v1/orgs/{orgId}/billing`
+returns it alongside your billing status (see
+[Billing](/api-reference/billing)).
+
+[Budgets](/primitives/budgets-and-usage) cap monthly spend per project,
+with alerts at a threshold you pick and an optional hard stop.

@@ -1,0 +1,102 @@
+---
+title: "API overview"
+description: "Base URL, authentication, roles, errors, and conventions for the Korve API."
+---
+
+```text
+https://api.korve.dev
+```
+
+Every Korve surface — dashboard, CLI, MCP — calls this API, so everything
+documented here is everything the platform can do. The API describes
+itself: [`GET /v1/spec`](/api-reference/system) returns an OpenAPI 3.1
+document, no auth required.
+
+## Authentication
+
+### Organization API keys
+
+Long-lived bearer credentials for agents, CI, and the CLI:
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects" \
+  -H "Authorization: Bearer korve_..."
+```
+
+- Secrets start with `korve_` and are **shown exactly once** at creation.
+- Keys are **org-scoped**: a key authorizes only the organization in the
+  request path (`{orgId}`). Cross-org requests answer `404`, never leaking
+  existence.
+- Keys carry a role ceiling of **`member` or `admin`** — owner keys do not
+  exist.
+- **Mint keys in the dashboard**, under your organization's settings
+  (**API keys**). Key management is session-only by design: API keys can
+  never create, list, or revoke keys (see below).
+
+### Sessions
+
+Signing in to the dashboard creates a session. Most operations accept
+either credential, but some are **session-only** — things a leaked key
+must never reach: API key management, billing mutations, organization
+membership, and the user profile. Session-only operations answer `401`
+when an API key is the only credential presented. Each operation's page
+states which contract applies.
+
+## Roles
+
+Organization roles are `owner > admin > member`. Each operation declares a
+minimum role, enforced once in the API layer:
+
+| Role     | Typical scope                                                      |
+| -------- | ------------------------------------------------------------------ |
+| `member` | Read resources, deploy, query logs and usage, record usage         |
+| `admin`  | Create projects, manage env vars, domains, budgets, databases      |
+| `owner`  | Deletions of last resort (projects, databases, the org), billing   |
+
+A `403` means your role is too low; a `404` can also mean you're not a
+member of the addressed organization.
+
+## Errors
+
+Every error uses one envelope:
+
+```json
+{ "error": { "code": "PAYMENT_REQUIRED", "message": "Activate billing for this organization first." } }
+```
+
+`code` is a stable machine-readable string (e.g. `VALIDATION`,
+`NOT_FOUND`, `PAYMENT_REQUIRED`); `message` is human-readable and may
+change.
+
+## Status codes
+
+| Status | Meaning                                                                  |
+| ------ | ------------------------------------------------------------------------ |
+| `200` / `201` / `202` | Success — `202` means accepted and processing (deploys)   |
+| `401`  | Missing/invalid credentials, or an API key on a session-only operation   |
+| `402`  | **Billing not active.** Korve is paid-only — operations that provision or consume resources require the organization's billing status to be `active`. Activate via checkout, then retry. |
+| `403`  | Authenticated, but your role doesn't meet the operation's minimum        |
+| `404`  | Doesn't exist — or you can't see it (non-members and cross-org keys get `404`, never confirmation) |
+| `409`  | Conflict — slug or hostname already taken, resource already exists       |
+| `422`  | Validation failed — the message says which field                         |
+| `5xx`  | Platform-side failure; for gateway-style `502`s the response says whether anything changed |
+
+## Rate guidance
+
+Be a good neighbor: reuse connections, prefer list endpoints over fanning
+out per-resource GETs, and back off exponentially on `429` or `5xx`.
+Polling deploy status every 2-3 seconds (what the CLI does) is fine;
+sub-second polling loops are not. Heavy log analysis should narrow
+`since`/`until` windows rather than repeatedly pulling the maximum
+`limit`.
+
+## Conventions
+
+- All request and response bodies are JSON (`Content-Type: application/json`).
+- Timestamps are RFC 3339 strings; durations of retention and expiry are
+  stated per endpoint.
+- Path parameters are UUIDs unless documented otherwise (the CLI accepts
+  slugs and resolves them for you).
+- Operations are identified by stable ids (`projects.create`,
+  `logs.query`) — the same ids appear in [MCP `search`](/agents/mcp-setup)
+  results and as method names on the MCP `korve` client.

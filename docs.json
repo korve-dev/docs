@@ -14,11 +14,52 @@
     "groups": [
       {
         "group": "Getting started",
-        "pages": ["introduction", "quickstart", "pricing"]
+        "pages": ["introduction", "quickstart", "install-cli", "pricing"]
       },
       {
-        "group": "Platform",
-        "pages": ["deploys", "environment-variables", "infrastructure-as-code"]
+        "group": "Agents",
+        "pages": ["agents/mcp-setup", "agents/agent-onboarding", "agents/skills"]
+      },
+      {
+        "group": "Primitives",
+        "pages": [
+          "primitives/deploys",
+          "primitives/databases",
+          "primitives/storage",
+          "primitives/logs",
+          "primitives/budgets-and-usage",
+          "primitives/domains",
+          "primitives/environment-variables",
+          "primitives/previews",
+          "primitives/manifests",
+          "primitives/remediation"
+        ]
+      },
+      {
+        "group": "API reference",
+        "pages": [
+          "api-reference/overview",
+          "api-reference/system",
+          "api-reference/me",
+          "api-reference/orgs",
+          "api-reference/apikeys",
+          "api-reference/billing",
+          "api-reference/projects",
+          "api-reference/deploys",
+          "api-reference/previews",
+          "api-reference/env",
+          "api-reference/logs",
+          "api-reference/domains",
+          "api-reference/database",
+          "api-reference/storage",
+          "api-reference/budgets",
+          "api-reference/usage",
+          "api-reference/manifest"
+        ]
+      },
+      {
+        "group": "CLI reference",
+        "pages": ["cli/overview", "cli/commands"]
       }
     ]
   },

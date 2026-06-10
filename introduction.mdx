@@ -3,25 +3,58 @@ title: "Introduction"
 description: "Korve is an agent-era platform: deploy full-stack apps with batteries included."
 ---
 
-Korve deploys your full-stack apps to `your-app.korve.app` with Postgres,
-object storage, logs, and budgets out of the box — plus a platform agent
-that explains and fixes deploy and runtime failures.
+Korve deploys full-stack apps to `your-app.korve.app` with managed Postgres,
+object storage, logs, custom domains, and budgets out of the box — plus a
+platform agent that diagnoses failed deploys for you.
+
+It is built agents-first. Every capability ships on four surfaces that speak
+the same typed API, with identical permissions and identical behavior:
+
+1. **API** — `https://api.korve.dev`, described by a public spec at
+   [`GET /v1/spec`](/api-reference/system). See the
+   [API reference](/api-reference/overview).
+2. **CLI** — the `korve` binary. Every API operation a key can call maps to
+   exactly one command (a tested parity guarantee). See the
+   [CLI reference](/cli/overview).
+3. **MCP** — `https://mcp.korve.dev/mcp`, two tools: `search` the API and
+   `execute` code against it. See [MCP setup](/agents/mcp-setup).
+4. **Dashboard** — the convenience layer at korve.dev for the things humans
+   prefer to click.
+
+Anything you can click, an agent can call. If your agent can read this page,
+it can run your infrastructure — start with
+[agent onboarding](/agents/agent-onboarding).
 
 ## How Korve is built
 
 - **Paid-only, usage-based.** No free tier, no seats. You pay for what you
-  run, metered against a public rate card.
-- **Agent-native.** The dashboard, the `korve` CLI, and the MCP server all
-  speak the same typed API. Anything you can click, an agent can call.
+  run, metered against a [public rate card](/primitives/budgets-and-usage)
+  to the cent, with a $5/month platform minimum credited against usage.
+- **One spec, one enforcement point.** Auth, roles, and billing gates are
+  declared per operation and enforced once in the API layer. The dashboard,
+  CLI, and MCP inherit identical behavior — there is no surface with secret
+  extra powers.
 - **Declarative when you want it.** Describe projects, environment, and
-  domains in a manifest and apply it — the platform reconciles, and never
-  deletes anything you didn't ask it to.
+  domains in a [manifest](/primitives/manifests) and apply it. The platform
+  reconciles and never deletes anything you didn't ask it to.
+- **Self-healing by default.** Failed deploys can be diagnosed by
+  [the platform agent](/primitives/remediation), which returns a structured
+  cause and suggested fix.
 
 ## Runtime classes
 
 Every project picks one of two runtime classes at creation:
 
-| Class | Best for | Billing |
-|---|---|---|
-| `scale-to-zero` | Most web apps and APIs | Per million requests |
-| `always-on` | Long-lived processes, websockets, background work | Per compute-hour |
+| Class           | Best for                                          | Billing              |
+| --------------- | ------------------------------------------------- | -------------------- |
+| `scale-to-zero` | Most web apps and APIs                            | Per million requests |
+| `always-on`     | Long-lived processes, websockets, background work | Per compute-hour     |
+
+See [Deploys](/primitives/deploys) for what each class expects from your
+code.
+
+## Next steps
+
+- [Quickstart](/quickstart) — account to live app in a few minutes.
+- [Install the CLI](/install-cli).
+- [Connect an agent over MCP](/agents/mcp-setup).

@@ -1,0 +1,162 @@
+---
+title: "Domains"
+description: "Custom domains. Point a domain you own at a project: add it, create the returned CNAME record, then check until it goes active."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Custom domains. Point a domain you own at a project: add it, create the returned CNAME record, then check until it goes active.
+
+## domains.list
+
+List the project's custom domains with their verification status.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/domains
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/domains" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | Custom domains, oldest first. |
+| `404` | No such project in this organization. |
+
+### Response body (200)
+
+An array of objects with these fields:
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `hostname` | string | Pattern: `^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$`. |
+| `status` | string | Verification state: pending_dns until the CNAME points at the platform, pending_ssl while the certificate is issued, then active. failed is terminal. One of: `pending_dns`, `pending_ssl`, `active`, `failed`. |
+| `verificationErrors` | string or null | Why verification is stuck, when the edge reported a reason. |
+| `createdAt` | string | Format: `date-time`. |
+
+## domains.add
+
+Add a custom domain to the project and get the CNAME record to create.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/domains
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write`
+
+### Request body
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `hostname` | string | Yes | Hostname you control, e.g. "app.acme.com". Pattern: `^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$`. |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/domains" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "hostname": "app.acme.com"
+}'
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `201` | Domain registered. Create the CNAME from the instructions, then check the domain until it goes active. |
+| `402` | Organization billing is not active. |
+| `404` | No such project in this organization. |
+| `409` | That hostname is already in use on the platform. |
+| `422` | Invalid hostname, or a managed platform hostname. |
+| `502` | Registering the domain at the edge failed; nothing was added. |
+
+### Response body (201)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `hostname` | string | Pattern: `^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$`. |
+| `status` | string | Verification state: pending_dns until the CNAME points at the platform, pending_ssl while the certificate is issued, then active. failed is terminal. One of: `pending_dns`, `pending_ssl`, `active`, `failed`. |
+| `verificationErrors` | string or null | Why verification is stuck, when the edge reported a reason. |
+| `createdAt` | string | Format: `date-time`. |
+| `instructions` | string | DNS setup step, e.g. "CNAME app.acme.com → my-app.korve.app". |
+
+## domains.check
+
+Re-check the domain's DNS and certificate verification and return its current status.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/domains/{domainId}/check
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `write`
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/domains/$DOMAIN_ID/check" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | The domain with its refreshed status. |
+| `404` | No such domain on this project. |
+| `502` | The edge could not be reached; the stored status is unchanged. |
+
+### Response body (200)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `hostname` | string | Pattern: `^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$`. |
+| `status` | string | Verification state: pending_dns until the CNAME points at the platform, pending_ssl while the certificate is issued, then active. failed is terminal. One of: `pending_dns`, `pending_ssl`, `active`, `failed`. |
+| `verificationErrors` | string or null | Why verification is stuck, when the edge reported a reason. |
+| `createdAt` | string | Format: `date-time`. |
+
+## domains.remove
+
+Remove a custom domain. Traffic to it stops being served.
+
+```text
+DELETE /v1/orgs/{orgId}/projects/{projectId}/domains/{domainId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `destructive` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/domains/$DOMAIN_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | Domain removed. |
+| `404` | No such domain on this project. |
+| `502` | Removing the domain at the edge failed; the domain was kept. |

@@ -1,0 +1,222 @@
+---
+title: "Manifest"
+description: "Infrastructure as code: declare an organization's desired platform state and reconcile it. Plans never delete — undeclared resources are reported as orphaned."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Infrastructure as code: declare an organization's desired platform state and reconcile it. Plans never delete — undeclared resources are reported as orphaned.
+
+## manifest.get
+
+Export the organization's current state as a manifest document (env values masked).
+
+```text
+GET /v1/orgs/{orgId}/manifest
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/manifest" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | The current state as a manifest. |
+
+### Response body (200)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `version` | integer | One of: `1`. |
+| `organization` | string | Organization slug the manifest targets. |
+| `projects` | object[] | — |
+| `projects[].name` | string | — |
+| `projects[].slug` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].runtimeClass` | string | One of: `scale-to-zero`, `always-on`. |
+| `projects[].git` | object | — |
+| `projects[].git.repo` | string | Pattern: `^[\w.-]+/[\w.-]+$`. |
+| `projects[].git.ref` | string | — |
+| `projects[].env` | object | Masked values ("********") are ignored on apply. Map of string values. |
+| `projects[].domains` | string[] | — |
+| `projects[].storage` | object[] | — |
+| `projects[].storage[].name` | string | — |
+| `projects[].queues` | object[] | — |
+| `projects[].queues[].name` | string | — |
+
+## manifest.plan
+
+Dry-run a manifest against current state and return the reconciliation plan.
+
+```text
+POST /v1/orgs/{orgId}/manifest/plan
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `write`
+
+### Request body
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `version` | integer | Yes | One of: `1`. |
+| `organization` | string | Yes | Organization slug the manifest targets. |
+| `projects` | object[] | No | — |
+| `projects[].name` | string | Yes | — |
+| `projects[].slug` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].runtimeClass` | string | Yes | One of: `scale-to-zero`, `always-on`. |
+| `projects[].git` | object | No | — |
+| `projects[].git.repo` | string | Yes | Pattern: `^[\w.-]+/[\w.-]+$`. |
+| `projects[].git.ref` | string | No | — |
+| `projects[].env` | object | No | Masked values ("********") are ignored on apply. Map of string values. |
+| `projects[].domains` | string[] | No | — |
+| `projects[].storage` | object[] | No | — |
+| `projects[].storage[].name` | string | Yes | — |
+| `projects[].queues` | object[] | No | — |
+| `projects[].queues[].name` | string | Yes | — |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/manifest/plan" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "version": 1,
+  "organization": "acme",
+  "projects": [
+    {
+      "name": "Storefront",
+      "slug": "storefront",
+      "runtimeClass": "scale-to-zero",
+      "git": {
+        "repo": "acme/storefront",
+        "ref": "main"
+      },
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "domains": [
+        "app.acme.com"
+      ],
+      "storage": [
+        {
+          "name": "uploads"
+        }
+      ],
+      "queues": [
+        {
+          "name": "jobs"
+        }
+      ]
+    }
+  ]
+}'
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | The reconciliation plan. |
+| `422` | Manifest failed validation. |
+
+### Response body (200)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `organization` | string | — |
+| `actions` | object[] | — |
+| `actions[].type` | string | One of: `create`, `update`, `noop`, `orphaned`, `deferred`, `invalid`. |
+| `actions[].resource` | string | One of: `project`, `env`, `domain`, `storage`, `queue`. |
+| `actions[].project` | string | — |
+| `actions[].detail` | string | — |
+| `summary` | object | Map of integer values. |
+
+## manifest.apply
+
+Apply a manifest: create and update declared resources. Never deletes; orphans are reported.
+
+```text
+POST /v1/orgs/{orgId}/manifest/apply
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `version` | integer | Yes | One of: `1`. |
+| `organization` | string | Yes | Organization slug the manifest targets. |
+| `projects` | object[] | No | — |
+| `projects[].name` | string | Yes | — |
+| `projects[].slug` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].runtimeClass` | string | Yes | One of: `scale-to-zero`, `always-on`. |
+| `projects[].git` | object | No | — |
+| `projects[].git.repo` | string | Yes | Pattern: `^[\w.-]+/[\w.-]+$`. |
+| `projects[].git.ref` | string | No | — |
+| `projects[].env` | object | No | Masked values ("********") are ignored on apply. Map of string values. |
+| `projects[].domains` | string[] | No | — |
+| `projects[].storage` | object[] | No | — |
+| `projects[].storage[].name` | string | Yes | — |
+| `projects[].queues` | object[] | No | — |
+| `projects[].queues[].name` | string | Yes | — |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/manifest/apply" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "version": 1,
+  "organization": "acme",
+  "projects": [
+    {
+      "name": "Storefront",
+      "slug": "storefront",
+      "runtimeClass": "scale-to-zero",
+      "git": {
+        "repo": "acme/storefront",
+        "ref": "main"
+      },
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "domains": [
+        "app.acme.com"
+      ],
+      "storage": [
+        {
+          "name": "uploads"
+        }
+      ],
+      "queues": [
+        {
+          "name": "jobs"
+        }
+      ]
+    }
+  ]
+}'
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | Apply results with the executed actions and the resulting plan. |
+| `422` | Manifest failed validation or contains invalid changes. |

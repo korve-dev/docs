@@ -1,0 +1,69 @@
+---
+title: "Storage"
+description: "Per-project object storage with tenant-scoped keys and signed URL transfers."
+---
+
+Each project gets isolated object storage. Keys are **tenant-relative** —
+you see `uploads/report.pdf`, never a shared global namespace — and one
+project can never address another's objects. Bytes move through
+short-lived **signed URLs**, so large uploads and downloads never proxy
+through the API.
+
+## CLI
+
+```bash
+korve storage upload ./report.pdf                 # content type guessed
+korve storage list --prefix uploads/
+korve storage download uploads/report.pdf -o ./report.pdf
+korve storage delete uploads/report.pdf
+```
+
+## The signed-URL flow (API / MCP)
+
+Uploading is two steps — create the signed upload, then PUT the bytes:
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/storage/uploads" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{"filename": "report.pdf", "contentType": "application/pdf", "byteLength": 24576}'
+# → { "key": "uploads/report.pdf", "url": "...", "method": "PUT",
+#     "headers": { ... }, "expiresAt": "..." }
+
+curl -X PUT "<url>" -H "Content-Type: application/pdf" \
+  --data-binary @report.pdf    # include any returned headers verbatim
+```
+
+`byteLength` must match the upload exactly, and the URL expires quickly —
+mint it right before sending. Downloads mirror the shape:
+`POST .../storage/downloads` with `{"key": "..."}` returns
+`{ url, expiresAt }`.
+
+Over MCP:
+
+```js
+const { url, headers } = await korve.storage.createUpload({
+  orgId, projectId,
+  body: { filename: "report.pdf", contentType: "application/pdf", byteLength: 24576 },
+});
+```
+
+Full contracts in the [Storage API](/api-reference/storage).
+
+## Deleting objects
+
+Deletes are idempotent. Over the raw API the key travels as a single
+URL-encoded path segment (`/` becomes `%2F`):
+
+```text
+DELETE /v1/orgs/{orgId}/projects/{projectId}/storage/objects/uploads%2Freport.pdf
+```
+
+The CLI and MCP client handle the encoding for you.
+
+## Roles and billing
+
+Listing and downloading need `member`; creating uploads requires active
+billing; deleting requires `admin`. Storage meters `storage.objects` per
+GB-month plus `network.egress` per GB — see the
+[rate card](/primitives/budgets-and-usage#the-rate-card).

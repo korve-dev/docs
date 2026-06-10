@@ -1,0 +1,138 @@
+---
+title: "Database"
+description: "The managed per-project Postgres database. One database per project; credentials are issued once and rotatable on demand."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+The managed per-project Postgres database. One database per project; credentials are issued once and rotatable on demand.
+
+## database.get
+
+Get the project's database status and connection details (never the password).
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/database
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/database" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | The database. |
+| `404` | No database provisioned for this project. |
+
+### Response body (200)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `status` | string | One of: `provisioning`, `ready`, `failed`. |
+| `host` | string | Managed database endpoint ("db.korve.app"). |
+| `port` | integer | — |
+| `dbName` | string | — |
+| `user` | string | — |
+
+## database.provision
+
+Provision the project's database and issue its credentials.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/database
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write`
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/database" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `201` | Database provisioned. The connection string is shown once; store it securely. Rotate to obtain a new one. |
+| `402` | Organization billing is not active. |
+| `404` | No such project in this organization. |
+| `409` | The project already has a database. |
+
+### Response body (201)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `status` | string | One of: `provisioning`, `ready`, `failed`. |
+| `connectionString` | string | Full postgres:// connection string including the password. Shown exactly once — it is never retrievable later. |
+
+## database.rotatePassword
+
+Rotate the database password. The old password stops working immediately.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/database/rotate
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/database/rotate" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | New credentials issued. The connection string is shown once; store it securely. Rotate to obtain a new one. |
+| `404` | No database provisioned for this project. |
+
+### Response body (200)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `connectionString` | string | Full postgres:// connection string including the password. Shown exactly once — it is never retrievable later. |
+
+## database.delete
+
+Delete the project's database and all of its data. This cannot be undone.
+
+```text
+DELETE /v1/orgs/{orgId}/projects/{projectId}/database
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `owner`
+- **Risk:** `destructive` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/database" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | Database deleted. |
+| `404` | No database provisioned for this project. |

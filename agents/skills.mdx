@@ -1,0 +1,36 @@
+---
+title: "Skills"
+description: "Pre-built knowledge packs that teach coding agents how to operate Korve."
+---
+
+Skills are markdown knowledge packs (SKILL.md files) that agent harnesses
+like Claude Code load on demand. They encode the Korve mental model, the
+golden paths, and the troubleshooting recipes so your agent doesn't have to
+rediscover them every session.
+
+## Install
+
+```bash
+curl -fsSL https://korve.dev/skills.sh | sh
+```
+
+The installer places the skills where your harness discovers them.
+
+## What's in the box
+
+| Skill               | What it teaches                                                       |
+| ------------------- | --------------------------------------------------------------------- |
+| `korve-platform`    | The platform mental model: orgs, projects, runtime classes, primitives, billing. |
+| `korve-deploy-app`  | The golden path to ship an app: create, connect repo, deploy, verify, troubleshoot. |
+| `korve-mcp-setup`   | Wiring any MCP client to `mcp.korve.dev` and using the `search`/`execute` tools. |
+| `korve-cli-setup`   | Installing and configuring the CLI, auth, config precedence, exit codes. |
+| `korve-api-querying` | Calling the REST API directly: auth headers, the error envelope, pagination habits. |
+
+Skills are versioned with the platform; re-run the installer to update.
+
+## Do I need skills if I have MCP?
+
+No — they're complementary. [MCP](/agents/mcp-setup) gives an agent live,
+typed access to the API; skills give it the judgment layer: which runtime
+class to pick, what to check before creating resources, how to read a
+failed deploy. Use both for best results.

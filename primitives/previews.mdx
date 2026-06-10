@@ -1,0 +1,55 @@
+---
+title: "Preview environments"
+description: "Every open pull request gets its own live URL. Close the PR, and it's gone."
+---
+
+When a `scale-to-zero` project has a connected repository, every open pull
+request gets a preview environment: a full deployment of that PR's code on
+its own managed subdomain.
+
+```text
+https://<project-slug>-pr-<n>.korve.app
+```
+
+## Lifecycle — fully automatic
+
+1. **PR opened** → preview created and deployed.
+2. **PR updated** → preview redeployed with the new commits.
+3. **PR closed or merged** → preview torn down; the app and subdomain are
+   released.
+
+There is nothing to configure beyond
+[connecting the repository](/quickstart#4-connect-github).
+
+## Inspecting previews
+
+```bash
+korve previews list
+```
+
+| Field          | Meaning                                  |
+| -------------- | ---------------------------------------- |
+| `prNumber`     | Pull request number at the connected repo |
+| `slug` / `url` | The preview's managed subdomain           |
+| `status`       | `active` or `removed`                     |
+| `deploymentId` | Latest deployment released to the preview |
+
+API: `GET .../previews`; MCP: `await korve.previews.list({ orgId, projectId })`.
+See the [Previews API](/api-reference/previews).
+
+## Removing one by hand
+
+```bash
+korve previews remove <preview-id>    # prompts; --yes to skip
+```
+
+Closing the pull request does this automatically — manual removal is for
+previews you want gone early (or whose PRs live forever).
+
+## Notes
+
+- Previews run with the project's current
+  [environment variables](/primitives/environment-variables).
+- Preview traffic meters like any other scale-to-zero usage and counts
+  toward the project's [budget](/primitives/budgets-and-usage).
+- Previews currently apply to `scale-to-zero` projects.

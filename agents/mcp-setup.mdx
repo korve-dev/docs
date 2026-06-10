@@ -1,0 +1,96 @@
+---
+title: "MCP setup"
+description: "Connect any MCP client to Korve in one command — two tools, the whole platform."
+---
+
+Korve's MCP server lives at `https://mcp.korve.dev/mcp`. For Claude Code:
+
+```bash
+claude mcp add --transport http korve https://mcp.korve.dev/mcp \
+  --header "Authorization: Bearer korve_..."
+```
+
+Any MCP client that speaks streamable HTTP works the same way: point it at
+the URL and send your org-scoped API key as a bearer token. Mint keys in
+the dashboard — see [the quickstart](/quickstart#2-mint-an-api-key).
+
+## Two tools, not forty
+
+Korve uses Code Mode: instead of one MCP tool per endpoint, there are
+exactly two tools that compose into everything the platform can do.
+
+### `search` — discover operations
+
+Free discovery over the public API spec. No API key required.
+
+| Call                          | Returns                                        |
+| ----------------------------- | ---------------------------------------------- |
+| `search` with no arguments    | Compact index of every operation, by resource  |
+| `search {"query": "deploy"}`  | Matching operations with their full contracts  |
+| `search {"resource": "logs"}` | Every operation on one resource                |
+
+Each match includes the operation id, method, path, description, auth
+requirement, minimum org role, risk classification, parameters, and request
+body schema — everything needed to call it correctly on the first try.
+
+### `execute` — run code against the API
+
+Runs JavaScript with a typed `korve` client in scope: one async method per
+operation id from `search`. Requires your API key.
+
+```js
+// execute {"code": "..."}
+const projects = await korve.projects.list({ orgId: "org-id" });
+const deploy = await korve.deploys.create({
+  orgId: "org-id",
+  projectId: projects[0].id,
+  body: { gitRef: "main" },
+});
+deploy
+```
+
+Pass path and query parameters as named fields and the request body as
+`body`. Top-level `await` is allowed; the final expression (or an explicit
+`return`) becomes the result, and `console.log` output is captured.
+
+Responses come back as `{ result, logs, requests }` — `requests` is the
+`[{ op, status }]` audit trail of every API call the code made.
+
+## A typical search → execute flow
+
+1. `search {"query": "logs"}` → finds `logs.query` and its parameters.
+2. `execute`:
+
+```js
+const { entries } = await korve.logs.query({
+  orgId,
+  projectId,
+  level: "error",
+  limit: 50,
+});
+entries.map((e) => `${e.timestamp} ${e.message}`).join("\n")
+```
+
+3. Spot a failed deploy? `search {"query": "diagnose"}` →
+   `execute` with `await korve.deploys.diagnose({ orgId, projectId, deployId })`.
+
+## Scoping and safety
+
+- **Keys are org-scoped with a role ceiling.** A key authorizes only its
+  own organization, as `member` or `admin` — never `owner`. Key
+  management, billing mutations, and membership are session-only, so a
+  leaked key can't escalate.
+- **Execution is sandboxed.** Code runs in an isolated sandbox whose only
+  egress is the Korve API with your key. No other network access exists,
+  and execution times out after 10 seconds.
+- **Everything is audited.** Every result includes the `requests` audit
+  trail; risky operations are flagged as `dangerous` or `destructive` in
+  `search` results so harnesses can gate approval.
+- `search` and `tools/list` work without a key, so agents can explore the
+  surface before credentials exist.
+
+## Next
+
+- [Agent onboarding](/agents/agent-onboarding) — the golden path from zero
+  to deployed.
+- [Skills](/agents/skills) — pre-built knowledge packs for coding agents.

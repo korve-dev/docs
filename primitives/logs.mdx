@@ -1,0 +1,54 @@
+---
+title: "Logs"
+description: "Runtime logs from your deployed app — uniform, queryable, retained 7 days."
+---
+
+Whatever your deployed app prints becomes queryable log entries. Entries
+look the same regardless of runtime class:
+
+| Field       | Values                                              |
+| ----------- | --------------------------------------------------- |
+| `timestamp` | RFC 3339                                            |
+| `level`     | `info`, `warn`, `error`, `debug`                    |
+| `message`   | The line your app (or the platform) emitted          |
+| `source`    | `app` — your code; `platform` — Korve itself        |
+
+**Retention is 7 days.** Queries return the most recent matching entries,
+oldest first; the window defaults to the last hour.
+
+## CLI
+
+```bash
+korve logs                                  # last hour
+korve logs --level error --limit 500        # limit is 1-500, default 100
+korve logs --since 2026-06-01T00:00:00Z --until 2026-06-01T06:00:00Z
+korve logs --json                           # machine-readable
+```
+
+## API
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/logs?level=error&limit=100" \
+  -H "Authorization: Bearer korve_..."
+```
+
+Responses are `{ entries, note? }` — `note` appears when there's context
+worth surfacing, like a project that has no runtime because nothing was
+deployed yet. Full contract in the [Logs API](/api-reference/logs).
+
+## MCP
+
+```js
+const { entries } = await korve.logs.query({
+  orgId, projectId, level: "error", since: "2026-06-01T00:00:00Z",
+});
+```
+
+## Notes
+
+- Build output is not here — it lives on each deploy
+  (`korve deploys get <deploy-id>`); this stream is what your app prints
+  at runtime.
+- Log volume meters `logs.events` per million events — see the
+  [rate card](/primitives/budgets-and-usage#the-rate-card).
+- The dashboard's **Logs** tab is the same query with a refresh button.

@@ -1,0 +1,72 @@
+---
+title: "Custom domains"
+description: "Point a domain you own at a project: add, CNAME, verify, done."
+---
+
+Every project is always reachable at `https://<slug>.korve.app`. Custom
+domains route a hostname you own to the same app, with TLS issued and
+renewed by Korve's edge. Hostnames are globally unique across the platform
+— one domain can only ever serve one project.
+
+## The flow
+
+### 1. Add the domain
+
+```bash
+korve domains add app.acme.com
+```
+
+```text
+CNAME app.acme.com → storefront.korve.app
+```
+
+The response includes the exact CNAME record to create. API:
+`POST .../domains` with `{"hostname": "app.acme.com"}` (`admin` role,
+active billing) — see the [Domains API](/api-reference/domains).
+
+### 2. Create the CNAME
+
+At your DNS provider, point the hostname at your project's managed
+subdomain as instructed.
+
+### 3. Check until active
+
+```bash
+korve domains check app.acme.com
+```
+
+Re-runs verification and returns the current status. Repeat (or poll over
+the API/MCP) until `active`.
+
+## Statuses
+
+| Status        | Meaning                                                            |
+| ------------- | ------------------------------------------------------------------ |
+| `pending_dns` | Waiting for the CNAME to point at the platform                     |
+| `pending_ssl` | DNS verified; certificate being issued                            |
+| `active`      | Serving traffic with TLS                                           |
+| `failed`      | Terminal — `verificationErrors` says why when the edge reported it |
+
+`korve domains list` shows every domain with its status and any
+verification errors.
+
+## Removing
+
+```bash
+korve domains remove app.acme.com
+```
+
+Traffic to the hostname stops being served immediately. The managed
+`<slug>.korve.app` URL is unaffected — it always works.
+
+## Manifest
+
+Domains can also be [declared in your manifest](/primitives/manifests):
+
+```yaml
+projects:
+  - slug: storefront
+    # ...
+    domains:
+      - app.acme.com
+```

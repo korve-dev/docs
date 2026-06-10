@@ -1,0 +1,69 @@
+---
+title: "Remediation"
+description: "The platform agent diagnoses failed deploys and hands you a structured fix."
+---
+
+When a deploy fails, you don't have to read the build log alone. **The
+platform agent** — Korve's built-in diagnostician — analyzes the failed
+deployment and returns a structured diagnosis: what broke, why, and a
+concrete suggested fix.
+
+## Asking for a diagnosis
+
+```bash
+korve deploys diagnose <deploy-id>
+```
+
+API: `POST .../deploys/{deployId}/diagnosis` — see the
+[Deploys API](/api-reference/deploys). MCP:
+`await korve.deploys.diagnose({ orgId, projectId, deployId })`.
+
+Only **failed** deployments are diagnosable (`409` otherwise). The first
+call produces the diagnosis; it is then cached, so repeat calls are free
+and instant — the response carries `cached: true`.
+
+## What it sees
+
+The platform agent reasons over the failed deploy's build log and recorded
+error, the project's runtime class, recent deployment history (flaky vs
+persistent failures), and the **names** of configured environment
+variables. Env var **values are never read** — they stay encrypted; the
+agent only knows which keys exist (enough to notice a missing
+`DATABASE_URL`).
+
+## The diagnosis shape
+
+```json
+{
+  "diagnosis": {
+    "summary": "The build failed because the entry module imports a package that isn't in package.json.",
+    "probableCause": "`sharp` is imported in src/index.js but missing from dependencies.",
+    "suggestedFix": {
+      "kind": "code",
+      "title": "Add the missing dependency",
+      "detail": "Install sharp and commit the updated package.json and lockfile.",
+      "commands": ["npm install sharp", "git add package*.json && git commit -m 'add sharp'"]
+    },
+    "confidence": "high"
+  },
+  "cached": false
+}
+```
+
+| Field                  | Values                                                  |
+| ---------------------- | ------------------------------------------------------- |
+| `summary`              | 1-2 sentences, plain language                           |
+| `probableCause`        | The specific thing that broke                           |
+| `suggestedFix.kind`    | `env`, `code`, `config`, or `retry`                     |
+| `suggestedFix.commands`| Optional shell commands that apply the fix as-is        |
+| `confidence`           | `low`, `medium`, `high`                                 |
+
+The shape is strict and validated — agents can branch on `kind` and
+`confidence` without defensive parsing. A `retry` kind with decent
+confidence means: just deploy again.
+
+## Cost
+
+Each fresh diagnosis meters `agent.diagnosis` ($0.20/run on the
+[rate card](/primitives/budgets-and-usage#the-rate-card)); cached reads
+are not re-metered. Diagnosis requires active billing.

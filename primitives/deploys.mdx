@@ -1,0 +1,80 @@
+---
+title: "Deploys"
+description: "How code becomes a running app on Korve."
+---
+
+A deploy builds a git ref on an isolated, ephemeral build runner and
+releases the result to your project's managed subdomain. Every deploy moves
+through one state machine:
+
+```text
+queued → building → deploying → ready
+                  ↘ failed (build log attached)
+```
+
+## Triggering deploys
+
+- **Push to the production branch** of a connected repository (default
+  `main`) — automatic.
+- **CLI:** `korve deploy [--repo owner/repo] [--ref <branch|tag|sha>]` —
+  queues and polls until `ready` or `failed`, printing status transitions
+  and the live URL.
+- **API:** `POST /v1/orgs/{orgId}/projects/{projectId}/deploys` — see
+  [Deploys API](/api-reference/deploys).
+- **MCP:** `await korve.deploys.create({ orgId, projectId, body: { gitRef: "main" } })`.
+
+Deploying requires active billing (`402` otherwise).
+
+## What the build expects from your code
+
+Builds clone the ref, and if a `package.json` exists run an npm install
+(lockfile optional) followed by `npm run build` when one is defined. Then
+the runtime classes diverge:
+
+### `scale-to-zero`
+
+Your app ships as an edge isolate that handles requests. The build looks
+for an entry module, in this order:
+
+1. `dist/index.js`
+2. `dist/worker.js`
+3. `build/index.js`
+4. `src/index.js`
+5. `index.js`
+6. `worker.js`
+
+The first match wins; if none exists the deploy fails with a message
+listing the candidates. **Bundling is provided** — the platform bundles
+your entry module and its dependencies into a single artifact, so regular
+npm dependencies just work.
+
+### `always-on`
+
+Your app ships as a dedicated instance behind the same managed hostname.
+
+- If the repo has a `Dockerfile`, it's used as-is.
+- Otherwise the platform supplies a default Node 22 recipe: production npm
+  install, then `npm start`.
+
+Either way, your app **must listen on `$PORT` (8080)** — the platform
+routes traffic there and injects the variable.
+
+## Build logs and diagnosis
+
+`korve deploys get <deploy-id>` returns the deployment with its
+accumulated build log; failed deploys keep the full tail. When a deploy
+fails, [the platform agent](/primitives/remediation) can diagnose it:
+
+```bash
+korve deploys diagnose <deploy-id>
+```
+
+## Inspecting history
+
+```bash
+korve deploys list            # newest first: id, status, repo, ref, sha
+korve deploys get <deploy-id> # one deploy, including the build log
+```
+
+The dashboard shows the same history with live-streaming build logs under
+each project's **Deployments** tab.

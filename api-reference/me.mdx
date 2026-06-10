@@ -1,0 +1,50 @@
+---
+title: "Current user"
+description: "The authenticated user and their organization memberships."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+The authenticated user and their organization memberships.
+
+## me.get
+
+Current user profile with organization memberships and roles.
+
+```text
+GET /v1/me
+```
+
+- **Auth:** Dashboard session only — organization API keys are rejected.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/me" \
+  -b "$SESSION"
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | The authenticated principal. |
+
+### Response body (200)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `user` | object | — |
+| `user.id` | string | — |
+| `user.email` | string | — |
+| `user.name` | string | — |
+| `user.emailVerified` | boolean | — |
+| `organizations` | object[] | — |
+| `organizations[].id` | string | — |
+| `organizations[].name` | string | — |
+| `organizations[].slug` | string | — |
+| `organizations[].role` | string | One of: `owner`, `admin`, `member`. |
+| `organizations[].isPersonal` | boolean | — |
+| `organizations[].billingStatus` | string | One of: `unpaid`, `active`, `past_due`, `canceled`. |

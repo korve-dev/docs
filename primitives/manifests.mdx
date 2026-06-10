@@ -1,0 +1,82 @@
+---
+title: "Manifests (IaC)"
+description: "Declare your organization's desired state in korve.yaml; plan and apply to reconcile."
+---
+
+A manifest declares the desired state of an organization's projects,
+environment, domains, and platform resources. The platform reconciles
+toward it — and **never deletes**: resources you stop declaring are
+reported as orphaned and left alone.
+
+## Full reference: `korve.yaml`
+
+```yaml
+version: 1                  # required, always 1
+organization: acme          # required — the org slug this manifest targets
+
+projects:
+  - name: Storefront        # required — display name
+    slug: storefront        # required — permanent; becomes storefront.korve.app
+    runtimeClass: scale-to-zero   # required — scale-to-zero | always-on
+    git:                    # optional — push-to-deploy + PR previews
+      repo: acme/storefront # required inside git
+      ref: main             # optional — production branch
+    env:                    # optional — KEY: value map
+      NODE_ENV: production
+      API_BASE_URL: https://api.example.com
+    domains:                # optional — custom hostnames
+      - app.acme.com
+    storage:                # optional — named storage resources
+      - name: uploads
+    queues:                 # optional — named queues
+      - name: jobs
+```
+
+Field rules mirror the API: slugs match `^[a-z][a-z0-9-]{1,61}$`, repos are
+`owner/repo`, env keys are `UPPER_SNAKE`. Runtime class is immutable after
+creation — changing it in the manifest is reported as invalid rather than
+applied.
+
+## plan / apply
+
+```bash
+korve manifest plan -f korve.yaml      # dry run — prints the plan, changes nothing
+korve manifest apply -f korve.yaml     # plans, asks for confirmation, applies
+korve manifest apply -f korve.yaml --yes   # CI mode: skip the confirmation
+```
+
+A plan is a list of actions, each typed:
+
+| Action     | Meaning                                                        |
+| ---------- | -------------------------------------------------------------- |
+| `create`   | Declared but doesn't exist — will be created                   |
+| `update`   | Exists but differs — will be updated                           |
+| `noop`     | Already matches                                                |
+| `orphaned` | Exists but is not declared — reported, **never deleted**       |
+| `deferred` | Can't be applied yet (e.g. depends on something being created) |
+| `invalid`  | The declared change isn't allowed (e.g. runtime class change)  |
+
+API: `GET /v1/orgs/{orgId}/manifest` (export),
+`POST .../manifest/plan`, `POST .../manifest/apply` — all `admin` role;
+apply requires active billing. See the
+[Manifest API](/api-reference/manifest). Over MCP:
+`await korve.manifest.plan({ orgId, body: manifest })`.
+
+## Exporting current state
+
+```bash
+korve manifest export -o korve.yaml
+```
+
+Round-trips the organization's live state into a manifest. **Secret values
+are masked** as `********` on export, and masked values are **ignored on
+apply** — so the export → commit → apply loop never moves secrets through
+git. Set real values with
+[`korve env set`](/primitives/environment-variables).
+
+## A good workflow
+
+1. `korve manifest export -o korve.yaml` — snapshot reality.
+2. Edit, commit, PR — your infrastructure is now reviewed like code.
+3. `korve manifest plan -f korve.yaml` in CI — the diff is the review.
+4. `korve manifest apply -f korve.yaml --yes` on merge.

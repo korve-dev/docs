@@ -1,0 +1,137 @@
+---
+title: "Agent onboarding"
+description: "The golden path for an agent operating Korve: key → project → repo → deploy → logs → diagnose."
+---
+
+This page is written to be executed. If you are an agent, follow it top to
+bottom; every step is copy-pasteable and every command has an API and MCP
+equivalent (see the [parity promise](/cli/overview#the-parity-promise)).
+
+## 0. Install the Korve skills (optional but recommended)
+
+```bash
+curl -fsSL https://korve.dev/skills.sh | sh
+```
+
+This drops [skill files](/agents/skills) with the platform mental model,
+CLI map, and troubleshooting recipes into your harness.
+
+## 1. Get a key
+
+API keys are minted by a human in the dashboard (organization settings →
+**API keys**) — key management is session-only by design, so an agent can
+never mint its own credentials. Ask your operator for:
+
+- the **org id**
+- an **API key** (`korve_...`) — role `admin` if you'll create
+  infrastructure, `member` if you'll only observe.
+
+Then either log in once:
+
+```bash
+korve login --org <org-id>    # reads the key from $KORVE_API_KEY or stdin
+```
+
+or stay stateless (best for CI):
+
+```bash
+export KORVE_API_KEY=korve_...
+export KORVE_ORG=<org-id>
+```
+
+Verify before doing anything else:
+
+```bash
+korve whoami    # org name, id, billing status — billing must be "active"
+```
+
+## 2. Create the project
+
+```bash
+korve projects create \
+  --name "Storefront" \
+  --slug storefront \
+  --runtime-class scale-to-zero
+korve link storefront    # writes .korve.toml so --project becomes implicit
+```
+
+Choosing a runtime class: `scale-to-zero` for request/response apps,
+`always-on` for websockets and background work — details in
+[Deploys](/primitives/deploys). Slugs are permanent and become the public
+URL (`https://storefront.korve.app`).
+
+## 3. Connect the repository
+
+Check access first; the failure answer includes the exact URL where a
+human grants it:
+
+```bash
+korve projects check-repo acme/storefront
+# not accessible → send your operator to:
+# https://github.com/apps/korve-dev/installations/new
+korve projects update --repo acme/storefront --branch main
+```
+
+Once connected, pushes to `main` deploy automatically and pull requests
+get [preview environments](/primitives/previews).
+
+## 4. Deploy and watch
+
+```bash
+korve deploy --repo acme/storefront    # queues, then polls to ready/failed
+```
+
+`korve deploy` exits `0` with the live URL on success and non-zero with
+the build-log tail on failure. Add `--json` to any command for
+machine-readable output.
+
+```bash
+korve deploys list --json
+curl -fsS https://storefront.korve.app/   # smoke-test the live app
+```
+
+## 5. Read logs
+
+```bash
+korve logs --level error --limit 100
+korve logs --since 2026-06-01T00:00:00Z --until 2026-06-02T00:00:00Z
+```
+
+Entries are retained for 7 days and tagged `app` or `platform` — see
+[Logs](/primitives/logs).
+
+## 6. Diagnose failures
+
+Never guess at a failed deploy. Ask the platform agent:
+
+```bash
+korve deploys diagnose <deploy-id> --json
+```
+
+The diagnosis is structured — `summary`, `probableCause`,
+`suggestedFix {kind, title, detail, commands[]}`, `confidence` — and
+`suggestedFix.commands` are shell commands you can apply directly. See
+[Remediation](/primitives/remediation).
+
+## Operating rules for well-behaved agents
+
+- **Check before you create.** `korve projects list` / `korve database show`
+  first; creation is not idempotent (slugs collide with `409`).
+- **Mind the exit codes.** `3` = auth, `4` = not found, `5` = billing
+  inactive — don't retry those blindly.
+  [Full table](/cli/overview#exit-codes).
+- **Treat shown-once secrets as toxic waste.** Database connection strings
+  and API key secrets appear exactly once; store them in
+  [env vars](/primitives/environment-variables) or your secret manager
+  immediately.
+- **Confirmations:** destructive commands prompt; pass `--yes` only when
+  your operator has approved the action.
+- **Set a budget** on anything autonomous:
+  `korve budget set --cap-usd 50 --hard-stop`.
+
+## The same path over MCP
+
+Every step above maps to `execute` calls — `korve.projects.create`,
+`korve.projects.checkRepoAccess`, `korve.deploys.create`,
+`korve.logs.query`, `korve.deploys.diagnose` — discoverable via `search`.
+See [MCP setup](/agents/mcp-setup).

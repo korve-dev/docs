@@ -1,0 +1,74 @@
+---
+title: "CLI overview"
+description: "The korve binary: install, authenticate, configure — and everything the API does."
+---
+
+```bash
+curl -fsSL https://korve.dev/install.sh | sh
+```
+
+See [Install the CLI](/install-cli) for platform notes (`darwin-arm64`
+today, more coming) and authentication.
+
+## The parity promise
+
+**Everything the API does, the CLI does.** Every public API operation that
+accepts an API key maps to exactly one `korve` command — this is enforced
+by a parity test in the CLI's own test suite, so a new platform capability
+cannot ship without its command. The layout is `korve <noun> <verb>`
+(`korve domains add`, `korve database rotate`) plus a few top-level verbs
+(`korve deploy`, `korve logs`, `korve login`).
+
+The only exceptions are session-only operations (key management, billing
+mutations, org membership) — the CLI ships those commands anyway so the
+failure mode is a helpful pointer to the dashboard rather than a mystery.
+
+## Global flags
+
+| Flag        | Effect                                                         |
+| ----------- | -------------------------------------------------------------- |
+| `--json`    | Print the raw JSON API response instead of human output        |
+| `--api-url` | Override the API base URL (also `$KORVE_API_URL`)              |
+
+`--json` is the agent/scripting mode: stdout is the API payload, status
+chatter goes to stderr. Shown-once secrets print bare on stdout so they
+pipe cleanly.
+
+## Configuration precedence
+
+Explicit beats ambient, everywhere:
+
+1. Command-line flags (`--project`, `--api-url`, `--api-key`)
+2. Environment (`KORVE_API_KEY`, `KORVE_ORG`, `KORVE_PROJECT`,
+   `KORVE_API_URL`)
+3. Local link file `.korve.toml` (project only — written by `korve link`)
+4. `~/.config/korve/config.toml` (written by `korve login`, `0600`)
+5. Built-in defaults (`https://api.korve.dev`)
+
+Project-scoped commands resolve the project as
+`--project` → `$KORVE_PROJECT` → `.korve.toml`, and accept either a slug
+or a UUID.
+
+## Exit codes
+
+| Code | Meaning                                                 |
+| ---- | ------------------------------------------------------- |
+| `0`  | Success                                                 |
+| `1`  | Generic failure (API 409/422/5xx, I/O, failed deploy)   |
+| `2`  | Usage error — bad flags, malformed `KEY=VALUE`, missing project |
+| `3`  | Authentication/authorization (API 401/403, not logged in) |
+| `4`  | Not found (API 404)                                     |
+| `5`  | Payment required (API 402 — activate billing)           |
+
+API errors print as `error (CODE): message` on stderr, preserving the
+[error envelope](/api-reference/overview#errors)'s machine-readable code.
+
+## Confirmations
+
+Destructive commands (`projects delete`, `database delete`,
+`previews remove`, `manifest apply`) prompt interactively; pass `--yes` to
+skip in scripts. `korve projects delete` asks you to type the slug.
+
+## Next
+
+- [All commands](/cli/commands) — every command, flag, and example.
