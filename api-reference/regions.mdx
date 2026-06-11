@@ -1,0 +1,63 @@
+---
+title: "regions"
+description: "Region catalogs — where compute, storage, and databases can be placed."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Region catalogs — where compute, storage, and databases can be placed.
+
+## regions.list
+
+List every available region per primitive: compute regions for always-on apps, storage placement areas, database regions, and the global edge placement scale-to-zero apps run on.
+
+```text
+GET /v1/regions
+```
+
+- **Auth:** None — public endpoint.
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/regions"
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | The region catalogs. |
+
+### Response body (200)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `compute` | object[] | — |
+| `compute[].id` | string | Region id used in create requests (e.g. "fra"). |
+| `compute[].city` | string | Display city or area name. |
+| `compute[].country` | string | — |
+| `compute[].countryCode` | string | ISO 3166 alpha-2 code. |
+| `compute[].flag` | string | Flag emoji derived from the country code. |
+| `compute[].continent` | string | — |
+| `storage` | object[] | — |
+| `storage[].id` | string | Region id used in create requests (e.g. "fra"). |
+| `storage[].city` | string | Display city or area name. |
+| `storage[].country` | string | — |
+| `storage[].countryCode` | string | ISO 3166 alpha-2 code. |
+| `storage[].flag` | string | Flag emoji derived from the country code. |
+| `storage[].continent` | string | — |
+| `database` | object[] | — |
+| `database[].id` | string | Region id used in create requests (e.g. "fra"). |
+| `database[].city` | string | Display city or area name. |
+| `database[].country` | string | — |
+| `database[].countryCode` | string | ISO 3166 alpha-2 code. |
+| `database[].flag` | string | Flag emoji derived from the country code. |
+| `database[].continent` | string | — |
+| `global` | object | The regionless placement scale-to-zero apps run on — every edge location at once, so there is no continent and the flag is a globe. |
+| `global.id` | string | Always "global". |
+| `global.city` | string | — |
+| `global.country` | string | — |
+| `global.countryCode` | string | Empty — the globe has no country. |
+| `global.flag` | string | — |

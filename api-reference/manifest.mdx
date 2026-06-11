@@ -28,30 +28,30 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/manifest" \
 
 ### Responses
 
-| Status | Description                      |
-| ------ | -------------------------------- |
-| `200`  | The current state as a manifest. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | The current state as a manifest. |
 
 ### Response body (200)
 
-| Field                       | Type     | Description                                                                                                         |
-| --------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------- |
-| `version`                   | integer  | One of: `1`.                                                                                                        |
-| `organization`              | string   | Organization slug the manifest targets.                                                                             |
-| `projects`                  | object[] | —                                                                                                                   |
-| `projects[].name`           | string   | —                                                                                                                   |
-| `projects[].slug`           | string   | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                  |
-| `projects[].runtimeClass`   | string   | One of: `scale-to-zero`, `always-on`.                                                                               |
-| `projects[].git`            | object   | —                                                                                                                   |
-| `projects[].git.repo`       | string   | Pattern: `^[\w.-]+/[\w.-]+$`.                                                                                       |
-| `projects[].git.ref`        | string   | —                                                                                                                   |
-| `projects[].env`            | object   | The production environment's variables. Masked values ("**\*\*\*\***") are ignored on apply. Map of string values.  |
-| `projects[].environments`   | object   | Custom environments by slug. "production" and "preview" are implicit and never declared here. Map of object values. |
-| `projects[].domains`        | string[] | —                                                                                                                   |
-| `projects[].storage`        | object[] | —                                                                                                                   |
-| `projects[].storage[].name` | string   | —                                                                                                                   |
-| `projects[].queues`         | object[] | —                                                                                                                   |
-| `projects[].queues[].name`  | string   | —                                                                                                                   |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `version` | integer | One of: `1`. |
+| `organization` | string | Organization slug the manifest targets. |
+| `projects` | object[] | — |
+| `projects[].name` | string | — |
+| `projects[].slug` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].runtimeClass` | string | One of: `scale-to-zero`, `always-on`. |
+| `projects[].git` | object | — |
+| `projects[].git.repo` | string | Pattern: `^[\w.-]+/[\w.-]+$`. |
+| `projects[].git.ref` | string | — |
+| `projects[].env` | object | The production environment's variables. Masked values ("********") are ignored on apply. Map of string values. |
+| `projects[].environments` | object | Custom environments by slug. "production" and "preview" are implicit and never declared here. Map of object values. |
+| `projects[].domains` | string[] | — |
+| `projects[].storage` | object[] | — |
+| `projects[].storage[].name` | string | — |
+| `projects[].queues` | object[] | — |
+| `projects[].queues[].name` | string | — |
 
 ## manifest.plan
 
@@ -67,24 +67,24 @@ POST /v1/orgs/{orgId}/manifest/plan
 
 ### Request body
 
-| Field                       | Type     | Required | Description                                                                                                         |
-| --------------------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------- |
-| `version`                   | integer  | Yes      | One of: `1`.                                                                                                        |
-| `organization`              | string   | Yes      | Organization slug the manifest targets.                                                                             |
-| `projects`                  | object[] | No       | —                                                                                                                   |
-| `projects[].name`           | string   | Yes      | —                                                                                                                   |
-| `projects[].slug`           | string   | Yes      | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                  |
-| `projects[].runtimeClass`   | string   | Yes      | One of: `scale-to-zero`, `always-on`.                                                                               |
-| `projects[].git`            | object   | No       | —                                                                                                                   |
-| `projects[].git.repo`       | string   | Yes      | Pattern: `^[\w.-]+/[\w.-]+$`.                                                                                       |
-| `projects[].git.ref`        | string   | No       | —                                                                                                                   |
-| `projects[].env`            | object   | No       | The production environment's variables. Masked values ("**\*\*\*\***") are ignored on apply. Map of string values.  |
-| `projects[].environments`   | object   | No       | Custom environments by slug. "production" and "preview" are implicit and never declared here. Map of object values. |
-| `projects[].domains`        | string[] | No       | —                                                                                                                   |
-| `projects[].storage`        | object[] | No       | —                                                                                                                   |
-| `projects[].storage[].name` | string   | Yes      | —                                                                                                                   |
-| `projects[].queues`         | object[] | No       | —                                                                                                                   |
-| `projects[].queues[].name`  | string   | Yes      | —                                                                                                                   |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `version` | integer | Yes | One of: `1`. |
+| `organization` | string | Yes | Organization slug the manifest targets. |
+| `projects` | object[] | No | — |
+| `projects[].name` | string | Yes | — |
+| `projects[].slug` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].runtimeClass` | string | Yes | One of: `scale-to-zero`, `always-on`. |
+| `projects[].git` | object | No | — |
+| `projects[].git.repo` | string | Yes | Pattern: `^[\w.-]+/[\w.-]+$`. |
+| `projects[].git.ref` | string | No | — |
+| `projects[].env` | object | No | The production environment's variables. Masked values ("********") are ignored on apply. Map of string values. |
+| `projects[].environments` | object | No | Custom environments by slug. "production" and "preview" are implicit and never declared here. Map of object values. |
+| `projects[].domains` | string[] | No | — |
+| `projects[].storage` | object[] | No | — |
+| `projects[].storage[].name` | string | Yes | — |
+| `projects[].queues` | object[] | No | — |
+| `projects[].queues[].name` | string | Yes | — |
 
 ### Example
 
@@ -130,22 +130,22 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/manifest/plan" \
 
 ### Responses
 
-| Status | Description                 |
-| ------ | --------------------------- |
-| `200`  | The reconciliation plan.    |
-| `422`  | Manifest failed validation. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | The reconciliation plan. |
+| `422` | Manifest failed validation. |
 
 ### Response body (200)
 
-| Field                | Type     | Description                                                            |
-| -------------------- | -------- | ---------------------------------------------------------------------- |
-| `organization`       | string   | —                                                                      |
-| `actions`            | object[] | —                                                                      |
-| `actions[].type`     | string   | One of: `create`, `update`, `noop`, `orphaned`, `deferred`, `invalid`. |
-| `actions[].resource` | string   | One of: `project`, `env`, `environment`, `domain`, `storage`, `queue`. |
-| `actions[].project`  | string   | —                                                                      |
-| `actions[].detail`   | string   | —                                                                      |
-| `summary`            | object   | Map of integer values.                                                 |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `organization` | string | — |
+| `actions` | object[] | — |
+| `actions[].type` | string | One of: `create`, `update`, `noop`, `orphaned`, `deferred`, `invalid`. |
+| `actions[].resource` | string | One of: `project`, `env`, `environment`, `domain`, `storage`, `queue`. |
+| `actions[].project` | string | — |
+| `actions[].detail` | string | — |
+| `summary` | object | Map of integer values. |
 
 ## manifest.apply
 
@@ -162,24 +162,24 @@ POST /v1/orgs/{orgId}/manifest/apply
 
 ### Request body
 
-| Field                       | Type     | Required | Description                                                                                                         |
-| --------------------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------- |
-| `version`                   | integer  | Yes      | One of: `1`.                                                                                                        |
-| `organization`              | string   | Yes      | Organization slug the manifest targets.                                                                             |
-| `projects`                  | object[] | No       | —                                                                                                                   |
-| `projects[].name`           | string   | Yes      | —                                                                                                                   |
-| `projects[].slug`           | string   | Yes      | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                  |
-| `projects[].runtimeClass`   | string   | Yes      | One of: `scale-to-zero`, `always-on`.                                                                               |
-| `projects[].git`            | object   | No       | —                                                                                                                   |
-| `projects[].git.repo`       | string   | Yes      | Pattern: `^[\w.-]+/[\w.-]+$`.                                                                                       |
-| `projects[].git.ref`        | string   | No       | —                                                                                                                   |
-| `projects[].env`            | object   | No       | The production environment's variables. Masked values ("**\*\*\*\***") are ignored on apply. Map of string values.  |
-| `projects[].environments`   | object   | No       | Custom environments by slug. "production" and "preview" are implicit and never declared here. Map of object values. |
-| `projects[].domains`        | string[] | No       | —                                                                                                                   |
-| `projects[].storage`        | object[] | No       | —                                                                                                                   |
-| `projects[].storage[].name` | string   | Yes      | —                                                                                                                   |
-| `projects[].queues`         | object[] | No       | —                                                                                                                   |
-| `projects[].queues[].name`  | string   | Yes      | —                                                                                                                   |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `version` | integer | Yes | One of: `1`. |
+| `organization` | string | Yes | Organization slug the manifest targets. |
+| `projects` | object[] | No | — |
+| `projects[].name` | string | Yes | — |
+| `projects[].slug` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].runtimeClass` | string | Yes | One of: `scale-to-zero`, `always-on`. |
+| `projects[].git` | object | No | — |
+| `projects[].git.repo` | string | Yes | Pattern: `^[\w.-]+/[\w.-]+$`. |
+| `projects[].git.ref` | string | No | — |
+| `projects[].env` | object | No | The production environment's variables. Masked values ("********") are ignored on apply. Map of string values. |
+| `projects[].environments` | object | No | Custom environments by slug. "production" and "preview" are implicit and never declared here. Map of object values. |
+| `projects[].domains` | string[] | No | — |
+| `projects[].storage` | object[] | No | — |
+| `projects[].storage[].name` | string | Yes | — |
+| `projects[].queues` | object[] | No | — |
+| `projects[].queues[].name` | string | Yes | — |
 
 ### Example
 
@@ -225,7 +225,7 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/manifest/apply" \
 
 ### Responses
 
-| Status | Description                                                     |
-| ------ | --------------------------------------------------------------- |
-| `200`  | Apply results with the executed actions and the resulting plan. |
-| `422`  | Manifest failed validation or contains invalid changes.         |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Apply results with the executed actions and the resulting plan. |
+| `422` | Manifest failed validation or contains invalid changes. |

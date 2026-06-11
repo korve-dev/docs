@@ -28,19 +28,19 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/budget" \
 
 ### Responses
 
-| Status | Description                            |
-| ------ | -------------------------------------- |
-| `200`  | The budget.                            |
-| `404`  | No budget configured for this project. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | The budget. |
+| `404` | No budget configured for this project. |
 
 ### Response body (200)
 
-| Field             | Type    | Description                                                      |
-| ----------------- | ------- | ---------------------------------------------------------------- |
-| `monthlyCapUsd`   | number  | —                                                                |
-| `hardStop`        | boolean | Whether spend past the cap suspends the project's paid activity. |
-| `alertAtPercent`  | integer | Alert threshold as a percent of the cap.                         |
-| `currentSpendUsd` | number  | Month-to-date spend at rate-card prices.                         |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `monthlyCapUsd` | number | — |
+| `hardStop` | boolean | Whether spend past the cap suspends the project's paid activity. |
+| `alertAtPercent` | integer | Alert threshold as a percent of the cap. |
+| `currentSpendUsd` | number | Month-to-date spend at rate-card prices. |
 
 ## budgets.set
 
@@ -57,11 +57,11 @@ PUT /v1/orgs/{orgId}/projects/{projectId}/budget
 
 ### Request body
 
-| Field            | Type    | Required | Description                      |
-| ---------------- | ------- | -------- | -------------------------------- |
-| `monthlyCapUsd`  | number  | Yes      | Monthly cap in USD. Must be > 0. |
-| `hardStop`       | boolean | No       | Defaults to false.               |
-| `alertAtPercent` | integer | No       | 1-100. Defaults to 80.           |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `monthlyCapUsd` | number | Yes | Monthly cap in USD. Must be > 0. |
+| `hardStop` | boolean | No | Defaults to false. |
+| `alertAtPercent` | integer | No | 1-100. Defaults to 80. |
 
 ### Example
 
@@ -78,21 +78,21 @@ curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/budget" 
 
 ### Responses
 
-| Status | Description                                      |
-| ------ | ------------------------------------------------ |
-| `200`  | Budget stored.                                   |
-| `402`  | Organization billing is not active.              |
-| `404`  | No such project in this organization.            |
-| `422`  | Invalid cap, hard stop flag, or alert threshold. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Budget stored. |
+| `402` | Organization billing is not active. |
+| `404` | No such project in this organization. |
+| `422` | Invalid cap, hard stop flag, or alert threshold. |
 
 ### Response body (200)
 
-| Field             | Type    | Description                                                      |
-| ----------------- | ------- | ---------------------------------------------------------------- |
-| `monthlyCapUsd`   | number  | —                                                                |
-| `hardStop`        | boolean | Whether spend past the cap suspends the project's paid activity. |
-| `alertAtPercent`  | integer | Alert threshold as a percent of the cap.                         |
-| `currentSpendUsd` | number  | Month-to-date spend at rate-card prices.                         |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `monthlyCapUsd` | number | — |
+| `hardStop` | boolean | Whether spend past the cap suspends the project's paid activity. |
+| `alertAtPercent` | integer | Alert threshold as a percent of the cap. |
+| `currentSpendUsd` | number | Month-to-date spend at rate-card prices. |
 
 ## budgets.delete
 
@@ -115,7 +115,7 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/budge
 
 ### Responses
 
-| Status | Description                            |
-| ------ | -------------------------------------- |
-| `200`  | Budget removed.                        |
-| `404`  | No budget configured for this project. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Budget removed. |
+| `404` | No budget configured for this project. |

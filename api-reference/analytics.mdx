@@ -1,0 +1,60 @@
+---
+title: "analytics"
+description: "Traffic analytics for the project's deployed app: requests, errors, and CPU-time percentiles over time, in UTC buckets."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Traffic analytics for the project's deployed app: requests, errors, and CPU-time percentiles over time, in UTC buckets.
+
+## analytics.get
+
+Request, error, and CPU-time analytics for the project's deployed app, bucketed by hour (default) or UTC day. The window defaults to the last 24 hours. Scale-to-zero apps answer with real traffic; always-on apps currently answer an empty series with an explanatory note.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/analytics
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `since` | string | No | Format: `date-time`. |
+| `until` | string | No | Format: `date-time`. |
+| `granularity` | string | No | One of: `hour`, `day`. |
+| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/analytics?since=2026-06-01T12%3A00%3A00Z" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description |
+| ------ | ----------- |
+| `200` | Bucketed traffic series with window totals. |
+| `404` | No such project or environment in this organization. |
+| `422` | Invalid since, until, or granularity. |
+
+### Response body (200)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `series` | object[] | Ascending by bucket. Buckets the window saw no traffic for are omitted. |
+| `series[].bucket` | string | Start of the bucket (UTC). Format: `date-time`. |
+| `series[].requests` | number | — |
+| `series[].errors` | number | — |
+| `series[].cpuP50Us` | number or null | Median CPU time per request in microseconds — execution time, not wall-clock latency. Null when the bucket reports none. |
+| `series[].cpuP99Us` | number or null | 99th-percentile CPU time per request in microseconds — execution time, not wall-clock latency. Null when the bucket reports none. |
+| `totals` | object | — |
+| `totals.requests` | number | — |
+| `totals.errors` | number | — |
+| `totals.errorRate` | number | errors / requests across the window; 0 when the window saw no requests. |
+| `note` | string | Present when there is context worth surfacing — for example the environment has no runtime yet, or the project's runtime class does not report traffic analytics. |

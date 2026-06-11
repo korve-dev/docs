@@ -21,9 +21,9 @@ GET /v1/orgs/{orgId}/projects/{projectId}/database
 
 ### Query parameters
 
-| Name          | Type   | Required | Description                        |
-| ------------- | ------ | -------- | ---------------------------------- |
-| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Example
 
@@ -34,20 +34,21 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/database?enviro
 
 ### Responses
 
-| Status | Description                                   |
-| ------ | --------------------------------------------- |
-| `200`  | The database.                                 |
-| `404`  | No database provisioned for this environment. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | The database. |
+| `404` | No database provisioned for this environment. |
 
 ### Response body (200)
 
-| Field    | Type    | Description                                 |
-| -------- | ------- | ------------------------------------------- |
-| `status` | string  | One of: `provisioning`, `ready`, `failed`.  |
-| `host`   | string  | Managed database endpoint ("db.korve.app"). |
-| `port`   | integer | —                                           |
-| `dbName` | string  | —                                           |
-| `user`   | string  | —                                           |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `status` | string | One of: `provisioning`, `ready`, `failed`. |
+| `region` | string | Database region id (see regions.list). Immutable after provisioning. |
+| `host` | string | Managed database endpoint ("db.korve.app"). |
+| `port` | integer | — |
+| `dbName` | string | — |
+| `user` | string | — |
 
 ## database.provision
 
@@ -64,31 +65,42 @@ POST /v1/orgs/{orgId}/projects/{projectId}/database
 
 ### Query parameters
 
-| Name          | Type   | Required | Description                        |
-| ------------- | ------ | -------- | ---------------------------------- |
-| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+
+### Request body (optional)
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `region` | string | No | Database region id (see regions.list); defaults to the platform default. Immutable after provisioning. |
 
 ### Example
 
 ```bash
 curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/database?environment=example" \
-  -H "Authorization: Bearer korve_..."
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "region": "example"
+}'
 ```
 
 ### Responses
 
-| Status | Description                                                                                               |
-| ------ | --------------------------------------------------------------------------------------------------------- |
-| `201`  | Database provisioned. The connection string is shown once; store it securely. Rotate to obtain a new one. |
-| `402`  | Organization billing is not active.                                                                       |
-| `404`  | No such project or environment in this organization.                                                      |
-| `409`  | This environment already has a database.                                                                  |
+| Status | Description |
+| ------ | ----------- |
+| `201` | Database provisioned. The connection string is shown once; store it securely. Rotate to obtain a new one. |
+| `402` | Organization billing is not active. |
+| `404` | No such project or environment in this organization. |
+| `409` | This environment already has a database. |
+| `422` | Unknown or unavailable database region. |
 
 ### Response body (201)
 
-| Field              | Type   | Description                                                                                                    |
-| ------------------ | ------ | -------------------------------------------------------------------------------------------------------------- |
-| `status`           | string | One of: `provisioning`, `ready`, `failed`.                                                                     |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `status` | string | One of: `provisioning`, `ready`, `failed`. |
 | `connectionString` | string | Full postgres:// connection string including the password. Shown exactly once — it is never retrievable later. |
 
 ## database.rotatePassword
@@ -105,9 +117,9 @@ POST /v1/orgs/{orgId}/projects/{projectId}/database/rotate
 
 ### Query parameters
 
-| Name          | Type   | Required | Description                        |
-| ------------- | ------ | -------- | ---------------------------------- |
-| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Example
 
@@ -118,15 +130,15 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databas
 
 ### Responses
 
-| Status | Description                                                                                                 |
-| ------ | ----------------------------------------------------------------------------------------------------------- |
-| `200`  | New credentials issued. The connection string is shown once; store it securely. Rotate to obtain a new one. |
-| `404`  | No database provisioned for this environment.                                                               |
+| Status | Description |
+| ------ | ----------- |
+| `200` | New credentials issued. The connection string is shown once; store it securely. Rotate to obtain a new one. |
+| `404` | No database provisioned for this environment. |
 
 ### Response body (200)
 
-| Field              | Type   | Description                                                                                                    |
-| ------------------ | ------ | -------------------------------------------------------------------------------------------------------------- |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
 | `connectionString` | string | Full postgres:// connection string including the password. Shown exactly once — it is never retrievable later. |
 
 ## database.delete
@@ -143,9 +155,9 @@ DELETE /v1/orgs/{orgId}/projects/{projectId}/database
 
 ### Query parameters
 
-| Name          | Type   | Required | Description                        |
-| ------------- | ------ | -------- | ---------------------------------- |
-| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Example
 
@@ -156,7 +168,7 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/datab
 
 ### Responses
 
-| Status | Description                                   |
-| ------ | --------------------------------------------- |
-| `200`  | Database deleted.                             |
-| `404`  | No database provisioned for this environment. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Database deleted. |
+| `404` | No database provisioned for this environment. |
