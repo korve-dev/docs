@@ -14,20 +14,11 @@
     "groups": [
       {
         "group": "Getting started",
-        "pages": [
-          "introduction",
-          "quickstart",
-          "install-cli",
-          "pricing"
-        ]
+        "pages": ["introduction", "quickstart", "install-cli", "pricing"]
       },
       {
         "group": "Agents",
-        "pages": [
-          "agents/mcp-setup",
-          "agents/agent-onboarding",
-          "agents/skills"
-        ]
+        "pages": ["agents/mcp-setup", "agents/agent-onboarding", "agents/skills"]
       },
       {
         "group": "Primitives",
@@ -73,10 +64,7 @@
       },
       {
         "group": "CLI reference",
-        "pages": [
-          "cli/overview",
-          "cli/commands"
-        ]
+        "pages": ["cli/overview", "cli/commands"]
       }
     ]
   },
