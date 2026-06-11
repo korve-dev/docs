@@ -21,10 +21,10 @@ POST /v1/orgs/{orgId}/projects/{projectId}/usage
 
 ### Request body
 
-| Field      | Type   | Required | Description                                |
-| ---------- | ------ | -------- | ------------------------------------------ |
-| `meterId`  | string | Yes      | A known rate-card meter id.                |
-| `quantity` | number | Yes      | Quantity in the meter's unit. Must be > 0. |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `meterId` | string | Yes | A known rate-card meter id. |
+| `quantity` | number | Yes | Quantity in the meter's unit. Must be > 0. |
 
 ### Example
 
@@ -40,20 +40,20 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/usage" 
 
 ### Responses
 
-| Status | Description                                                    |
-| ------ | -------------------------------------------------------------- |
-| `202`  | Usage recorded. Includes budget standing when a budget exists. |
-| `404`  | No such project in this organization.                          |
-| `422`  | Unknown meter id or invalid quantity.                          |
+| Status | Description |
+| ------ | ----------- |
+| `202` | Usage recorded. Includes budget standing when a budget exists. |
+| `404` | No such project in this organization. |
+| `422` | Unknown meter id or invalid quantity. |
 
 ### Response body (202)
 
-| Field             | Type    | Description                                                |
-| ----------------- | ------- | ---------------------------------------------------------- |
-| `ok`              | boolean | —                                                          |
-| `budget`          | object  | Present when the project has a budget configured.          |
-| `budget.capUsd`   | number  | —                                                          |
-| `budget.spendUsd` | number  | —                                                          |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `ok` | boolean | — |
+| `budget` | object | Present when the project has a budget configured. |
+| `budget.capUsd` | number | — |
+| `budget.spendUsd` | number | — |
 | `budget.exceeded` | boolean | True once month-to-date spend has reached the monthly cap. |
 
 ## usage.get
@@ -70,9 +70,10 @@ GET /v1/orgs/{orgId}/projects/{projectId}/usage
 
 ### Query parameters
 
-| Name    | Type   | Required | Description          |
-| ------- | ------ | -------- | -------------------- |
-| `since` | string | No       | Format: `date-time`. |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `since` | string | No | Format: `date-time`. |
+| `granularity` | string | No | One of: `day`. |
 
 ### Example
 
@@ -83,18 +84,21 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/usage?since=202
 
 ### Responses
 
-| Status | Description                            |
-| ------ | -------------------------------------- |
-| `200`  | Aggregated meters at rate-card prices. |
-| `404`  | No such project in this organization.  |
-| `422`  | Invalid since timestamp.               |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Aggregated meters at rate-card prices. |
+| `404` | No such project in this organization. |
+| `422` | Invalid since timestamp or granularity. |
 
 ### Response body (200)
 
-| Field               | Type     | Description |
-| ------------------- | -------- | ----------- |
-| `meters`            | object[] | —           |
-| `meters[].meterId`  | string   | —           |
-| `meters[].quantity` | number   | —           |
-| `meters[].costUsd`  | number   | —           |
-| `totalUsd`          | number   | —           |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `meters` | object[] | — |
+| `meters[].meterId` | string | — |
+| `meters[].quantity` | number | — |
+| `meters[].costUsd` | number | — |
+| `totalUsd` | number | — |
+| `days` | object[] | Present with granularity=day: cost per UTC calendar day, ascending. Days in the window without usage are omitted. |
+| `days[].date` | string | UTC calendar day, "YYYY-MM-DD". |
+| `days[].totalUsd` | number | — |

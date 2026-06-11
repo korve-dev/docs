@@ -3,9 +3,13 @@ title: "Environment variables"
 description: "Encrypted configuration, applied on the next deploy."
 ---
 
-Per-project environment variables are **encrypted at rest** and injected
-into your app's environment on the next deploy. Keys follow the usual
-shape: `^[A-Z][A-Z0-9_]{0,63}$`.
+Environment variables are **encrypted at rest** and injected into your
+app's environment on the next deploy. Keys follow the usual shape:
+`^[A-Z][A-Z0-9_]{0,63}$`.
+
+Variables are scoped per [environment](/primitives/environments). Every
+command and endpoint below defaults to `production`; pass `--env <slug>`
+(CLI) or `?environment=<slug>` (API) to target another environment.
 
 ## CLI
 

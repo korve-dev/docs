@@ -1,0 +1,78 @@
+---
+title: "Environments"
+description: "Production, preview, and any custom environment you create — each with its own infrastructure."
+---
+
+Every project has two built-in environments:
+
+| Environment  | What it is                                                         |
+| ------------ | ------------------------------------------------------------------ |
+| `production` | The default target for every deploy, env var, database, and query. |
+| `preview`    | Backs [pull-request previews](/primitives/previews) automatically. |
+
+You can add **custom environments** — `staging`, `development`, `qa`,
+anything — and each one gets its own isolated slice of every primitive:
+
+- **Env vars** are scoped per environment. `DATABASE_URL` in `staging`
+  never leaks into `production`.
+- **Databases** are provisioned per environment, so a staging database
+  can coexist with the production one.
+- **Storage** prefixes are isolated per environment.
+- **Deploys** target an environment; a custom environment runs as its own
+  app at `https://<project-slug>-<env-slug>.korve.app`.
+
+Omitting the environment everywhere means `production` — existing
+workflows keep working unchanged.
+
+## CLI
+
+```bash
+korve environments list
+korve environments create staging --name "Staging"
+
+korve deploy --env staging                 # deploy the current ref to staging
+korve env set FLAG=on --env staging        # staging-scoped variable
+korve database provision --env staging     # its own database
+korve logs --env staging
+korve environments remove staging --yes    # tears down the env's app + config
+```
+
+## API / MCP
+
+```bash
+# create
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/environments" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{"slug": "staging", "name": "Staging"}'
+
+# scope any environment-aware operation with ?environment=
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/env?environment=staging" \
+  -H "Authorization: Bearer korve_..."
+```
+
+```js
+await korve.environments.create({ orgId, projectId, body: { slug: "staging" } });
+await korve.env.set({
+  orgId,
+  projectId,
+  query: { environment: "staging" },
+  body: { vars: [{ key: "FLAG", value: "on" }] },
+});
+await korve.deploys.create({ orgId, projectId, body: { environment: "staging" } });
+```
+
+Full contracts in the [Environments API](/api-reference/environments).
+
+## Behavior to know
+
+- **Slugs are permanent and unique per project.** Lowercase letters,
+  digits, and hyphens; `production` and `preview` are reserved.
+- **Built-ins can't be deleted.** `production` and `preview` exist for
+  every project; only custom environments can be removed.
+- **Deleting an environment is destructive.** Its running app,
+  environment variables, and database go with it. The CLI asks for
+  `--yes`.
+- **Usage is metered per project**, not per environment — a staging
+  database costs the same as a production one and counts toward the same
+  [budget](/primitives/budgets-and-usage).

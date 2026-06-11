@@ -21,12 +21,13 @@ GET /v1/orgs/{orgId}/projects/{projectId}/logs
 
 ### Query parameters
 
-| Name    | Type    | Required | Description                               |
-| ------- | ------- | -------- | ----------------------------------------- |
-| `since` | string  | No       | Format: `date-time`.                      |
-| `until` | string  | No       | Format: `date-time`.                      |
-| `limit` | integer | No       | —                                         |
-| `level` | string  | No       | One of: `info`, `warn`, `error`, `debug`. |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `since` | string | No | Format: `date-time`. |
+| `until` | string | No | Format: `date-time`. |
+| `limit` | integer | No | — |
+| `level` | string | No | One of: `info`, `warn`, `error`, `debug`. |
+| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Example
 
@@ -37,19 +38,19 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/logs?since=2026
 
 ### Responses
 
-| Status | Description                            |
-| ------ | -------------------------------------- |
-| `200`  | Log entries, oldest first.             |
-| `404`  | No such project in this organization.  |
-| `422`  | Invalid since, until, limit, or level. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Log entries, oldest first. |
+| `404` | No such project or environment in this organization. |
+| `422` | Invalid since, until, limit, or level. |
 
 ### Response body (200)
 
-| Field                 | Type     | Description                                                                                                              |
-| --------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `entries`             | object[] | —                                                                                                                        |
-| `entries[].timestamp` | string   | Format: `date-time`.                                                                                                     |
-| `entries[].level`     | string   | One of: `info`, `warn`, `error`, `debug`.                                                                                |
-| `entries[].message`   | string   | —                                                                                                                        |
-| `entries[].source`    | string   | Whether the app emitted the line or the platform did. One of: `app`, `platform`.                                         |
-| `note`                | string   | Present when there is context worth surfacing — for example the project has no runtime yet because nothing was deployed. |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `entries` | object[] | — |
+| `entries[].timestamp` | string | Format: `date-time`. |
+| `entries[].level` | string | One of: `info`, `warn`, `error`, `debug`. |
+| `entries[].message` | string | — |
+| `entries[].source` | string | Whether the app emitted the line or the platform did. One of: `app`, `platform`. |
+| `note` | string | Present when there is context worth surfacing — for example the project has no runtime yet because nothing was deployed. |
