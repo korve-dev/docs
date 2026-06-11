@@ -28,22 +28,22 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/domains" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Custom domains, oldest first. |
-| `404` | No such project in this organization. |
+| Status | Description                           |
+| ------ | ------------------------------------- |
+| `200`  | Custom domains, oldest first.         |
+| `404`  | No such project in this organization. |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `hostname` | string | Pattern: `^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$`. |
-| `status` | string | Verification state: pending_dns until the CNAME points at the platform, pending_ssl while the certificate is issued, then active. failed is terminal. One of: `pending_dns`, `pending_ssl`, `active`, `failed`. |
-| `verificationErrors` | string or null | Why verification is stuck, when the edge reported a reason. |
-| `createdAt` | string | Format: `date-time`. |
+| Field                | Type           | Description                                                                                                                                                                                                     |
+| -------------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                 | string         | —                                                                                                                                                                                                               |
+| `hostname`           | string         | Pattern: `^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$`.                                                                                                                                              |
+| `status`             | string         | Verification state: pending_dns until the CNAME points at the platform, pending_ssl while the certificate is issued, then active. failed is terminal. One of: `pending_dns`, `pending_ssl`, `active`, `failed`. |
+| `verificationErrors` | string or null | Why verification is stuck, when the edge reported a reason.                                                                                                                                                     |
+| `createdAt`          | string         | Format: `date-time`.                                                                                                                                                                                            |
 
 ## domains.add
 
@@ -60,9 +60,9 @@ POST /v1/orgs/{orgId}/projects/{projectId}/domains
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `hostname` | string | Yes | Hostname you control, e.g. "app.acme.com". Pattern: `^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$`. |
+| Field      | Type   | Required | Description                                                                                                   |
+| ---------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------- |
+| `hostname` | string | Yes      | Hostname you control, e.g. "app.acme.com". Pattern: `^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$`. |
 
 ### Example
 
@@ -77,25 +77,25 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/domains
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `201` | Domain registered. Create the CNAME from the instructions, then check the domain until it goes active. |
-| `402` | Organization billing is not active. |
-| `404` | No such project in this organization. |
-| `409` | That hostname is already in use on the platform. |
-| `422` | Invalid hostname, or a managed platform hostname. |
-| `502` | Registering the domain at the edge failed; nothing was added. |
+| Status | Description                                                                                            |
+| ------ | ------------------------------------------------------------------------------------------------------ |
+| `201`  | Domain registered. Create the CNAME from the instructions, then check the domain until it goes active. |
+| `402`  | Organization billing is not active.                                                                    |
+| `404`  | No such project in this organization.                                                                  |
+| `409`  | That hostname is already in use on the platform.                                                       |
+| `422`  | Invalid hostname, or a managed platform hostname.                                                      |
+| `502`  | Registering the domain at the edge failed; nothing was added.                                          |
 
 ### Response body (201)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `hostname` | string | Pattern: `^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$`. |
-| `status` | string | Verification state: pending_dns until the CNAME points at the platform, pending_ssl while the certificate is issued, then active. failed is terminal. One of: `pending_dns`, `pending_ssl`, `active`, `failed`. |
-| `verificationErrors` | string or null | Why verification is stuck, when the edge reported a reason. |
-| `createdAt` | string | Format: `date-time`. |
-| `instructions` | string | DNS setup step, e.g. "CNAME app.acme.com → my-app.korve.app". |
+| Field                | Type           | Description                                                                                                                                                                                                     |
+| -------------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                 | string         | —                                                                                                                                                                                                               |
+| `hostname`           | string         | Pattern: `^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$`.                                                                                                                                              |
+| `status`             | string         | Verification state: pending_dns until the CNAME points at the platform, pending_ssl while the certificate is issued, then active. failed is terminal. One of: `pending_dns`, `pending_ssl`, `active`, `failed`. |
+| `verificationErrors` | string or null | Why verification is stuck, when the edge reported a reason.                                                                                                                                                     |
+| `createdAt`          | string         | Format: `date-time`.                                                                                                                                                                                            |
+| `instructions`       | string         | DNS setup step, e.g. "CNAME app.acme.com → my-app.korve.app".                                                                                                                                                   |
 
 ## domains.check
 
@@ -118,21 +118,21 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/domains
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | The domain with its refreshed status. |
-| `404` | No such domain on this project. |
-| `502` | The edge could not be reached; the stored status is unchanged. |
+| Status | Description                                                    |
+| ------ | -------------------------------------------------------------- |
+| `200`  | The domain with its refreshed status.                          |
+| `404`  | No such domain on this project.                                |
+| `502`  | The edge could not be reached; the stored status is unchanged. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `hostname` | string | Pattern: `^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$`. |
-| `status` | string | Verification state: pending_dns until the CNAME points at the platform, pending_ssl while the certificate is issued, then active. failed is terminal. One of: `pending_dns`, `pending_ssl`, `active`, `failed`. |
-| `verificationErrors` | string or null | Why verification is stuck, when the edge reported a reason. |
-| `createdAt` | string | Format: `date-time`. |
+| Field                | Type           | Description                                                                                                                                                                                                     |
+| -------------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                 | string         | —                                                                                                                                                                                                               |
+| `hostname`           | string         | Pattern: `^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$`.                                                                                                                                              |
+| `status`             | string         | Verification state: pending_dns until the CNAME points at the platform, pending_ssl while the certificate is issued, then active. failed is terminal. One of: `pending_dns`, `pending_ssl`, `active`, `failed`. |
+| `verificationErrors` | string or null | Why verification is stuck, when the edge reported a reason.                                                                                                                                                     |
+| `createdAt`          | string         | Format: `date-time`.                                                                                                                                                                                            |
 
 ## domains.remove
 
@@ -155,8 +155,8 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/domai
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Domain removed. |
-| `404` | No such domain on this project. |
-| `502` | Removing the domain at the edge failed; the domain was kept. |
+| Status | Description                                                  |
+| ------ | ------------------------------------------------------------ |
+| `200`  | Domain removed.                                              |
+| `404`  | No such domain on this project.                              |
+| `502`  | Removing the domain at the edge failed; the domain was kept. |

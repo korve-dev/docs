@@ -28,25 +28,25 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/previews" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Preview environments with their public URLs. |
-| `404` | No such project in this organization. |
+| Status | Description                                  |
+| ------ | -------------------------------------------- |
+| `200`  | Preview environments with their public URLs. |
+| `404`  | No such project in this organization.        |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `prNumber` | integer | Pull request number at the connected repository. |
-| `slug` | string | Managed subdomain label — "&lt;project-slug>-pr-&lt;n>". |
-| `url` | string | Public preview URL ("https://&lt;slug>.korve.app"). |
-| `status` | string | One of: `active`, `removed`. |
-| `deploymentId` | string or null | Latest deployment released to this preview. |
-| `createdAt` | string | Format: `date-time`. |
-| `updatedAt` | string | Format: `date-time`. |
+| Field          | Type           | Description                                              |
+| -------------- | -------------- | -------------------------------------------------------- |
+| `id`           | string         | —                                                        |
+| `prNumber`     | integer        | Pull request number at the connected repository.         |
+| `slug`         | string         | Managed subdomain label — "&lt;project-slug>-pr-&lt;n>". |
+| `url`          | string         | Public preview URL ("https://&lt;slug>.korve.app").      |
+| `status`       | string         | One of: `active`, `removed`.                             |
+| `deploymentId` | string or null | Latest deployment released to this preview.              |
+| `createdAt`    | string         | Format: `date-time`.                                     |
+| `updatedAt`    | string         | Format: `date-time`.                                     |
 
 ## previews.remove
 
@@ -69,8 +69,8 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/previ
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Preview removed. |
-| `404` | No such preview in this project. |
-| `502` | Releasing the preview's compute failed. Nothing was deleted — try again. |
+| Status | Description                                                              |
+| ------ | ------------------------------------------------------------------------ |
+| `200`  | Preview removed.                                                         |
+| `404`  | No such preview in this project.                                         |
+| `502`  | Releasing the preview's compute failed. Nothing was deleted — try again. |

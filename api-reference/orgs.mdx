@@ -28,22 +28,22 @@ curl "https://api.korve.dev/v1/orgs" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Organizations with the caller's role. |
+| Status | Description                           |
+| ------ | ------------------------------------- |
+| `200`  | Organizations with the caller's role. |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `name` | string | — |
-| `slug` | string | — |
-| `isPersonal` | boolean | — |
-| `billingStatus` | string | One of: `unpaid`, `active`, `past_due`, `canceled`. |
-| `createdAt` | string | Format: `date-time`. |
+| Field           | Type    | Description                                         |
+| --------------- | ------- | --------------------------------------------------- |
+| `id`            | string  | —                                                   |
+| `name`          | string  | —                                                   |
+| `slug`          | string  | —                                                   |
+| `isPersonal`    | boolean | —                                                   |
+| `billingStatus` | string  | One of: `unpaid`, `active`, `past_due`, `canceled`. |
+| `createdAt`     | string  | Format: `date-time`.                                |
 
 ## orgs.create
 
@@ -59,10 +59,10 @@ POST /v1/orgs
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `name` | string | Yes | — |
-| `slug` | string | Yes | — |
+| Field  | Type   | Required | Description |
+| ------ | ------ | -------- | ----------- |
+| `name` | string | Yes      | —           |
+| `slug` | string | Yes      | —           |
 
 ### Example
 
@@ -78,21 +78,21 @@ curl -X POST "https://api.korve.dev/v1/orgs" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `201` | Organization created. |
-| `409` | Slug already taken. |
+| Status | Description           |
+| ------ | --------------------- |
+| `201`  | Organization created. |
+| `409`  | Slug already taken.   |
 
 ### Response body (201)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `name` | string | — |
-| `slug` | string | — |
-| `isPersonal` | boolean | — |
-| `billingStatus` | string | One of: `unpaid`, `active`, `past_due`, `canceled`. |
-| `createdAt` | string | Format: `date-time`. |
+| Field           | Type    | Description                                         |
+| --------------- | ------- | --------------------------------------------------- |
+| `id`            | string  | —                                                   |
+| `name`          | string  | —                                                   |
+| `slug`          | string  | —                                                   |
+| `isPersonal`    | boolean | —                                                   |
+| `billingStatus` | string  | One of: `unpaid`, `active`, `past_due`, `canceled`. |
+| `createdAt`     | string  | Format: `date-time`.                                |
 
 ## orgs.get
 
@@ -115,21 +115,21 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | The organization. |
-| `404` | Not a member or no such organization. |
+| Status | Description                           |
+| ------ | ------------------------------------- |
+| `200`  | The organization.                     |
+| `404`  | Not a member or no such organization. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `name` | string | — |
-| `slug` | string | — |
-| `isPersonal` | boolean | — |
-| `billingStatus` | string | One of: `unpaid`, `active`, `past_due`, `canceled`. |
-| `createdAt` | string | Format: `date-time`. |
+| Field           | Type    | Description                                         |
+| --------------- | ------- | --------------------------------------------------- |
+| `id`            | string  | —                                                   |
+| `name`          | string  | —                                                   |
+| `slug`          | string  | —                                                   |
+| `isPersonal`    | boolean | —                                                   |
+| `billingStatus` | string  | One of: `unpaid`, `active`, `past_due`, `canceled`. |
+| `createdAt`     | string  | Format: `date-time`.                                |
 
 ## orgs.update
 
@@ -145,10 +145,10 @@ PATCH /v1/orgs/{orgId}
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `name` | string | No | 1-100 characters. |
-| `slug` | string | No | Pattern: `^[a-z][a-z0-9-]{1,38}$`. |
+| Field  | Type   | Required | Description                        |
+| ------ | ------ | -------- | ---------------------------------- |
+| `name` | string | No       | 1-100 characters.                  |
+| `slug` | string | No       | Pattern: `^[a-z][a-z0-9-]{1,38}$`. |
 
 ### Example
 
@@ -164,22 +164,22 @@ curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Updated organization. |
-| `409` | Slug already in use. |
-| `422` | Invalid name or slug. |
+| Status | Description           |
+| ------ | --------------------- |
+| `200`  | Updated organization. |
+| `409`  | Slug already in use.  |
+| `422`  | Invalid name or slug. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `name` | string | — |
-| `slug` | string | — |
-| `isPersonal` | boolean | — |
-| `billingStatus` | string | One of: `unpaid`, `active`, `past_due`, `canceled`. |
-| `createdAt` | string | Format: `date-time`. |
+| Field           | Type    | Description                                         |
+| --------------- | ------- | --------------------------------------------------- |
+| `id`            | string  | —                                                   |
+| `name`          | string  | —                                                   |
+| `slug`          | string  | —                                                   |
+| `isPersonal`    | boolean | —                                                   |
+| `billingStatus` | string  | One of: `unpaid`, `active`, `past_due`, `canceled`. |
+| `createdAt`     | string  | Format: `date-time`.                                |
 
 ## orgs.delete
 
@@ -202,10 +202,10 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Organization deleted. |
-| `422` | Personal organizations cannot be deleted. |
+| Status | Description                               |
+| ------ | ----------------------------------------- |
+| `200`  | Organization deleted.                     |
+| `422`  | Personal organizations cannot be deleted. |
 
 ## orgs.listMembers
 
@@ -230,20 +230,20 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/members" \
 
 | Status | Description |
 | ------ | ----------- |
-| `200` | Members. |
+| `200`  | Members.    |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `userId` | string | — |
-| `email` | string | — |
-| `name` | string | — |
-| `role` | string | One of: `owner`, `admin`, `member`. |
-| `createdAt` | string | Format: `date-time`. |
+| Field       | Type   | Description                         |
+| ----------- | ------ | ----------------------------------- |
+| `id`        | string | —                                   |
+| `userId`    | string | —                                   |
+| `email`     | string | —                                   |
+| `name`      | string | —                                   |
+| `role`      | string | One of: `owner`, `admin`, `member`. |
+| `createdAt` | string | Format: `date-time`.                |
 
 ## orgs.updateMemberRole
 
@@ -259,9 +259,9 @@ PATCH /v1/orgs/{orgId}/members/{memberId}
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `role` | string | Yes | One of: `owner`, `admin`, `member`. |
+| Field  | Type   | Required | Description                         |
+| ------ | ------ | -------- | ----------------------------------- |
+| `role` | string | Yes      | One of: `owner`, `admin`, `member`. |
 
 ### Example
 
@@ -276,20 +276,20 @@ curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/members/$MEMBER_ID" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Updated member. |
+| Status | Description     |
+| ------ | --------------- |
+| `200`  | Updated member. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `userId` | string | — |
-| `email` | string | — |
-| `name` | string | — |
-| `role` | string | One of: `owner`, `admin`, `member`. |
-| `createdAt` | string | Format: `date-time`. |
+| Field       | Type   | Description                         |
+| ----------- | ------ | ----------------------------------- |
+| `id`        | string | —                                   |
+| `userId`    | string | —                                   |
+| `email`     | string | —                                   |
+| `name`      | string | —                                   |
+| `role`      | string | One of: `owner`, `admin`, `member`. |
+| `createdAt` | string | Format: `date-time`.                |
 
 ## orgs.removeMember
 
@@ -312,10 +312,10 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/members/$MEMBER_ID" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Member removed. |
-| `422` | The last owner cannot be removed. |
+| Status | Description                       |
+| ------ | --------------------------------- |
+| `200`  | Member removed.                   |
+| `422`  | The last owner cannot be removed. |
 
 ## orgs.listInvitations
 
@@ -338,21 +338,21 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/invitations" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Pending invitations. |
+| Status | Description          |
+| ------ | -------------------- |
+| `200`  | Pending invitations. |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `email` | string | — |
-| `role` | string | One of: `owner`, `admin`, `member`. |
-| `status` | string | — |
-| `expiresAt` | string | Format: `date-time`. |
+| Field       | Type   | Description                         |
+| ----------- | ------ | ----------------------------------- |
+| `id`        | string | —                                   |
+| `email`     | string | —                                   |
+| `role`      | string | One of: `owner`, `admin`, `member`. |
+| `status`    | string | —                                   |
+| `expiresAt` | string | Format: `date-time`.                |
 
 ## orgs.createInvitation
 
@@ -368,10 +368,10 @@ POST /v1/orgs/{orgId}/invitations
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `email` | string | Yes | Format: `email`. |
-| `role` | string | Yes | One of: `admin`, `member`. |
+| Field   | Type   | Required | Description                |
+| ------- | ------ | -------- | -------------------------- |
+| `email` | string | Yes      | Format: `email`.           |
+| `role`  | string | Yes      | One of: `admin`, `member`. |
 
 ### Example
 
@@ -387,19 +387,19 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/invitations" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `201` | Invitation created and emailed. |
+| Status | Description                     |
+| ------ | ------------------------------- |
+| `201`  | Invitation created and emailed. |
 
 ### Response body (201)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `email` | string | — |
-| `role` | string | One of: `owner`, `admin`, `member`. |
-| `status` | string | — |
-| `expiresAt` | string | Format: `date-time`. |
+| Field       | Type   | Description                         |
+| ----------- | ------ | ----------------------------------- |
+| `id`        | string | —                                   |
+| `email`     | string | —                                   |
+| `role`      | string | One of: `owner`, `admin`, `member`. |
+| `status`    | string | —                                   |
+| `expiresAt` | string | Format: `date-time`.                |
 
 ## orgs.revokeInvitation
 
@@ -422,6 +422,6 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/invitations/$INVITATION_ID
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Invitation canceled. |
+| Status | Description          |
+| ------ | -------------------- |
+| `200`  | Invitation canceled. |

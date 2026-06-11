@@ -28,23 +28,23 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/api-keys" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | API keys, including revoked ones. |
+| Status | Description                       |
+| ------ | --------------------------------- |
+| `200`  | API keys, including revoked ones. |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `name` | string | — |
-| `keyPrefix` | string | Display handle for the key, e.g. "korve_ab12…". Never the secret. |
-| `role` | string | Role ceiling the key authenticates with. Defaults to "admin"; never owner. One of: `member`, `admin`. |
-| `lastUsedAt` | string or null | Format: `date-time`. |
-| `revokedAt` | string or null | Format: `date-time`. |
-| `createdAt` | string | Format: `date-time`. |
+| Field        | Type           | Description                                                                                           |
+| ------------ | -------------- | ----------------------------------------------------------------------------------------------------- |
+| `id`         | string         | —                                                                                                     |
+| `name`       | string         | —                                                                                                     |
+| `keyPrefix`  | string         | Display handle for the key, e.g. "korve_ab12…". Never the secret.                                     |
+| `role`       | string         | Role ceiling the key authenticates with. Defaults to "admin"; never owner. One of: `member`, `admin`. |
+| `lastUsedAt` | string or null | Format: `date-time`.                                                                                  |
+| `revokedAt`  | string or null | Format: `date-time`.                                                                                  |
+| `createdAt`  | string         | Format: `date-time`.                                                                                  |
 
 ## apikeys.create
 
@@ -60,10 +60,10 @@ POST /v1/orgs/{orgId}/api-keys
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `name` | string | Yes | Display name, 1-100 characters. Pattern: `^.{1,100}$`. |
-| `role` | string | No | Role ceiling the key authenticates with. Defaults to "admin"; never owner. One of: `member`, `admin`. |
+| Field  | Type   | Required | Description                                                                                           |
+| ------ | ------ | -------- | ----------------------------------------------------------------------------------------------------- |
+| `name` | string | Yes      | Display name, 1-100 characters. Pattern: `^.{1,100}$`.                                                |
+| `role` | string | No       | Role ceiling the key authenticates with. Defaults to "admin"; never owner. One of: `member`, `admin`. |
 
 ### Example
 
@@ -79,20 +79,20 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/api-keys" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `201` | API key created. `key` is the full secret — shown exactly once; store it securely. |
-| `422` | Invalid name or role (owner keys do not exist). |
+| Status | Description                                                                        |
+| ------ | ---------------------------------------------------------------------------------- |
+| `201`  | API key created. `key` is the full secret — shown exactly once; store it securely. |
+| `422`  | Invalid name or role (owner keys do not exist).                                    |
 
 ### Response body (201)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `name` | string | — |
-| `keyPrefix` | string | Display handle for the key, e.g. "korve_ab12…". Never the secret. |
-| `role` | string | Role ceiling the key authenticates with. Defaults to "admin"; never owner. One of: `member`, `admin`. |
-| `key` | string | The full secret. Shown exactly once — it is never retrievable later. Pattern: `^korve_[0-9a-f]{40}$`. |
+| Field       | Type   | Description                                                                                           |
+| ----------- | ------ | ----------------------------------------------------------------------------------------------------- |
+| `id`        | string | —                                                                                                     |
+| `name`      | string | —                                                                                                     |
+| `keyPrefix` | string | Display handle for the key, e.g. "korve_ab12…". Never the secret.                                     |
+| `role`      | string | Role ceiling the key authenticates with. Defaults to "admin"; never owner. One of: `member`, `admin`. |
+| `key`       | string | The full secret. Shown exactly once — it is never retrievable later. Pattern: `^korve_[0-9a-f]{40}$`. |
 
 ## apikeys.revoke
 
@@ -115,13 +115,13 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/api-keys/$KEY_ID" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Key revoked (or already was). |
-| `404` | No such API key in this organization. |
+| Status | Description                           |
+| ------ | ------------------------------------- |
+| `200`  | Key revoked (or already was).         |
+| `404`  | No such API key in this organization. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field       | Type   | Description          |
+| ----------- | ------ | -------------------- |
 | `revokedAt` | string | Format: `date-time`. |
