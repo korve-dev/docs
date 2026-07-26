@@ -1,0 +1,286 @@
+---
+title: "backupDestinations"
+description: "Organization-owned custom object-storage destinations for portable database backups and exports. Credentials are encrypted and never returned."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Organization-owned custom object-storage destinations for portable database backups and exports. Credentials are encrypted and never returned.
+
+## backupDestinations.list
+
+List custom backup destinations without credentials.
+
+```text
+GET /v1/orgs/{orgId}/backup-destinations
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/backup-destinations" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                          |
+| ------ | ------------------------------------ |
+| `200`  | Backup destinations ordered by name. |
+
+### Response body (200)
+
+An array of objects with these fields:
+
+| Field          | Type           | Description                             |
+| -------------- | -------------- | --------------------------------------- |
+| `id`           | string         | —                                       |
+| `name`         | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.      |
+| `kind`         | string         | One of: `custom_object_storage`.        |
+| `endpoint`     | string         | Format: `uri`.                          |
+| `bucket`       | string         | —                                       |
+| `prefix`       | string         | —                                       |
+| `region`       | string or null | —                                       |
+| `version`      | integer        | Active immutable configuration version. |
+| `status`       | string         | One of: `pending`, `ready`, `failed`.   |
+| `lastTestedAt` | string or null | Format: `date-time`.                    |
+| `createdAt`    | string         | Format: `date-time`.                    |
+| `updatedAt`    | string         | Format: `date-time`.                    |
+
+## backupDestinations.create
+
+Register encrypted credentials for compatible custom object storage and verify access before use.
+
+```text
+POST /v1/orgs/{orgId}/backup-destinations
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field                         | Type           | Required | Description                                                         |
+| ----------------------------- | -------------- | -------- | ------------------------------------------------------------------- |
+| `name`                        | string         | Yes      | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                  |
+| `endpoint`                    | string         | Yes      | HTTPS endpoint for compatible custom object storage. Format: `uri`. |
+| `bucket`                      | string         | Yes      | —                                                                   |
+| `prefix`                      | string         | No       | —                                                                   |
+| `region`                      | string or null | No       | —                                                                   |
+| `credentials`                 | object         | Yes      | —                                                                   |
+| `credentials.accessKeyId`     | string         | Yes      | —                                                                   |
+| `credentials.secretAccessKey` | string         | Yes      | —                                                                   |
+| `credentials.sessionToken`    | string         | No       | —                                                                   |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/backup-destinations" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "example",
+  "endpoint": "https://app.acme.com/callback",
+  "bucket": "example",
+  "credentials": {
+    "accessKeyId": "example",
+    "secretAccessKey": "example"
+  }
+}'
+```
+
+### Responses
+
+| Status | Description                                           |
+| ------ | ----------------------------------------------------- |
+| `201`  | Destination registered; credentials are not returned. |
+| `409`  | A destination with that name already exists.          |
+| `422`  | Invalid endpoint or credentials.                      |
+
+### Response body (201)
+
+| Field          | Type           | Description                             |
+| -------------- | -------------- | --------------------------------------- |
+| `id`           | string         | —                                       |
+| `name`         | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.      |
+| `kind`         | string         | One of: `custom_object_storage`.        |
+| `endpoint`     | string         | Format: `uri`.                          |
+| `bucket`       | string         | —                                       |
+| `prefix`       | string         | —                                       |
+| `region`       | string or null | —                                       |
+| `version`      | integer        | Active immutable configuration version. |
+| `status`       | string         | One of: `pending`, `ready`, `failed`.   |
+| `lastTestedAt` | string or null | Format: `date-time`.                    |
+| `createdAt`    | string         | Format: `date-time`.                    |
+| `updatedAt`    | string         | Format: `date-time`.                    |
+
+## backupDestinations.get
+
+Get one destination without credentials.
+
+```text
+GET /v1/orgs/{orgId}/backup-destinations/{destinationId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/backup-destinations/$DESTINATION_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                               |
+| ------ | ----------------------------------------- |
+| `200`  | Backup destination.                       |
+| `404`  | No such destination in this organization. |
+
+### Response body (200)
+
+| Field          | Type           | Description                             |
+| -------------- | -------------- | --------------------------------------- |
+| `id`           | string         | —                                       |
+| `name`         | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.      |
+| `kind`         | string         | One of: `custom_object_storage`.        |
+| `endpoint`     | string         | Format: `uri`.                          |
+| `bucket`       | string         | —                                       |
+| `prefix`       | string         | —                                       |
+| `region`       | string or null | —                                       |
+| `version`      | integer        | Active immutable configuration version. |
+| `status`       | string         | One of: `pending`, `ready`, `failed`.   |
+| `lastTestedAt` | string or null | Format: `date-time`.                    |
+| `createdAt`    | string         | Format: `date-time`.                    |
+| `updatedAt`    | string         | Format: `date-time`.                    |
+
+## backupDestinations.update
+
+Create and validate a new immutable version before activation. Existing recovery points keep their exact prior version.
+
+```text
+PATCH /v1/orgs/{orgId}/backup-destinations/{destinationId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field                         | Type           | Required | Description                                                         |
+| ----------------------------- | -------------- | -------- | ------------------------------------------------------------------- |
+| `name`                        | string         | No       | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                  |
+| `endpoint`                    | string         | No       | HTTPS endpoint for compatible custom object storage. Format: `uri`. |
+| `bucket`                      | string         | No       | —                                                                   |
+| `prefix`                      | string         | No       | —                                                                   |
+| `region`                      | string or null | No       | —                                                                   |
+| `credentials`                 | object         | No       | —                                                                   |
+| `credentials.accessKeyId`     | string         | Yes      | —                                                                   |
+| `credentials.secretAccessKey` | string         | Yes      | —                                                                   |
+| `credentials.sessionToken`    | string         | No       | —                                                                   |
+
+### Example
+
+```bash
+curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/backup-destinations/$DESTINATION_ID" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### Responses
+
+| Status | Description                               |
+| ------ | ----------------------------------------- |
+| `200`  | Updated destination.                      |
+| `404`  | No such destination in this organization. |
+| `422`  | Invalid endpoint or credentials.          |
+
+### Response body (200)
+
+| Field          | Type           | Description                             |
+| -------------- | -------------- | --------------------------------------- |
+| `id`           | string         | —                                       |
+| `name`         | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.      |
+| `kind`         | string         | One of: `custom_object_storage`.        |
+| `endpoint`     | string         | Format: `uri`.                          |
+| `bucket`       | string         | —                                       |
+| `prefix`       | string         | —                                       |
+| `region`       | string or null | —                                       |
+| `version`      | integer        | Active immutable configuration version. |
+| `status`       | string         | One of: `pending`, `ready`, `failed`.   |
+| `lastTestedAt` | string or null | Format: `date-time`.                    |
+| `createdAt`    | string         | Format: `date-time`.                    |
+| `updatedAt`    | string         | Format: `date-time`.                    |
+
+## backupDestinations.delete
+
+Delete a destination configuration. Existing remote objects are not deleted.
+
+```text
+DELETE /v1/orgs/{orgId}/backup-destinations/{destinationId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `owner`
+- **Risk:** `destructive` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/backup-destinations/$DESTINATION_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                             |
+| ------ | ------------------------------------------------------- |
+| `200`  | Destination configuration deleted.                      |
+| `404`  | No such destination in this organization.               |
+| `409`  | An active policy or export still uses this destination. |
+
+## backupDestinations.test
+
+Verify write, read, and delete access using a temporary object.
+
+```text
+POST /v1/orgs/{orgId}/backup-destinations/{destinationId}/test
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/backup-destinations/$DESTINATION_ID/test" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                               |
+| ------ | ----------------------------------------- |
+| `200`  | Access test result.                       |
+| `404`  | No such destination in this organization. |
+| `422`  | Destination access test failed.           |
+
+### Response body (200)
+
+| Field      | Type    | Description          |
+| ---------- | ------- | -------------------- |
+| `ok`       | boolean | —                    |
+| `testedAt` | string  | Format: `date-time`. |

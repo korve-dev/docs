@@ -1,0 +1,21 @@
+---
+title: "Billing and budgets"
+description: "Understand organization billing, metered resources, and project spend controls."
+---
+
+Billing belongs to the organization; usage is attributed to projects and named resources. A paid
+organization has a monthly platform minimum credited against metered usage. Provisioning operations
+return `402` until billing is active.
+
+Use organization billing for payment state and invoices, project usage for attribution, and project
+budgets for autonomous-work guardrails. A budget can alert at a threshold and can enforce a hard
+stop where the resource contract supports it.
+
+```bash
+korve billing show
+korve usage summary --project storefront
+korve budget set --project storefront --cap-usd 50 --hard-stop
+```
+
+Prices change only through the published rate card. Read the live card from the
+[Billing API](/api-reference/billing), not from hard-coded application values.

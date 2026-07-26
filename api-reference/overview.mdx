@@ -100,8 +100,10 @@ sub-second polling loops are not. Heavy log analysis should narrow
 - All request and response bodies are JSON (`Content-Type: application/json`).
 - Timestamps are RFC 3339 strings; durations of retention and expiry are
   stated per endpoint.
-- Path parameters are UUIDs unless documented otherwise (the CLI accepts
-  slugs and resolves them for you).
+- Organization and project address parameters accept their id or slug where
+  the operation documents that shared convention. Other resource parameters
+  use the exact id or name stated on the operation.
 - Operations are identified by stable ids (`projects.create`,
   `logs.query`) — the same ids appear in [MCP `search`](/agents/mcp-setup)
-  results and as method names on the MCP `korve` client.
+  results. MCP execution uses their declared method and path through
+  `korve.request`.

@@ -28,16 +28,67 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/billing" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Billing state. |
+| Status | Description    |
+| ------ | -------------- |
+| `200`  | Billing state. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `status` | string | One of: `unpaid`, `active`, `past_due`, `canceled`. |
-| `rateCard` | object | — |
+| Field                             | Type             | Description                                         |
+| --------------------------------- | ---------------- | --------------------------------------------------- |
+| `status`                          | string           | One of: `unpaid`, `active`, `past_due`, `canceled`. |
+| `rateCard`                        | object[]         | —                                                   |
+| `rateCard[].id`                   | string           | —                                                   |
+| `rateCard[].label`                | string           | —                                                   |
+| `rateCard[].unit`                 | string           | —                                                   |
+| `rateCard[].unitPriceUsd`         | number           | —                                                   |
+| `rateCard[].includedQuantity`     | number           | —                                                   |
+| `rateCard[].overage`              | boolean          | —                                                   |
+| `rateCard[].consumable`           | boolean          | —                                                   |
+| `rateCard[].tierBehavior`         | string           | One of: `graduated`, `volume`.                      |
+| `rateCard[].tiers`                | object[]         | —                                                   |
+| `rateCard[].tiers[].upTo`         | number or string | —                                                   |
+| `rateCard[].tiers[].unitPriceUsd` | number           | —                                                   |
+
+## billing.invoices
+
+Invoice history for an organization, newest first.
+
+```text
+GET /v1/orgs/{orgId}/invoices
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/invoices" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                           |
+| ------ | ------------------------------------- |
+| `200`  | Issued invoices, newest first.        |
+| `502`  | Invoices are unavailable — try again. |
+
+### Response body (200)
+
+An array of objects with these fields:
+
+| Field         | Type           | Description                                                          |
+| ------------- | -------------- | -------------------------------------------------------------------- |
+| `id`          | string         | Opaque invoice id.                                                   |
+| `status`      | string         | Invoice state, e.g. "paid", "open", "void".                          |
+| `totalUsd`    | number         | Invoice total in USD.                                                |
+| `periodStart` | string         | Start of the billing period the invoice covers. Format: `date-time`. |
+| `periodEnd`   | string         | End of the billing period the invoice covers. Format: `date-time`.   |
+| `createdAt`   | string         | Format: `date-time`.                                                 |
+| `hostedUrl`   | string or null | Hosted invoice page, when one is available.                          |
 
 ## billing.createCheckout
 
@@ -53,10 +104,10 @@ POST /v1/orgs/{orgId}/billing/checkout
 
 ### Request body (optional)
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `successUrl` | string | No | — |
-| `cancelUrl` | string | No | — |
+| Field        | Type   | Required | Description |
+| ------------ | ------ | -------- | ----------- |
+| `successUrl` | string | No       | —           |
+| `cancelUrl`  | string | No       | —           |
 
 ### Example
 
@@ -64,24 +115,21 @@ POST /v1/orgs/{orgId}/billing/checkout
 curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/billing/checkout" \
   -b "$SESSION" \
   -H "Content-Type: application/json" \
-  -d '{
-  "successUrl": "https://acme.com/billing/success",
-  "cancelUrl": "https://acme.com/billing/canceled"
-}'
+  -d '{}'
 ```
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Checkout session. |
-| `409` | Organization is already active. |
+| Status | Description                     |
+| ------ | ------------------------------- |
+| `200`  | Checkout session.               |
+| `409`  | Organization is already active. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `url` | string | — |
+| Field | Type   | Description |
+| ----- | ------ | ----------- |
+| `url` | string | —           |
 
 ## billing.confirm
 
@@ -104,14 +152,14 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/billing/confirm" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Refreshed billing state. |
+| Status | Description              |
+| ------ | ------------------------ |
+| `200`  | Refreshed billing state. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field    | Type   | Description                                         |
+| -------- | ------ | --------------------------------------------------- |
 | `status` | string | One of: `unpaid`, `active`, `past_due`, `canceled`. |
 
 ## billing.portal
@@ -135,12 +183,12 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/billing/portal" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Portal session. |
+| Status | Description     |
+| ------ | --------------- |
+| `200`  | Portal session. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `url` | string | — |
+| Field | Type   | Description |
+| ----- | ------ | ----------- |
+| `url` | string | —           |

@@ -1,0 +1,27 @@
+---
+title: "Metrics"
+description: "Query real project and database signals, drill into time ranges, and correlate deploys."
+---
+
+Start with the catalog: it is the source of truth for metric names, units, supported scopes,
+aggregations, and grouping dimensions.
+
+```bash
+korve metrics catalog
+korve metrics project --data @query.json
+korve metrics database --database primary --data @query.json
+```
+
+```json
+{
+  "names": ["cpu.percent", "memory.used_bytes"],
+  "since": "2026-07-25T00:00:00Z",
+  "until": "2026-07-25T06:00:00Z",
+  "stepSeconds": 60
+}
+```
+
+Queries accept between one and ten supported metric names. Use a narrow time range for drill-down,
+then widen it for trends. Project charts correlate deployment annotations; dense deployment windows
+are grouped so events remain usable instead of covering the signal. Metric values come from the
+selected resource scope and are never substituted with sample data. See the [Metrics API](/api-reference/metrics).

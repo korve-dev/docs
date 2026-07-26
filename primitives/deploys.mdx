@@ -21,7 +21,7 @@ queued → building → deploying → ready
   and the live URL.
 - **API:** `POST /v1/orgs/{orgId}/projects/{projectId}/deploys` — see
   [Deploys API](/api-reference/deploys).
-- **MCP:** `await korve.deploys.create({ orgId, projectId, body: { gitRef: "main" } })`.
+- **MCP:** discover `deploys.create`, then call its method and path through `korve.request`.
 
 Deploying requires active billing (`402` otherwise).
 
@@ -63,7 +63,7 @@ routes traffic there and injects the variable.
 
 `korve deploys get <deploy-id>` returns the deployment with its
 accumulated build log; failed deploys keep the full tail. When a deploy
-fails, [the platform agent](/primitives/remediation) can diagnose it:
+fails, [the deployment agent](/primitives/deployment-agent) can investigate it:
 
 ```bash
 korve deploys diagnose <deploy-id>

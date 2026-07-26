@@ -39,12 +39,12 @@ mint it right before sending. Downloads mirror the shape:
 `POST .../storage/downloads` with `{"key": "..."}` returns
 `{ url, expiresAt }`.
 
-Over MCP:
+Over MCP, use the method and path returned by `search`:
 
 ```js
-const { url, headers } = await korve.storage.createUpload({
-  orgId,
-  projectId,
+const upload = await korve.request({
+  method: "POST",
+  path: `/v1/orgs/${orgId}/projects/${projectId}/storage/uploads`,
   body: { filename: "report.pdf", contentType: "application/pdf", byteLength: 24576 },
 });
 ```
@@ -60,7 +60,7 @@ URL-encoded path segment (`/` becomes `%2F`):
 DELETE /v1/orgs/{orgId}/projects/{projectId}/storage/objects/uploads%2Freport.pdf
 ```
 
-The CLI and MCP client handle the encoding for you.
+The CLI handles encoding; MCP code should URL-encode the key path segment.
 
 ## Roles and billing
 

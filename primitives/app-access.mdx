@@ -1,0 +1,94 @@
+---
+title: "App access and sharing"
+description: "Share an app publicly or protect it with verified, organization, or invitation access."
+---
+
+App access is separate from [App Auth](/sdk/app-auth). App Auth identifies your application's own
+customers. The access gateway decides whether a Korve viewer may reach the application at all.
+
+| Mode            | Who can reach the app                                |
+| --------------- | ---------------------------------------------------- |
+| `public`        | Anyone with the URL                                  |
+| `authenticated` | A signed-in viewer with a verified Korve identity    |
+| `organization`  | A current member of the project's Korve organization |
+| `invite_only`   | A verified viewer with an active project grant       |
+
+The project policy applies to production. Pull-request previews may inherit it or choose an explicit
+mode, and named environments may override it individually.
+
+```bash
+korve access status
+korve access configure --mode organization --preview-mode invite-only \
+  --environment staging=authenticated
+```
+
+## Enforcement readiness
+
+`korve access status` returns `enforcement.status`: `ready`, `provisioning`, or `unavailable`, plus a
+reason when applicable. Korve refuses to save any protected policy while enforcement is not `ready`.
+The dashboard labels this state directly and never presents an invitation as protection when traffic
+is still public.
+
+The same policy is enforced for the managed application hostname and every active custom domain.
+Policy lookup or session-validation failure is fail-closed with `503`; it does not bypass protection.
+Readiness includes the viewer portal and private ingress path, so a protected policy is accepted only
+when the complete browser journey can be enforced.
+
+## Viewer sign-in and sessions
+
+For an HTML navigation without access, the gateway creates a short-lived, replay-safe login context
+and redirects to the branded `/access/signin` or `/access/invite` portal with only that opaque
+`context`. The browser does not supply a project, hostname, mode, scope, callback, or destination.
+Those values are bound to the context by the gateway and validated by the control plane. Non-browser
+requests receive `401 APP_ACCESS_REQUIRED` with the same action URL.
+
+The portal moves the context into tab-local session storage and immediately replaces it in browser
+history with a random `resume` handle. Signing in returns to that handle without granting access
+automatically. After the verified viewer satisfies the effective policy, exchanging the context
+consumes it and returns a server-derived callback and same-origin return path.
+
+Browsers submit that token in a top-level form POST to the application origin at
+`/.well-known/korve/access/session`. The application origin sets the host-only
+`__Host-korve_access` cookie with `HttpOnly`, `Secure`, `SameSite=Lax`, and `Path=/`, and no `Domain`
+attribute, then redirects only to a same-origin path. This is why a custom domain receives its own
+cookie rather than a cross-origin platform cookie.
+
+API clients send the token as `x-korve-access-token`. `Authorization` remains reserved for your
+application's own authentication. The gateway strips its access cookie and platform transport
+headers before forwarding a request to your code.
+
+## Invitations, grants, and revocation
+
+Admins create invitations in the dashboard. Creation returns a complete, branded URL once in this
+form:
+
+```text
+https://korve.dev/access/invite#project=<project-uuid>&token=<one-time-token>
+```
+
+Share the complete URL only with the intended viewer. The plaintext token is never returned again;
+Korve retains only its SHA-256 digest. Because the secret is in the URL fragment, it is not included
+in the initial HTTP request. Before the route renders, the portal validates that the fragment contains
+exactly `project` and `token`, moves both values into tab-local session storage, removes the fragment,
+and replaces the visible URL with `?invite=<random-resume-handle>`. If validation or tab-local storage
+fails, the fragment is still scrubbed and acceptance stops. The accepting viewer must use the same
+verified email. Acceptance returns only the server-derived managed app URL; browser-supplied redirect
+targets are not honored.
+
+Invitations expire after seven days by default. An admin may choose from five minutes through 30
+days when creating one. Pending invitations can be revoked and a one-time invitation cannot be
+accepted twice. After accepting, the viewer opens the app; its normal opaque-context flow exchanges
+the active grant for a host-bound access session.
+
+```bash
+korve access grants
+korve access sessions
+korve access revoke-session <session-id>
+korve access audit
+```
+
+Invitation creation/revocation, grant revocation, and invitation acceptance require an interactive
+session. Revoking a grant revokes every active session derived from it. Changing any policy increments
+the policy version and revokes the project's active access sessions. Organization membership and
+invite grants are also checked again at request time, so removal takes effect without waiting for the
+session's expiry.

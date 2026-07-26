@@ -1,0 +1,27 @@
+---
+title: "Runtime SDK"
+description: "Publish queue messages, consume signed deliveries, and connect to managed caches."
+---
+
+`@korve-dev/sdk` is server-only. Korve injects a project-and-environment-scoped runtime token and
+delivery secret; never substitute an organization API key or bundle the SDK into browser code.
+
+```ts
+import { ack, createKorve, retry } from "@korve-dev/sdk";
+
+const korve = createKorve();
+const emails = korve.queue<{ userId: string }>("emails");
+await emails.send({ userId: "u_123" }, { idempotencyKey: "welcome:u_123" });
+
+export const POST = korve.handler<{ userId: string }>(async (message) => {
+  await persistWelcomeEmailOnce(message.id, message.body.userId);
+  return ack(); // or retry(30)
+});
+```
+
+Queue delivery is at least once. Make durable effects idempotent with `message.id`; the SDK verifies
+the timestamp and signature, but your application owns business-level deduplication. `sendBatch`
+accepts up to 100 messages in one atomic request. `korve.cache("sessions")` returns the injected TLS
+connection string for a ready cache.
+
+See [Queues](/primitives/queues) and [Caches](/primitives/caches).

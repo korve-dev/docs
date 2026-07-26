@@ -1,0 +1,28 @@
+---
+title: "Queues"
+description: "Durable at-least-once work delivery with retries, batches, and dead-letter recovery."
+---
+
+Korve queues push signed HTTP deliveries to a handler in your deployed application. Push removes the
+need to run a polling worker and lets the platform schedule retries and concurrency. Delivery is at
+least once, so handlers must make durable effects idempotent.
+
+```bash
+korve queues create --data @queue.json
+korve queues publish emails --data '{"body":{"userId":"u_123"},"idempotencyKey":"welcome:u_123"}'
+korve queues stats emails
+```
+
+`queue.json` declares a name, environment, consumer path, retention, batch size/wait, retry policy,
+optional dead-letter queue, and optional concurrency cap. Publish batches contain at most 100
+messages and are accepted atomically.
+
+When retries are exhausted, inspect and deliberately replay or purge dead letters:
+
+```bash
+korve queues dead-letters emails
+korve queues replay-dead-letters emails --data '{"messageIds":["msg_123"]}' --yes
+```
+
+Use `@korve-dev/sdk` to publish and verify deliveries. See the [Runtime SDK](/sdk/runtime) and
+[Queues API](/api-reference/queues).

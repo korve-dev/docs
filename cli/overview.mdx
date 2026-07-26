@@ -7,8 +7,8 @@ description: "The korve binary: install, authenticate, configure — and everyth
 curl -fsSL https://korve.dev/install.sh | sh
 ```
 
-See [Install the CLI](/install-cli) for platform notes (`darwin-arm64`
-today, more coming) and authentication.
+See [Install the CLI](/install-cli) for the published macOS ARM64, Linux x86-64,
+and Linux ARM64 binaries and authentication.
 
 ## The parity promise
 
@@ -16,8 +16,8 @@ today, more coming) and authentication.
 accepts an API key maps to exactly one `korve` command — this is enforced
 by a parity test in the CLI's own test suite, so a new platform capability
 cannot ship without its command. The layout is `korve <noun> <verb>`
-(`korve domains add`, `korve database rotate`) plus a few top-level verbs
-(`korve deploy`, `korve logs`, `korve login`).
+(`korve domains add`, `korve databases rotate`) plus a few top-level verbs
+(`korve init`, `korve deploy`, `korve logs`, `korve login`).
 
 The only exceptions are session-only operations (key management, billing
 mutations, org membership) — the CLI ships those commands anyway so the
@@ -42,7 +42,9 @@ Explicit beats ambient, everywhere:
 2. Environment (`KORVE_API_KEY`, `KORVE_ORG`, `KORVE_PROJECT`,
    `KORVE_API_URL`)
 3. Local link file `.korve.toml` (project only — written by `korve link`)
-4. `~/.config/korve/config.toml` (written by `korve login`, `0600`)
+4. macOS Keychain for OAuth tokens; Linux, unavailable Keychain, and explicit
+   `KORVE_CONFIG_DIR` use `${KORVE_CONFIG_DIR:-~/.config/korve}/oauth-credentials.toml`
+   with `0600`; `~/.config/korve/config.toml` stores login metadata or a legacy key
 5. Built-in defaults (`https://api.korve.dev`)
 
 Project-scoped commands resolve the project as
@@ -62,6 +64,10 @@ or a UUID.
 
 API errors print as `error (CODE): message` on stderr, preserving the
 [error envelope](/api-reference/overview#errors)'s machine-readable code.
+
+OAuth grants have a member or admin ceiling and never carry owner authority. The
+CLI rejects owner-only operations before network I/O and tells you to use an
+organization API key for that explicit command.
 
 ## Confirmations
 

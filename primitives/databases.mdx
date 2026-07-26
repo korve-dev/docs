@@ -1,71 +1,37 @@
 ---
-title: "Databases"
-description: "One managed Postgres database per project, credentials shown once, rotatable on demand."
+title: "Managed Postgres"
+description: "Provision several named databases per environment, inspect them, and manage credentials safely."
 ---
 
-Every project can provision exactly one managed Postgres database. It lives
-at the branded endpoint `db.korve.app`; you never see (or manage) the
-machinery behind it.
-
-## Provision
+A project can have several named Postgres databases in each environment. Choose the SKU and database
+region at creation. The shown-once connection string uses a Korve hostname and standard TLS.
 
 ```bash
-korve database provision
+korve databases provision primary --sku db-s1 --region us-east
+korve databases list
+korve databases show primary
 ```
 
-```text
-postgres://u_4f2a...:••••@db.korve.app:5432/p_storefront
-```
-
-The full connection string — **including the password — is shown exactly
-once** and is never retrievable later. Store it immediately, typically as a
-project [environment variable](/primitives/environment-variables):
+Store the connection string immediately as a server-side environment variable. It cannot be fetched
+later. Rotation prints a new connection string and invalidates the old password, so update the
+application and redeploy as one coordinated change.
 
 ```bash
+korve databases rotate primary
 korve env set DATABASE_URL='postgres://...'
+korve deploy
 ```
 
-API: `POST /v1/orgs/{orgId}/projects/{projectId}/database` (`admin` role,
-active billing). MCP: `await korve.database.provision({ orgId, projectId })`.
-See the [Database API](/api-reference/database).
-
-## Inspect
+The explorer supports schema inspection, cursor-bounded rows, exactly one read-only SQL statement,
+cancellation, and metadata-only history. Query results are bounded to 500 rows.
 
 ```bash
-korve database show
+korve databases schema primary
+korve databases rows primary users --schema public --limit 100
+korve databases query primary --sql 'select count(*) from users'
+korve databases insights primary --limit 25
 ```
 
-Returns status (`provisioning | ready | failed`), host, port, database
-name, and user — never the password.
-
-## Rotate
-
-```bash
-korve database rotate
-```
-
-Issues a new password and prints the new connection string once. **The old
-password stops working immediately** — update `DATABASE_URL` and redeploy
-in the same breath.
-
-## Delete
-
-```bash
-korve database delete    # prompts; owner role required
-```
-
-Deletes the database and all of its data. This cannot be undone.
-
-## Connecting
-
-Connect with any standard Postgres client using the connection string.
-
-- Connections work from anywhere — external runtimes, `always-on` apps,
-  and code inside `scale-to-zero` apps alike. TLS verifies fully against
-  `db.korve.app`.
-
-## Billing
-
-The project database meters `database.compute` (per month) and
-`database.storage` (per GB-month) — exact prices on the
-[rate card](/primitives/budgets-and-usage#the-rate-card).
+Use [backups](/primitives/backups), [branches](/primitives/database-branches),
+[metrics](/primitives/metrics), and the [advisor](/primitives/advisor) before production changes.
+See the [Databases API](/api-reference/databases).

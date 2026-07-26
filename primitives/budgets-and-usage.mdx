@@ -1,70 +1,28 @@
 ---
-title: "Budgets & usage"
-description: "Metered usage at rate-card prices, with per-project monthly caps and an optional hard stop."
+title: "Usage and budgets"
+description: "Attribute organization cost to projects and named resources, then cap autonomous spend."
 ---
 
-Korve meters everything your projects consume and prices it against the
-public rate card. Budgets watch month-to-date spend per project and flag —
-or, with hard stop, suspend — overruns.
-
-## The rate card
-
-Prices are per unit, in USD. Meter ids are stable and machine-usable.
-
-| Meter id                             | What it meters                               | Unit             | Price  |
-| ------------------------------------ | -------------------------------------------- | ---------------- | ------ |
-| `compute.always-on.shared-1x-2gb`    | Always-on compute (shared, 1 vCPU / 2 GB)    | hour             | $0.042 |
-| `compute.always-on.shared-1x-1gb`    | Always-on compute (shared, 1 vCPU / 1 GB)    | hour             | $0.03  |
-| `compute.always-on.dedicated-1x-2gb` | Always-on compute (dedicated, 1 vCPU / 2 GB) | hour             | $0.125 |
-| `compute.scale-to-zero.requests`     | Scale-to-zero requests                       | million requests | $0.90  |
-| `network.egress`                     | Egress                                       | GB               | $0.06  |
-| `storage.objects`                    | Object storage                               | GB-month         | $0.045 |
-| `database.storage`                   | Database storage                             | GB-month         | $0.30  |
-| `database.compute`                   | Project database                             | month            | $15.00 |
-| `logs.events`                        | Log events                                   | 1M events        | $1.70  |
-| `agent.diagnosis`                    | Agent diagnosis                              | run              | $0.20  |
-
-The platform minimum is **$5/month, credited against usage**. The current
-rate card is always available programmatically via
-[`GET /v1/orgs/{orgId}/billing`](/api-reference/billing) or
-`korve billing show`.
-
-## Reading usage
+The live organization rate card is the only pricing source of truth. Read it with `korve billing
+show` or the [Billing API](/api-reference/billing); do not hard-code copied rates.
 
 ```bash
-korve usage show                              # current calendar month
-korve usage show --since 2026-06-01T00:00:00Z
+korve usage organization
+korve usage show --project storefront --granularity day
 ```
 
-API: `GET .../usage` returns `{ meters: [{ meterId, quantity, costUsd }], totalUsd }`.
-MCP: `await korve.usage.get({ orgId, projectId })`. See the
-[Usage API](/api-reference/usage).
+Organization usage groups cost by project and named resource. Project usage groups it by meter and
+can return UTC day buckets. Use `since` and `until` for a closed billing window.
 
-Internal meters and agents can also record quantities directly with
-`korve usage record --meter <meter-id> --quantity <n>`
-(`POST .../usage`) — unknown meter ids are rejected with `422`.
-
-## Budgets
-
-A budget is a monthly USD cap per project:
+A project budget stores a monthly USD cap, alert threshold, and optional hard stop:
 
 ```bash
-korve budget set --cap-usd 50 --alert-at 80 --hard-stop
-korve budget show     # cap, hard stop, alert threshold, month-to-date spend
-korve budget remove   # usage keeps accruing, uncapped
+korve budget set --project storefront --cap-usd 50 --alert-at 80 --hard-stop
+korve budget show --project storefront
 ```
 
-- **`--alert-at`** — alert threshold as a percent of the cap (1-100,
-  default 80).
-- **`--hard-stop`** — once month-to-date spend reaches the cap, the
-  project's paid activity is suspended. Default off (alert-only).
-- Setting a budget replaces the previous one; omitted options reset to
-  defaults.
+Setting replaces the previous budget; omitted options return to defaults. Removing a budget does not
+remove usage or resources—it allows spend to continue uncapped. Put hard-stop budgets on projects
+operated by unattended agents, and alert before the cap so a human can intervene.
 
-Recording usage against a budgeted project returns the budget standing
-inline (`{ capUsd, spendUsd, exceeded }`), so agents see overruns the
-moment they happen. Full contracts in the
-[Budgets API](/api-reference/budgets).
-
-**Set a budget with `--hard-stop` on any project an autonomous agent
-operates.** It converts a runaway loop from an invoice into a suspension.
+See the [Usage API](/api-reference/usage) and [Budgets API](/api-reference/budgets).

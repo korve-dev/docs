@@ -1,0 +1,23 @@
+---
+title: "Database advisor"
+description: "Review database performance, security, reliability, and cost findings with guarded remediation."
+---
+
+The production advisor scans a database and records findings with category, severity, evidence, and
+a recommended action. History remains available after a finding is resolved or dismissed.
+
+```bash
+korve advisor scan --database primary --data '{}'
+korve advisor findings --database primary --severity critical
+korve advisor preview --database primary <finding-id>
+```
+
+Where an automated fix is available, preview it first. Remediation requires explicit confirmation
+and revalidates the finding and current authorization before applying the action.
+
+```bash
+korve advisor remediate --database primary <finding-id> --yes
+```
+
+Findings are advice, not proof: inspect query plans and workload behavior before index or sizing
+changes. See the [Advisor API](/api-reference/advisor).

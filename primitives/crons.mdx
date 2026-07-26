@@ -1,0 +1,30 @@
+---
+title: "Cron jobs"
+description: "Timezone-aware scheduled HTTP or queue work with retained run history."
+---
+
+A cron belongs to a project environment and targets either an application HTTP path or a queue.
+Schedules use five-field cron expressions and an IANA timezone. The default concurrency policy is
+`skip`: if a previous run is still active, the overlapping occurrence is recorded without starting
+another copy.
+
+```bash
+korve crons create --data @cron.json
+korve crons trigger nightly-report --idempotency-key manual-2026-07-25
+korve crons runs nightly-report --status failed
+```
+
+```json
+{
+  "name": "nightly-report",
+  "schedule": "0 2 * * *",
+  "timezone": "America/Los_Angeles",
+  "target": { "kind": "http", "path": "/jobs/nightly", "method": "POST" },
+  "retry": { "maxAttempts": 3, "initialDelaySeconds": 5, "maxDelaySeconds": 60 },
+  "concurrencyPolicy": "skip",
+  "timeoutSeconds": 300
+}
+```
+
+Create, update, trigger, and inspect runs through the [Crons API](/api-reference/crons), CLI, MCP,
+or a manifest.

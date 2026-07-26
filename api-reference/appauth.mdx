@@ -1,0 +1,836 @@
+---
+title: "appauth"
+description: "Project-isolated application authentication. This is customer-app identity and is separate from Korve dashboard sign-in."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Project-isolated application authentication. This is customer-app identity and is separate from Korve dashboard sign-in.
+
+## appauth.getConfig
+
+Get app-auth policy and provider status. Provider secrets are never returned.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/auth
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                                |
+| ------ | ---------------------------------------------------------- |
+| `200`  | App-auth configuration.                                    |
+| `404`  | No such project or app-auth resource in this organization. |
+| `422`  | Invalid configuration or request.                          |
+
+### Response body (200)
+
+| Field                     | Type            | Description                                                                             |
+| ------------------------- | --------------- | --------------------------------------------------------------------------------------- |
+| `enabled`                 | boolean         | —                                                                                       |
+| `allowedOrigins`          | string[]        | Exact browser origins. Wildcards are not accepted.                                      |
+| `redirectUrls`            | string[]        | Exact post-sign-in redirect URLs. HTTPS is required except for loopback localhost URLs. |
+| `accessTokenTtlSeconds`   | integer         | —                                                                                       |
+| `refreshTokenTtlSeconds`  | integer         | —                                                                                       |
+| `sessionIdleTtlSeconds`   | integer         | —                                                                                       |
+| `sessionMaxTtlSeconds`    | integer         | —                                                                                       |
+| `google`                  | object          | —                                                                                       |
+| `google.enabled`          | boolean         | —                                                                                       |
+| `google.clientId`         | string or null  | —                                                                                       |
+| `google.secretConfigured` | boolean         | —                                                                                       |
+| `google.secretVersion`    | integer or null | —                                                                                       |
+| `google.rotatedAt`        | string or null  | Format: `date-time`.                                                                    |
+| `callbackUrl`             | string          | Exact Google OAuth callback URL to register for this project.                           |
+| `createdAt`               | string          | Format: `date-time`.                                                                    |
+| `updatedAt`               | string          | Format: `date-time`.                                                                    |
+
+## appauth.updateConfig
+
+Create or update app-auth policy using exact browser origins and redirect URLs.
+
+```text
+PUT /v1/orgs/{orgId}/projects/{projectId}/auth
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `write`
+
+### Request body
+
+| Field                    | Type     | Required | Description                                                                             |
+| ------------------------ | -------- | -------- | --------------------------------------------------------------------------------------- |
+| `enabled`                | boolean  | Yes      | —                                                                                       |
+| `allowedOrigins`         | string[] | Yes      | Exact browser origins. Wildcards are not accepted.                                      |
+| `redirectUrls`           | string[] | Yes      | Exact post-sign-in redirect URLs. HTTPS is required except for loopback localhost URLs. |
+| `accessTokenTtlSeconds`  | integer  | No       | 300-3600 seconds.                                                                       |
+| `refreshTokenTtlSeconds` | integer  | No       | 3600-2592000 seconds.                                                                   |
+| `sessionIdleTtlSeconds`  | integer  | No       | 900-604800 seconds.                                                                     |
+| `sessionMaxTtlSeconds`   | integer  | No       | 3600-2592000 seconds.                                                                   |
+
+### Example
+
+```bash
+curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "enabled": true,
+  "allowedOrigins": [
+    "https://app.acme.com"
+  ],
+  "redirectUrls": [
+    "https://app.acme.com/auth/callback"
+  ]
+}'
+```
+
+### Responses
+
+| Status | Description                                                |
+| ------ | ---------------------------------------------------------- |
+| `200`  | Updated app-auth configuration.                            |
+| `404`  | No such project or app-auth resource in this organization. |
+| `422`  | Invalid configuration or request.                          |
+
+### Response body (200)
+
+| Field                     | Type            | Description                                                                             |
+| ------------------------- | --------------- | --------------------------------------------------------------------------------------- |
+| `enabled`                 | boolean         | —                                                                                       |
+| `allowedOrigins`          | string[]        | Exact browser origins. Wildcards are not accepted.                                      |
+| `redirectUrls`            | string[]        | Exact post-sign-in redirect URLs. HTTPS is required except for loopback localhost URLs. |
+| `accessTokenTtlSeconds`   | integer         | —                                                                                       |
+| `refreshTokenTtlSeconds`  | integer         | —                                                                                       |
+| `sessionIdleTtlSeconds`   | integer         | —                                                                                       |
+| `sessionMaxTtlSeconds`    | integer         | —                                                                                       |
+| `google`                  | object          | —                                                                                       |
+| `google.enabled`          | boolean         | —                                                                                       |
+| `google.clientId`         | string or null  | —                                                                                       |
+| `google.secretConfigured` | boolean         | —                                                                                       |
+| `google.secretVersion`    | integer or null | —                                                                                       |
+| `google.rotatedAt`        | string or null  | Format: `date-time`.                                                                    |
+| `callbackUrl`             | string          | Exact Google OAuth callback URL to register for this project.                           |
+| `createdAt`               | string          | Format: `date-time`.                                                                    |
+| `updatedAt`               | string          | Format: `date-time`.                                                                    |
+
+## appauth.deleteConfig
+
+Delete app-auth configuration, users, identities, sessions, and retained audit history.
+
+```text
+DELETE /v1/orgs/{orgId}/projects/{projectId}/auth
+```
+
+- **Auth:** Dashboard session only — organization API keys are rejected.
+- **Minimum role:** `owner`
+- **Risk:** `destructive` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth" \
+  -b "$SESSION"
+```
+
+### Responses
+
+| Status | Description                                                |
+| ------ | ---------------------------------------------------------- |
+| `200`  | Application auth deleted.                                  |
+| `404`  | No such project or app-auth resource in this organization. |
+| `422`  | Invalid configuration or request.                          |
+
+## appauth.setGoogleProvider
+
+Configure Google OAuth with the customer's client id and a secret encrypted at ingestion.
+
+```text
+PUT /v1/orgs/{orgId}/projects/{projectId}/auth/providers/google
+```
+
+- **Auth:** Dashboard session only — organization API keys are rejected.
+- **Minimum role:** `owner`
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field          | Type    | Required | Description                     |
+| -------------- | ------- | -------- | ------------------------------- |
+| `clientId`     | string  | Yes      | —                               |
+| `clientSecret` | string  | Yes      | Write-only OAuth client secret. |
+| `enabled`      | boolean | Yes      | —                               |
+
+### Example
+
+```bash
+curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth/providers/google" \
+  -b "$SESSION" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "clientId": "example",
+  "clientSecret": "example",
+  "enabled": true
+}'
+```
+
+### Responses
+
+| Status | Description                                                |
+| ------ | ---------------------------------------------------------- |
+| `200`  | Provider status without its secret.                        |
+| `404`  | No such project or app-auth resource in this organization. |
+| `422`  | Invalid configuration or request.                          |
+
+### Response body (200)
+
+| Field              | Type            | Description          |
+| ------------------ | --------------- | -------------------- |
+| `enabled`          | boolean         | —                    |
+| `clientId`         | string or null  | —                    |
+| `secretConfigured` | boolean         | —                    |
+| `secretVersion`    | integer or null | —                    |
+| `rotatedAt`        | string or null  | Format: `date-time`. |
+
+## appauth.rotateGoogleSecret
+
+Replace the encrypted Google OAuth secret and increment its rotation version.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/auth/providers/google/rotate
+```
+
+- **Auth:** Dashboard session only — organization API keys are rejected.
+- **Minimum role:** `owner`
+- **Risk:** `dangerous` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field          | Type   | Required | Description                     |
+| -------------- | ------ | -------- | ------------------------------- |
+| `clientSecret` | string | Yes      | Write-only OAuth client secret. |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth/providers/google/rotate" \
+  -b "$SESSION" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "clientSecret": "example"
+}'
+```
+
+### Responses
+
+| Status | Description                                                |
+| ------ | ---------------------------------------------------------- |
+| `200`  | Provider status without its secret.                        |
+| `404`  | No such project or app-auth resource in this organization. |
+| `422`  | Invalid configuration or request.                          |
+
+### Response body (200)
+
+| Field              | Type            | Description          |
+| ------------------ | --------------- | -------------------- |
+| `enabled`          | boolean         | —                    |
+| `clientId`         | string or null  | —                    |
+| `secretConfigured` | boolean         | —                    |
+| `secretVersion`    | integer or null | —                    |
+| `rotatedAt`        | string or null  | Format: `date-time`. |
+
+## appauth.listUsers
+
+Search and page customer-app users, newest first.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/auth/users
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name     | Type    | Required | Description                   |
+| -------- | ------- | -------- | ----------------------------- |
+| `cursor` | string  | No       | —                             |
+| `limit`  | integer | No       | —                             |
+| `search` | string  | No       | —                             |
+| `status` | string  | No       | One of: `active`, `disabled`. |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth/users?cursor=example" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                                |
+| ------ | ---------------------------------------------------------- |
+| `200`  | A page of app users.                                       |
+| `404`  | No such project or app-auth resource in this organization. |
+| `422`  | Invalid configuration or request.                          |
+
+### Response body (200)
+
+| Field                   | Type           | Description          |
+| ----------------------- | -------------- | -------------------- |
+| `items`                 | object[]       | —                    |
+| `items[].id`            | string         | —                    |
+| `items[].email`         | string         | Format: `email`.     |
+| `items[].emailVerified` | boolean        | —                    |
+| `items[].name`          | string or null | —                    |
+| `items[].image`         | string or null | —                    |
+| `items[].disabledAt`    | string or null | Format: `date-time`. |
+| `items[].createdAt`     | string         | Format: `date-time`. |
+| `items[].lastSignInAt`  | string or null | Format: `date-time`. |
+| `items[].lastActiveAt`  | string or null | Format: `date-time`. |
+| `nextCursor`            | string or null | —                    |
+
+## appauth.getUser
+
+Inspect a customer-app user, identities, and active or recent sessions.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/auth/users/{userId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth/users/$USER_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                                |
+| ------ | ---------------------------------------------------------- |
+| `200`  | App-user detail.                                           |
+| `404`  | No such project or app-auth resource in this organization. |
+| `422`  | Invalid configuration or request.                          |
+
+### Response body (200)
+
+| Field                        | Type           | Description          |
+| ---------------------------- | -------------- | -------------------- |
+| `user`                       | object         | —                    |
+| `user.id`                    | string         | —                    |
+| `user.email`                 | string         | Format: `email`.     |
+| `user.emailVerified`         | boolean        | —                    |
+| `user.name`                  | string or null | —                    |
+| `user.image`                 | string or null | —                    |
+| `user.disabledAt`            | string or null | Format: `date-time`. |
+| `user.createdAt`             | string         | Format: `date-time`. |
+| `user.lastSignInAt`          | string or null | Format: `date-time`. |
+| `user.lastActiveAt`          | string or null | Format: `date-time`. |
+| `identities`                 | object[]       | —                    |
+| `identities[].provider`      | string         | One of: `google`.    |
+| `identities[].providerEmail` | string         | Format: `email`.     |
+| `identities[].emailVerified` | boolean        | —                    |
+| `identities[].createdAt`     | string         | Format: `date-time`. |
+| `identities[].lastSignInAt`  | string or null | Format: `date-time`. |
+| `sessions`                   | object[]       | —                    |
+| `sessions[].id`              | string         | —                    |
+| `sessions[].createdAt`       | string         | Format: `date-time`. |
+| `sessions[].lastActiveAt`    | string         | Format: `date-time`. |
+| `sessions[].expiresAt`       | string         | Format: `date-time`. |
+| `sessions[].revokedAt`       | string or null | Format: `date-time`. |
+| `sessions[].userAgent`       | string or null | —                    |
+
+## appauth.revokeUserSessions
+
+Revoke every active session for one customer-app user and record an audit event.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/auth/users/{userId}/revoke-sessions
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `dangerous` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth/users/$USER_ID/revoke-sessions" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                                |
+| ------ | ---------------------------------------------------------- |
+| `200`  | Sessions revoked.                                          |
+| `404`  | No such project or app-auth resource in this organization. |
+| `422`  | Invalid configuration or request.                          |
+
+## appauth.disableUser
+
+Disable a customer-app user, revoke every session, and record an audit event.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/auth/users/{userId}/disable
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `dangerous` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth/users/$USER_ID/disable" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                                |
+| ------ | ---------------------------------------------------------- |
+| `200`  | Disabled user.                                             |
+| `404`  | No such project or app-auth resource in this organization. |
+| `422`  | Invalid configuration or request.                          |
+
+### Response body (200)
+
+| Field           | Type           | Description          |
+| --------------- | -------------- | -------------------- |
+| `id`            | string         | —                    |
+| `email`         | string         | Format: `email`.     |
+| `emailVerified` | boolean        | —                    |
+| `name`          | string or null | —                    |
+| `image`         | string or null | —                    |
+| `disabledAt`    | string or null | Format: `date-time`. |
+| `createdAt`     | string         | Format: `date-time`. |
+| `lastSignInAt`  | string or null | Format: `date-time`. |
+| `lastActiveAt`  | string or null | Format: `date-time`. |
+
+## appauth.enableUser
+
+Re-enable a disabled customer-app user and record an audit event.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/auth/users/{userId}/enable
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `write`
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth/users/$USER_ID/enable" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                                |
+| ------ | ---------------------------------------------------------- |
+| `200`  | Enabled user.                                              |
+| `404`  | No such project or app-auth resource in this organization. |
+| `422`  | Invalid configuration or request.                          |
+
+### Response body (200)
+
+| Field           | Type           | Description          |
+| --------------- | -------------- | -------------------- |
+| `id`            | string         | —                    |
+| `email`         | string         | Format: `email`.     |
+| `emailVerified` | boolean        | —                    |
+| `name`          | string or null | —                    |
+| `image`         | string or null | —                    |
+| `disabledAt`    | string or null | Format: `date-time`. |
+| `createdAt`     | string         | Format: `date-time`. |
+| `lastSignInAt`  | string or null | Format: `date-time`. |
+| `lastActiveAt`  | string or null | Format: `date-time`. |
+
+## appauth.listAuditEvents
+
+Page retained app-auth security events without credentials or token contents.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/auth/audit-events
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name     | Type    | Required | Description |
+| -------- | ------- | -------- | ----------- |
+| `cursor` | string  | No       | —           |
+| `limit`  | integer | No       | —           |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth/audit-events?cursor=example" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                                |
+| ------ | ---------------------------------------------------------- |
+| `200`  | A page of app-auth audit events.                           |
+| `404`  | No such project or app-auth resource in this organization. |
+| `422`  | Invalid configuration or request.                          |
+
+### Response body (200)
+
+| Field               | Type           | Description                               |
+| ------------------- | -------------- | ----------------------------------------- |
+| `items`             | object[]       | —                                         |
+| `items[].id`        | string         | —                                         |
+| `items[].action`    | string         | —                                         |
+| `items[].actorType` | string         | One of: `app_user`, `operator`, `system`. |
+| `items[].userId`    | string or null | —                                         |
+| `items[].targetId`  | string or null | —                                         |
+| `items[].outcome`   | string         | One of: `success`, `denied`, `error`.     |
+| `items[].createdAt` | string         | Format: `date-time`.                      |
+| `nextCursor`        | string or null | —                                         |
+
+## appauth.getPublicConfig
+
+Get public provider availability and session policy for an enabled project.
+
+```text
+GET /v1/apps/{projectId}/auth/config
+```
+
+- **Auth:** None — public endpoint.
+- **Risk:** `read`
+
+### Path parameters
+
+| Name        | Type   | Required | Description |
+| ----------- | ------ | -------- | ----------- |
+| `projectId` | string | Yes      | —           |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/config"
+```
+
+### Responses
+
+| Status | Description                           |
+| ------ | ------------------------------------- |
+| `200`  | Public app-auth settings.             |
+| `404`  | No enabled app auth for this project. |
+
+### Response body (200)
+
+| Field                   | Type     | Description |
+| ----------------------- | -------- | ----------- |
+| `enabled`               | boolean  | —           |
+| `providers`             | string[] | —           |
+| `accessTokenTtlSeconds` | integer  | —           |
+
+## appauth.startGoogle
+
+Create a single-use state, nonce, and PKCE challenge for an exact allowed redirect URL.
+
+```text
+POST /v1/apps/{projectId}/auth/oauth/google/start
+```
+
+- **Auth:** None — public endpoint.
+- **Risk:** `write`
+
+### Path parameters
+
+| Name        | Type   | Required | Description |
+| ----------- | ------ | -------- | ----------- |
+| `projectId` | string | Yes      | —           |
+
+### Request body
+
+| Field         | Type   | Required | Description |
+| ------------- | ------ | -------- | ----------- |
+| `redirectUrl` | string | Yes      | —           |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/oauth/google/start" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "redirectUrl": "https://app.acme.com/auth/callback"
+}'
+```
+
+### Responses
+
+| Status | Description                                                |
+| ------ | ---------------------------------------------------------- |
+| `200`  | Authorization URL and browser state value.                 |
+| `404`  | No such project or app-auth resource in this organization. |
+| `422`  | Invalid configuration or request.                          |
+| `429`  | Too many sign-in attempts.                                 |
+
+### Response body (200)
+
+| Field              | Type   | Description |
+| ------------------ | ------ | ----------- |
+| `authorizationUrl` | string | —           |
+| `state`            | string | —           |
+
+## appauth.googleCallback
+
+Validate the one-time OAuth state and Google response, then redirect with a short-lived exchange code.
+
+```text
+GET /v1/apps/{projectId}/auth/oauth/google/callback
+```
+
+- **Auth:** None — public endpoint.
+- **Risk:** `read`
+
+### Path parameters
+
+| Name        | Type   | Required | Description |
+| ----------- | ------ | -------- | ----------- |
+| `projectId` | string | Yes      | —           |
+
+### Query parameters
+
+| Name    | Type   | Required | Description |
+| ------- | ------ | -------- | ----------- |
+| `state` | string | Yes      | —           |
+| `code`  | string | No       | —           |
+| `error` | string | No       | —           |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/oauth/google/callback?state=example"
+```
+
+### Responses
+
+| Status | Description                                          |
+| ------ | ---------------------------------------------------- |
+| `302`  | Exact configured application redirect.               |
+| `400`  | Invalid, expired, consumed, or failed OAuth attempt. |
+
+## appauth.exchangeCode
+
+Consume a one-time authorization code and return a new app session.
+
+```text
+POST /v1/apps/{projectId}/auth/token
+```
+
+- **Auth:** None — public endpoint.
+- **Risk:** `write`
+
+### Path parameters
+
+| Name        | Type   | Required | Description |
+| ----------- | ------ | -------- | ----------- |
+| `projectId` | string | Yes      | —           |
+
+### Request body
+
+| Field  | Type   | Required | Description |
+| ------ | ------ | -------- | ----------- |
+| `code` | string | Yes      | —           |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/token" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "code": "example"
+}'
+```
+
+### Responses
+
+| Status | Description                         |
+| ------ | ----------------------------------- |
+| `200`  | New app session.                    |
+| `400`  | Invalid, expired, or consumed code. |
+| `429`  | Too many token exchanges.           |
+
+### Response body (200)
+
+| Field                | Type           | Description                                                                |
+| -------------------- | -------------- | -------------------------------------------------------------------------- |
+| `accessToken`        | string         | Short-lived opaque bearer token. Only a SHA-256 digest is stored by Korve. |
+| `refreshToken`       | string         | One-time rotating token. Only a SHA-256 digest is stored by Korve.         |
+| `expiresAt`          | string         | Format: `date-time`.                                                       |
+| `user`               | object         | —                                                                          |
+| `user.id`            | string         | —                                                                          |
+| `user.email`         | string         | Format: `email`.                                                           |
+| `user.emailVerified` | boolean        | —                                                                          |
+| `user.name`          | string or null | —                                                                          |
+| `user.image`         | string or null | —                                                                          |
+| `user.disabledAt`    | string or null | Format: `date-time`.                                                       |
+| `user.createdAt`     | string         | Format: `date-time`.                                                       |
+| `user.lastSignInAt`  | string or null | Format: `date-time`.                                                       |
+| `user.lastActiveAt`  | string or null | Format: `date-time`.                                                       |
+
+## appauth.getSession
+
+Return the current project-scoped app user and session expiry.
+
+```text
+GET /v1/apps/{projectId}/auth/session
+```
+
+- **Auth:** Project App Auth access token (`Authorization: Bearer $APP_ACCESS_TOKEN`).
+- **Risk:** `read`
+
+### Path parameters
+
+| Name        | Type   | Required | Description |
+| ----------- | ------ | -------- | ----------- |
+| `projectId` | string | Yes      | —           |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/session" \
+  -H "Authorization: Bearer $APP_ACCESS_TOKEN"
+```
+
+### Responses
+
+| Status | Description                                                          |
+| ------ | -------------------------------------------------------------------- |
+| `200`  | Current app session.                                                 |
+| `401`  | Missing, expired, revoked, idle, disabled, or cross-project session. |
+
+### Response body (200)
+
+| Field                | Type           | Description          |
+| -------------------- | -------------- | -------------------- |
+| `user`               | object         | —                    |
+| `user.id`            | string         | —                    |
+| `user.email`         | string         | Format: `email`.     |
+| `user.emailVerified` | boolean        | —                    |
+| `user.name`          | string or null | —                    |
+| `user.image`         | string or null | —                    |
+| `user.disabledAt`    | string or null | Format: `date-time`. |
+| `user.createdAt`     | string         | Format: `date-time`. |
+| `user.lastSignInAt`  | string or null | Format: `date-time`. |
+| `user.lastActiveAt`  | string or null | Format: `date-time`. |
+| `expiresAt`          | string         | Format: `date-time`. |
+
+## appauth.refreshSession
+
+Atomically consume one refresh token and rotate both session tokens; reuse revokes the session.
+
+```text
+POST /v1/apps/{projectId}/auth/refresh
+```
+
+- **Auth:** None — public endpoint.
+- **Risk:** `write`
+
+### Path parameters
+
+| Name        | Type   | Required | Description |
+| ----------- | ------ | -------- | ----------- |
+| `projectId` | string | Yes      | —           |
+
+### Request body
+
+| Field          | Type   | Required | Description |
+| -------------- | ------ | -------- | ----------- |
+| `refreshToken` | string | Yes      | —           |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/refresh" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "refreshToken": "example"
+}'
+```
+
+### Responses
+
+| Status | Description                                                        |
+| ------ | ------------------------------------------------------------------ |
+| `200`  | Rotated app session.                                               |
+| `401`  | Invalid, expired, reused, revoked, or cross-project refresh token. |
+| `429`  | Too many refresh attempts.                                         |
+
+### Response body (200)
+
+| Field                | Type           | Description                                                                |
+| -------------------- | -------------- | -------------------------------------------------------------------------- |
+| `accessToken`        | string         | Short-lived opaque bearer token. Only a SHA-256 digest is stored by Korve. |
+| `refreshToken`       | string         | One-time rotating token. Only a SHA-256 digest is stored by Korve.         |
+| `expiresAt`          | string         | Format: `date-time`.                                                       |
+| `user`               | object         | —                                                                          |
+| `user.id`            | string         | —                                                                          |
+| `user.email`         | string         | Format: `email`.                                                           |
+| `user.emailVerified` | boolean        | —                                                                          |
+| `user.name`          | string or null | —                                                                          |
+| `user.image`         | string or null | —                                                                          |
+| `user.disabledAt`    | string or null | Format: `date-time`.                                                       |
+| `user.createdAt`     | string         | Format: `date-time`.                                                       |
+| `user.lastSignInAt`  | string or null | Format: `date-time`.                                                       |
+| `user.lastActiveAt`  | string or null | Format: `date-time`.                                                       |
+
+## appauth.signOut
+
+Revoke the current app session and all of its refresh tokens.
+
+```text
+POST /v1/apps/{projectId}/auth/sign-out
+```
+
+- **Auth:** Project App Auth access token (`Authorization: Bearer $APP_ACCESS_TOKEN`).
+- **Risk:** `write`
+
+### Path parameters
+
+| Name        | Type   | Required | Description |
+| ----------- | ------ | -------- | ----------- |
+| `projectId` | string | Yes      | —           |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/sign-out" \
+  -H "Authorization: Bearer $APP_ACCESS_TOKEN"
+```
+
+### Responses
+
+| Status | Description                           |
+| ------ | ------------------------------------- |
+| `200`  | Session revoked.                      |
+| `401`  | Invalid or cross-project app session. |

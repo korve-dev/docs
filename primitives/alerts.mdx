@@ -1,0 +1,19 @@
+---
+title: "Alerts"
+description: "Route project and database signals to dashboard, email, signed webhooks, or chat."
+---
+
+Alert channels belong to the organization; policies belong to a project and reference one or more
+channels. Supported destinations are email, signed HTTPS webhook, and Slack. Credentials are
+encrypted and masked after creation; a webhook verification secret is shown once.
+
+```bash
+korve alerts channel-create --data @channel.json
+korve alerts policy-create --project storefront --data @policy.json
+korve alerts incidents --project storefront
+```
+
+Test a channel before attaching production policies. A policy declares scope, signal, operator,
+threshold, evaluation duration, severity, and cooldown. Incident transitions are retained for audit
+and acknowledgement. See [Channels](/api-reference/alertChannels),
+[policies](/api-reference/alertPolicies), and [incidents](/api-reference/alertIncidents).

@@ -1,0 +1,278 @@
+---
+title: "databaseRestores"
+description: "Asynchronous recovery into a new isolated database. Source databases are never overwritten; traffic promotion is a separate confirmed owner action."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Asynchronous recovery into a new isolated database. Source databases are never overwritten; traffic promotion is a separate confirmed owner action.
+
+## databaseRestores.list
+
+List restore jobs sourced from this database.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/restores
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/restores" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                       |
+| ------ | --------------------------------- |
+| `200`  | Restore jobs.                     |
+| `404`  | No such database in this project. |
+
+### Response body (200)
+
+An array of objects with these fields:
+
+| Field                | Type           | Description                                                                |
+| -------------------- | -------------- | -------------------------------------------------------------------------- |
+| `id`                 | string         | —                                                                          |
+| `sourceDatabaseId`   | string         | —                                                                          |
+| `targetDatabaseId`   | string or null | —                                                                          |
+| `status`             | string         | One of: `queued`, `restoring`, `verifying`, `ready`, `failed`, `promoted`. |
+| `source`             | object         | —                                                                          |
+| `source.kind`        | string         | One of: `current`, `backup`, `point_in_time`.                              |
+| `source.backupId`    | string         | —                                                                          |
+| `source.pointInTime` | string         | Format: `date-time`.                                                       |
+| `progressPercent`    | integer        | —                                                                          |
+| `error`              | string or null | —                                                                          |
+| `createdAt`          | string         | Format: `date-time`.                                                       |
+| `completedAt`        | string or null | Format: `date-time`.                                                       |
+
+## databaseRestores.create
+
+Restore a recovery point or timestamp into a newly provisioned isolated database. The source is never overwritten.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/restores
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `owner`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `dangerous` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field                | Type   | Required | Description                                                                                             |
+| -------------------- | ------ | -------- | ------------------------------------------------------------------------------------------------------- |
+| `source`             | object | Yes      | —                                                                                                       |
+| `source.kind`        | string | Yes      | One of: `current`, `backup`, `point_in_time`.                                                           |
+| `source.backupId`    | string | No       | —                                                                                                       |
+| `source.pointInTime` | string | No       | Format: `date-time`.                                                                                    |
+| `targetName`         | string | Yes      | Name for the new isolated database. The source is never overwritten. Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `targetEnvironment`  | string | Yes      | Pattern: `^[a-z][a-z0-9-]{0,38}$`.                                                                      |
+| `targetRegion`       | string | Yes      | —                                                                                                       |
+| `targetSku`          | string | Yes      | —                                                                                                       |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/restores" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "source": {
+    "kind": "current"
+  },
+  "targetName": "example",
+  "targetEnvironment": "example",
+  "targetRegion": "example",
+  "targetSku": "example"
+}'
+```
+
+### Responses
+
+| Status | Description                                                               |
+| ------ | ------------------------------------------------------------------------- |
+| `202`  | Restore queued.                                                           |
+| `404`  | No such source database, backup, environment, region, or SKU.             |
+| `409`  | The target database name already exists.                                  |
+| `422`  | Timestamp is outside the continuous recovery window or target is invalid. |
+
+### Response body (202)
+
+| Field                | Type           | Description                                                                |
+| -------------------- | -------------- | -------------------------------------------------------------------------- |
+| `id`                 | string         | —                                                                          |
+| `sourceDatabaseId`   | string         | —                                                                          |
+| `targetDatabaseId`   | string or null | —                                                                          |
+| `status`             | string         | One of: `queued`, `restoring`, `verifying`, `ready`, `failed`, `promoted`. |
+| `source`             | object         | —                                                                          |
+| `source.kind`        | string         | One of: `current`, `backup`, `point_in_time`.                              |
+| `source.backupId`    | string         | —                                                                          |
+| `source.pointInTime` | string         | Format: `date-time`.                                                       |
+| `progressPercent`    | integer        | —                                                                          |
+| `error`              | string or null | —                                                                          |
+| `createdAt`          | string         | Format: `date-time`.                                                       |
+| `completedAt`        | string or null | Format: `date-time`.                                                       |
+
+## databaseRestores.get
+
+Get restore progress and the new database id when ready.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/restores/{restoreId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/restores/$RESTORE_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                        |
+| ------ | ---------------------------------- |
+| `200`  | Restore job.                       |
+| `404`  | No such restore for this database. |
+
+### Response body (200)
+
+| Field                | Type           | Description                                                                |
+| -------------------- | -------------- | -------------------------------------------------------------------------- |
+| `id`                 | string         | —                                                                          |
+| `sourceDatabaseId`   | string         | —                                                                          |
+| `targetDatabaseId`   | string or null | —                                                                          |
+| `status`             | string         | One of: `queued`, `restoring`, `verifying`, `ready`, `failed`, `promoted`. |
+| `source`             | object         | —                                                                          |
+| `source.kind`        | string         | One of: `current`, `backup`, `point_in_time`.                              |
+| `source.backupId`    | string         | —                                                                          |
+| `source.pointInTime` | string         | Format: `date-time`.                                                       |
+| `progressPercent`    | integer        | —                                                                          |
+| `error`              | string or null | —                                                                          |
+| `createdAt`          | string         | Format: `date-time`.                                                       |
+| `completedAt`        | string or null | Format: `date-time`.                                                       |
+
+## databaseRestores.previewPromotion
+
+Preview the exact binding swap and mint a short-lived one-use confirmation bound to its current version.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/restores/{restoreId}/promotion-preview
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `owner`
+- **Risk:** `dangerous` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field         | Type   | Required | Description |
+| ------------- | ------ | -------- | ----------- |
+| `bindingName` | string | Yes      | —           |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/restores/$RESTORE_ID/promotion-preview" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "bindingName": "example"
+}'
+```
+
+### Responses
+
+| Status | Description                            |
+| ------ | -------------------------------------- |
+| `200`  | Exact promotion plan and confirmation. |
+| `404`  | No ready restore or binding.           |
+| `409`  | The binding target already changed.    |
+
+### Response body (200)
+
+| Field                              | Type    | Description          |
+| ---------------------------------- | ------- | -------------------- |
+| `bindingName`                      | string  | —                    |
+| `currentDatabaseId`                | string  | —                    |
+| `targetDatabaseId`                 | string  | —                    |
+| `bindingVersion`                   | integer | —                    |
+| `impact`                           | object  | —                    |
+| `impact.sourceRemainsAvailable`    | boolean | One of: `true`.      |
+| `impact.automaticDataMerge`        | boolean | One of: `false`.     |
+| `impact.connectionRestartRequired` | boolean | —                    |
+| `rollbackWindowSeconds`            | integer | —                    |
+| `planHash`                         | string  | —                    |
+| `confirmationToken`                | string  | —                    |
+| `expiresAt`                        | string  | Format: `date-time`. |
+
+## databaseRestores.promote
+
+Explicitly promote a verified restored database by swapping the selected application binding. The source remains available until separately deleted.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/restores/{restoreId}/promote
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `owner`
+- **Risk:** `dangerous` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field               | Type    | Required | Description                                                                      |
+| ------------------- | ------- | -------- | -------------------------------------------------------------------------------- |
+| `confirmed`         | boolean | Yes      | Explicit confirmation from the owner-facing confirmation dialog. One of: `true`. |
+| `confirmationToken` | string  | Yes      | Short-lived token bound to this exact action and target.                         |
+| `bindingName`       | string  | Yes      | —                                                                                |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/restores/$RESTORE_ID/promote" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "confirmed": true,
+  "confirmationToken": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "bindingName": "example"
+}'
+```
+
+### Responses
+
+| Status | Description                                    |
+| ------ | ---------------------------------------------- |
+| `200`  | Binding promoted.                              |
+| `404`  | No ready restore or binding.                   |
+| `409`  | Binding changed after confirmation was issued. |
+| `422`  | Confirmation is invalid or expired.            |
+
+### Response body (200)
+
+| Field                | Type           | Description                                                                |
+| -------------------- | -------------- | -------------------------------------------------------------------------- |
+| `id`                 | string         | —                                                                          |
+| `sourceDatabaseId`   | string         | —                                                                          |
+| `targetDatabaseId`   | string or null | —                                                                          |
+| `status`             | string         | One of: `queued`, `restoring`, `verifying`, `ready`, `failed`, `promoted`. |
+| `source`             | object         | —                                                                          |
+| `source.kind`        | string         | One of: `current`, `backup`, `point_in_time`.                              |
+| `source.backupId`    | string         | —                                                                          |
+| `source.pointInTime` | string         | Format: `date-time`.                                                       |
+| `progressPercent`    | integer        | —                                                                          |
+| `error`              | string or null | —                                                                          |
+| `createdAt`          | string         | Format: `date-time`.                                                       |
+| `completedAt`        | string or null | Format: `date-time`.                                                       |

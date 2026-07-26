@@ -1,0 +1,320 @@
+---
+title: "databaseBackups"
+description: "Encrypted managed recovery points, continuous point-in-time recovery, retention, and optional portable copies for a database."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Encrypted managed recovery points, continuous point-in-time recovery, retention, and optional portable copies for a database.
+
+## databaseBackups.list
+
+Page retained recovery points for a database.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/backups
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name     | Type    | Required | Description                                                |
+| -------- | ------- | -------- | ---------------------------------------------------------- |
+| `cursor` | string  | No       | —                                                          |
+| `limit`  | integer | No       | —                                                          |
+| `status` | string  | No       | One of: `queued`, `running`, `ready`, `failed`, `expired`. |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/backups?cursor=example" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                       |
+| ------ | --------------------------------- |
+| `200`  | Backup page.                      |
+| `404`  | No such database in this project. |
+
+### Response body (200)
+
+| Field                        | Type            | Description                                                            |
+| ---------------------------- | --------------- | ---------------------------------------------------------------------- |
+| `items`                      | object[]        | —                                                                      |
+| `items[].id`                 | string          | —                                                                      |
+| `items[].databaseId`         | string          | —                                                                      |
+| `items[].kind`               | string          | One of: `continuous`, `manual`, `daily`, `weekly`, `monthly`.          |
+| `items[].status`             | string          | One of: `queued`, `running`, `ready`, `failed`, `expired`.             |
+| `items[].recoveryPoint`      | string or null  | Format: `date-time`.                                                   |
+| `items[].sizeBytes`          | integer or null | —                                                                      |
+| `items[].destinationId`      | string or null  | —                                                                      |
+| `items[].destinationVersion` | integer or null | Exact immutable destination configuration used by this recovery point. |
+| `items[].error`              | string or null  | —                                                                      |
+| `items[].expiresAt`          | string or null  | Format: `date-time`.                                                   |
+| `items[].createdAt`          | string          | Format: `date-time`.                                                   |
+| `items[].completedAt`        | string or null  | Format: `date-time`.                                                   |
+| `nextCursor`                 | string or null  | —                                                                      |
+
+## databaseBackups.create
+
+Create an on-demand recovery point, optionally copied to a configured destination.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/backups
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field           | Type           | Required | Description |
+| --------------- | -------------- | -------- | ----------- |
+| `destinationId` | string or null | No       | —           |
+| `retentionDays` | integer        | No       | —           |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/backups" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### Responses
+
+| Status | Description                                    |
+| ------ | ---------------------------------------------- |
+| `202`  | Backup queued.                                 |
+| `404`  | No such database or destination.               |
+| `409`  | A backup is already running.                   |
+| `422`  | Database is not ready or retention is invalid. |
+
+### Response body (202)
+
+| Field                | Type            | Description                                                            |
+| -------------------- | --------------- | ---------------------------------------------------------------------- |
+| `id`                 | string          | —                                                                      |
+| `databaseId`         | string          | —                                                                      |
+| `kind`               | string          | One of: `continuous`, `manual`, `daily`, `weekly`, `monthly`.          |
+| `status`             | string          | One of: `queued`, `running`, `ready`, `failed`, `expired`.             |
+| `recoveryPoint`      | string or null  | Format: `date-time`.                                                   |
+| `sizeBytes`          | integer or null | —                                                                      |
+| `destinationId`      | string or null  | —                                                                      |
+| `destinationVersion` | integer or null | Exact immutable destination configuration used by this recovery point. |
+| `error`              | string or null  | —                                                                      |
+| `expiresAt`          | string or null  | Format: `date-time`.                                                   |
+| `createdAt`          | string          | Format: `date-time`.                                                   |
+| `completedAt`        | string or null  | Format: `date-time`.                                                   |
+
+## databaseBackups.get
+
+Get recovery-point status and metadata.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/backups/{backupId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/backups/$BACKUP_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                       |
+| ------ | --------------------------------- |
+| `200`  | Backup.                           |
+| `404`  | No such backup for this database. |
+
+### Response body (200)
+
+| Field                | Type            | Description                                                            |
+| -------------------- | --------------- | ---------------------------------------------------------------------- |
+| `id`                 | string          | —                                                                      |
+| `databaseId`         | string          | —                                                                      |
+| `kind`               | string          | One of: `continuous`, `manual`, `daily`, `weekly`, `monthly`.          |
+| `status`             | string          | One of: `queued`, `running`, `ready`, `failed`, `expired`.             |
+| `recoveryPoint`      | string or null  | Format: `date-time`.                                                   |
+| `sizeBytes`          | integer or null | —                                                                      |
+| `destinationId`      | string or null  | —                                                                      |
+| `destinationVersion` | integer or null | Exact immutable destination configuration used by this recovery point. |
+| `error`              | string or null  | —                                                                      |
+| `expiresAt`          | string or null  | Format: `date-time`.                                                   |
+| `createdAt`          | string          | Format: `date-time`.                                                   |
+| `completedAt`        | string or null  | Format: `date-time`.                                                   |
+
+## databaseBackups.delete
+
+Permanently delete an on-demand recovery point and its managed copies.
+
+```text
+DELETE /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/backups/{backupId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `owner`
+- **Risk:** `destructive` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/backups/$BACKUP_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                                    |
+| ------ | -------------------------------------------------------------- |
+| `200`  | Backup deleted.                                                |
+| `404`  | No such backup for this database.                              |
+| `422`  | Policy-managed recovery points cannot be deleted individually. |
+
+## databaseBackups.getPolicy
+
+Get continuous recovery and scheduled retention policy.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/backup-policy
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/backup-policy" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                       |
+| ------ | --------------------------------- |
+| `200`  | Backup policy.                    |
+| `404`  | No such database in this project. |
+
+### Response body (200)
+
+| Field            | Type     | Description                                                                                                |
+| ---------------- | -------- | ---------------------------------------------------------------------------------------------------------- |
+| `pitrDays`       | integer  | Continuous point-in-time recovery window. Defaults to 14 days.                                             |
+| `dailyDays`      | integer  | Daily recovery-point retention. Defaults to 30 days.                                                       |
+| `weeklyWeeks`    | integer  | Weekly recovery-point retention. Defaults to 12 weeks.                                                     |
+| `monthlyMonths`  | integer  | Monthly recovery-point retention. Defaults to 12 months.                                                   |
+| `destinationIds` | string[] | Optional additional customer-managed copies.                                                               |
+| `copyRegions`    | string[] | Reserved for future regional copy placement. Must remain empty until regional copy execution is available. |
+
+## databaseBackups.updatePolicy
+
+Replace retention, portability, and explicitly selected disaster-recovery copy areas. Longer retention and external transfer are metered.
+
+```text
+PUT /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/backup-policy
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `owner`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `dangerous` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field            | Type     | Required | Description                                                                                                |
+| ---------------- | -------- | -------- | ---------------------------------------------------------------------------------------------------------- |
+| `pitrDays`       | integer  | Yes      | Continuous point-in-time recovery window. Defaults to 14 days.                                             |
+| `dailyDays`      | integer  | Yes      | Daily recovery-point retention. Defaults to 30 days.                                                       |
+| `weeklyWeeks`    | integer  | Yes      | Weekly recovery-point retention. Defaults to 12 weeks.                                                     |
+| `monthlyMonths`  | integer  | Yes      | Monthly recovery-point retention. Defaults to 12 months.                                                   |
+| `destinationIds` | string[] | Yes      | Optional additional customer-managed copies.                                                               |
+| `copyRegions`    | string[] | Yes      | Reserved for future regional copy placement. Must remain empty until regional copy execution is available. |
+
+### Example
+
+```bash
+curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/backup-policy" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "pitrDays": 1,
+  "dailyDays": 1,
+  "weeklyWeeks": 1,
+  "monthlyMonths": 1,
+  "destinationIds": [
+    "example"
+  ],
+  "copyRegions": []
+}'
+```
+
+### Responses
+
+| Status | Description                      |
+| ------ | -------------------------------- |
+| `200`  | Updated backup policy.           |
+| `404`  | No such database or destination. |
+| `422`  | Invalid retention or copy area.  |
+
+### Response body (200)
+
+| Field            | Type     | Description                                                                                                |
+| ---------------- | -------- | ---------------------------------------------------------------------------------------------------------- |
+| `pitrDays`       | integer  | Continuous point-in-time recovery window. Defaults to 14 days.                                             |
+| `dailyDays`      | integer  | Daily recovery-point retention. Defaults to 30 days.                                                       |
+| `weeklyWeeks`    | integer  | Weekly recovery-point retention. Defaults to 12 weeks.                                                     |
+| `monthlyMonths`  | integer  | Monthly recovery-point retention. Defaults to 12 months.                                                   |
+| `destinationIds` | string[] | Optional additional customer-managed copies.                                                               |
+| `copyRegions`    | string[] | Reserved for future regional copy placement. Must remain empty until regional copy execution is available. |
+
+## databaseBackups.recoveryWindow
+
+Get the oldest and newest recoverable timestamps and any continuity gaps.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/recovery-window
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/recovery-window" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                       |
+| ------ | --------------------------------- |
+| `200`  | Continuous recovery window.       |
+| `404`  | No such database in this project. |
+
+### Response body (200)
+
+| Field          | Type           | Description          |
+| -------------- | -------------- | -------------------- |
+| `oldest`       | string or null | Format: `date-time`. |
+| `newest`       | string or null | Format: `date-time`. |
+| `gaps`         | object[]       | —                    |
+| `gaps[].from`  | string         | Format: `date-time`. |
+| `gaps[].until` | string         | Format: `date-time`. |

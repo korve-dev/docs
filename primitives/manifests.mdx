@@ -1,82 +1,73 @@
 ---
-title: "Manifests (IaC)"
-description: "Declare your organization's desired state in korve.yaml; plan and apply to reconcile."
+title: "Infrastructure as code"
+description: "Export, plan, and apply organization state from TOML, JSON, or YAML."
 ---
 
-A manifest declares the desired state of an organization's projects,
-environment, domains, and platform resources. The platform reconciles
-toward it — and **never deletes**: resources you stop declaring are
-reported as orphaned and left alone.
-
-## Full reference: `korve.yaml`
+Korve manifests reconcile projects and their runtime, Git source, environment variables, named
+environments, domains, storage, queues, crons, databases, caches, preview database-branch policy,
+alerts, app access, and project maintenance. The same versioned contract drives CLI, API, dashboard,
+and MCP.
 
 ```yaml
-version: 1 # required, always 1
-organization: acme # required — the org slug this manifest targets
-
+version: 1
+organization: acme
 projects:
-  - name: Storefront # required — display name
-    slug: storefront # required — permanent; becomes storefront.korve.app
-    runtimeClass: scale-to-zero # required — scale-to-zero | always-on
-    git: # optional — push-to-deploy + PR previews
-      repo: acme/storefront # required inside git
-      ref: main # optional — production branch
-    env: # optional — KEY: value map
-      NODE_ENV: production
-      API_BASE_URL: https://api.example.com
-    domains: # optional — custom hostnames
-      - app.acme.com
-    storage: # optional — named storage resources
-      - name: uploads
-    queues: # optional — named queues
-      - name: jobs
+  - name: Storefront
+    slug: storefront
+    runtimeClass: scale-to-zero
+    git: { repo: acme/storefront, ref: main }
+    env: { NODE_ENV: production }
+    storage:
+      - { name: uploads, region: us-east }
+    queues:
+      - name: emails
+        consumer: { path: /jobs/email, maxRetries: 3 }
+    crons:
+      - name: nightly
+        schedule: "0 2 * * *"
+        timezone: UTC
+        target: { kind: queue, queue: emails, body: { kind: nightly } }
+    databases:
+      - name: primary
+        sku: db-s1
+        region: us-east
+        backup: { pitrDays: 14, dailyDays: 30, weeklyWeeks: 12, monthlyMonths: 12 }
+    caches:
+      - { name: sessions, sku: cache-n1, region: us-east, persistence: aof }
+    access:
+      mode: organization
+      previewMode: invite_only
+      environments: { staging: authenticated }
+    maintenance:
+      enabled: true
+      schedule: daily
+      categories: [security, reliability, performance, cost]
+      environments: [production]
+      autoRemediation:
+        enabled: false
+        maximumRisk: read
+        allowedOperationIds: []
+        maxActionsPerRun: 5
 ```
 
-Field rules mirror the API: slugs match `^[a-z][a-z0-9-]{1,61}$`, repos are
-`owner/repo`, env keys are `UPPER_SNAKE`. Runtime class is immutable after
-creation — changing it in the manifest is reported as invalid rather than
-applied.
-
-## plan / apply
+The exact supported region and SKU values come from `korve regions` and the live API contract.
+Scale-to-zero projects must not declare a compute region. `production` and `preview` are implicit,
+so named `environments` must use other slugs.
 
 ```bash
-korve manifest plan -f korve.yaml      # dry run — prints the plan, changes nothing
-korve manifest apply -f korve.yaml     # plans, asks for confirmation, applies
-korve manifest apply -f korve.yaml --yes   # CI mode: skip the confirmation
+korve manifest export -o korve.toml
+korve manifest plan -f korve.toml
+korve manifest apply -f korve.toml
 ```
 
-A plan is a list of actions, each typed:
+Format follows the `.toml`, `.json`, `.yaml`, or `.yml` extension. Plans classify actions as create,
+update, no-op, deferred, invalid, or orphaned. Apply creates and updates declared resources but does
+not delete live resources omitted from the file.
 
-| Action     | Meaning                                                        |
-| ---------- | -------------------------------------------------------------- |
-| `create`   | Declared but doesn't exist — will be created                   |
-| `update`   | Exists but differs — will be updated                           |
-| `noop`     | Already matches                                                |
-| `orphaned` | Exists but is not declared — reported, **never deleted**       |
-| `deferred` | Can't be applied yet (e.g. depends on something being created) |
-| `invalid`  | The declared change isn't allowed (e.g. runtime class change)  |
+Omitting `access` or `maintenance` leaves the live policy unmanaged. A protected access policy cannot
+apply until the access gateway reports enforcement `ready`. Maintenance auto-remediation uses an
+exact public operation-id allowlist; dangerous and destructive actions remain human-gated.
 
-API: `GET /v1/orgs/{orgId}/manifest` (export),
-`POST .../manifest/plan`, `POST .../manifest/apply` — all `admin` role;
-apply requires active billing. See the
-[Manifest API](/api-reference/manifest). Over MCP:
-`await korve.manifest.plan({ orgId, body: manifest })`.
-
-## Exporting current state
-
-```bash
-korve manifest export -o korve.yaml
-```
-
-Round-trips the organization's live state into a manifest. **Secret values
-are masked** as `********` on export, and masked values are **ignored on
-apply** — so the export → commit → apply loop never moves secrets through
-git. Set real values with
-[`korve env set`](/primitives/environment-variables).
-
-## A good workflow
-
-1. `korve manifest export -o korve.yaml` — snapshot reality.
-2. Edit, commit, PR — your infrastructure is now reviewed like code.
-3. `korve manifest plan -f korve.yaml` in CI — the diff is the review.
-4. `korve manifest apply -f korve.yaml --yes` on merge.
+Exports replace secret values and encrypted destinations with `********`. Applying that placeholder
+preserves the live value. Never replace it with plaintext in version control. See the
+[Manifest API](/api-reference/manifest).

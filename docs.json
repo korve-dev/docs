@@ -2,75 +2,132 @@
   "$schema": "https://mintlify.com/docs.json",
   "name": "Korve",
   "theme": "mint",
-  "colors": {
-    "primary": "#7c6cf0",
-    "light": "#9d90f5",
-    "dark": "#5b4ee0"
-  },
-  "appearance": {
-    "default": "dark"
-  },
+  "logo": { "light": "/logo-light.svg", "dark": "/logo-dark.svg" },
+  "favicon": "/favicon.svg",
+  "colors": { "primary": "#7867f2", "light": "#9e92f7", "dark": "#5d4bd8" },
+  "appearance": { "default": "dark" },
+  "seo": { "metatags": { "canonical": "https://docs.korve.dev" } },
+  "topbarLinks": [{ "name": "Dashboard", "url": "https://korve.dev" }],
+  "topbarCtaButton": { "name": "Open Korve", "url": "https://korve.dev" },
+  "anchors": [
+    { "name": "API status", "icon": "signal", "url": "https://api.korve.dev/v1/health" },
+    { "name": "GitHub", "icon": "github", "url": "https://github.com/korve-dev" }
+  ],
   "navigation": {
     "groups": [
       {
-        "group": "Getting started",
-        "pages": ["introduction", "quickstart", "install-cli", "pricing"]
+        "group": "Start",
+        "pages": ["introduction", "quickstart", "install-cli", "pricing", "troubleshooting"]
       },
       {
-        "group": "Agents",
-        "pages": ["agents/mcp-setup", "agents/agent-onboarding", "agents/skills"]
-      },
-      {
-        "group": "Primitives",
+        "group": "Core concepts",
         "pages": [
-          "primitives/deploys",
-          "primitives/databases",
-          "primitives/storage",
-          "primitives/logs",
-          "primitives/budgets-and-usage",
-          "primitives/domains",
-          "primitives/environments",
-          "primitives/environment-variables",
-          "primitives/previews",
-          "primitives/manifests",
-          "primitives/remediation"
+          "concepts/projects-and-environments",
+          "concepts/runtime-and-regions",
+          "concepts/security-and-roles",
+          "concepts/billing-and-budgets"
         ]
       },
       {
+        "group": "Agents",
+        "pages": [
+          "agents/agent-onboarding",
+          "agents/oauth",
+          "agents/mcp-setup",
+          "agents/skills",
+          "agents/safe-automation"
+        ]
+      },
+      {
+        "group": "Build",
+        "pages": [
+          "sdk/runtime",
+          "sdk/app-auth",
+          "primitives/deploys",
+          "primitives/app-access",
+          "primitives/project-operator",
+          "primitives/deployment-agent",
+          "primitives/environments",
+          "primitives/environment-variables",
+          "primitives/previews",
+          "primitives/domains",
+          "primitives/manifests"
+        ]
+      },
+      {
+        "group": "Data and work",
+        "pages": [
+          "primitives/databases",
+          "primitives/backups",
+          "primitives/database-branches",
+          "primitives/storage",
+          "primitives/caches",
+          "primitives/queues",
+          "primitives/crons"
+        ]
+      },
+      {
+        "group": "Operate",
+        "pages": [
+          "primitives/project-maintenance",
+          "primitives/logs",
+          "primitives/metrics",
+          "primitives/alerts",
+          "primitives/advisor",
+          "primitives/budgets-and-usage",
+          "primitives/remediation"
+        ]
+      },
+      { "group": "CLI reference", "pages": ["cli/overview", "cli/commands"] },
+      {
         "group": "API reference",
+        "openapi": "openapi.json",
         "pages": [
           "api-reference/overview",
           "api-reference/system",
           "api-reference/regions",
           "api-reference/me",
           "api-reference/orgs",
+          "api-reference/agentAuth",
           "api-reference/apikeys",
           "api-reference/billing",
           "api-reference/projects",
-          "api-reference/deploys",
-          "api-reference/previews",
+          "api-reference/appAccess",
+          "api-reference/projectOperator",
+          "api-reference/projectMaintenance",
           "api-reference/environments",
+          "api-reference/deploys",
+          "api-reference/deploymentAgent",
+          "api-reference/previews",
           "api-reference/env",
           "api-reference/logs",
           "api-reference/analytics",
+          "api-reference/metrics",
+          "api-reference/alertChannels",
+          "api-reference/alertPolicies",
+          "api-reference/alertIncidents",
+          "api-reference/appauth",
           "api-reference/domains",
-          "api-reference/database",
+          "api-reference/databases",
+          "api-reference/caches",
+          "api-reference/databaseBackups",
+          "api-reference/backupDestinations",
+          "api-reference/databaseExports",
+          "api-reference/databaseRestores",
+          "api-reference/databaseBranches",
+          "api-reference/advisor",
+          "api-reference/queues",
+          "api-reference/crons",
           "api-reference/storage",
           "api-reference/buckets",
           "api-reference/budgets",
           "api-reference/usage",
+          "api-reference/webhooks",
           "api-reference/manifest"
         ]
-      },
-      {
-        "group": "CLI reference",
-        "pages": ["cli/overview", "cli/commands"]
       }
     ]
   },
-  "footer": {
-    "socials": {
-      "github": "https://github.com/korve-dev"
-    }
-  }
+  "footer": { "socials": { "github": "https://github.com/korve-dev" } },
+  "redirects": [{ "source": "/docs/:slug*", "destination": "/:slug*" }]
 }

@@ -1,0 +1,21 @@
+---
+title: "Safe automation"
+description: "Build agents and CI that inspect first, plan changes, and preserve human control."
+---
+
+Use a `member` key for observation and an `admin` key only when an automation must change resources.
+Keep organization, project, and environment explicit in unattended jobs.
+
+1. Discover with MCP `search`, the OpenAPI document, or a CLI `list` command.
+2. Read current state before creating a named resource.
+3. Prefer `manifest plan` before `manifest apply` for multi-resource changes.
+4. Stop on authentication, authorization, billing, validation, and not-found errors; do not retry
+   them blindly.
+5. Ask for approval when an operation is marked `dangerous` or `destructive`.
+6. Verify the resulting state and application URL after a write.
+
+Project operators and maintenance follow the same boundary: read-only tools may run immediately,
+but protected mutations become persisted, version-bound pending actions. A signed-in human decides
+the exact action; approval does not grant a reusable credential. See
+[Project operator](/primitives/project-operator) and
+[Project maintenance](/primitives/project-maintenance).

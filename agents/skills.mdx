@@ -3,10 +3,9 @@ title: "Skills"
 description: "Pre-built knowledge packs that teach coding agents how to operate Korve."
 ---
 
-Skills are markdown knowledge packs (SKILL.md files) that agent harnesses
-like Claude Code load on demand. They encode the Korve mental model, the
-golden paths, and the troubleshooting recipes so your agent doesn't have to
-rediscover them every session.
+Skills are markdown knowledge packs (`SKILL.md` files) that compatible agent harnesses load on
+demand. They encode the Korve mental model, golden paths, and troubleshooting recipes so your
+agent does not have to rediscover them every session.
 
 ## Install
 
@@ -14,17 +13,28 @@ rediscover them every session.
 curl -fsSL https://korve.dev/skills.sh | sh
 ```
 
-The installer places the skills where your harness discovers them.
+Claude is the backward-compatible default. Choose the target harness and scope explicitly when
+installing for the open Agent Skills directory or Codex:
+
+```bash
+curl -fsSL https://korve.dev/skills.sh | sh -s -- --agent agents --global
+curl -fsSL https://korve.dev/skills.sh | sh -s -- --agent codex --global
+curl -fsSL https://korve.dev/skills.sh | sh -s -- --agent claude --global
+```
+
+The supported values are `--agent agents`, `--agent codex`, and `--agent claude`. Replace
+`--global` with `--project` to install into the current repository.
 
 ## What's in the box
 
-| Skill                | What it teaches                                                                     |
-| -------------------- | ----------------------------------------------------------------------------------- |
-| `korve-platform`     | The platform mental model: orgs, projects, runtime classes, primitives, billing.    |
-| `korve-deploy-app`   | The golden path to ship an app: create, connect repo, deploy, verify, troubleshoot. |
-| `korve-mcp-setup`    | Wiring any MCP client to `mcp.korve.dev` and using the `search`/`execute` tools.    |
-| `korve-cli-setup`    | Installing and configuring the CLI, auth, config precedence, exit codes.            |
-| `korve-api-querying` | Calling the REST API directly: auth headers, the error envelope, pagination habits. |
+| Skill                     | What it teaches                                                                                          |
+| ------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `korve-platform`          | Organizations, projects, runtime classes, optional primitives, billing, and equivalent control surfaces. |
+| `korve-quickstart-deploy` | The concise create, connect, deploy, verify, and troubleshoot path.                                      |
+| `korve-ship-app`          | The agent execution loop from repository inspection through a production smoke test.                     |
+| `korve-mcp-setup`         | Connecting MCP clients and using the `search` and `execute` Code Mode tools safely.                      |
+| `korve-cli-setup`         | CLI installation, authentication, configuration precedence, commands, and exit codes.                    |
+| `korve-iac`               | TOML, JSON, and YAML manifests with plan, apply, export, drift, and immutability semantics.              |
 
 Skills are versioned with the platform; re-run the installer to update.
 

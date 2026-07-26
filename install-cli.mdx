@@ -13,9 +13,9 @@ The installer puts the binary in `~/.korve/bin/korve` (override with
 `KORVE_INSTALL_DIR`) and tells you if that directory needs adding to your
 `PATH`.
 
-**Platforms:** macOS on Apple Silicon (`darwin-arm64`) is published today;
-more platforms are coming. The installer fails with a clear message on
-anything else.
+**Published binaries:** macOS on Apple Silicon (`darwin-arm64`), Linux x86-64
+(`linux-x64`), and Linux ARM64 (`linux-arm64`). The installer fails with a
+source-build command on unsupported systems.
 
 Verify:
 
@@ -24,33 +24,47 @@ korve --version
 korve health   # checks API liveness, no auth needed
 ```
 
-## Authenticate
+## Authenticate interactively
 
-The CLI authenticates with an org-scoped API key
-([minted in the dashboard](/quickstart#2-mint-an-api-key)):
+The primary sign-in path is browser OAuth with PKCE:
 
 ```bash
-korve login --org <org-id>
+korve login
 ```
 
-The key is read from `--api-key`, then `$KORVE_API_KEY`, then prompted on
-stdin. Login validates the key against your organization before storing
-`{api_key, org_id, api_url}` in `~/.config/korve/config.toml` with `0600`
-permissions. `korve logout` deletes the file.
+The CLI opens a browser authorization page and listens on a random literal
+`127.0.0.1` callback port. On macOS, it first stores the resulting short-lived access
+token and rotating refresh token in Keychain. On Linux, when Keychain is unavailable,
+or when `KORVE_CONFIG_DIR` is set, the private-file fallback is
+`${KORVE_CONFIG_DIR:-~/.config/korve}/oauth-credentials.toml` with `0600`
+permissions. Non-secret organization, grant, and API URL metadata live separately
+in `~/.config/korve/config.toml`; a legacy API key, when used, is stored there with
+`0600` permissions. `korve logout` removes the stored login material. See
+[Agent OAuth](/agents/oauth).
+
+For unattended CI, a legacy organization API key remains supported:
+
+```bash
+korve login --org "$KORVE_ORG" --api-key "$KORVE_API_KEY"
+```
 
 ## Configuration precedence
 
 Every setting resolves the same way — explicit beats ambient:
 
-| Setting | Resolution order                                                         |
-| ------- | ------------------------------------------------------------------------ |
-| API key | `$KORVE_API_KEY` → config file                                           |
-| Org     | `$KORVE_ORG` → config file                                               |
-| API URL | `--api-url` / `$KORVE_API_URL` → config file → `https://api.korve.dev`   |
-| Project | `--project` → `$KORVE_PROJECT` → `.korve.toml` (written by `korve link`) |
+| Setting    | Resolution order                                                         |
+| ---------- | ------------------------------------------------------------------------ |
+| Credential | `$KORVE_API_KEY` → stored OAuth access/refresh pair → stored API key     |
+| Org        | `$KORVE_ORG` → config file                                               |
+| API URL    | `--api-url` / `$KORVE_API_URL` → config file → `https://api.korve.dev`   |
+| Project    | `--project` → `$KORVE_PROJECT` → `.korve.toml` (written by `korve link`) |
 
-For CI and agents, skip `login` entirely and set `KORVE_API_KEY` +
-`KORVE_ORG` in the environment.
+For CI, skip persisted login and set `KORVE_API_KEY` + `KORVE_ORG` in the
+environment. Never copy a local OAuth refresh token into CI.
+
+OAuth grants deliberately stop at admin. Commands backed by owner-only operations
+(for example destructive project deletion) fail locally with an explicit instruction
+to use a separately revocable organization API key.
 
 ## Shell completions
 

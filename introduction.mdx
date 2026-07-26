@@ -3,17 +3,23 @@ title: "Introduction"
 description: "Korve is an agent-era platform: deploy full-stack apps with batteries included."
 ---
 
-Korve deploys full-stack apps to `your-app.korve.app` with managed Postgres,
-object storage, logs, custom domains, and budgets out of the box — plus a
-platform agent that diagnoses failed deploys for you.
+Build an application with an agent, deploy it from Git, and operate it through
+one contract. Korve gives each project a managed `your-app.korve.app` URL and
+optional databases, storage, queues, crons, caches, observability, recovery,
+custom domains, and spend controls — plus a deployment agent that investigates
+failures and proposes approval-gated actions.
 
-It is built agents-first. Every capability ships on four surfaces that speak
-the same typed API, with identical permissions and identical behavior:
+The shortest path from repository to live application is `korve init`: it
+detects the Git source, writes a reviewable manifest, shows the plan, applies
+it, links the directory, deploys, and verifies the terminal deployment state.
+
+It is built agents-first. Public operator capabilities are declared once and
+projected onto four surfaces with the same permissions and behavior:
 
 1. **API** — `https://api.korve.dev`, described by a public spec at
    [`GET /v1/spec`](/api-reference/system). See the
    [API reference](/api-reference/overview).
-2. **CLI** — the `korve` binary. Every API operation a key can call maps to
+2. **CLI** — the `korve` binary. Every public API operation a key can call maps to
    exactly one command (a tested parity guarantee). See the
    [CLI reference](/cli/overview).
 3. **MCP** — `https://mcp.korve.dev/mcp`, two tools: `search` the API and
@@ -21,8 +27,8 @@ the same typed API, with identical permissions and identical behavior:
 4. **Dashboard** — the convenience layer at korve.dev for the things humans
    prefer to click.
 
-Anything you can click, an agent can call. If your agent can read this page,
-it can run your infrastructure — start with
+Agents can call the complete public operator surface; identity, billing, and
+membership work that requires a dashboard session stays intentionally human-gated. Start with
 [agent onboarding](/agents/agent-onboarding).
 
 ## How Korve is built
@@ -37,9 +43,9 @@ it can run your infrastructure — start with
 - **Declarative when you want it.** Describe projects, environment, and
   domains in a [manifest](/primitives/manifests) and apply it. The platform
   reconciles and never deletes anything you didn't ask it to.
-- **Self-healing by default.** Failed deploys can be diagnosed by
-  [the platform agent](/primitives/remediation), which returns a structured
-  cause and suggested fix.
+- **Assisted operations.** Failed deploys can be diagnosed by
+  [the deployment agent](/primitives/deployment-agent), which persists the
+  conversation and requires approval before any mutation.
 
 ## Runtime classes
 

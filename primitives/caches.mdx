@@ -1,0 +1,21 @@
+---
+title: "Managed caches"
+description: "Create an isolated TLS-compatible cache beside your application and database."
+---
+
+Managed caches are environment-scoped and expose a shown-once TLS connection string. Choose a
+supported cache region independently from the project's compute region; co-locate latency-sensitive
+workloads when possible.
+
+```bash
+korve caches create sessions --env production --sku cache-n1 --region us-east \
+  --persistence aof --eviction-policy allkeys-lru
+korve caches get sessions
+```
+
+Persistence is `aof` or `none`. Eviction policies are `allkeys-lru`, `allkeys-lfu`, `volatile-lru`,
+or `noeviction`. Rotate credentials when exposure is suspected; rotation invalidates the old
+connection material.
+
+Inside a deployed server runtime, `createKorve().cache("sessions").connectionString` resolves the
+injected secret. Never send it to a browser or log it. See the [Caches API](/api-reference/caches).

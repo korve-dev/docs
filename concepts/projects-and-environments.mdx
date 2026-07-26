@@ -1,0 +1,24 @@
+---
+title: "Projects and environments"
+description: "How Korve scopes apps, configuration, previews, and resources."
+---
+
+An organization contains projects. A project is one deployable application with a permanent slug,
+a production environment, and optional named environments. The slug addresses both the API and the
+managed `https://<slug>.korve.app` hostname.
+
+`production` and `preview` are implicit. Create named environments such as `staging` when you need
+a stable URL and independent configuration. Environment-scoped resources never silently fall back
+to production.
+
+```bash
+korve environments create staging --name "Staging"
+korve env set --env staging API_ORIGIN=https://staging-api.example.com
+korve deploy --env staging
+```
+
+Project commands resolve `--project`, then `KORVE_PROJECT`, then the project written by
+`korve link <slug>`. Use explicit project and environment arguments in CI.
+
+See [Environments](/primitives/environments), [previews](/primitives/previews), and the
+[Projects API](/api-reference/projects).

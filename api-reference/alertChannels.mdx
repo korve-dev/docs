@@ -1,0 +1,255 @@
+---
+title: "alertChannels"
+description: "Organization alert delivery channels for email, signed HTTPS webhooks, and Slack. Destinations and stored credentials are masked after creation."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Organization alert delivery channels for email, signed HTTPS webhooks, and Slack. Destinations and stored credentials are masked after creation.
+
+## alertChannels.list
+
+List alert channels with masked destinations and credential hints.
+
+```text
+GET /v1/orgs/{orgId}/alert-channels
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/alert-channels" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                            |
+| ------ | -------------------------------------- |
+| `200`  | Masked alert channels ordered by name. |
+
+### Response body (200)
+
+An array of objects with these fields:
+
+| Field               | Type           | Description                                                             |
+| ------------------- | -------------- | ----------------------------------------------------------------------- |
+| `id`                | string         | —                                                                       |
+| `name`              | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                      |
+| `kind`              | string         | One of: `email`, `signed_webhook`, `slack`.                             |
+| `destinationMasked` | string or null | Masked email address or endpoint. Full destinations are never returned. |
+| `secretHint`        | string or null | Non-secret suffix that identifies which stored credential is active.    |
+| `verified`          | boolean        | —                                                                       |
+| `createdAt`         | string         | Format: `date-time`.                                                    |
+| `updatedAt`         | string         | Format: `date-time`.                                                    |
+
+## alertChannels.create
+
+Create an email, signed webhook, or Slack channel. Endpoint credentials are encrypted; a generated signing secret is shown only once.
+
+```text
+POST /v1/orgs/{orgId}/alert-channels
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field        | Type   | Required | Description                                                                                   |
+| ------------ | ------ | -------- | --------------------------------------------------------------------------------------------- |
+| `name`       | string | Yes      | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                            |
+| `kind`       | string | Yes      | One of: `email`, `signed_webhook`, `slack`.                                                   |
+| `email`      | string | No       | Format: `email`.                                                                              |
+| `webhookUrl` | string | No       | HTTPS endpoint or incoming Slack webhook. Stored encrypted and never returned. Format: `uri`. |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/alert-channels" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "example",
+  "kind": "email"
+}'
+```
+
+### Responses
+
+| Status | Description                                                           |
+| ------ | --------------------------------------------------------------------- |
+| `201`  | Alert channel created. A signed webhook secret is shown exactly once. |
+| `409`  | An alert channel with that name already exists.                       |
+| `422`  | Channel kind and destination do not match or are invalid.             |
+
+### Response body (201)
+
+| Field               | Type           | Description                                                                                              |
+| ------------------- | -------------- | -------------------------------------------------------------------------------------------------------- |
+| `id`                | string         | —                                                                                                        |
+| `name`              | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                       |
+| `kind`              | string         | One of: `email`, `signed_webhook`, `slack`.                                                              |
+| `destinationMasked` | string or null | Masked email address or endpoint. Full destinations are never returned.                                  |
+| `secretHint`        | string or null | Non-secret suffix that identifies which stored credential is active.                                     |
+| `verified`          | boolean        | —                                                                                                        |
+| `createdAt`         | string         | Format: `date-time`.                                                                                     |
+| `updatedAt`         | string         | Format: `date-time`.                                                                                     |
+| `signingSecret`     | string or null | For a signed webhook, the delivery verification secret shown exactly once; null for other channel kinds. |
+
+## alertChannels.get
+
+Get one alert channel with its destination and credentials masked.
+
+```text
+GET /v1/orgs/{orgId}/alert-channels/{channelId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/alert-channels/$CHANNEL_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                 |
+| ------ | ------------------------------------------- |
+| `200`  | Masked alert channel.                       |
+| `404`  | No such alert channel in this organization. |
+
+### Response body (200)
+
+| Field               | Type           | Description                                                             |
+| ------------------- | -------------- | ----------------------------------------------------------------------- |
+| `id`                | string         | —                                                                       |
+| `name`              | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                      |
+| `kind`              | string         | One of: `email`, `signed_webhook`, `slack`.                             |
+| `destinationMasked` | string or null | Masked email address or endpoint. Full destinations are never returned. |
+| `secretHint`        | string or null | Non-secret suffix that identifies which stored credential is active.    |
+| `verified`          | boolean        | —                                                                       |
+| `createdAt`         | string         | Format: `date-time`.                                                    |
+| `updatedAt`         | string         | Format: `date-time`.                                                    |
+
+## alertChannels.update
+
+Rename a channel or replace its destination and encrypted credential. Omitted secret fields keep the stored value.
+
+```text
+PATCH /v1/orgs/{orgId}/alert-channels/{channelId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field        | Type   | Required | Description                                                                                   |
+| ------------ | ------ | -------- | --------------------------------------------------------------------------------------------- |
+| `name`       | string | No       | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                            |
+| `kind`       | string | No       | One of: `email`, `signed_webhook`, `slack`.                                                   |
+| `email`      | string | No       | Format: `email`.                                                                              |
+| `webhookUrl` | string | No       | HTTPS endpoint or incoming Slack webhook. Stored encrypted and never returned. Format: `uri`. |
+
+### Example
+
+```bash
+curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/alert-channels/$CHANNEL_ID" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### Responses
+
+| Status | Description                                               |
+| ------ | --------------------------------------------------------- |
+| `200`  | Updated masked alert channel.                             |
+| `404`  | No such alert channel in this organization.               |
+| `422`  | Channel kind and destination do not match or are invalid. |
+
+### Response body (200)
+
+| Field               | Type           | Description                                                             |
+| ------------------- | -------------- | ----------------------------------------------------------------------- |
+| `id`                | string         | —                                                                       |
+| `name`              | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                      |
+| `kind`              | string         | One of: `email`, `signed_webhook`, `slack`.                             |
+| `destinationMasked` | string or null | Masked email address or endpoint. Full destinations are never returned. |
+| `secretHint`        | string or null | Non-secret suffix that identifies which stored credential is active.    |
+| `verified`          | boolean        | —                                                                       |
+| `createdAt`         | string         | Format: `date-time`.                                                    |
+| `updatedAt`         | string         | Format: `date-time`.                                                    |
+
+## alertChannels.delete
+
+Delete an alert channel and stop future deliveries through it.
+
+```text
+DELETE /v1/orgs/{orgId}/alert-channels/{channelId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `owner`
+- **Risk:** `destructive` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/alert-channels/$CHANNEL_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                 |
+| ------ | ------------------------------------------- |
+| `200`  | Alert channel deleted.                      |
+| `404`  | No such alert channel in this organization. |
+| `409`  | An alert policy still uses this channel.    |
+
+## alertChannels.test
+
+Send a clearly labeled test notification through an alert channel.
+
+```text
+POST /v1/orgs/{orgId}/alert-channels/{channelId}/test
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+A `object` value.
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/alert-channels/$CHANNEL_ID/test" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `202`  | Test delivery accepted.                                  |
+| `404`  | No such alert channel in this organization.              |
+| `422`  | Channel is unverified or its delivery failed validation. |

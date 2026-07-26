@@ -1,0 +1,121 @@
+---
+title: "Webhooks"
+description: "Organization webhooks. Register an HTTPS endpoint to receive signed platform events: deploy failures and budget threshold crossings."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Organization webhooks. Register an HTTPS endpoint to receive signed platform events: deploy failures and budget threshold crossings.
+
+## webhooks.list
+
+List the organization's webhook endpoints with their subscribed event types. Signing secrets are never shown.
+
+```text
+GET /v1/orgs/{orgId}/webhooks
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/webhooks" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                      |
+| ------ | -------------------------------- |
+| `200`  | Webhook endpoints, oldest first. |
+
+### Response body (200)
+
+An array of objects with these fields:
+
+| Field       | Type     | Description                                                   |
+| ----------- | -------- | ------------------------------------------------------------- |
+| `id`        | string   | —                                                             |
+| `url`       | string   | HTTPS endpoint events are POSTed to. Unique per organization. |
+| `events`    | string[] | Event types delivered to this endpoint, in canonical order.   |
+| `createdAt` | string   | Format: `date-time`.                                          |
+
+## webhooks.create
+
+Register a webhook endpoint for one or more event types. The response carries the signing secret exactly once — verify each delivery's korve-signature header against it.
+
+```text
+POST /v1/orgs/{orgId}/webhooks
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field    | Type     | Required | Description                                                                                      |
+| -------- | -------- | -------- | ------------------------------------------------------------------------------------------------ |
+| `url`    | string   | Yes      | HTTPS endpoint to deliver events to, e.g. "https://hooks.acme.com/korve". Plain http is refused. |
+| `events` | string[] | Yes      | Event types to deliver. At least one; duplicates are ignored.                                    |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/webhooks" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "url": "https://hooks.acme.com/korve",
+  "events": [
+    "deploy.failed"
+  ]
+}'
+```
+
+### Responses
+
+| Status | Description                                                                                 |
+| ------ | ------------------------------------------------------------------------------------------- |
+| `201`  | Webhook registered. `secret` is the signing secret — shown exactly once; store it securely. |
+| `409`  | That URL already receives this organization's events.                                       |
+| `422`  | Not an https:// URL, or no valid event types.                                               |
+
+### Response body (201)
+
+| Field       | Type     | Description                                                                                                                                                              |
+| ----------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `id`        | string   | —                                                                                                                                                                        |
+| `url`       | string   | HTTPS endpoint events are POSTed to. Unique per organization.                                                                                                            |
+| `events`    | string[] | Event types delivered to this endpoint, in canonical order.                                                                                                              |
+| `createdAt` | string   | Format: `date-time`.                                                                                                                                                     |
+| `secret`    | string   | The signing secret deliveries are HMAC'd with. Shown exactly once — it is never retrievable later. Store it with the receiving service. Pattern: `^whsec_[0-9a-f]{40}$`. |
+
+## webhooks.delete
+
+Delete a webhook endpoint. Deliveries to it stop immediately.
+
+```text
+DELETE /v1/orgs/{orgId}/webhooks/{webhookId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `destructive` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/webhooks/$WEBHOOK_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                           |
+| ------ | ------------------------------------- |
+| `200`  | Webhook deleted.                      |
+| `404`  | No such webhook in this organization. |

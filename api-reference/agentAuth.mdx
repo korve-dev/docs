@@ -1,0 +1,353 @@
+---
+title: "agentAuth"
+description: "OAuth 2.1 authorization-code grants for Korve's CLI and MCP clients. Access tokens are short-lived, refresh tokens rotate, and every grant is organization-, audience-, scope-, user-, and role-bound."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+OAuth 2.1 authorization-code grants for Korve's CLI and MCP clients. Access tokens are short-lived, refresh tokens rotate, and every grant is organization-, audience-, scope-, user-, and role-bound.
+
+## agentAuth.createAuthorizationRequest
+
+Begin a first-party OAuth authorization-code flow with PKCE.
+
+```text
+POST /v1/agent-auth/authorization-requests
+```
+
+- **Auth:** None — public endpoint.
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field                 | Type     | Required | Description                                                                                             |
+| --------------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------- |
+| `clientId`            | string   | Yes      | One of: `korve-cli`, `korve-mcp`.                                                                       |
+| `redirectUri`         | string   | Yes      | Format: `uri`.                                                                                          |
+| `state`               | string   | Yes      | —                                                                                                       |
+| `codeChallenge`       | string   | Yes      | Base64url SHA-256 digest of the client's PKCE verifier. Pattern: `^[A-Za-z0-9_-]{43}$`.                 |
+| `codeChallengeMethod` | string   | Yes      | One of: `S256`.                                                                                         |
+| `audience`            | string   | Yes      | The first-party client surface that may present the resulting token. One of: `cli`, `mcp`.              |
+| `scopes`              | string[] | Yes      | Exact public API operation ids the grant may call.                                                      |
+| `requestedRole`       | string   | Yes      | Maximum organization role the grant may exercise. Owner grants do not exist. One of: `member`, `admin`. |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/agent-auth/authorization-requests" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "clientId": "korve-cli",
+  "redirectUri": "https://app.acme.com/callback",
+  "state": "examplexxxxxxxxxxxxxxxxxxxxxxxxx",
+  "codeChallenge": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "codeChallengeMethod": "S256",
+  "audience": "cli",
+  "scopes": [
+    "projects.read"
+  ],
+  "requestedRole": "member"
+}'
+```
+
+### Responses
+
+| Status | Description                                                        |
+| ------ | ------------------------------------------------------------------ |
+| `201`  | Authorization request created; open authorizationUrl in a browser. |
+| `422`  | Invalid client, redirect, state, PKCE challenge, scope, or role.   |
+| `429`  | Too many authorization attempts from this network source.          |
+
+### Response body (201)
+
+| Field              | Type   | Description          |
+| ------------------ | ------ | -------------------- |
+| `requestId`        | string | Format: `uuid`.      |
+| `authorizationUrl` | string | Format: `uri`.       |
+| `expiresAt`        | string | Format: `date-time`. |
+
+## agentAuth.getAuthorizationRequest
+
+Inspect a pending first-party authorization request before approving or denying it.
+
+```text
+GET /v1/agent-auth/authorization-requests/{requestId}
+```
+
+- **Auth:** Dashboard session only — organization API keys are rejected.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/agent-auth/authorization-requests/$REQUEST_ID" \
+  -b "$SESSION"
+```
+
+### Responses
+
+| Status | Description                                                          |
+| ------ | -------------------------------------------------------------------- |
+| `200`  | Safe approval details; redirect and credential material are omitted. |
+| `404`  | Unknown, expired, approved, denied, or consumed request.             |
+
+### Response body (200)
+
+| Field           | Type     | Description                                                                                             |
+| --------------- | -------- | ------------------------------------------------------------------------------------------------------- |
+| `requestId`     | string   | Format: `uuid`.                                                                                         |
+| `clientId`      | string   | One of: `korve-cli`, `korve-mcp`.                                                                       |
+| `audience`      | string   | The first-party client surface that may present the resulting token. One of: `cli`, `mcp`.              |
+| `scopes`        | string[] | Exact public API operation ids the grant may call.                                                      |
+| `requestedRole` | string   | Maximum organization role the grant may exercise. Owner grants do not exist. One of: `member`, `admin`. |
+| `expiresAt`     | string   | Format: `date-time`.                                                                                    |
+
+## agentAuth.denyAuthorizationRequest
+
+Deny a pending authorization request and return only its previously bound loopback redirect and state.
+
+```text
+POST /v1/agent-auth/authorization-requests/{requestId}/deny
+```
+
+- **Auth:** Dashboard session only — organization API keys are rejected.
+- **Minimum role:** `member`
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+A `object` value.
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/agent-auth/authorization-requests/$REQUEST_ID/deny" \
+  -b "$SESSION" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### Responses
+
+| Status | Description                                                         |
+| ------ | ------------------------------------------------------------------- |
+| `200`  | Request denied; redirect the browser to the exact bound client URI. |
+| `404`  | Unknown, expired, approved, denied, or consumed request.            |
+
+### Response body (200)
+
+| Field         | Type    | Description     |
+| ------------- | ------- | --------------- |
+| `denied`      | boolean | One of: `true`. |
+| `redirectUri` | string  | Format: `uri`.  |
+| `state`       | string  | —               |
+
+## agentAuth.approveAuthorizationRequest
+
+Approve a pending authorization request as the signed-in user. The grant can never exceed the approving user's organization role.
+
+```text
+POST /v1/orgs/{orgId}/agent-grants/authorization-requests/{requestId}/approve
+```
+
+- **Auth:** Dashboard session only — organization API keys are rejected.
+- **Minimum role:** `member`
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+A `object` value.
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/agent-grants/authorization-requests/$REQUEST_ID/approve" \
+  -b "$SESSION" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### Responses
+
+| Status | Description                                                               |
+| ------ | ------------------------------------------------------------------------- |
+| `200`  | One-time authorization code and exact client state bound to the redirect. |
+| `404`  | Unknown, expired, consumed, or cross-organization request.                |
+
+### Response body (200)
+
+| Field         | Type   | Description                                  |
+| ------------- | ------ | -------------------------------------------- |
+| `redirectUri` | string | Format: `uri`.                               |
+| `code`        | string | One-time code; never persisted in plaintext. |
+| `state`       | string | —                                            |
+
+## agentAuth.exchangeToken
+
+Exchange an authorization code with its PKCE verifier, or rotate a refresh token. Refresh-token reuse revokes the entire grant.
+
+```text
+POST /v1/agent-auth/token
+```
+
+- **Auth:** None — public endpoint.
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field          | Type   | Required | Description                                    |
+| -------------- | ------ | -------- | ---------------------------------------------- |
+| `grantType`    | string | Yes      | One of: `authorization_code`, `refresh_token`. |
+| `clientId`     | string | Yes      | One of: `korve-cli`, `korve-mcp`.              |
+| `redirectUri`  | string | No       | Format: `uri`.                                 |
+| `code`         | string | No       | —                                              |
+| `codeVerifier` | string | No       | —                                              |
+| `refreshToken` | string | No       | —                                              |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/agent-auth/token" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "grantType": "authorization_code",
+  "clientId": "korve-cli"
+}'
+```
+
+### Responses
+
+| Status | Description                                                         |
+| ------ | ------------------------------------------------------------------- |
+| `200`  | A short-lived access token and a single-use rotating refresh token. |
+| `400`  | Invalid, expired, consumed, replayed, or mis-bound grant.           |
+
+### Response body (200)
+
+| Field              | Type     | Description                                                                                             |
+| ------------------ | -------- | ------------------------------------------------------------------------------------------------------- |
+| `tokenType`        | string   | One of: `Bearer`.                                                                                       |
+| `accessToken`      | string   | —                                                                                                       |
+| `expiresIn`        | integer  | —                                                                                                       |
+| `refreshToken`     | string   | —                                                                                                       |
+| `refreshExpiresAt` | string   | Format: `date-time`.                                                                                    |
+| `audience`         | string   | The first-party client surface that may present the resulting token. One of: `cli`, `mcp`.              |
+| `role`             | string   | Maximum organization role the grant may exercise. Owner grants do not exist. One of: `member`, `admin`. |
+| `scopes`           | string[] | Exact public API operation ids the grant may call.                                                      |
+| `organizationId`   | string   | Format: `uuid`.                                                                                         |
+| `grantId`          | string   | Format: `uuid`.                                                                                         |
+
+## agentAuth.revokeToken
+
+Revoke the complete grant family identified by a refresh token. Unknown tokens return the same response to avoid an oracle.
+
+```text
+POST /v1/agent-auth/revoke
+```
+
+- **Auth:** None — public endpoint.
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field      | Type   | Required | Description                       |
+| ---------- | ------ | -------- | --------------------------------- |
+| `clientId` | string | Yes      | One of: `korve-cli`, `korve-mcp`. |
+| `token`    | string | Yes      | —                                 |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/agent-auth/revoke" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "clientId": "korve-cli",
+  "token": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}'
+```
+
+### Responses
+
+| Status | Description                                         |
+| ------ | --------------------------------------------------- |
+| `200`  | The matching grant family is revoked, if it exists. |
+
+### Response body (200)
+
+| Field     | Type    | Description     |
+| --------- | ------- | --------------- |
+| `revoked` | boolean | One of: `true`. |
+
+## agentAuth.listGrants
+
+List the signed-in user's grants; admins may inspect all grants in the organization.
+
+```text
+GET /v1/orgs/{orgId}/agent-grants
+```
+
+- **Auth:** Dashboard session only — organization API keys are rejected.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/agent-grants" \
+  -b "$SESSION"
+```
+
+### Responses
+
+| Status | Description             |
+| ------ | ----------------------- |
+| `200`  | Revocable agent grants. |
+
+### Response body (200)
+
+An array of objects with these fields:
+
+| Field        | Type           | Description                                                                                             |
+| ------------ | -------------- | ------------------------------------------------------------------------------------------------------- |
+| `id`         | string         | Format: `uuid`.                                                                                         |
+| `clientId`   | string         | One of: `korve-cli`, `korve-mcp`.                                                                       |
+| `audience`   | string         | The first-party client surface that may present the resulting token. One of: `cli`, `mcp`.              |
+| `role`       | string         | Maximum organization role the grant may exercise. Owner grants do not exist. One of: `member`, `admin`. |
+| `scopes`     | string[]       | Exact public API operation ids the grant may call.                                                      |
+| `userId`     | string         | —                                                                                                       |
+| `revokedAt`  | string or null | Format: `date-time`.                                                                                    |
+| `lastUsedAt` | string or null | Format: `date-time`.                                                                                    |
+| `createdAt`  | string         | Format: `date-time`.                                                                                    |
+
+## agentAuth.revokeGrant
+
+Revoke a grant and all of its access and refresh tokens. Members may revoke their own grants; admins may revoke any grant in the organization.
+
+```text
+DELETE /v1/orgs/{orgId}/agent-grants/{grantId}
+```
+
+- **Auth:** Dashboard session only — organization API keys are rejected.
+- **Minimum role:** `member`
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/agent-grants/$GRANT_ID" \
+  -b "$SESSION"
+```
+
+### Responses
+
+| Status | Description                            |
+| ------ | -------------------------------------- |
+| `200`  | Grant revoked, idempotently.           |
+| `404`  | No visible grant in this organization. |
+
+### Response body (200)
+
+| Field       | Type   | Description          |
+| ----------- | ------ | -------------------- |
+| `revokedAt` | string | Format: `date-time`. |

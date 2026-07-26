@@ -1,0 +1,20 @@
+---
+title: "Database branches"
+description: "Create isolated asynchronous database branches and opt previews into branch creation."
+---
+
+A database branch is an isolated, asynchronous copy used for tests, previews, and risky migration
+work. Creation returns before the branch is ready; poll its state before connecting.
+
+```bash
+korve branches create --database primary --data '{"name":"feature-search","expiresInDays":7}' --yes
+korve branches get --database primary <branch-id>
+```
+
+Pull-request database branches are opt in. The preview policy names the source environment and
+database, expiry, and whether closing the preview deletes its branch. Production data is never copied
+into previews merely because a Git repository is connected.
+
+Promotion uses the same preview-and-one-use-token pattern as restore promotion. Read the proposed
+binding swap, confirm the exact target, and pass sensitive confirmation data from a file. See the
+[Database Branches API](/api-reference/databaseBranches).

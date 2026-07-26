@@ -1,0 +1,33 @@
+---
+title: "App Auth SDK"
+description: "Add project-scoped sign-in and sessions to applications deployed on Korve."
+---
+
+Install `@korve-dev/app-auth` and use an explicit browser or server entrypoint.
+
+```ts
+import { createKorveAuthClient } from "@korve-dev/app-auth/browser";
+
+const auth = createKorveAuthClient({ apiUrl: "https://api.korve.dev", project: "storefront" });
+await auth.signInWithGoogle(`${location.origin}/auth/callback`);
+const session = await auth.handleOAuthCallback();
+```
+
+The default browser storage is compatible with client-only applications, but an XSS bug could read
+its tokens. For server-rendered and security-sensitive apps, exchange callbacks and rotate refresh
+tokens in server routes. Store application-owned tokens in `Secure`, `HttpOnly`, `SameSite=Lax`
+`__Host-` cookies with no `Domain` attribute, and apply CSRF protection to writes.
+
+```ts
+import { createKorveAuthServerClient } from "@korve-dev/app-auth/server";
+
+const auth = createKorveAuthServerClient({
+  apiUrl: "https://api.korve.dev",
+  project: "storefront",
+  accessToken,
+});
+const user = await auth.getUser();
+```
+
+App-user tokens are separate from operator API keys and runtime tokens. Configure policy and inspect
+the endpoint contract in the [App Auth API](/api-reference/appauth).

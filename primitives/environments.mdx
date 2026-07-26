@@ -32,7 +32,7 @@ korve environments create staging --name "Staging"
 
 korve deploy --env staging                 # deploy the current ref to staging
 korve env set FLAG=on --env staging        # staging-scoped variable
-korve database provision --env staging     # its own database
+korve databases provision primary --sku db-s1 --region us-east --env staging
 korve logs --env staging
 korve environments remove staging --yes    # tears down the env's app + config
 ```
@@ -51,16 +51,8 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/env?environment
   -H "Authorization: Bearer korve_..."
 ```
 
-```js
-await korve.environments.create({ orgId, projectId, body: { slug: "staging" } });
-await korve.env.set({
-  orgId,
-  projectId,
-  query: { environment: "staging" },
-  body: { vars: [{ key: "FLAG", value: "on" }] },
-});
-await korve.deploys.create({ orgId, projectId, body: { environment: "staging" } });
-```
+Over MCP, discover each operation and call its public method and path through
+`korve.request({ method, path, query?, body? })`.
 
 Full contracts in the [Environments API](/api-reference/environments).
 
@@ -71,7 +63,7 @@ Full contracts in the [Environments API](/api-reference/environments).
 - **Built-ins can't be deleted.** `production` and `preview` exist for
   every project; only custom environments can be removed.
 - **Deleting an environment is destructive.** Its running app,
-  environment variables, and database go with it. The CLI asks for
+  environment variables, and environment-scoped resources go with it. The CLI asks for
   `--yes`.
 - **Usage is metered per project**, not per environment — a staging
   database costs the same as a production one and counts toward the same

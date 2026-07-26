@@ -1,0 +1,20 @@
+---
+title: "Runtime and regions"
+description: "Choose the runtime class and locality that match an application's workload."
+---
+
+Choose `scale-to-zero` for request-driven web applications and APIs. It runs at the global edge and
+does not accept a compute region. Choose `always-on` for long-lived processes, WebSockets, or steady
+background work; it runs in a selected compute region.
+
+Databases, caches, storage, and always-on compute each publish their own supported locality catalog.
+Never copy region ids from another resource type: discover the current catalog instead.
+
+```bash
+korve regions
+korve projects create --name Worker --slug worker --runtime-class always-on --region us-east
+```
+
+Project runtime class and initial region are immutable. Plan locality before creating stateful
+resources, and keep compute near its database when request latency matters. See the
+[Regions API](/api-reference/regions).

@@ -1,0 +1,220 @@
+---
+title: "databaseExports"
+description: "Portable logical or physical database exports, available through short-lived downloads or copied to customer-managed storage with metered transfer."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Portable logical or physical database exports, available through short-lived downloads or copied to customer-managed storage with metered transfer.
+
+## databaseExports.list
+
+List database exports, newest first.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/exports
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/exports" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                       |
+| ------ | --------------------------------- |
+| `200`  | Database exports.                 |
+| `404`  | No such database in this project. |
+
+### Response body (200)
+
+An array of objects with these fields:
+
+| Field                | Type            | Description                                                               |
+| -------------------- | --------------- | ------------------------------------------------------------------------- |
+| `id`                 | string          | —                                                                         |
+| `databaseId`         | string          | —                                                                         |
+| `format`             | string          | One of: `logical_sql`, `logical_archive`, `physical_archive`.             |
+| `status`             | string          | One of: `queued`, `running`, `ready`, `failed`, `expired`.                |
+| `destinationId`      | string or null  | —                                                                         |
+| `destinationVersion` | integer or null | Exact immutable destination configuration used by this export.            |
+| `sizeBytes`          | integer or null | —                                                                         |
+| `transferBytes`      | integer or null | Bytes transferred to a customer destination and billed as metered egress. |
+| `expiresAt`          | string or null  | Format: `date-time`.                                                      |
+| `error`              | string or null  | —                                                                         |
+| `createdAt`          | string          | Format: `date-time`.                                                      |
+
+## databaseExports.create
+
+Create a portable export. Transfer to customer storage is metered by bytes sent.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/exports
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field            | Type           | Required | Description                                                   |
+| ---------------- | -------------- | -------- | ------------------------------------------------------------- |
+| `format`         | string         | Yes      | One of: `logical_sql`, `logical_archive`, `physical_archive`. |
+| `destinationId`  | string or null | No       | —                                                             |
+| `expiresInHours` | integer        | No       | —                                                             |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/exports" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "format": "logical_sql"
+}'
+```
+
+### Responses
+
+| Status | Description                      |
+| ------ | -------------------------------- |
+| `202`  | Export queued.                   |
+| `404`  | No such database or destination. |
+| `409`  | An export is already running.    |
+| `422`  | Invalid format or expiry.        |
+
+### Response body (202)
+
+| Field                | Type            | Description                                                               |
+| -------------------- | --------------- | ------------------------------------------------------------------------- |
+| `id`                 | string          | —                                                                         |
+| `databaseId`         | string          | —                                                                         |
+| `format`             | string          | One of: `logical_sql`, `logical_archive`, `physical_archive`.             |
+| `status`             | string          | One of: `queued`, `running`, `ready`, `failed`, `expired`.                |
+| `destinationId`      | string or null  | —                                                                         |
+| `destinationVersion` | integer or null | Exact immutable destination configuration used by this export.            |
+| `sizeBytes`          | integer or null | —                                                                         |
+| `transferBytes`      | integer or null | Bytes transferred to a customer destination and billed as metered egress. |
+| `expiresAt`          | string or null  | Format: `date-time`.                                                      |
+| `error`              | string or null  | —                                                                         |
+| `createdAt`          | string          | Format: `date-time`.                                                      |
+
+## databaseExports.get
+
+Get export progress, size, expiry, and metered transfer.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/exports/{exportId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/exports/$EXPORT_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                       |
+| ------ | --------------------------------- |
+| `200`  | Database export.                  |
+| `404`  | No such export for this database. |
+
+### Response body (200)
+
+| Field                | Type            | Description                                                               |
+| -------------------- | --------------- | ------------------------------------------------------------------------- |
+| `id`                 | string          | —                                                                         |
+| `databaseId`         | string          | —                                                                         |
+| `format`             | string          | One of: `logical_sql`, `logical_archive`, `physical_archive`.             |
+| `status`             | string          | One of: `queued`, `running`, `ready`, `failed`, `expired`.                |
+| `destinationId`      | string or null  | —                                                                         |
+| `destinationVersion` | integer or null | Exact immutable destination configuration used by this export.            |
+| `sizeBytes`          | integer or null | —                                                                         |
+| `transferBytes`      | integer or null | Bytes transferred to a customer destination and billed as metered egress. |
+| `expiresAt`          | string or null  | Format: `date-time`.                                                      |
+| `error`              | string or null  | —                                                                         |
+| `createdAt`          | string          | Format: `date-time`.                                                      |
+
+## databaseExports.createDownload
+
+Create a signed, short-lived, single-use download URL for a ready export containing database data.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/exports/{exportId}/download
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `owner`
+- **Risk:** `dangerous` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field              | Type    | Required | Description |
+| ------------------ | ------- | -------- | ----------- |
+| `expiresInSeconds` | integer | No       | —           |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/exports/$EXPORT_ID/download" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### Responses
+
+| Status | Description                        |
+| ------ | ---------------------------------- |
+| `200`  | Short-lived single-use download.   |
+| `404`  | No ready export for this database. |
+| `422`  | Invalid expiry.                    |
+
+### Response body (200)
+
+| Field            | Type   | Description                                                |
+| ---------------- | ------ | ---------------------------------------------------------- |
+| `url`            | string | Format: `uri`.                                             |
+| `expiresAt`      | string | Format: `date-time`.                                       |
+| `checksumSha256` | string | Hex SHA-256 checksum for verifying the downloaded archive. |
+
+## databaseExports.delete
+
+Permanently delete a managed export. Copies already written to customer storage remain there.
+
+```text
+DELETE /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/exports/{exportId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `owner`
+- **Risk:** `destructive` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/exports/$EXPORT_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                       |
+| ------ | --------------------------------- |
+| `200`  | Export deleted.                   |
+| `404`  | No such export for this database. |

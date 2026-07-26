@@ -1,0 +1,365 @@
+---
+title: "advisor"
+description: "Deterministic database performance, security, cost, reliability, and backup findings with retained evidence and separately confirmed remediations."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Deterministic database performance, security, cost, reliability, and backup findings with retained evidence and separately confirmed remediations.
+
+## advisor.listFindings
+
+List current database findings from retained catalog, query, health, backup, and cost evidence.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/advisor/findings
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name       | Type   | Required | Description                                                         |
+| ---------- | ------ | -------- | ------------------------------------------------------------------- |
+| `status`   | string | No       | One of: `open`, `dismissed`, `resolved`.                            |
+| `category` | string | No       | One of: `performance`, `security`, `cost`, `reliability`, `backup`. |
+| `severity` | string | No       | One of: `info`, `warning`, `critical`.                              |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/advisor/findings?status=open" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                       |
+| ------ | --------------------------------- |
+| `200`  | Advisor findings.                 |
+| `404`  | No such database in this project. |
+
+### Response body (200)
+
+An array of objects with these fields:
+
+| Field                            | Type                                | Description                                                                 |
+| -------------------------------- | ----------------------------------- | --------------------------------------------------------------------------- |
+| `id`                             | string                              | —                                                                           |
+| `databaseId`                     | string                              | —                                                                           |
+| `category`                       | string                              | One of: `performance`, `security`, `cost`, `reliability`, `backup`.         |
+| `severity`                       | string                              | One of: `info`, `warning`, `critical`.                                      |
+| `status`                         | string                              | One of: `open`, `dismissed`, `resolved`.                                    |
+| `title`                          | string                              | —                                                                           |
+| `summary`                        | string                              | —                                                                           |
+| `recommendation`                 | string                              | —                                                                           |
+| `remediationAvailable`           | boolean                             | —                                                                           |
+| `evidence`                       | object[]                            | —                                                                           |
+| `evidence[].metric`              | string                              | —                                                                           |
+| `evidence[].value`               | number or string or boolean or null | —                                                                           |
+| `evidence[].unit`                | string or null                      | —                                                                           |
+| `evidence[].observedFrom`        | string                              | Format: `date-time`.                                                        |
+| `evidence[].observedUntil`       | string                              | Format: `date-time`.                                                        |
+| `evidence[].normalizedQuery`     | string or null                      | Normalized SQL with literal values removed; raw SQL is never retained here. |
+| `estimatedMonthlyCostDeltaCents` | integer or null                     | —                                                                           |
+| `firstObservedAt`                | string                              | Format: `date-time`.                                                        |
+| `lastObservedAt`                 | string                              | Format: `date-time`.                                                        |
+| `dismissedAt`                    | string or null                      | Format: `date-time`.                                                        |
+| `resolvedAt`                     | string or null                      | Format: `date-time`.                                                        |
+
+## advisor.getFinding
+
+Get one finding with deterministic evidence and remediation availability.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/advisor/findings/{findingId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/advisor/findings/$FINDING_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                        |
+| ------ | ---------------------------------- |
+| `200`  | Advisor finding.                   |
+| `404`  | No such finding for this database. |
+
+### Response body (200)
+
+| Field                            | Type                                | Description                                                                 |
+| -------------------------------- | ----------------------------------- | --------------------------------------------------------------------------- |
+| `id`                             | string                              | —                                                                           |
+| `databaseId`                     | string                              | —                                                                           |
+| `category`                       | string                              | One of: `performance`, `security`, `cost`, `reliability`, `backup`.         |
+| `severity`                       | string                              | One of: `info`, `warning`, `critical`.                                      |
+| `status`                         | string                              | One of: `open`, `dismissed`, `resolved`.                                    |
+| `title`                          | string                              | —                                                                           |
+| `summary`                        | string                              | —                                                                           |
+| `recommendation`                 | string                              | —                                                                           |
+| `remediationAvailable`           | boolean                             | —                                                                           |
+| `evidence`                       | object[]                            | —                                                                           |
+| `evidence[].metric`              | string                              | —                                                                           |
+| `evidence[].value`               | number or string or boolean or null | —                                                                           |
+| `evidence[].unit`                | string or null                      | —                                                                           |
+| `evidence[].observedFrom`        | string                              | Format: `date-time`.                                                        |
+| `evidence[].observedUntil`       | string                              | Format: `date-time`.                                                        |
+| `evidence[].normalizedQuery`     | string or null                      | Normalized SQL with literal values removed; raw SQL is never retained here. |
+| `estimatedMonthlyCostDeltaCents` | integer or null                     | —                                                                           |
+| `firstObservedAt`                | string                              | Format: `date-time`.                                                        |
+| `lastObservedAt`                 | string                              | Format: `date-time`.                                                        |
+| `dismissedAt`                    | string or null                      | Format: `date-time`.                                                        |
+| `resolvedAt`                     | string or null                      | Format: `date-time`.                                                        |
+
+## advisor.history
+
+Page finding state changes and remediation outcomes. Findings remain until dismissed or resolved.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/advisor/history
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name     | Type    | Required | Description |
+| -------- | ------- | -------- | ----------- |
+| `cursor` | string  | No       | —           |
+| `limit`  | integer | No       | —           |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/advisor/history?cursor=example" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                       |
+| ------ | --------------------------------- |
+| `200`  | Advisor history.                  |
+| `404`  | No such database in this project. |
+
+### Response body (200)
+
+| Field               | Type           | Description                                                                                                                 |
+| ------------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `items`             | object[]       | —                                                                                                                           |
+| `items[].id`        | string         | —                                                                                                                           |
+| `items[].findingId` | string         | —                                                                                                                           |
+| `items[].event`     | string         | One of: `opened`, `updated`, `dismissed`, `resolved`, `remediation_started`, `remediation_succeeded`, `remediation_failed`. |
+| `items[].detail`    | string or null | —                                                                                                                           |
+| `items[].createdAt` | string         | Format: `date-time`.                                                                                                        |
+| `nextCursor`        | string or null | —                                                                                                                           |
+
+## advisor.dismiss
+
+Dismiss a finding with an optional operator reason. Reappearing evidence may open a new finding later.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/advisor/findings/{findingId}/dismiss
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `write`
+
+### Request body
+
+| Field    | Type   | Required | Description |
+| -------- | ------ | -------- | ----------- |
+| `reason` | string | No       | —           |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/advisor/findings/$FINDING_ID/dismiss" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### Responses
+
+| Status | Description                        |
+| ------ | ---------------------------------- |
+| `200`  | Dismissed finding.                 |
+| `404`  | No such finding for this database. |
+| `409`  | Finding is already resolved.       |
+
+### Response body (200)
+
+| Field                            | Type                                | Description                                                                 |
+| -------------------------------- | ----------------------------------- | --------------------------------------------------------------------------- |
+| `id`                             | string                              | —                                                                           |
+| `databaseId`                     | string                              | —                                                                           |
+| `category`                       | string                              | One of: `performance`, `security`, `cost`, `reliability`, `backup`.         |
+| `severity`                       | string                              | One of: `info`, `warning`, `critical`.                                      |
+| `status`                         | string                              | One of: `open`, `dismissed`, `resolved`.                                    |
+| `title`                          | string                              | —                                                                           |
+| `summary`                        | string                              | —                                                                           |
+| `recommendation`                 | string                              | —                                                                           |
+| `remediationAvailable`           | boolean                             | —                                                                           |
+| `evidence`                       | object[]                            | —                                                                           |
+| `evidence[].metric`              | string                              | —                                                                           |
+| `evidence[].value`               | number or string or boolean or null | —                                                                           |
+| `evidence[].unit`                | string or null                      | —                                                                           |
+| `evidence[].observedFrom`        | string                              | Format: `date-time`.                                                        |
+| `evidence[].observedUntil`       | string                              | Format: `date-time`.                                                        |
+| `evidence[].normalizedQuery`     | string or null                      | Normalized SQL with literal values removed; raw SQL is never retained here. |
+| `estimatedMonthlyCostDeltaCents` | integer or null                     | —                                                                           |
+| `firstObservedAt`                | string                              | Format: `date-time`.                                                        |
+| `lastObservedAt`                 | string                              | Format: `date-time`.                                                        |
+| `dismissedAt`                    | string or null                      | Format: `date-time`.                                                        |
+| `resolvedAt`                     | string or null                      | Format: `date-time`.                                                        |
+
+## advisor.previewRemediation
+
+Re-evaluate a finding and return the exact proposed action, impact, cost change, and short-lived confirmation token without changing production.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/advisor/findings/{findingId}/remediation/preview
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `read` · sensitive (elevated blast radius)
+
+### Request body
+
+A `object` value.
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/advisor/findings/$FINDING_ID/remediation/preview" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### Responses
+
+| Status | Description                              |
+| ------ | ---------------------------------------- |
+| `200`  | Remediation preview.                     |
+| `404`  | No remediable finding for this database. |
+| `409`  | Evidence changed; refresh the finding.   |
+
+### Response body (200)
+
+| Field                            | Type            | Description                                                                      |
+| -------------------------------- | --------------- | -------------------------------------------------------------------------------- |
+| `findingId`                      | string          | —                                                                                |
+| `action`                         | string          | —                                                                                |
+| `impact`                         | string          | —                                                                                |
+| `reversible`                     | boolean         | —                                                                                |
+| `estimatedDowntimeSeconds`       | integer or null | —                                                                                |
+| `estimatedMonthlyCostDeltaCents` | integer or null | —                                                                                |
+| `confirmationToken`              | string          | Short-lived token bound to the finding, exact action, database state, and owner. |
+| `expiresAt`                      | string          | Format: `date-time`.                                                             |
+
+## advisor.remediate
+
+Apply exactly the previously previewed remediation after an owner explicitly confirms it. The token is rejected if evidence or target state changed.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/advisor/findings/{findingId}/remediation
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `owner`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `dangerous` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field               | Type    | Required | Description     |
+| ------------------- | ------- | -------- | --------------- |
+| `confirmed`         | boolean | Yes      | One of: `true`. |
+| `confirmationToken` | string  | Yes      | —               |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/advisor/findings/$FINDING_ID/remediation" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "confirmed": true,
+  "confirmationToken": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}'
+```
+
+### Responses
+
+| Status | Description                                     |
+| ------ | ----------------------------------------------- |
+| `202`  | Remediation accepted.                           |
+| `404`  | No remediable finding for this database.        |
+| `409`  | Evidence or target state changed after preview. |
+| `422`  | Confirmation is invalid or expired.             |
+
+### Response body (202)
+
+| Field           | Type   | Description                  |
+| --------------- | ------ | ---------------------------- |
+| `remediationId` | string | —                            |
+| `status`        | string | One of: `queued`, `running`. |
+
+## advisor.scan
+
+Queue an on-demand deterministic advisor scan without changing the database.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/advisor/scans
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write`
+
+### Request body
+
+| Field        | Type     | Required | Description |
+| ------------ | -------- | -------- | ----------- |
+| `categories` | string[] | No       | —           |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/advisor/scans" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### Responses
+
+| Status | Description                       |
+| ------ | --------------------------------- |
+| `202`  | Advisor scan queued.              |
+| `404`  | No such database in this project. |
+| `409`  | A scan is already running.        |
+
+### Response body (202)
+
+| Field      | Type   | Description          |
+| ---------- | ------ | -------------------- |
+| `scanId`   | string | —                    |
+| `queuedAt` | string | Format: `date-time`. |

@@ -26,38 +26,46 @@ curl "https://api.korve.dev/v1/regions"
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | The region catalogs. |
+| Status | Description          |
+| ------ | -------------------- |
+| `200`  | The region catalogs. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `compute` | object[] | — |
-| `compute[].id` | string | Region id used in create requests (e.g. "fra"). |
-| `compute[].city` | string | Display city or area name. |
-| `compute[].country` | string | — |
-| `compute[].countryCode` | string | ISO 3166 alpha-2 code. |
-| `compute[].flag` | string | Flag emoji derived from the country code. |
-| `compute[].continent` | string | — |
-| `storage` | object[] | — |
-| `storage[].id` | string | Region id used in create requests (e.g. "fra"). |
-| `storage[].city` | string | Display city or area name. |
-| `storage[].country` | string | — |
-| `storage[].countryCode` | string | ISO 3166 alpha-2 code. |
-| `storage[].flag` | string | Flag emoji derived from the country code. |
-| `storage[].continent` | string | — |
-| `database` | object[] | — |
-| `database[].id` | string | Region id used in create requests (e.g. "fra"). |
-| `database[].city` | string | Display city or area name. |
-| `database[].country` | string | — |
-| `database[].countryCode` | string | ISO 3166 alpha-2 code. |
-| `database[].flag` | string | Flag emoji derived from the country code. |
-| `database[].continent` | string | — |
-| `global` | object | The regionless placement scale-to-zero apps run on — every edge location at once, so there is no continent and the flag is a globe. |
-| `global.id` | string | Always "global". |
-| `global.city` | string | — |
-| `global.country` | string | — |
-| `global.countryCode` | string | Empty — the globe has no country. |
-| `global.flag` | string | — |
+| Field                    | Type     | Description                                                                                                                         |
+| ------------------------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `compute`                | object[] | —                                                                                                                                   |
+| `compute[].id`           | string   | Region id used in create requests (e.g. "fra").                                                                                     |
+| `compute[].name`         | string   | Customer-facing geographic area name (e.g. "US East").                                                                              |
+| `compute[].code`         | string   | Physical provider region or location-hint code shown in the UI.                                                                     |
+| `compute[].city`         | string   | Display city or area name.                                                                                                          |
+| `compute[].country`      | string   | —                                                                                                                                   |
+| `compute[].countryCode`  | string   | ISO 3166 alpha-2 code.                                                                                                              |
+| `compute[].flag`         | string   | Flag emoji derived from the country code.                                                                                           |
+| `compute[].continent`    | string   | —                                                                                                                                   |
+| `storage`                | object[] | —                                                                                                                                   |
+| `storage[].id`           | string   | Region id used in create requests (e.g. "fra").                                                                                     |
+| `storage[].name`         | string   | Customer-facing geographic area name (e.g. "US East").                                                                              |
+| `storage[].code`         | string   | Physical provider region or location-hint code shown in the UI.                                                                     |
+| `storage[].city`         | string   | Display city or area name.                                                                                                          |
+| `storage[].country`      | string   | —                                                                                                                                   |
+| `storage[].countryCode`  | string   | ISO 3166 alpha-2 code.                                                                                                              |
+| `storage[].flag`         | string   | Flag emoji derived from the country code.                                                                                           |
+| `storage[].continent`    | string   | —                                                                                                                                   |
+| `database`               | object[] | —                                                                                                                                   |
+| `database[].id`          | string   | Region id used in create requests (e.g. "fra").                                                                                     |
+| `database[].name`        | string   | Customer-facing geographic area name (e.g. "US East").                                                                              |
+| `database[].code`        | string   | Physical provider region or location-hint code shown in the UI.                                                                     |
+| `database[].city`        | string   | Display city or area name.                                                                                                          |
+| `database[].country`     | string   | —                                                                                                                                   |
+| `database[].countryCode` | string   | ISO 3166 alpha-2 code.                                                                                                              |
+| `database[].flag`        | string   | Flag emoji derived from the country code.                                                                                           |
+| `database[].continent`   | string   | —                                                                                                                                   |
+| `global`                 | object   | The regionless placement scale-to-zero apps run on — every edge location at once, so there is no continent and the flag is a globe. |
+| `global.id`              | string   | Always "global".                                                                                                                    |
+| `global.name`            | string   | Always "Global".                                                                                                                    |
+| `global.code`            | string   | Always "global".                                                                                                                    |
+| `global.city`            | string   | —                                                                                                                                   |
+| `global.country`         | string   | —                                                                                                                                   |
+| `global.countryCode`     | string   | Empty — the globe has no country.                                                                                                   |
+| `global.flag`            | string   | —                                                                                                                                   |

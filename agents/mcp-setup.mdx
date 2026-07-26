@@ -1,96 +1,52 @@
 ---
-title: "MCP setup"
-description: "Connect any MCP client to Korve in one command — two tools, the whole platform."
+title: "MCP Code Mode"
+description: "Connect an agent to two tools: search the Korve contract, then execute bounded API requests."
 ---
 
-Korve's MCP server lives at `https://mcp.korve.dev/mcp`. For Claude Code:
+Korve's streamable HTTP MCP endpoint is `https://mcp.korve.dev/mcp`.
+
+Legacy API-key setup:
 
 ```bash
 claude mcp add --transport http korve https://mcp.korve.dev/mcp \
   --header "Authorization: Bearer korve_..."
 ```
 
-Any MCP client that speaks streamable HTTP works the same way: point it at
-the URL and send your org-scoped API key as a bearer token. Mint keys in
-the dashboard — see [the quickstart](/quickstart#2-mint-an-api-key).
+Use an organization-scoped key with the least role the agent needs. MCP clients that implement
+protected-resource and authorization-server discovery, dynamic public-client registration,
+authorization code with S256 PKCE, and rotating refresh tokens can instead request a grant bound
+to audience `mcp` and exact operation scopes; see
+[Agent OAuth](/agents/oauth). Never reuse a CLI-audience token. `search` works without a credential;
+`execute` requires one.
 
-## Two tools, not forty
+## Search the contract
 
-Korve uses Code Mode: instead of one MCP tool per endpoint, there are
-exactly two tools that compose into everything the platform can do.
+`search` accepts a text query, a resource name, or no arguments for the compact public index. A
+match includes operation id, method, path, auth, minimum role, risk, approval requirement,
+parameters, and body schema.
 
-### `search` — discover operations
-
-Free discovery over the public API spec. No API key required.
-
-| Call                          | Returns                                       |
-| ----------------------------- | --------------------------------------------- |
-| `search` with no arguments    | Compact index of every operation, by resource |
-| `search {"query": "deploy"}`  | Matching operations with their full contracts |
-| `search {"resource": "logs"}` | Every operation on one resource               |
-
-Each match includes the operation id, method, path, description, auth
-requirement, minimum org role, risk classification, parameters, and request
-body schema — everything needed to call it correctly on the first try.
-
-### `execute` — run code against the API
-
-Runs JavaScript with a typed `korve` client in scope: one async method per
-operation id from `search`. Requires your API key.
-
-```js
-// execute {"code": "..."}
-const projects = await korve.projects.list({ orgId: "org-id" });
-const deploy = await korve.deploys.create({
-  orgId: "org-id",
-  projectId: projects[0].id,
-  body: { gitRef: "main" },
-});
-deploy;
+```json
+{ "query": "failed deployment logs" }
 ```
 
-Pass path and query parameters as named fields and the request body as
-`body`. Top-level `await` is allowed; the final expression (or an explicit
-`return`) becomes the result, and `console.log` output is captured.
+## Execute bounded JavaScript
 
-Responses come back as `{ result, logs, requests }` — `requests` is the
-`[{ op, status }]` audit trail of every API call the code made.
-
-## A typical search → execute flow
-
-1. `search {"query": "logs"}` → finds `logs.query` and its parameters.
-2. `execute`:
+After searching, call `execute` with JavaScript. The sandbox exposes only
+`korve.request({ method, path, query?, body? })`, console logging, and ordinary language features.
 
 ```js
-const { entries } = await korve.logs.query({
-  orgId,
-  projectId,
-  level: "error",
-  limit: 50,
+const projects = await korve.request({
+  method: "GET",
+  path: `/v1/orgs/${orgId}/projects`,
 });
-entries.map((e) => `${e.timestamp} ${e.message}`).join("\n");
+return projects;
 ```
 
-3. Spot a failed deploy? `search {"query": "diagnose"}` →
-   `execute` with `await korve.deploys.diagnose({ orgId, projectId, deployId })`.
+The result is `{ result, logs, requests }`; `requests` records method/path operations and response
+status for the run. The sandbox cannot use direct network access, filesystem or environment access,
+provider SDKs, or internal/runtime-only routes. A request must match a public operation from the
+spec before authenticated dispatch.
 
-## Scoping and safety
-
-- **Keys are org-scoped with a role ceiling.** A key authorizes only its
-  own organization, as `member` or `admin` — never `owner`. Key
-  management, billing mutations, and membership are session-only, so a
-  leaked key can't escalate.
-- **Execution is sandboxed.** Code runs in an isolated sandbox whose only
-  egress is the Korve API with your key. No other network access exists,
-  and execution times out after 10 seconds.
-- **Everything is audited.** Every result includes the `requests` audit
-  trail; risky operations are flagged as `dangerous` or `destructive` in
-  `search` results so harnesses can gate approval.
-- `search` and `tools/list` work without a key, so agents can explore the
-  surface before credentials exist.
-
-## Next
-
-- [Agent onboarding](/agents/agent-onboarding) — the golden path from zero
-  to deployed.
-- [Skills](/agents/skills) — pre-built knowledge packs for coding agents.
+Search results label `safe`, `write`, `dangerous`, and `destructive` operations. The MCP host should
+require approval for risky tool execution, and the platform agent separately persists mutations as
+pending actions. See [Safe automation](/agents/safe-automation).

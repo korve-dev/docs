@@ -1,250 +1,49 @@
 ---
-title: "Commands"
-description: "Every korve command, with flags, examples, and behavior notes."
+title: "Command map"
+description: "The stable korve noun-and-verb command surface with examples for every product area."
 ---
 
-Conventions used below:
+Run `korve <command> --help` for the installed version's complete flags. Add global `--json` for
+machine-readable output. Project commands accept `--project <slug|id>` and otherwise use
+`KORVE_PROJECT` or `.korve.toml`.
 
-- Commands marked **(project-scoped)** accept `--project <slug|id>` and
-  fall back to `$KORVE_PROJECT`, then `.korve.toml`
-  (see [precedence](/cli/overview#configuration-precedence)).
-- Add `--json` to any command for the raw API response.
-- Exit codes are listed in the [CLI overview](/cli/overview#exit-codes).
+| Area                   | Commands                                                                                          |
+| ---------------------- | ------------------------------------------------------------------------------------------------- |
+| Session and bootstrap  | `login`, `logout`, `whoami`, `init`, `link`, `health`, `spec`, `regions`, `completions`           |
+| Organization           | `orgs`, `billing`, `webhooks`, `api-keys`                                                         |
+| Application            | `projects`, `environments`, `deploy`, `deploys`, `previews`, `env`, `domains`, `access`           |
+| Data                   | `databases`, `branches`, `backups`, `storage`, `buckets`, `caches`                                |
+| Work                   | `queues`, `crons`                                                                                 |
+| Operations             | `operator`, `maintenance`, `logs`, `analytics`, `metrics`, `alerts`, `advisor`, `budget`, `usage` |
+| Infrastructure as code | `manifest export`, `manifest plan`, `manifest apply`                                              |
 
-## Auth & setup
-
-### `korve login`
-
-Authenticate with an org-scoped API key and store it (`0600`) in
-`~/.config/korve/config.toml`. The key is validated against the
-organization before anything is written.
-
-```bash
-korve login --org <org-id>                 # prompts for the key
-korve login --org <org-id> --api-key korve_...
-echo "$KEY" | korve login --org <org-id>   # stdin works too
-```
-
-| Flag        | Notes                                                |
-| ----------- | ---------------------------------------------------- |
-| `--org`     | Organization id (or `$KORVE_ORG`). Required.         |
-| `--api-key` | The key; falls back to `$KORVE_API_KEY`, then stdin. |
-
-### `korve logout`
-
-Remove stored credentials.
-
-### `korve whoami`
-
-Show the organization the CLI is authenticated against (name, id, billing
-status).
-
-### `korve link <slug>`
-
-Write `.korve.toml` in the current directory so project-scoped commands
-resolve without `--project`.
+## Common flows
 
 ```bash
-korve link storefront
-```
+# detect, plan, apply, link, and deploy
+korve init
 
-### `korve health` / `korve spec`
-
-Public, no auth: `health` checks API liveness; `spec` prints the OpenAPI
-document.
-
-### `korve completions <shell>`
-
-Generate completions for `bash`, `zsh`, `fish`, `elvish`, or `powershell`.
-
-## Organization & billing
-
-### `korve orgs show` (alias: `org`)
-
-Organization details: name, id, slug, personal flag, billing status.
-
-### `korve billing show`
-
-Billing status and the current rate card.
-
-### `korve api-keys list|create|revoke`
-
-```bash
-korve api-keys list
-korve api-keys create --name ci-deployer --role member
-korve api-keys revoke <key-id>
-```
-
-Key management is **session-only** at the API: these commands exist so the
-failure is helpful — they surface the 401/403 with a pointer to the
-dashboard (organization settings → API keys), where keys are actually
-minted. `create`'s secret, when issued, prints bare on stdout and is shown
-once.
-
-## Projects
-
-### `korve projects list` (alias: `project`)
-
-### `korve projects create`
-
-```bash
-korve projects create \
-  --name "Storefront" \
-  --slug storefront \
-  --runtime-class scale-to-zero \
-  --repo acme/storefront --ref main    # optional: queue a first deploy
-```
-
-| Flag              | Notes                                                          |
-| ----------------- | -------------------------------------------------------------- |
-| `--name`          | Display name. Required.                                        |
-| `--slug`          | Managed subdomain label, globally unique, permanent. Required. |
-| `--runtime-class` | `scale-to-zero` or `always-on`. Required.                      |
-| `--repo`          | Also queue an initial deploy from `owner/repo`.                |
-| `--ref`           | Git ref for that deploy (requires `--repo`).                   |
-
-### `korve projects get [<project>]` (project-scoped)
-
-One project with its latest deployment.
-
-### `korve projects update` (project-scoped)
-
-```bash
-korve projects update --name "Storefront v2"
-korve projects update --repo acme/storefront --branch main
-korve projects update --no-repo            # disconnect the repository
-```
-
-`--repo` and `--no-repo` conflict; the slug and URL never change.
-
-### `korve projects check-repo <owner/repo>` (project-scoped)
-
-Check whether the platform can deploy from a repository. Inaccessible
-answers include the URL where access is granted.
-
-### `korve projects delete [<project>]` (project-scoped)
-
-Deletes the project, its deployments, env vars, and runtime. Asks you to
-type the slug; `--yes` skips. Owner role required.
-
-## Deploys
-
-### `korve deploy` (project-scoped)
-
-Queue a deployment and follow it until `ready` or `failed`. Prints status
-transitions to stderr, the URL on success, and the build-log tail (and a
-non-zero exit) on failure.
-
-```bash
-korve deploy
-korve deploy --repo acme/storefront --ref my-branch
-```
-
-### `korve deploys list|get|diagnose` (alias: `deployments`, project-scoped)
-
-```bash
+# inspect an application
 korve deploys list
-korve deploys get <deploy-id>          # includes the build log
-korve deploys diagnose <deploy-id>     # platform-agent diagnosis of a failed deploy
+korve logs --level error --limit 100
+korve analytics
+
+# declare and reconcile an organization
+korve manifest export -o korve.toml
+korve manifest plan -f korve.toml
+korve manifest apply -f korve.toml
 ```
 
-## Previews
-
-### `korve previews list|remove` (alias: `preview`, project-scoped)
+Commands with complex request bodies accept `--data '<json>'` or `--data @request.json`. Prefer a
+file for confirmation tokens and secrets so they do not enter shell history.
 
 ```bash
-korve previews list
-korve previews remove <preview-id> --yes
+korve queues create --data @queue.json
+korve crons create --data @cron.json
+korve metrics project --data @metrics-query.json
+korve backups restore-promote --database primary <restore-id> --data @confirm.json --yes
 ```
 
-## Logs
-
-### `korve logs` (project-scoped)
-
-```bash
-korve logs --level error --limit 500
-korve logs --since 2026-06-01T00:00:00Z --until 2026-06-01T06:00:00Z
-```
-
-| Flag                  | Notes                               |
-| --------------------- | ----------------------------------- |
-| `--since` / `--until` | RFC 3339; defaults to the last hour |
-| `--limit`             | 1-500, default 100                  |
-| `--level`             | `info`, `warn`, `error`, `debug`    |
-
-## Environment variables
-
-### `korve env list|set|unset` (project-scoped)
-
-```bash
-korve env set KEY=value OTHER=value2
-korve env set --from-file .env        # args win over the file on duplicates
-korve env list                        # admin — values are decrypted
-korve env unset KEY
-```
-
-## Domains
-
-### `korve domains list|add|check|remove` (project-scoped)
-
-```bash
-korve domains add app.acme.com        # returns the CNAME to create
-korve domains check app.acme.com      # re-verify; accepts id or hostname
-korve domains remove app.acme.com
-```
-
-## Database
-
-### `korve database provision|show|rotate|delete` (alias: `db`, project-scoped)
-
-```bash
-korve database provision    # prints the connection string exactly once
-korve database show         # status + details, never the password
-korve database rotate       # new connection string, old password dies now
-korve database delete --yes # all data, gone, owner role
-```
-
-## Storage
-
-### `korve storage list|upload|download|delete` (project-scoped)
-
-```bash
-korve storage upload ./report.pdf --content-type application/pdf
-korve storage list --prefix uploads/
-korve storage download uploads/report.pdf -o ./report.pdf   # stdout without -o
-korve storage delete uploads/report.pdf
-```
-
-`--content-type` is guessed from the extension when omitted.
-
-## Budgets & usage
-
-### `korve budget show|set|remove` (alias: `budgets`, project-scoped)
-
-```bash
-korve budget set --cap-usd 50 --alert-at 80 --hard-stop
-korve budget show
-korve budget remove
-```
-
-Omitted options on `set` reset to defaults (alert 80%, hard stop off).
-
-### `korve usage show|record` (project-scoped)
-
-```bash
-korve usage show --since 2026-06-01T00:00:00Z
-korve usage record --meter network.egress --quantity 2.5
-```
-
-## Manifest
-
-### `korve manifest export|plan|apply`
-
-```bash
-korve manifest export -o korve.yaml    # current org state, env values masked
-korve manifest plan -f korve.yaml      # dry run
-korve manifest apply -f korve.yaml     # plan + confirm + apply; --yes skips
-```
-
-See [Manifests](/primitives/manifests) for the file format and plan
-semantics.
+Create/update/delete verbs, accepted body fields, roles, and response shapes are generated from the
+same contract as the [API reference](/api-reference/overview). The CLI parity test prevents an
+API-key-capable public operation from shipping without its command.

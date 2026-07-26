@@ -1,0 +1,459 @@
+---
+title: "crons"
+description: "Environment-scoped schedules that invoke authenticated project-relative HTTP targets. Missed schedules are skipped by default and every run is retained for inspection."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Environment-scoped schedules that invoke authenticated project-relative HTTP targets. Missed schedules are skipped by default and every run is retained for inspection.
+
+## crons.list
+
+List cron jobs in one project environment.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/crons
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/crons?environment=example" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                     |
+| ------ | ------------------------------- |
+| `200`  | Cron jobs ordered by name.      |
+| `404`  | No such project or environment. |
+
+### Response body (200)
+
+An array of objects with these fields:
+
+| Field                       | Type             | Description                                                                                                   |
+| --------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| `id`                        | string           | —                                                                                                             |
+| `name`                      | string           | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                            |
+| `environment`               | string           | —                                                                                                             |
+| `schedule`                  | string           | Five-field cron expression.                                                                                   |
+| `timezone`                  | string           | IANA timezone name. Defaults to UTC.                                                                          |
+| `enabled`                   | boolean          | —                                                                                                             |
+| `catchUp`                   | boolean          | Missed invocations are skipped; catch-up is not performed at launch. One of: `false`.                         |
+| `target`                    | object or object | Exactly one same-environment target: a signed project-relative HTTP invocation or a queue publication.        |
+| `target.kind`               | string           | One of: `http`.                                                                                               |
+| `target.path`               | string           | Project-relative HTTP path that receives a signed invocation. Pattern: `^/`.                                  |
+| `target.method`             | string           | One of: `POST`, `PUT`, `PATCH`.                                                                               |
+| `target.body`               | object           | Optional JSON request body, at most 122,880 encoded bytes before the signed 128,000-byte invocation envelope. |
+| `retry`                     | object           | —                                                                                                             |
+| `retry.maxAttempts`         | integer          | Total attempts from 1 to 10.                                                                                  |
+| `retry.initialDelaySeconds` | integer          | Initial retry delay from 1 to 3,600 seconds.                                                                  |
+| `retry.maxDelaySeconds`     | integer          | Maximum retry delay from 1 to 86,400 seconds.                                                                 |
+| `concurrencyPolicy`         | string           | One of: `allow`, `skip`, `replace`.                                                                           |
+| `timeoutSeconds`            | integer          | Target timeout in seconds, bounded below the durable execution lease.                                         |
+| `lastRunAt`                 | string or null   | Format: `date-time`.                                                                                          |
+| `nextRunAt`                 | string or null   | Format: `date-time`.                                                                                          |
+| `createdAt`                 | string           | Format: `date-time`.                                                                                          |
+| `updatedAt`                 | string           | Format: `date-time`.                                                                                          |
+
+## crons.create
+
+Create a timezone-aware cron job. Missed schedules are skipped.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/crons
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write`
+
+### Query parameters
+
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+
+### Request body
+
+| Field                       | Type             | Required | Description                                                                                                   |
+| --------------------------- | ---------------- | -------- | ------------------------------------------------------------------------------------------------------------- |
+| `name`                      | string           | Yes      | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                            |
+| `schedule`                  | string           | Yes      | —                                                                                                             |
+| `timezone`                  | string           | No       | —                                                                                                             |
+| `enabled`                   | boolean          | No       | —                                                                                                             |
+| `target`                    | object or object | Yes      | Exactly one same-environment target: a signed project-relative HTTP invocation or a queue publication.        |
+| `target.kind`               | string           | Yes      | One of: `http`.                                                                                               |
+| `target.path`               | string           | Yes      | Project-relative HTTP path that receives a signed invocation. Pattern: `^/`.                                  |
+| `target.method`             | string           | No       | One of: `POST`, `PUT`, `PATCH`.                                                                               |
+| `target.body`               | object           | No       | Optional JSON request body, at most 122,880 encoded bytes before the signed 128,000-byte invocation envelope. |
+| `retry`                     | object           | No       | —                                                                                                             |
+| `retry.maxAttempts`         | integer          | No       | Total attempts from 1 to 10.                                                                                  |
+| `retry.initialDelaySeconds` | integer          | No       | Initial retry delay from 1 to 3,600 seconds.                                                                  |
+| `retry.maxDelaySeconds`     | integer          | No       | Maximum retry delay from 1 to 86,400 seconds.                                                                 |
+| `concurrencyPolicy`         | string           | No       | One of: `allow`, `skip`, `replace`.                                                                           |
+| `timeoutSeconds`            | integer          | No       | Target timeout in seconds, bounded below the durable execution lease.                                         |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/crons?environment=example" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "example",
+  "schedule": "example",
+  "target": {
+    "kind": "http",
+    "path": "/health"
+  }
+}'
+```
+
+### Responses
+
+| Status | Description                                                       |
+| ------ | ----------------------------------------------------------------- |
+| `201`  | Cron job created.                                                 |
+| `404`  | No such project or environment.                                   |
+| `409`  | A cron job with that name already exists.                         |
+| `422`  | Invalid schedule, timezone, target, retry, or concurrency policy. |
+
+### Response body (201)
+
+| Field                       | Type             | Description                                                                                                   |
+| --------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| `id`                        | string           | —                                                                                                             |
+| `name`                      | string           | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                            |
+| `environment`               | string           | —                                                                                                             |
+| `schedule`                  | string           | Five-field cron expression.                                                                                   |
+| `timezone`                  | string           | IANA timezone name. Defaults to UTC.                                                                          |
+| `enabled`                   | boolean          | —                                                                                                             |
+| `catchUp`                   | boolean          | Missed invocations are skipped; catch-up is not performed at launch. One of: `false`.                         |
+| `target`                    | object or object | Exactly one same-environment target: a signed project-relative HTTP invocation or a queue publication.        |
+| `target.kind`               | string           | One of: `http`.                                                                                               |
+| `target.path`               | string           | Project-relative HTTP path that receives a signed invocation. Pattern: `^/`.                                  |
+| `target.method`             | string           | One of: `POST`, `PUT`, `PATCH`.                                                                               |
+| `target.body`               | object           | Optional JSON request body, at most 122,880 encoded bytes before the signed 128,000-byte invocation envelope. |
+| `retry`                     | object           | —                                                                                                             |
+| `retry.maxAttempts`         | integer          | Total attempts from 1 to 10.                                                                                  |
+| `retry.initialDelaySeconds` | integer          | Initial retry delay from 1 to 3,600 seconds.                                                                  |
+| `retry.maxDelaySeconds`     | integer          | Maximum retry delay from 1 to 86,400 seconds.                                                                 |
+| `concurrencyPolicy`         | string           | One of: `allow`, `skip`, `replace`.                                                                           |
+| `timeoutSeconds`            | integer          | Target timeout in seconds, bounded below the durable execution lease.                                         |
+| `lastRunAt`                 | string or null   | Format: `date-time`.                                                                                          |
+| `nextRunAt`                 | string or null   | Format: `date-time`.                                                                                          |
+| `createdAt`                 | string           | Format: `date-time`.                                                                                          |
+| `updatedAt`                 | string           | Format: `date-time`.                                                                                          |
+
+## crons.get
+
+Get a cron job and its next scheduled run.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/crons/{cronId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/crons/$CRON_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                       |
+| ------ | --------------------------------- |
+| `200`  | Cron job.                         |
+| `404`  | No such cron job in this project. |
+
+### Response body (200)
+
+| Field                       | Type             | Description                                                                                                   |
+| --------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| `id`                        | string           | —                                                                                                             |
+| `name`                      | string           | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                            |
+| `environment`               | string           | —                                                                                                             |
+| `schedule`                  | string           | Five-field cron expression.                                                                                   |
+| `timezone`                  | string           | IANA timezone name. Defaults to UTC.                                                                          |
+| `enabled`                   | boolean          | —                                                                                                             |
+| `catchUp`                   | boolean          | Missed invocations are skipped; catch-up is not performed at launch. One of: `false`.                         |
+| `target`                    | object or object | Exactly one same-environment target: a signed project-relative HTTP invocation or a queue publication.        |
+| `target.kind`               | string           | One of: `http`.                                                                                               |
+| `target.path`               | string           | Project-relative HTTP path that receives a signed invocation. Pattern: `^/`.                                  |
+| `target.method`             | string           | One of: `POST`, `PUT`, `PATCH`.                                                                               |
+| `target.body`               | object           | Optional JSON request body, at most 122,880 encoded bytes before the signed 128,000-byte invocation envelope. |
+| `retry`                     | object           | —                                                                                                             |
+| `retry.maxAttempts`         | integer          | Total attempts from 1 to 10.                                                                                  |
+| `retry.initialDelaySeconds` | integer          | Initial retry delay from 1 to 3,600 seconds.                                                                  |
+| `retry.maxDelaySeconds`     | integer          | Maximum retry delay from 1 to 86,400 seconds.                                                                 |
+| `concurrencyPolicy`         | string           | One of: `allow`, `skip`, `replace`.                                                                           |
+| `timeoutSeconds`            | integer          | Target timeout in seconds, bounded below the durable execution lease.                                         |
+| `lastRunAt`                 | string or null   | Format: `date-time`.                                                                                          |
+| `nextRunAt`                 | string or null   | Format: `date-time`.                                                                                          |
+| `createdAt`                 | string           | Format: `date-time`.                                                                                          |
+| `updatedAt`                 | string           | Format: `date-time`.                                                                                          |
+
+## crons.update
+
+Update a cron job's schedule, target, retries, concurrency, or enabled state.
+
+```text
+PATCH /v1/orgs/{orgId}/projects/{projectId}/crons/{cronId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write`
+
+### Request body
+
+| Field                       | Type             | Required | Description                                                                                                   |
+| --------------------------- | ---------------- | -------- | ------------------------------------------------------------------------------------------------------------- |
+| `name`                      | string           | No       | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                            |
+| `schedule`                  | string           | No       | —                                                                                                             |
+| `timezone`                  | string           | No       | —                                                                                                             |
+| `enabled`                   | boolean          | No       | —                                                                                                             |
+| `target`                    | object or object | No       | Exactly one same-environment target: a signed project-relative HTTP invocation or a queue publication.        |
+| `target.kind`               | string           | Yes      | One of: `http`.                                                                                               |
+| `target.path`               | string           | Yes      | Project-relative HTTP path that receives a signed invocation. Pattern: `^/`.                                  |
+| `target.method`             | string           | No       | One of: `POST`, `PUT`, `PATCH`.                                                                               |
+| `target.body`               | object           | No       | Optional JSON request body, at most 122,880 encoded bytes before the signed 128,000-byte invocation envelope. |
+| `retry`                     | object           | No       | —                                                                                                             |
+| `retry.maxAttempts`         | integer          | No       | Total attempts from 1 to 10.                                                                                  |
+| `retry.initialDelaySeconds` | integer          | No       | Initial retry delay from 1 to 3,600 seconds.                                                                  |
+| `retry.maxDelaySeconds`     | integer          | No       | Maximum retry delay from 1 to 86,400 seconds.                                                                 |
+| `concurrencyPolicy`         | string           | No       | One of: `allow`, `skip`, `replace`.                                                                           |
+| `timeoutSeconds`            | integer          | No       | Target timeout in seconds, bounded below the durable execution lease.                                         |
+
+### Example
+
+```bash
+curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/crons/$CRON_ID" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### Responses
+
+| Status | Description                       |
+| ------ | --------------------------------- |
+| `200`  | Updated cron job.                 |
+| `404`  | No such cron job in this project. |
+| `422`  | Invalid cron job configuration.   |
+
+### Response body (200)
+
+| Field                       | Type             | Description                                                                                                   |
+| --------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| `id`                        | string           | —                                                                                                             |
+| `name`                      | string           | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                            |
+| `environment`               | string           | —                                                                                                             |
+| `schedule`                  | string           | Five-field cron expression.                                                                                   |
+| `timezone`                  | string           | IANA timezone name. Defaults to UTC.                                                                          |
+| `enabled`                   | boolean          | —                                                                                                             |
+| `catchUp`                   | boolean          | Missed invocations are skipped; catch-up is not performed at launch. One of: `false`.                         |
+| `target`                    | object or object | Exactly one same-environment target: a signed project-relative HTTP invocation or a queue publication.        |
+| `target.kind`               | string           | One of: `http`.                                                                                               |
+| `target.path`               | string           | Project-relative HTTP path that receives a signed invocation. Pattern: `^/`.                                  |
+| `target.method`             | string           | One of: `POST`, `PUT`, `PATCH`.                                                                               |
+| `target.body`               | object           | Optional JSON request body, at most 122,880 encoded bytes before the signed 128,000-byte invocation envelope. |
+| `retry`                     | object           | —                                                                                                             |
+| `retry.maxAttempts`         | integer          | Total attempts from 1 to 10.                                                                                  |
+| `retry.initialDelaySeconds` | integer          | Initial retry delay from 1 to 3,600 seconds.                                                                  |
+| `retry.maxDelaySeconds`     | integer          | Maximum retry delay from 1 to 86,400 seconds.                                                                 |
+| `concurrencyPolicy`         | string           | One of: `allow`, `skip`, `replace`.                                                                           |
+| `timeoutSeconds`            | integer          | Target timeout in seconds, bounded below the durable execution lease.                                         |
+| `lastRunAt`                 | string or null   | Format: `date-time`.                                                                                          |
+| `nextRunAt`                 | string or null   | Format: `date-time`.                                                                                          |
+| `createdAt`                 | string           | Format: `date-time`.                                                                                          |
+| `updatedAt`                 | string           | Format: `date-time`.                                                                                          |
+
+## crons.delete
+
+Delete a cron job and stop future runs. Retained run history is deleted.
+
+```text
+DELETE /v1/orgs/{orgId}/projects/{projectId}/crons/{cronId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `owner`
+- **Risk:** `destructive` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/crons/$CRON_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                       |
+| ------ | --------------------------------- |
+| `200`  | Cron job deleted.                 |
+| `404`  | No such cron job in this project. |
+
+## crons.trigger
+
+Trigger one manual run using the cron job's current target and retry policy.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/crons/{cronId}/runs
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write`
+
+### Request body
+
+| Field            | Type   | Required | Description |
+| ---------------- | ------ | -------- | ----------- |
+| `idempotencyKey` | string | No       | —           |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/crons/$CRON_ID/runs" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### Responses
+
+| Status | Description                                               |
+| ------ | --------------------------------------------------------- |
+| `202`  | Manual run queued.                                        |
+| `404`  | No such cron job in this project.                         |
+| `409`  | Concurrency policy skipped or replaced the requested run. |
+
+### Response body (202)
+
+| Field            | Type            | Description                                                    |
+| ---------------- | --------------- | -------------------------------------------------------------- |
+| `id`             | string          | —                                                              |
+| `cronId`         | string          | —                                                              |
+| `source`         | string          | One of: `scheduled`, `manual`.                                 |
+| `status`         | string          | One of: `queued`, `running`, `succeeded`, `failed`, `skipped`. |
+| `scheduledFor`   | string          | Format: `date-time`.                                           |
+| `startedAt`      | string or null  | Format: `date-time`.                                           |
+| `completedAt`    | string or null  | Format: `date-time`.                                           |
+| `attemptCount`   | integer         | —                                                              |
+| `responseStatus` | integer or null | —                                                              |
+| `error`          | string or null  | —                                                              |
+
+## crons.listRuns
+
+Page scheduled and manual run history, newest first.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/crons/{cronId}/runs
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name     | Type    | Required | Description                                                    |
+| -------- | ------- | -------- | -------------------------------------------------------------- |
+| `cursor` | string  | No       | —                                                              |
+| `limit`  | integer | No       | —                                                              |
+| `status` | string  | No       | One of: `queued`, `running`, `succeeded`, `failed`, `skipped`. |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/crons/$CRON_ID/runs?cursor=example" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                       |
+| ------ | --------------------------------- |
+| `200`  | Run history page.                 |
+| `404`  | No such cron job in this project. |
+
+### Response body (200)
+
+| Field                    | Type            | Description                                                    |
+| ------------------------ | --------------- | -------------------------------------------------------------- |
+| `items`                  | object[]        | —                                                              |
+| `items[].id`             | string          | —                                                              |
+| `items[].cronId`         | string          | —                                                              |
+| `items[].source`         | string          | One of: `scheduled`, `manual`.                                 |
+| `items[].status`         | string          | One of: `queued`, `running`, `succeeded`, `failed`, `skipped`. |
+| `items[].scheduledFor`   | string          | Format: `date-time`.                                           |
+| `items[].startedAt`      | string or null  | Format: `date-time`.                                           |
+| `items[].completedAt`    | string or null  | Format: `date-time`.                                           |
+| `items[].attemptCount`   | integer         | —                                                              |
+| `items[].responseStatus` | integer or null | —                                                              |
+| `items[].error`          | string or null  | —                                                              |
+| `nextCursor`             | string or null  | —                                                              |
+
+## crons.getRun
+
+Get one cron run with attempts and a sanitized outcome.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/crons/{cronId}/runs/{runId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/crons/$CRON_ID/runs/$RUN_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                       |
+| ------ | --------------------------------- |
+| `200`  | Cron run.                         |
+| `404`  | No such cron run in this project. |
+
+### Response body (200)
+
+| Field            | Type            | Description                                                    |
+| ---------------- | --------------- | -------------------------------------------------------------- |
+| `id`             | string          | —                                                              |
+| `cronId`         | string          | —                                                              |
+| `source`         | string          | One of: `scheduled`, `manual`.                                 |
+| `status`         | string          | One of: `queued`, `running`, `succeeded`, `failed`, `skipped`. |
+| `scheduledFor`   | string          | Format: `date-time`.                                           |
+| `startedAt`      | string or null  | Format: `date-time`.                                           |
+| `completedAt`    | string or null  | Format: `date-time`.                                           |
+| `attemptCount`   | integer         | —                                                              |
+| `responseStatus` | integer or null | —                                                              |
+| `error`          | string or null  | —                                                              |

@@ -31,9 +31,8 @@ curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/env" \
   -d '{"vars": [{"key": "API_BASE_URL", "value": "https://api.example.com"}]}'
 ```
 
-```js
-await korve.env.set({ orgId, projectId, body: { vars: [...] } });
-```
+MCP uses the same `PUT` method and path through `korve.request`; discover the
+body contract with `search {"resource":"env"}` first.
 
 Full contracts in the [Environment variables API](/api-reference/env).
 

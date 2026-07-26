@@ -1,0 +1,46 @@
+---
+title: "Troubleshooting"
+description: "Resolve authentication, billing, deploy, data, metrics, and automation failures."
+---
+
+## Start with identity and scope
+
+```bash
+korve health
+korve whoami
+korve projects list
+```
+
+`401` means missing or invalid credentials, or a session-only operation called with an API key.
+`403` means the credential's role is too low. `404` may mean the resource is outside your
+organization. `402` means organization billing is not active.
+
+## A deployment failed
+
+```bash
+korve deploys get <deploy-id> --json
+korve deploys diagnose <deploy-id> --json
+korve logs --level error --limit 100
+```
+
+Read the complete build log and recorded error before retrying. Use the persisted deployment agent
+for follow-ups and approve only the exact corrective action you reviewed.
+
+## Metrics will not load
+
+Run `korve metrics catalog`, then query one to ten names supported by the chosen project or database
+scope. Use RFC 3339 bounds with `since < until` and a step appropriate to the window.
+
+## A queue handler repeats work
+
+At-least-once delivery can repeat a message after timeouts or retries. Deduplicate durable effects
+with the stable message id. Return an acknowledgement only after the durable side effect commits.
+
+## A resource is still provisioning
+
+Databases, branches, caches, backups, restores, and exports can be asynchronous. Poll their GET
+operation with exponential backoff and stop on a terminal failure; do not use a shown-once
+connection string until status is ready.
+
+For reproducible support, include the operation id, public error code, timestamp, and resource id.
+Never include API keys, runtime tokens, passwords, connection strings, or webhook secrets.

@@ -1,0 +1,25 @@
+---
+title: "Deployment agent"
+description: "Investigate a deployment in a persisted conversation and approve exact corrective actions."
+---
+
+Every deployment can have one durable agent thread. It keeps the diagnosis, follow-up messages, and
+proposed actions so a reload or teammate does not lose the investigation.
+
+From a deployment in the dashboard, open **Diagnose**, ask a question, and watch status and text
+events stream in. The same contract is available through the
+[Deployment Agent API](/api-reference/deploymentAgent).
+
+Read-only tools may run while the agent answers. A mutation—such as redeploying or changing a
+configuration value—is stored as a pending action and cannot execute in the message call. Review the
+exact target and arguments, then approve or reject it separately. Approval is audited and rechecks
+authorization at execution time.
+
+The older one-shot diagnosis endpoint remains useful for CI:
+
+```bash
+korve deploys diagnose <deploy-id> --json
+```
+
+Use the conversation for iterative investigation and controlled action; use one-shot diagnosis when
+you only need a structured cause and suggested fix.

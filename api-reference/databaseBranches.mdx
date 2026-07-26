@@ -1,0 +1,474 @@
+---
+title: "databaseBranches"
+description: "Asynchronous independent database branches hydrated from current data, a backup, or a recoverable timestamp, with explicit expiry and promotion."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Asynchronous independent database branches hydrated from current data, a backup, or a recoverable timestamp, with explicit expiry and promotion.
+
+## databaseBranches.list
+
+List database branches sourced from this database.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/branches
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/branches" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                       |
+| ------ | --------------------------------- |
+| `200`  | Database branches.                |
+| `404`  | No such database in this project. |
+
+### Response body (200)
+
+An array of objects with these fields:
+
+| Field                      | Type           | Description                                                                                                                   |
+| -------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `id`                       | string         | —                                                                                                                             |
+| `sourceDatabaseId`         | string         | —                                                                                                                             |
+| `databaseId`               | string or null | —                                                                                                                             |
+| `name`                     | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                            |
+| `environment`              | string         | Pattern: `^[a-z][a-z0-9-]{0,38}$`.                                                                                            |
+| `source`                   | object         | —                                                                                                                             |
+| `source.kind`              | string         | One of: `current`, `backup`, `point_in_time`.                                                                                 |
+| `source.backupId`          | string         | —                                                                                                                             |
+| `source.pointInTime`       | string         | Format: `date-time`.                                                                                                          |
+| `status`                   | string         | One of: `queued`, `hydrating`, `ready`, `failed`, `expired`, `promoted`.                                                      |
+| `progressPercent`          | integer        | —                                                                                                                             |
+| `hydrationMode`            | string         | Launch implementation hydrates a full independent copy; it is not copy-on-write. One of: `full_copy`.                         |
+| `hydrationProgressPercent` | integer        | —                                                                                                                             |
+| `connectionReady`          | boolean        | True only when the independent database safely accepts customer connections.                                                  |
+| `fullyHydrated`            | boolean        | True only after every data block is copied and verified. Full-copy branches never report connectionReady before this is true. |
+| `deleteOnPreviewClose`     | boolean        | —                                                                                                                             |
+| `expiresAt`                | string or null | Defaults to seven days; null disables automatic expiry. Format: `date-time`.                                                  |
+| `createdAt`                | string         | Format: `date-time`.                                                                                                          |
+
+## databaseBranches.create
+
+Hydrate a new independent database branch asynchronously. Production-data previews require explicit project opt-in outside this operation.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/branches
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `owner`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `dangerous` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field                  | Type            | Required | Description                                   |
+| ---------------------- | --------------- | -------- | --------------------------------------------- |
+| `name`                 | string          | Yes      | Pattern: `^[a-z][a-z0-9-]{1,61}$`.            |
+| `environment`          | string          | Yes      | Pattern: `^[a-z][a-z0-9-]{0,38}$`.            |
+| `region`               | string          | Yes      | —                                             |
+| `sku`                  | string          | Yes      | —                                             |
+| `source`               | object          | Yes      | —                                             |
+| `source.kind`          | string          | Yes      | One of: `current`, `backup`, `point_in_time`. |
+| `source.backupId`      | string          | No       | —                                             |
+| `source.pointInTime`   | string          | No       | Format: `date-time`.                          |
+| `expiresInDays`        | integer or null | No       | Defaults to seven days; null disables expiry. |
+| `deleteOnPreviewClose` | boolean         | No       | —                                             |
+| `previewId`            | string or null  | No       | —                                             |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/branches" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "example",
+  "environment": "example",
+  "region": "example",
+  "sku": "example",
+  "source": {
+    "kind": "current"
+  }
+}'
+```
+
+### Responses
+
+| Status | Description                                                                         |
+| ------ | ----------------------------------------------------------------------------------- |
+| `202`  | Branch hydration queued.                                                            |
+| `404`  | No such source, environment, preview, region, or SKU.                               |
+| `409`  | The branch database name already exists.                                            |
+| `422`  | Timestamp is outside the recovery window or preview data policy forbids the source. |
+
+### Response body (202)
+
+| Field                      | Type           | Description                                                                                                                   |
+| -------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `id`                       | string         | —                                                                                                                             |
+| `sourceDatabaseId`         | string         | —                                                                                                                             |
+| `databaseId`               | string or null | —                                                                                                                             |
+| `name`                     | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                            |
+| `environment`              | string         | Pattern: `^[a-z][a-z0-9-]{0,38}$`.                                                                                            |
+| `source`                   | object         | —                                                                                                                             |
+| `source.kind`              | string         | One of: `current`, `backup`, `point_in_time`.                                                                                 |
+| `source.backupId`          | string         | —                                                                                                                             |
+| `source.pointInTime`       | string         | Format: `date-time`.                                                                                                          |
+| `status`                   | string         | One of: `queued`, `hydrating`, `ready`, `failed`, `expired`, `promoted`.                                                      |
+| `progressPercent`          | integer        | —                                                                                                                             |
+| `hydrationMode`            | string         | Launch implementation hydrates a full independent copy; it is not copy-on-write. One of: `full_copy`.                         |
+| `hydrationProgressPercent` | integer        | —                                                                                                                             |
+| `connectionReady`          | boolean        | True only when the independent database safely accepts customer connections.                                                  |
+| `fullyHydrated`            | boolean        | True only after every data block is copied and verified. Full-copy branches never report connectionReady before this is true. |
+| `deleteOnPreviewClose`     | boolean        | —                                                                                                                             |
+| `expiresAt`                | string or null | Defaults to seven days; null disables automatic expiry. Format: `date-time`.                                                  |
+| `createdAt`                | string         | Format: `date-time`.                                                                                                          |
+
+## databaseBranches.get
+
+Get branch hydration progress and database id.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/branches/{branchId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/branches/$BRANCH_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                       |
+| ------ | --------------------------------- |
+| `200`  | Database branch.                  |
+| `404`  | No such branch for this database. |
+
+### Response body (200)
+
+| Field                      | Type           | Description                                                                                                                   |
+| -------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `id`                       | string         | —                                                                                                                             |
+| `sourceDatabaseId`         | string         | —                                                                                                                             |
+| `databaseId`               | string or null | —                                                                                                                             |
+| `name`                     | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                            |
+| `environment`              | string         | Pattern: `^[a-z][a-z0-9-]{0,38}$`.                                                                                            |
+| `source`                   | object         | —                                                                                                                             |
+| `source.kind`              | string         | One of: `current`, `backup`, `point_in_time`.                                                                                 |
+| `source.backupId`          | string         | —                                                                                                                             |
+| `source.pointInTime`       | string         | Format: `date-time`.                                                                                                          |
+| `status`                   | string         | One of: `queued`, `hydrating`, `ready`, `failed`, `expired`, `promoted`.                                                      |
+| `progressPercent`          | integer        | —                                                                                                                             |
+| `hydrationMode`            | string         | Launch implementation hydrates a full independent copy; it is not copy-on-write. One of: `full_copy`.                         |
+| `hydrationProgressPercent` | integer        | —                                                                                                                             |
+| `connectionReady`          | boolean        | True only when the independent database safely accepts customer connections.                                                  |
+| `fullyHydrated`            | boolean        | True only after every data block is copied and verified. Full-copy branches never report connectionReady before this is true. |
+| `deleteOnPreviewClose`     | boolean        | —                                                                                                                             |
+| `expiresAt`                | string or null | Defaults to seven days; null disables automatic expiry. Format: `date-time`.                                                  |
+| `createdAt`                | string         | Format: `date-time`.                                                                                                          |
+
+## databaseBranches.update
+
+Change branch expiry or automatic preview cleanup without changing its data source.
+
+```text
+PATCH /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/branches/{branchId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field                  | Type            | Required | Description |
+| ---------------------- | --------------- | -------- | ----------- |
+| `expiresInDays`        | integer or null | No       | —           |
+| `deleteOnPreviewClose` | boolean         | No       | —           |
+
+### Example
+
+```bash
+curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/branches/$BRANCH_ID" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### Responses
+
+| Status | Description                       |
+| ------ | --------------------------------- |
+| `200`  | Updated database branch.          |
+| `404`  | No such branch for this database. |
+| `422`  | Invalid expiry.                   |
+
+### Response body (200)
+
+| Field                      | Type           | Description                                                                                                                   |
+| -------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `id`                       | string         | —                                                                                                                             |
+| `sourceDatabaseId`         | string         | —                                                                                                                             |
+| `databaseId`               | string or null | —                                                                                                                             |
+| `name`                     | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                            |
+| `environment`              | string         | Pattern: `^[a-z][a-z0-9-]{0,38}$`.                                                                                            |
+| `source`                   | object         | —                                                                                                                             |
+| `source.kind`              | string         | One of: `current`, `backup`, `point_in_time`.                                                                                 |
+| `source.backupId`          | string         | —                                                                                                                             |
+| `source.pointInTime`       | string         | Format: `date-time`.                                                                                                          |
+| `status`                   | string         | One of: `queued`, `hydrating`, `ready`, `failed`, `expired`, `promoted`.                                                      |
+| `progressPercent`          | integer        | —                                                                                                                             |
+| `hydrationMode`            | string         | Launch implementation hydrates a full independent copy; it is not copy-on-write. One of: `full_copy`.                         |
+| `hydrationProgressPercent` | integer        | —                                                                                                                             |
+| `connectionReady`          | boolean        | True only when the independent database safely accepts customer connections.                                                  |
+| `fullyHydrated`            | boolean        | True only after every data block is copied and verified. Full-copy branches never report connectionReady before this is true. |
+| `deleteOnPreviewClose`     | boolean        | —                                                                                                                             |
+| `expiresAt`                | string or null | Defaults to seven days; null disables automatic expiry. Format: `date-time`.                                                  |
+| `createdAt`                | string         | Format: `date-time`.                                                                                                          |
+
+## databaseBranches.delete
+
+Permanently delete the independent branch database and its data.
+
+```text
+DELETE /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/branches/{branchId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `owner`
+- **Risk:** `destructive` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/branches/$BRANCH_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                       |
+| ------ | --------------------------------- |
+| `200`  | Branch deleted.                   |
+| `404`  | No such branch for this database. |
+
+## databaseBranches.previewPromotion
+
+Preview the exact binding swap and mint a short-lived one-use confirmation bound to its current version.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/branches/{branchId}/promotion-preview
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `owner`
+- **Risk:** `dangerous` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field         | Type   | Required | Description |
+| ------------- | ------ | -------- | ----------- |
+| `bindingName` | string | Yes      | —           |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/branches/$BRANCH_ID/promotion-preview" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "bindingName": "example"
+}'
+```
+
+### Responses
+
+| Status | Description                            |
+| ------ | -------------------------------------- |
+| `200`  | Exact promotion plan and confirmation. |
+| `404`  | No ready branch or binding.            |
+| `409`  | The binding target already changed.    |
+
+### Response body (200)
+
+| Field                              | Type    | Description          |
+| ---------------------------------- | ------- | -------------------- |
+| `bindingName`                      | string  | —                    |
+| `currentDatabaseId`                | string  | —                    |
+| `targetDatabaseId`                 | string  | —                    |
+| `bindingVersion`                   | integer | —                    |
+| `impact`                           | object  | —                    |
+| `impact.sourceRemainsAvailable`    | boolean | One of: `true`.      |
+| `impact.automaticDataMerge`        | boolean | One of: `false`.     |
+| `impact.connectionRestartRequired` | boolean | —                    |
+| `rollbackWindowSeconds`            | integer | —                    |
+| `planHash`                         | string  | —                    |
+| `confirmationToken`                | string  | —                    |
+| `expiresAt`                        | string  | Format: `date-time`. |
+
+## databaseBranches.promote
+
+Explicitly promote a ready branch by swapping one application binding. No data or schema is merged back automatically.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/branches/{branchId}/promote
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `owner`
+- **Risk:** `dangerous` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field               | Type    | Required | Description                                                                      |
+| ------------------- | ------- | -------- | -------------------------------------------------------------------------------- |
+| `confirmed`         | boolean | Yes      | Explicit confirmation from the owner-facing confirmation dialog. One of: `true`. |
+| `confirmationToken` | string  | Yes      | Short-lived token bound to this exact action and target.                         |
+| `bindingName`       | string  | Yes      | —                                                                                |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATABASE_ID/branches/$BRANCH_ID/promote" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "confirmed": true,
+  "confirmationToken": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "bindingName": "example"
+}'
+```
+
+### Responses
+
+| Status | Description                                    |
+| ------ | ---------------------------------------------- |
+| `200`  | Branch binding promoted.                       |
+| `404`  | No ready branch or binding.                    |
+| `409`  | Binding changed after confirmation was issued. |
+| `422`  | Confirmation is invalid or expired.            |
+
+### Response body (200)
+
+| Field                      | Type           | Description                                                                                                                   |
+| -------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `id`                       | string         | —                                                                                                                             |
+| `sourceDatabaseId`         | string         | —                                                                                                                             |
+| `databaseId`               | string or null | —                                                                                                                             |
+| `name`                     | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                            |
+| `environment`              | string         | Pattern: `^[a-z][a-z0-9-]{0,38}$`.                                                                                            |
+| `source`                   | object         | —                                                                                                                             |
+| `source.kind`              | string         | One of: `current`, `backup`, `point_in_time`.                                                                                 |
+| `source.backupId`          | string         | —                                                                                                                             |
+| `source.pointInTime`       | string         | Format: `date-time`.                                                                                                          |
+| `status`                   | string         | One of: `queued`, `hydrating`, `ready`, `failed`, `expired`, `promoted`.                                                      |
+| `progressPercent`          | integer        | —                                                                                                                             |
+| `hydrationMode`            | string         | Launch implementation hydrates a full independent copy; it is not copy-on-write. One of: `full_copy`.                         |
+| `hydrationProgressPercent` | integer        | —                                                                                                                             |
+| `connectionReady`          | boolean        | True only when the independent database safely accepts customer connections.                                                  |
+| `fullyHydrated`            | boolean        | True only after every data block is copied and verified. Full-copy branches never report connectionReady before this is true. |
+| `deleteOnPreviewClose`     | boolean        | —                                                                                                                             |
+| `expiresAt`                | string or null | Defaults to seven days; null disables automatic expiry. Format: `date-time`.                                                  |
+| `createdAt`                | string         | Format: `date-time`.                                                                                                          |
+
+## databaseBranches.getPreviewPolicy
+
+Get the project's persisted opt-in policy for attaching an isolated database branch to pull-request previews.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/database-branch-policy
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/database-branch-policy" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                           |
+| ------ | ------------------------------------- |
+| `200`  | Preview database branch policy.       |
+| `404`  | No such project in this organization. |
+
+### Response body (200)
+
+| Field                  | Type           | Description                        |
+| ---------------------- | -------------- | ---------------------------------- |
+| `enabled`              | boolean        | —                                  |
+| `sourceEnvironment`    | string         | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `sourceDatabaseId`     | string or null | —                                  |
+| `allowProductionData`  | boolean        | —                                  |
+| `expiresInDays`        | integer        | —                                  |
+| `deleteOnPreviewClose` | boolean        | —                                  |
+
+## databaseBranches.updatePreviewPolicy
+
+Explicitly opt a project into preview database branches and select the source environment/database. Production data requires allowProductionData=true from an owner.
+
+```text
+PUT /v1/orgs/{orgId}/projects/{projectId}/database-branch-policy
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `owner`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `dangerous` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field                  | Type           | Required | Description                        |
+| ---------------------- | -------------- | -------- | ---------------------------------- |
+| `enabled`              | boolean        | Yes      | —                                  |
+| `sourceEnvironment`    | string         | Yes      | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `sourceDatabaseId`     | string or null | Yes      | —                                  |
+| `allowProductionData`  | boolean        | Yes      | —                                  |
+| `expiresInDays`        | integer        | No       | —                                  |
+| `deleteOnPreviewClose` | boolean        | No       | —                                  |
+
+### Example
+
+```bash
+curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/database-branch-policy" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "enabled": true,
+  "sourceEnvironment": "example",
+  "sourceDatabaseId": "example",
+  "allowProductionData": true
+}'
+```
+
+### Responses
+
+| Status | Description                                                                                         |
+| ------ | --------------------------------------------------------------------------------------------------- |
+| `200`  | Preview database branch policy updated.                                                             |
+| `404`  | No such project, environment, or database.                                                          |
+| `422`  | Source database is outside the selected environment, or production data was not explicitly allowed. |

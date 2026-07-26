@@ -34,7 +34,7 @@ korve previews list
 | `status`       | `active` or `removed`                     |
 | `deploymentId` | Latest deployment released to the preview |
 
-API: `GET .../previews`; MCP: `await korve.previews.list({ orgId, projectId })`.
+API: `GET .../previews`; MCP calls the same method and path through `korve.request`.
 See the [Previews API](/api-reference/previews).
 
 ## Removing one by hand

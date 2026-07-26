@@ -1,0 +1,636 @@
+---
+title: "appAccess"
+description: "Project sharing policy and auditable access state. Customer app identity remains isolated under app-auth."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Project sharing policy and auditable access state. Customer app identity remains isolated under app-auth.
+
+## appAccess.getPolicy
+
+Get the effective project policy and explicit environment/preview inheritance.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/access
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/access" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Application access policy.                               |
+| `404`  | No such project or access resource in this organization. |
+
+### Response body (200)
+
+| Field                                | Type           | Description                                                                                                                                   |
+| ------------------------------------ | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mode`                               | string         | One of: `public`, `authenticated`, `organization`, `invite_only`.                                                                             |
+| `previewMode`                        | string         | Access for pull-request previews. Inherit uses the project mode. One of: `inherit`, `public`, `authenticated`, `organization`, `invite_only`. |
+| `environmentOverrides`               | object[]       | —                                                                                                                                             |
+| `environmentOverrides[].environment` | string         | —                                                                                                                                             |
+| `environmentOverrides[].mode`        | string         | One of: `public`, `authenticated`, `organization`, `invite_only`.                                                                             |
+| `version`                            | integer        | —                                                                                                                                             |
+| `createdAt`                          | string         | Format: `date-time`.                                                                                                                          |
+| `updatedAt`                          | string         | Format: `date-time`.                                                                                                                          |
+| `enforcement`                        | object         | —                                                                                                                                             |
+| `enforcement.status`                 | string         | One of: `ready`, `provisioning`, `unavailable`.                                                                                               |
+| `enforcement.reason`                 | string or null | —                                                                                                                                             |
+
+## appAccess.updatePolicy
+
+Replace the application access policy. Each successful mutation increments its version.
+
+```text
+PUT /v1/orgs/{orgId}/projects/{projectId}/access
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `dangerous`
+
+### Request body
+
+| Field                                | Type     | Required | Description                                                                  |
+| ------------------------------------ | -------- | -------- | ---------------------------------------------------------------------------- |
+| `mode`                               | string   | Yes      | One of: `public`, `authenticated`, `organization`, `invite_only`.            |
+| `previewMode`                        | string   | Yes      | One of: `inherit`, `public`, `authenticated`, `organization`, `invite_only`. |
+| `environmentOverrides`               | object[] | Yes      | —                                                                            |
+| `environmentOverrides[].environment` | string   | Yes      | —                                                                            |
+| `environmentOverrides[].mode`        | string   | Yes      | One of: `public`, `authenticated`, `organization`, `invite_only`.            |
+
+### Example
+
+```bash
+curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/access" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "mode": "public",
+  "previewMode": "inherit",
+  "environmentOverrides": [
+    {
+      "environment": "example",
+      "mode": "public"
+    }
+  ]
+}'
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Updated policy.                                          |
+| `404`  | No such project or access resource in this organization. |
+| `409`  | An environment appears more than once.                   |
+| `422`  | Unknown environment or invalid policy.                   |
+
+### Response body (200)
+
+| Field                                | Type           | Description                                                                                                                                   |
+| ------------------------------------ | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mode`                               | string         | One of: `public`, `authenticated`, `organization`, `invite_only`.                                                                             |
+| `previewMode`                        | string         | Access for pull-request previews. Inherit uses the project mode. One of: `inherit`, `public`, `authenticated`, `organization`, `invite_only`. |
+| `environmentOverrides`               | object[]       | —                                                                                                                                             |
+| `environmentOverrides[].environment` | string         | —                                                                                                                                             |
+| `environmentOverrides[].mode`        | string         | One of: `public`, `authenticated`, `organization`, `invite_only`.                                                                             |
+| `version`                            | integer        | —                                                                                                                                             |
+| `createdAt`                          | string         | Format: `date-time`.                                                                                                                          |
+| `updatedAt`                          | string         | Format: `date-time`.                                                                                                                          |
+| `enforcement`                        | object         | —                                                                                                                                             |
+| `enforcement.status`                 | string         | One of: `ready`, `provisioning`, `unavailable`.                                                                                               |
+| `enforcement.reason`                 | string or null | —                                                                                                                                             |
+
+## appAccess.listInvitations
+
+List invitations without their write-only tokens.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/access/invitations
+```
+
+- **Auth:** Dashboard session only — organization API keys are rejected.
+- **Minimum role:** `admin`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name     | Type    | Required | Description |
+| -------- | ------- | -------- | ----------- |
+| `cursor` | string  | No       | —           |
+| `limit`  | integer | No       | —           |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/access/invitations?cursor=example" \
+  -b "$SESSION"
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Invitations.                                             |
+| `404`  | No such project or access resource in this organization. |
+
+### Response body (200)
+
+| Field                | Type           | Description                                          |
+| -------------------- | -------------- | ---------------------------------------------------- |
+| `items`              | object[]       | —                                                    |
+| `items[].id`         | string         | Format: `uuid`.                                      |
+| `items[].email`      | string         | Format: `email`.                                     |
+| `items[].status`     | string         | One of: `pending`, `accepted`, `revoked`, `expired`. |
+| `items[].expiresAt`  | string         | Format: `date-time`.                                 |
+| `items[].acceptedAt` | string or null | Format: `date-time`.                                 |
+| `items[].revokedAt`  | string or null | Format: `date-time`.                                 |
+| `items[].createdAt`  | string         | Format: `date-time`.                                 |
+| `nextCursor`         | string or null | —                                                    |
+
+## appAccess.createInvitation
+
+Create an invitation. A branded one-time acceptance URL carries the token only in its URL fragment, which browsers never send in the initial HTTP request. The URL is returned once and only the token's SHA-256 digest is retained.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/access/invitations
+```
+
+- **Auth:** Dashboard session only — organization API keys are rejected.
+- **Minimum role:** `admin`
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field              | Type    | Required | Description      |
+| ------------------ | ------- | -------- | ---------------- |
+| `email`            | string  | Yes      | Format: `email`. |
+| `expiresInSeconds` | integer | No       | —                |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/access/invitations" \
+  -b "$SESSION" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "email": "dev@acme.com"
+}'
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `201`  | Invitation plus a one-time branded acceptance URL.       |
+| `404`  | No such project or access resource in this organization. |
+| `409`  | A pending invitation already exists for this email.      |
+
+### Response body (201)
+
+| Field                   | Type           | Description                                                                                                            |
+| ----------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `invitation`            | object         | —                                                                                                                      |
+| `invitation.id`         | string         | Format: `uuid`.                                                                                                        |
+| `invitation.email`      | string         | Format: `email`.                                                                                                       |
+| `invitation.status`     | string         | One of: `pending`, `accepted`, `revoked`, `expired`.                                                                   |
+| `invitation.expiresAt`  | string         | Format: `date-time`.                                                                                                   |
+| `invitation.acceptedAt` | string or null | Format: `date-time`.                                                                                                   |
+| `invitation.revokedAt`  | string or null | Format: `date-time`.                                                                                                   |
+| `invitation.createdAt`  | string         | Format: `date-time`.                                                                                                   |
+| `acceptUrl`             | string         | Dashboard acceptance URL with project and token in the fragment only; its query string is always empty. Format: `uri`. |
+
+## appAccess.revokeInvitation
+
+Revoke a pending invitation.
+
+```text
+DELETE /v1/orgs/{orgId}/projects/{projectId}/access/invitations/{invitationId}
+```
+
+- **Auth:** Dashboard session only — organization API keys are rejected.
+- **Minimum role:** `admin`
+- **Risk:** `destructive` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/access/invitations/$INVITATION_ID" \
+  -b "$SESSION"
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Invitation revoked.                                      |
+| `404`  | No such project or access resource in this organization. |
+
+### Response body (200)
+
+| Field        | Type           | Description                                          |
+| ------------ | -------------- | ---------------------------------------------------- |
+| `id`         | string         | Format: `uuid`.                                      |
+| `email`      | string         | Format: `email`.                                     |
+| `status`     | string         | One of: `pending`, `accepted`, `revoked`, `expired`. |
+| `expiresAt`  | string         | Format: `date-time`.                                 |
+| `acceptedAt` | string or null | Format: `date-time`.                                 |
+| `revokedAt`  | string or null | Format: `date-time`.                                 |
+| `createdAt`  | string         | Format: `date-time`.                                 |
+
+## appAccess.acceptInvitation
+
+Accept an invitation as a signed-in, verified Korve viewer identity. This identity is separate from customer app-auth.
+
+```text
+POST /v1/projects/{projectId}/access/invitations/accept
+```
+
+- **Auth:** Dashboard session only — organization API keys are rejected.
+- **Minimum role:** `member`
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field   | Type   | Required | Description |
+| ------- | ------ | -------- | ----------- |
+| `token` | string | Yes      | —           |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/projects/$PROJECT_ID/access/invitations/accept" \
+  -b "$SESSION" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "token": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}'
+```
+
+### Responses
+
+| Status | Description                                                   |
+| ------ | ------------------------------------------------------------- |
+| `200`  | Access grant plus the server-derived managed application URL. |
+| `403`  | Invitation does not match this verified identity.             |
+| `404`  | Invitation is invalid, expired, or revoked.                   |
+| `409`  | Invitation was already accepted.                              |
+
+### Response body (200)
+
+| Field                | Type           | Description                                                                                                  |
+| -------------------- | -------------- | ------------------------------------------------------------------------------------------------------------ |
+| `grant`              | object         | —                                                                                                            |
+| `grant.id`           | string         | Format: `uuid`.                                                                                              |
+| `grant.viewerUserId` | string         | —                                                                                                            |
+| `grant.email`        | string         | Format: `email`.                                                                                             |
+| `grant.invitationId` | string or null | Format: `uuid`.                                                                                              |
+| `grant.revokedAt`    | string or null | Format: `date-time`.                                                                                         |
+| `grant.createdAt`    | string         | Format: `date-time`.                                                                                         |
+| `appUrl`             | string         | Server-derived managed application URL. Custom and infrastructure origins are never returned. Format: `uri`. |
+
+## appAccess.acceptInvitationWithContext
+
+Accept an invitation for the project derived from an active edge-minted login context. The context is not consumed until session exchange.
+
+```text
+POST /v1/app-access/invitations/accept
+```
+
+- **Auth:** Dashboard session only — organization API keys are rejected.
+- **Minimum role:** `member`
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field     | Type   | Required | Description |
+| --------- | ------ | -------- | ----------- |
+| `context` | string | Yes      | —           |
+| `token`   | string | Yes      | —           |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/app-access/invitations/accept" \
+  -b "$SESSION" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "context": "examplexxxxxxxxxxxxxxxxxxxxxxxxx",
+  "token": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}'
+```
+
+### Responses
+
+| Status | Description                                                   |
+| ------ | ------------------------------------------------------------- |
+| `200`  | Access grant plus the server-derived managed application URL. |
+| `403`  | Invitation does not match the verified viewer identity.       |
+| `404`  | Context or invitation is invalid, expired, or unavailable.    |
+| `409`  | Invitation was already accepted.                              |
+
+### Response body (200)
+
+| Field                | Type           | Description                                                                                                  |
+| -------------------- | -------------- | ------------------------------------------------------------------------------------------------------------ |
+| `grant`              | object         | —                                                                                                            |
+| `grant.id`           | string         | Format: `uuid`.                                                                                              |
+| `grant.viewerUserId` | string         | —                                                                                                            |
+| `grant.email`        | string         | Format: `email`.                                                                                             |
+| `grant.invitationId` | string or null | Format: `uuid`.                                                                                              |
+| `grant.revokedAt`    | string or null | Format: `date-time`.                                                                                         |
+| `grant.createdAt`    | string         | Format: `date-time`.                                                                                         |
+| `appUrl`             | string         | Server-derived managed application URL. Custom and infrastructure origins are never returned. Format: `uri`. |
+
+## appAccess.exchangeSession
+
+Consume a one-time edge-minted login context and exchange the verified Korve user session for a scoped application access token. API clients send `x-korve-access-token: &lt;token>`; Authorization remains reserved for customer application auth. Browsers submit the token to the server-returned callback; the edge responds 303 with `__Host-korve_access=&lt;encoded token>; HttpOnly; Secure; SameSite=Lax; Path=/` and no Domain attribute. The central API never trusts browser callback, project, or scope parameters and never sets a cross-origin cookie.
+
+```text
+POST /v1/app-access/sessions/exchange
+```
+
+- **Auth:** Dashboard session only — organization API keys are rejected.
+- **Minimum role:** `member`
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field        | Type    | Required | Description |
+| ------------ | ------- | -------- | ----------- |
+| `context`    | string  | Yes      | —           |
+| `ttlSeconds` | integer | No       | —           |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/app-access/sessions/exchange" \
+  -b "$SESSION" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "context": "examplexxxxxxxxxxxxxxxxxxxxxxxxx"
+}'
+```
+
+### Responses
+
+| Status | Description                                                  |
+| ------ | ------------------------------------------------------------ |
+| `201`  | Session metadata plus a one-time bearer/cookie token.        |
+| `403`  | The viewer does not satisfy the effective access mode.       |
+| `404`  | Login context is invalid, expired, consumed, or unavailable. |
+| `422`  | The requested scope or lifetime is invalid.                  |
+| `503`  | Application access enforcement is not ready.                 |
+
+### Response body (201)
+
+| Field                   | Type           | Description                    |
+| ----------------------- | -------------- | ------------------------------ |
+| `session`               | object         | —                              |
+| `session.id`            | string         | Format: `uuid`.                |
+| `session.viewerUserId`  | string         | —                              |
+| `session.email`         | string         | Format: `email`.               |
+| `session.environment`   | string or null | —                              |
+| `session.previewId`     | string or null | Format: `uuid`.                |
+| `session.expiresAt`     | string         | Format: `date-time`.           |
+| `session.policyVersion` | integer        | —                              |
+| `session.revokedAt`     | string or null | Format: `date-time`.           |
+| `session.createdAt`     | string         | Format: `date-time`.           |
+| `token`                 | string         | —                              |
+| `cookieName`            | string         | One of: `__Host-korve_access`. |
+| `handoff`               | object         | —                              |
+| `handoff.callback`      | string         | Format: `uri`.                 |
+| `handoff.returnTo`      | string         | —                              |
+
+## appAccess.listGrants
+
+List project access grants.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/access/grants
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name     | Type    | Required | Description |
+| -------- | ------- | -------- | ----------- |
+| `cursor` | string  | No       | —           |
+| `limit`  | integer | No       | —           |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/access/grants?cursor=example" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Access grants.                                           |
+| `404`  | No such project or access resource in this organization. |
+
+### Response body (200)
+
+| Field                  | Type           | Description          |
+| ---------------------- | -------------- | -------------------- |
+| `items`                | object[]       | —                    |
+| `items[].id`           | string         | Format: `uuid`.      |
+| `items[].viewerUserId` | string         | —                    |
+| `items[].email`        | string         | Format: `email`.     |
+| `items[].invitationId` | string or null | Format: `uuid`.      |
+| `items[].revokedAt`    | string or null | Format: `date-time`. |
+| `items[].createdAt`    | string         | Format: `date-time`. |
+| `nextCursor`           | string or null | —                    |
+
+## appAccess.revokeGrant
+
+Revoke a grant and every active access session derived from it.
+
+```text
+DELETE /v1/orgs/{orgId}/projects/{projectId}/access/grants/{grantId}
+```
+
+- **Auth:** Dashboard session only — organization API keys are rejected.
+- **Minimum role:** `admin`
+- **Risk:** `destructive` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/access/grants/$GRANT_ID" \
+  -b "$SESSION"
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Grant revoked.                                           |
+| `404`  | No such project or access resource in this organization. |
+
+### Response body (200)
+
+| Field          | Type           | Description          |
+| -------------- | -------------- | -------------------- |
+| `id`           | string         | Format: `uuid`.      |
+| `viewerUserId` | string         | —                    |
+| `email`        | string         | Format: `email`.     |
+| `invitationId` | string or null | Format: `uuid`.      |
+| `revokedAt`    | string or null | Format: `date-time`. |
+| `createdAt`    | string         | Format: `date-time`. |
+
+## appAccess.listSessions
+
+List access-gateway session state without credential material.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/access/sessions
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name     | Type    | Required | Description |
+| -------- | ------- | -------- | ----------- |
+| `cursor` | string  | No       | —           |
+| `limit`  | integer | No       | —           |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/access/sessions?cursor=example" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Access sessions.                                         |
+| `404`  | No such project or access resource in this organization. |
+
+### Response body (200)
+
+| Field                   | Type           | Description          |
+| ----------------------- | -------------- | -------------------- |
+| `items`                 | object[]       | —                    |
+| `items[].id`            | string         | Format: `uuid`.      |
+| `items[].viewerUserId`  | string         | —                    |
+| `items[].email`         | string         | Format: `email`.     |
+| `items[].environment`   | string or null | —                    |
+| `items[].previewId`     | string or null | Format: `uuid`.      |
+| `items[].expiresAt`     | string         | Format: `date-time`. |
+| `items[].policyVersion` | integer        | —                    |
+| `items[].revokedAt`     | string or null | Format: `date-time`. |
+| `items[].createdAt`     | string         | Format: `date-time`. |
+| `nextCursor`            | string or null | —                    |
+
+## appAccess.revokeSession
+
+Revoke one access session.
+
+```text
+DELETE /v1/orgs/{orgId}/projects/{projectId}/access/sessions/{sessionId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `destructive` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/access/sessions/$SESSION_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Access session revoked.                                  |
+| `404`  | No such project or access resource in this organization. |
+
+### Response body (200)
+
+| Field           | Type           | Description          |
+| --------------- | -------------- | -------------------- |
+| `id`            | string         | Format: `uuid`.      |
+| `viewerUserId`  | string         | —                    |
+| `email`         | string         | Format: `email`.     |
+| `environment`   | string or null | —                    |
+| `previewId`     | string or null | Format: `uuid`.      |
+| `expiresAt`     | string         | Format: `date-time`. |
+| `policyVersion` | integer        | —                    |
+| `revokedAt`     | string or null | Format: `date-time`. |
+| `createdAt`     | string         | Format: `date-time`. |
+
+## appAccess.listAudit
+
+List tenant-scoped access policy, invitation, grant, and session audit events.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/access/audit-events
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name     | Type    | Required | Description |
+| -------- | ------- | -------- | ----------- |
+| `cursor` | string  | No       | —           |
+| `limit`  | integer | No       | —           |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/access/audit-events?cursor=example" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Access audit events.                                     |
+| `404`  | No such project or access resource in this organization. |
+
+### Response body (200)
+
+| Field               | Type           | Description                             |
+| ------------------- | -------------- | --------------------------------------- |
+| `items`             | object[]       | —                                       |
+| `items[].id`        | string         | Format: `uuid`.                         |
+| `items[].actorType` | string         | One of: `operator`, `viewer`, `system`. |
+| `items[].actorId`   | string or null | —                                       |
+| `items[].action`    | string         | —                                       |
+| `items[].targetId`  | string or null | —                                       |
+| `items[].outcome`   | string         | One of: `succeeded`, `denied`.          |
+| `items[].metadata`  | object or null | —                                       |
+| `items[].createdAt` | string         | Format: `date-time`.                    |
+| `nextCursor`        | string or null | —                                       |

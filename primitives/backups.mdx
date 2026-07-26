@@ -1,0 +1,22 @@
+---
+title: "Backups and restores"
+description: "Configure recovery policy, create backups, export portable copies, and restore safely."
+---
+
+Each database has a recovery policy for point-in-time, daily, weekly, and monthly retention. Inspect
+the recovery window before promising an RPO, and test restores instead of treating backup success as
+proof of recoverability.
+
+```bash
+korve backups policy-show --database primary
+korve backups create --database primary --data '{"kind":"manual"}'
+korve backups recovery-window --database primary
+```
+
+Restores are asynchronous and create an isolated target. Promotion is a separate two-step operation:
+preview the binding swap to receive a one-use confirmation token, then submit the exact token and
+binding with explicit confirmation. Do not place the token in shell history; pass `--data @file.json`.
+
+Portable exports can target an organization-owned compatible object destination. Test the destination
+before starting an export, and account for transfer charges. See [Backup destinations](/api-reference/backupDestinations),
+[exports](/api-reference/databaseExports), and [restores](/api-reference/databaseRestores).

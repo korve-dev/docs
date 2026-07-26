@@ -15,8 +15,8 @@ korve deploys diagnose <deploy-id>
 ```
 
 API: `POST .../deploys/{deployId}/diagnosis` — see the
-[Deploys API](/api-reference/deploys). MCP:
-`await korve.deploys.diagnose({ orgId, projectId, deployId })`.
+[Deploys API](/api-reference/deploys). MCP calls the same operation through
+`korve.request` after discovering it with `search`.
 
 Only **failed** deployments are diagnosable (`409` otherwise). The first
 call produces the diagnosis; it is then cached, so repeat calls are free

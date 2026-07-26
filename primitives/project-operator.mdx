@@ -1,0 +1,49 @@
+---
+title: "Project operator"
+description: "Use durable project-scoped conversations with typed tools, resumable events, and exact action approval."
+---
+
+The project operator is the long-lived operations workspace for an application. Unlike a one-shot
+deployment diagnosis, a thread can span deployments and keeps every run, event, evidence item, and
+proposed action.
+
+```bash
+korve operator create --title "Investigate production latency"
+korve operator threads
+korve operator ask <thread-id> "Correlate the spike with recent deploys"
+korve operator thread <thread-id>
+```
+
+Seed a new thread from one deployment with `--deployment <deploy-id>`. A follow-up uses only the
+curated typed Korve operation catalog. JSON requests wait until the run is durably persisted; the
+dashboard consumes streaming events. If a client disconnects, resume from the last numeric cursor:
+
+```bash
+korve operator events <thread-id> --after 42 --limit 100
+korve operator run <thread-id> <run-id>
+```
+
+Events are ordered and include status, text deltas, tool results, action-required notices, and the
+terminal result. Polling after a durable cursor does not lose already-persisted deltas.
+
+## Actions and approval
+
+Read-only investigation can run immediately. A mutation becomes an immutable preview with its exact
+operation id, risk, target, version, and redacted arguments; the encrypted request is retained for
+execution without exposing secrets. The run waits for a signed-in human to approve or reject that
+version. API keys and OAuth agent grants cannot approve their own proposed action.
+
+Approval is one use. Execution rechecks current organization membership, RBAC, active billing,
+tenant scope, target state, and request schema. A stale, changed, or already-decided action
+returns `409`. Verification or rollback evidence is appended to the same durable run.
+
+An accepted asynchronous operation is not success. Its action and run remain `running` while the
+observed resource is queued, building, or deploying. Reading the thread or run performs a bounded
+reconciliation against current project state; only a ready terminal state becomes `succeeded`, and
+a failed terminal state or failed verification request becomes `failed` with retained evidence.
+
+Use the dashboard to decide actions. CLI and MCP can list threads, runs, events, evidence, and pending
+actions, but the decision endpoint is intentionally session-only.
+
+Deployment-scoped conversations use the same safety model and remain documented under
+[Deployment agent](/primitives/deployment-agent).

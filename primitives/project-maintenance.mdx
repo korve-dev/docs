@@ -1,0 +1,70 @@
+---
+title: "Project maintenance"
+description: "Schedule evidence-backed health reviews and approve bounded, verified remediation."
+---
+
+A maintenance policy defines when Korve reviews a project, the categories and environments in scope,
+and the hard ceiling for unattended actions.
+
+```json
+{
+  "enabled": true,
+  "schedule": "daily",
+  "categories": ["security", "reliability", "performance", "cost"],
+  "environments": ["production"],
+  "autoRemediation": {
+    "enabled": false,
+    "maximumRisk": "read",
+    "allowedOperationIds": [],
+    "maxActionsPerRun": 5
+  },
+  "expectedVersion": null
+}
+```
+
+```bash
+korve maintenance policy-update --data @maintenance.json
+korve maintenance policy
+korve maintenance start --data '{"categories":["reliability"]}'
+korve maintenance runs
+```
+
+Schedules are `hourly`, `daily`, or `weekly`. A manual run may narrow the saved categories and
+environments but cannot expand them. Equivalent active runs conflict instead of duplicating work.
+Policy updates use `expectedVersion`; reload after a `409` rather than overwriting another operator's
+change.
+
+## Findings and evidence
+
+Runs retain findings in `security`, `reliability`, `performance`, and `cost`, with severity, stable
+resource identity, recommendation, and first/last observed times. Evidence is immutable, redacted,
+and records whether it came from a metric, log, configuration, query, or verification step.
+
+```bash
+korve maintenance findings --status open --severity warning
+korve maintenance finding <finding-id>
+korve maintenance evidence <finding-id>
+korve maintenance finding-update <finding-id> \
+  --data '{"status":"dismissed","reason":"Accepted until the migration completes"}'
+```
+
+## Remediation boundaries
+
+The auto-remediation policy is an exact operation-id allowlist plus a `read` or `write` maximum risk
+and per-run action cap. Dangerous and destructive operations always require a human decision.
+The current failed-deployment reliability workflow proposes a bounded `deploys.create` retry and
+always records it as approval required, even if the policy allowlists that operation.
+
+Use the dashboard to approve or reject the exact action version with a reason. The session-only
+decision rechecks role, tenant, billing, target state, and schema before execution. A successful retry
+must reach `ready` before the action succeeds; a failed verification retains the last ready deployment
+as rollback evidence when one exists.
+
+```bash
+korve maintenance actions --status approval_required
+korve maintenance audit
+```
+
+The audit trail is append-only across policy changes, runs, findings, decisions, execution,
+verification, and rollback. CLI and OAuth/API-key agents can inspect it; cancellation and action
+decisions remain session-only.

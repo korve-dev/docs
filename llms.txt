@@ -1,0 +1,36 @@
+# Korve documentation
+
+Korve is an agent-era application platform. Build with an agent, deploy from Git, and operate apps,
+databases, storage, queues, crons, caches, observability, budgets, and recovery through one public
+contract.
+
+Canonical docs: https://docs.korve.dev
+Dashboard and product: https://korve.dev
+API base: https://api.korve.dev
+OpenAPI 3.1: https://api.korve.dev/v1/spec
+MCP Code Mode: https://mcp.korve.dev/mcp
+
+Start:
+- https://docs.korve.dev/introduction
+- https://docs.korve.dev/quickstart
+- https://docs.korve.dev/agents/agent-onboarding
+- https://docs.korve.dev/agents/mcp-setup
+- https://docs.korve.dev/agents/oauth
+- https://docs.korve.dev/primitives/app-access
+- https://docs.korve.dev/primitives/project-operator
+- https://docs.korve.dev/primitives/project-maintenance
+- https://docs.korve.dev/primitives/manifests
+- https://docs.korve.dev/api-reference/overview
+
+Rules for agents:
+- Search the public contract before building or mutating infrastructure.
+- Use organization API keys only for operator automation; never ship them in customer applications.
+- Read current state, plan multi-resource changes, ask approval for dangerous/destructive actions,
+  then verify the resulting state.
+- Treat shown-once secrets as secrets and exported ******** values as preserve-live-value markers.
+- Queue delivery is at least once; make durable side effects idempotent.
+- Do not assume region or metric ids. Discover them from the current regions and metrics catalogs.
+- CLI and MCP OAuth grants are audience-bound; never reuse a CLI token for MCP.
+- A protected app-access policy is safe to activate only when enforcement reports ready.
+- Operator and maintenance mutations are persisted, version-bound actions; a signed-in human must
+  decide elevated actions, and execution must be verified before it is called successful.

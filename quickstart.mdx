@@ -1,103 +1,74 @@
 ---
 title: "Quickstart"
-description: "From zero to a deployed app on your-app.korve.app."
+description: "Turn a Git repository into a live, linked Korve project with one reviewed command."
 ---
 
-This walks the whole path: account → API key → CLI → project → GitHub →
-live app → logs. Every step past the first two also works through the
-[API](/api-reference/overview) and [MCP](/agents/mcp-setup).
+This path creates a reviewable manifest, shows the infrastructure plan, applies it, links the current
+directory, deploys the selected Git ref, and follows the deployment to a terminal state.
 
-## 1. Create your account
+## 1. Create an account and activate billing
 
-Sign up at [korve.dev/register](https://korve.dev/register). Korve is
-paid-only: after verifying your email you'll add a card on file — the
-platform minimum is $5/month, credited against usage. Nothing provisions
-until billing is active.
+Sign in at [korve.dev](https://korve.dev). Provisioning requires active organization billing; the CLI
+shows the published rate card before applying the first plan.
 
-## 2. Mint an API key
-
-In the dashboard, open your organization's settings and create an API key
-under **API keys**. Pick a role:
-
-- `admin` — can create projects, set environment variables, manage domains.
-- `member` — read-mostly: deploys, logs, usage.
-
-The secret (`korve_...`) is shown exactly once — store it securely. Key
-management is deliberately session-only: a leaked key can never mint, list,
-or revoke keys, touch billing, or manage members.
-
-## 3. Install the CLI and log in
+## 2. Install and authorize the CLI
 
 ```bash
 curl -fsSL https://korve.dev/install.sh | sh
-korve login --org <org-id>   # paste your API key when prompted
-korve whoami                  # confirms org and billing status
+korve login
 ```
 
-See [Install the CLI](/install-cli) for platforms and details.
+`korve login` opens a browser authorization page and uses OAuth 2.1 with PKCE. Review the organization,
+requested role, and exact operation scopes, then approve. See [Agent OAuth](/agents/oauth).
 
-## 4. Connect GitHub
+## 3. Initialize from the repository
 
-Install the Korve GitHub App on the repository you want to deploy:
-
-[https://github.com/apps/korve-dev/installations/new](https://github.com/apps/korve-dev/installations/new)
-
-Once your project exists (next step), you can verify access at any time
-with `korve projects check-repo acme/storefront` — if the platform can't
-reach the repo, the answer includes this install URL.
-
-## 5. Create the project (and first deploy)
+Run this from a Git checkout whose `origin` points to `github.com/<owner>/<repo>`:
 
 ```bash
-korve projects create \
-  --name "Storefront" \
-  --slug storefront \
-  --runtime-class scale-to-zero \
-  --repo acme/storefront
+korve init
 ```
 
-The slug becomes the public URL — `https://storefront.korve.app` — and is
-permanent. Passing `--repo` queues the first deploy immediately and enables
-push-to-deploy. Link the directory so later commands don't need `--project`:
+Korve detects the repository, current branch, directory-derived project name and slug, and whether
+the checkout resembles Next.js, Remix, TanStack Start, Vite, Rust, a Dockerfile app, or a generic
+application. Detection is informational: the generated manifest currently chooses the `always-on`
+runtime. Edit and plan the manifest first if you need another runtime class.
 
-```bash
-korve link storefront
+The command writes `korve.toml`, prints the complete plan and pricing guidance, and asks:
+
+```text
+Apply this plan and deploy it now?
 ```
 
-## 6. Push → live
-
-Every push to the production branch (default `main`) deploys automatically,
-and every pull request gets its own
-[preview environment](/primitives/previews). To deploy by hand and follow
-the build to completion:
+Confirm only after reviewing the repository, slug, ref, and plan. In CI, provide every value and use
+`--yes` only after that review is encoded in the workflow:
 
 ```bash
-korve deploy
+korve init --name Storefront --slug storefront --repo acme/storefront \
+  --ref main --manifest korve.toml --yes
 ```
 
-The command streams status transitions (`queued → building → deploying →
-ready`) and prints your live URL.
+If `korve.toml` or `.korve.toml` already contains different state, init stops instead of overwriting
+it. A matching manifest and link are safe to resume. If the matching deployment is already ready,
+the command prints its URL; if it is still active, the command resumes following it.
 
-## 7. Watch it run
+## 4. Verify the live application
 
 ```bash
-korve logs --level error --limit 50
 korve deploys list
+korve logs --level error --limit 100
+curl -fsS https://storefront.korve.app/
 ```
 
-If a deploy fails, ask [the platform agent](/primitives/remediation) what
-went wrong:
+If the deployment fails, inspect its complete build log and start a durable operator thread:
 
 ```bash
-korve deploys diagnose <deploy-id>
+korve deploys get <deploy-id> --json
+korve operator create --title "Investigate first deploy" --deployment <deploy-id>
 ```
 
-## Next
+## 5. Add infrastructure deliberately
 
-- Provision a [database](/primitives/databases) and
-  [object storage](/primitives/storage).
-- Set [environment variables](/primitives/environment-variables) and a
-  [budget cap](/primitives/budgets-and-usage).
-- Add a [custom domain](/primitives/domains).
-- Wire up your agent: [MCP setup](/agents/mcp-setup) and
-  [agent onboarding](/agents/agent-onboarding).
+Edit `korve.toml`, then run `korve manifest plan -f korve.toml` before applying. Add only the
+databases, storage, queues, crons, caches, alerts, access policy, and maintenance policy the app
+actually needs. See [Infrastructure as code](/primitives/manifests).

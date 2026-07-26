@@ -1,0 +1,18 @@
+---
+title: "Security and roles"
+description: "Credentials, organization roles, secret handling, and safe operator boundaries."
+---
+
+Organization roles are `owner > admin > member`. Each API operation declares a minimum role and the
+control plane enforces it for dashboard sessions and API keys alike. API keys are organization
+scoped and can carry `member` or `admin`; owner-only work remains tied to an interactive session.
+
+- Store API keys and shown-once connection strings in a secret manager.
+- Use runtime tokens inside deployed apps; never ship an organization API key to a browser.
+- Treat exported `********` values as preserve-live-value markers, not secrets.
+- Require a human confirmation for destructive CLI and agent actions.
+- Use the server App Auth client and `HttpOnly` cookies for security-sensitive applications.
+
+Cross-organization requests do not reveal whether a resource exists. Public errors are redacted and
+stable error codes are safe for automation. See [API authentication](/api-reference/overview) and
+[safe automation](/agents/safe-automation).
