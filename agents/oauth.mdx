@@ -22,11 +22,9 @@ server-bound loopback callback; denying it sends `access_denied`. Your platform 
 are never sent to the client.
 
 The resulting access token is short lived, and the CLI rotates its single-use refresh token
-automatically. On macOS, the CLI first stores the access and refresh tokens in Keychain under the
-`dev.korve.cli.oauth` service, keyed by API URL. If Keychain is unavailable—or when
-running on Linux, or when `KORVE_CONFIG_DIR` selects an isolated configuration directory—the tokens
-use the separate `${KORVE_CONFIG_DIR:-~/.config/korve}/oauth-credentials.toml` fallback with `0600`
-permissions. Organization, grant, and
+automatically. The CLI stores the tokens in the separate
+`${KORVE_CONFIG_DIR:-~/.config/korve}/oauth-credentials.toml` file, with `0600` permissions on
+Unix. Organization, grant, and
 API URL metadata stay in `~/.config/korve/config.toml`; OAuth tokens do not. Reusing a refresh token
 revokes the entire token family rather than issuing another credential.
 

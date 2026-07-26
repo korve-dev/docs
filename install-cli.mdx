@@ -33,10 +33,8 @@ korve login
 ```
 
 The CLI opens a browser authorization page and listens on a random literal
-`127.0.0.1` callback port. On macOS, it first stores the resulting short-lived access
-token and rotating refresh token in Keychain. On Linux, when Keychain is unavailable,
-or when `KORVE_CONFIG_DIR` is set, the private-file fallback is
-`${KORVE_CONFIG_DIR:-~/.config/korve}/oauth-credentials.toml` with `0600`
+`127.0.0.1` callback port. It stores the resulting short-lived access token and rotating
+refresh token in `${KORVE_CONFIG_DIR:-~/.config/korve}/oauth-credentials.toml`, with `0600`
 permissions. Non-secret organization, grant, and API URL metadata live separately
 in `~/.config/korve/config.toml`; a legacy API key, when used, is stored there with
 `0600` permissions. `korve logout` removes the stored login material. See

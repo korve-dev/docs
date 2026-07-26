@@ -42,9 +42,8 @@ Explicit beats ambient, everywhere:
 2. Environment (`KORVE_API_KEY`, `KORVE_ORG`, `KORVE_PROJECT`,
    `KORVE_API_URL`)
 3. Local link file `.korve.toml` (project only — written by `korve link`)
-4. macOS Keychain for OAuth tokens; Linux, unavailable Keychain, and explicit
-   `KORVE_CONFIG_DIR` use `${KORVE_CONFIG_DIR:-~/.config/korve}/oauth-credentials.toml`
-   with `0600`; `~/.config/korve/config.toml` stores login metadata or a legacy key
+4. `${KORVE_CONFIG_DIR:-~/.config/korve}/oauth-credentials.toml` for OAuth tokens,
+   with `0600` on Unix; `~/.config/korve/config.toml` stores login metadata or a legacy key
 5. Built-in defaults (`https://api.korve.dev`)
 
 Project-scoped commands resolve the project as
