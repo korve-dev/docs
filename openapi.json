@@ -274,6 +274,265 @@
         }
       }
     },
+    "/v1/agent-auth/device-authorizations/{userCode}/deny": {
+      "post": {
+        "operationId": "agentAuth.denyDeviceAuthorization",
+        "summary": "Deny Device Authorization",
+        "description": "Deny a pending device authorization. The polling client stops with an error.",
+        "tags": ["agentAuth"],
+        "parameters": [
+          {
+            "name": "userCode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[BCDFGHJKLMNPQRSTVWXZ]{4}-[BCDFGHJKLMNPQRSTVWXZ]{4}$",
+              "maxLength": 9,
+              "description": "Human-entered pairing code in XXXX-XXXX form, from an unambiguous alphabet."
+            }
+          }
+        ],
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Device authorization denied.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "denied": {
+                      "type": "boolean",
+                      "enum": [true]
+                    }
+                  },
+                  "required": ["denied"]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown, expired, approved, denied, or consumed device code."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": false,
+        "x-korve-required-role": "member",
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/agent-auth/device-authorizations/{userCode}": {
+      "get": {
+        "operationId": "agentAuth.getDeviceAuthorization",
+        "summary": "Get Device Authorization",
+        "description": "Inspect a pending device authorization by its user code before approving or denying it.",
+        "tags": ["agentAuth"],
+        "parameters": [
+          {
+            "name": "userCode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[BCDFGHJKLMNPQRSTVWXZ]{4}-[BCDFGHJKLMNPQRSTVWXZ]{4}$",
+              "maxLength": 9,
+              "description": "Human-entered pairing code in XXXX-XXXX form, from an unambiguous alphabet."
+            }
+          }
+        ],
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Safe approval details; the device code is never returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "userCode": {
+                      "type": "string",
+                      "pattern": "^[BCDFGHJKLMNPQRSTVWXZ]{4}-[BCDFGHJKLMNPQRSTVWXZ]{4}$",
+                      "maxLength": 9,
+                      "description": "Human-entered pairing code in XXXX-XXXX form, from an unambiguous alphabet."
+                    },
+                    "clientId": {
+                      "type": "string",
+                      "enum": ["korve-cli", "korve-mcp"]
+                    },
+                    "audience": {
+                      "type": "string",
+                      "enum": ["cli", "mcp"],
+                      "description": "The first-party client surface that may present the resulting token."
+                    },
+                    "scopes": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 256,
+                      "items": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z][A-Za-z0-9]*\\.[A-Za-z][A-Za-z0-9]*$",
+                        "maxLength": 128
+                      },
+                      "description": "Exact public API operation ids the grant may call."
+                    },
+                    "requestedRole": {
+                      "type": "string",
+                      "enum": ["member", "admin"],
+                      "description": "Maximum organization role the grant may exercise. Owner grants do not exist."
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "userCode",
+                    "clientId",
+                    "audience",
+                    "scopes",
+                    "requestedRole",
+                    "expiresAt"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown, expired, approved, denied, or consumed device code."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": false,
+        "x-korve-required-role": "member"
+      }
+    },
+    "/v1/agent-auth/device-authorizations": {
+      "post": {
+        "operationId": "agentAuth.createDeviceAuthorization",
+        "summary": "Create Device Authorization",
+        "description": "Begin a device authorization flow for a browserless or sandboxed client. A human approves the short pairing code on the dashboard while the client polls the token endpoint.",
+        "tags": ["agentAuth"],
+        "parameters": [],
+        "security": [],
+        "responses": {
+          "201": {
+            "description": "Device authorization created. Show the user code, then poll the token endpoint with the device code.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deviceCode": {
+                      "type": "string",
+                      "description": "Client-held polling secret; never shown to the approving user."
+                    },
+                    "userCode": {
+                      "type": "string",
+                      "pattern": "^[BCDFGHJKLMNPQRSTVWXZ]{4}-[BCDFGHJKLMNPQRSTVWXZ]{4}$",
+                      "maxLength": 9,
+                      "description": "Human-entered pairing code in XXXX-XXXX form, from an unambiguous alphabet."
+                    },
+                    "verificationUri": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "verificationUriComplete": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "The verification page with the user code pre-filled."
+                    },
+                    "expiresIn": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "interval": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "description": "Minimum seconds between token polls."
+                    }
+                  },
+                  "required": [
+                    "deviceCode",
+                    "userCode",
+                    "verificationUri",
+                    "verificationUriComplete",
+                    "expiresIn",
+                    "interval"
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid client, audience, scope, or role."
+          },
+          "429": {
+            "description": "Too many device authorization attempts from this network source."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": false,
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "clientId": {
+                    "type": "string",
+                    "enum": ["korve-cli", "korve-mcp"]
+                  },
+                  "audience": {
+                    "type": "string",
+                    "enum": ["cli", "mcp"],
+                    "description": "The first-party client surface that may present the resulting token."
+                  },
+                  "scopes": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 256,
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z][A-Za-z0-9]*\\.[A-Za-z][A-Za-z0-9]*$",
+                      "maxLength": 128
+                    },
+                    "description": "Exact public API operation ids the grant may call."
+                  },
+                  "requestedRole": {
+                    "type": "string",
+                    "enum": ["member", "admin"],
+                    "description": "Maximum organization role the grant may exercise. Owner grants do not exist."
+                  }
+                },
+                "required": ["clientId", "audience", "scopes", "requestedRole"]
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/agent-auth/revoke": {
       "post": {
         "operationId": "agentAuth.revokeToken",
@@ -332,7 +591,7 @@
       "post": {
         "operationId": "agentAuth.exchangeToken",
         "summary": "Exchange Token",
-        "description": "Exchange an authorization code with its PKCE verifier, or rotate a refresh token. Refresh-token reuse revokes the entire grant.",
+        "description": "Exchange an authorization code with its PKCE verifier, poll an approved device authorization, or rotate a refresh token. Refresh-token reuse revokes the entire grant.",
         "tags": ["agentAuth"],
         "parameters": [],
         "security": [],
@@ -409,7 +668,7 @@
             }
           },
           "400": {
-            "description": "Invalid, expired, consumed, replayed, or mis-bound grant."
+            "description": "Invalid, expired, consumed, replayed, or mis-bound grant. Device polling answers with the error codes AUTHORIZATION_PENDING, SLOW_DOWN, ACCESS_DENIED, or EXPIRED_TOKEN."
           }
         },
         "x-korve-risk": "write",
@@ -424,7 +683,7 @@
                 "properties": {
                   "grantType": {
                     "type": "string",
-                    "enum": ["authorization_code", "refresh_token"]
+                    "enum": ["authorization_code", "device_code", "refresh_token"]
                   },
                   "clientId": {
                     "type": "string",
@@ -442,6 +701,10 @@
                     "type": "string",
                     "minLength": 43,
                     "maxLength": 128
+                  },
+                  "deviceCode": {
+                    "type": "string",
+                    "description": "The device authorization's client-held polling secret."
                   },
                   "refreshToken": {
                     "type": "string"
@@ -1498,6 +1761,78 @@
         }
       }
     },
+    "/v1/orgs/{orgId}/agent-grants/device-authorizations/{userCode}/approve": {
+      "post": {
+        "operationId": "agentAuth.approveDeviceAuthorization",
+        "summary": "Approve Device Authorization",
+        "description": "Approve a pending device authorization as the signed-in user. The grant can never exceed the approving user's organization role; the polling client redeems it for tokens.",
+        "tags": ["agentAuth"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "userCode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[BCDFGHJKLMNPQRSTVWXZ]{4}-[BCDFGHJKLMNPQRSTVWXZ]{4}$",
+              "maxLength": 9,
+              "description": "Human-entered pairing code in XXXX-XXXX form, from an unambiguous alphabet."
+            }
+          }
+        ],
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Device authorization approved; the device completes on its next poll.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "approved": {
+                      "type": "boolean",
+                      "enum": [true]
+                    }
+                  },
+                  "required": ["approved"]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown, expired, approved, denied, or consumed device code."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": false,
+        "x-korve-required-role": "member",
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/orgs/{orgId}/agent-grants": {
       "get": {
         "operationId": "agentAuth.listGrants",
@@ -2367,6 +2702,121 @@
             }
           }
         }
+      }
+    },
+    "/v1/orgs/{orgId}/audit": {
+      "get": {
+        "operationId": "audit.list",
+        "summary": "List",
+        "description": "List the organization's audit log entries, newest first. Write operations are recorded with the actor, the HTTP status they answered (failed attempts included), and small request context; reads are not recorded. Entries are retained for 90 days.",
+        "tags": ["audit"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Only entries that occurred at or after this time (RFC 3339)."
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Only entries that occurred strictly before this time (RFC 3339)."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Maximum entries returned (1-200). Defaults to 50."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Audit entries, newest first.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "occurredAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "operation": {
+                        "type": "string",
+                        "description": "The operation performed, e.g. \"deploys.create\"."
+                      },
+                      "actor": {
+                        "type": "object",
+                        "description": "Who performed the operation.",
+                        "properties": {
+                          "kind": {
+                            "type": "string",
+                            "enum": ["user", "api_key", "agent_grant"]
+                          },
+                          "label": {
+                            "type": ["string", "null"],
+                            "description": "The user's email or the API key's name, captured when the entry was written — entries outlive removed members and revoked keys. Null for agent grants."
+                          }
+                        },
+                        "required": ["kind", "label"]
+                      },
+                      "project": {
+                        "type": ["string", "null"],
+                        "description": "Slug of the project the operation addressed, resolved when listing; null when no project was addressed or the project no longer exists."
+                      },
+                      "status": {
+                        "type": "integer",
+                        "description": "HTTP status the operation answered — failed writes are recorded too."
+                      },
+                      "detail": {
+                        "type": ["string", "null"],
+                        "description": "Request context such as a hostname, slug, or key name. Never contains secrets or environment-variable values."
+                      }
+                    },
+                    "required": ["occurredAt", "operation", "actor", "project", "status", "detail"]
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid since/until timestamp, empty window, or invalid limit."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": false,
+        "x-korve-required-role": "admin"
       }
     },
     "/v1/orgs/{orgId}/backup-destinations/{destinationId}/test": {
@@ -20106,6 +20556,109 @@
         "x-korve-required-role": "member"
       }
     },
+    "/v1/orgs/{orgId}/projects/{projectId}/deploys/sources": {
+      "post": {
+        "operationId": "deploys.createSource",
+        "summary": "Create Source",
+        "description": "Create a short-lived signed URL for uploading a project's source as a gzipped tar archive. Upload the archive with PUT, then pass the returned key to deploys.create as sourceKey to build and release it — no connected repository required. Ideal for deploying a local directory.",
+        "tags": ["deploys"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Signed upload. PUT the archive bytes to the URL before it expires.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "description": "Opaque source key — pass it to deploys.create as sourceKey."
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "method": {
+                      "type": "string",
+                      "enum": ["PUT"]
+                    },
+                    "headers": {
+                      "type": "object",
+                      "description": "Headers that must accompany the upload request.",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": ["key", "url", "method", "expiresAt"]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "No such project in this organization."
+          },
+          "422": {
+            "description": "Invalid archive size."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member",
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "byteLength": {
+                    "type": "integer",
+                    "description": "Exact size of the gzipped tar archive in bytes."
+                  }
+                },
+                "required": ["byteLength"]
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/orgs/{orgId}/projects/{projectId}/deploys": {
       "get": {
         "operationId": "deploys.list",
@@ -20225,7 +20778,7 @@
       "post": {
         "operationId": "deploys.create",
         "summary": "Create",
-        "description": "Queue a new deployment of the project. Defaults to the production environment; custom environments deploy to their own managed subdomain (\"https://<project-slug>-<environment>.korve.app\").",
+        "description": "Queue a new deployment of the project from a git ref or an uploaded source archive (sourceKey). Defaults to the production environment; custom environments deploy to their own managed subdomain (\"https://<project-slug>-<environment>.korve.app\").",
         "tags": ["deploys"],
         "parameters": [
           {
@@ -20283,7 +20836,7 @@
             "description": "No such project or environment in this organization."
           },
           "422": {
-            "description": "Invalid gitRepo, gitRef, or environment — including deploys addressed to the preview environment."
+            "description": "Invalid sourceKey, gitRepo, gitRef, or environment — including deploys addressed to the preview environment."
           }
         },
         "x-korve-risk": "write",
@@ -20297,6 +20850,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "sourceKey": {
+                    "type": "string",
+                    "description": "Key of an uploaded source archive from deploys.createSource. Builds that uploaded source instead of a repository; takes precedence over gitRepo."
+                  },
                   "gitRepo": {
                     "type": "string",
                     "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$",
@@ -28208,6 +28765,81 @@
             }
           }
         }
+      }
+    },
+    "/v1/orgs/{orgId}/repositories": {
+      "get": {
+        "operationId": "projects.listRepos",
+        "summary": "List Repos",
+        "description": "List the repositories the organization's GitHub App installation can reach, for connecting a project. When the organization has no resolvable installation, answers an empty list with installed=false and the URL where the app can be installed.",
+        "tags": ["projects"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The organization's installable repositories.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "installed": {
+                      "type": "boolean",
+                      "description": "Whether a GitHub App installation backs this organization."
+                    },
+                    "installUrl": {
+                      "type": "string",
+                      "description": "Where to install the Korve GitHub App for this organization."
+                    },
+                    "repositories": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "fullName": {
+                            "type": "string",
+                            "description": "Repository as \"owner/repo\"."
+                          },
+                          "private": {
+                            "type": "boolean"
+                          },
+                          "defaultBranch": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["fullName", "private", "defaultBranch"]
+                      }
+                    }
+                  },
+                  "required": ["installed", "installUrl", "repositories"]
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "The repository host could not be reached — try again."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": false,
+        "x-korve-required-role": "member"
       }
     },
     "/v1/orgs/{orgId}/usage": {

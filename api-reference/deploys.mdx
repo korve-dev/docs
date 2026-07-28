@@ -1,15 +1,64 @@
 ---
 title: "Deploys"
-description: "Deployments — build and release a project from a git ref."
+description: "Deployments — build and release a project from a git ref or an uploaded source."
 ---
 
 {/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
 
-Deployments — build and release a project from a git ref.
+Deployments — build and release a project from a git ref or an uploaded source.
+
+## deploys.createSource
+
+Create a short-lived signed URL for uploading a project's source as a gzipped tar archive. Upload the archive with PUT, then pass the returned key to deploys.create as sourceKey to build and release it — no connected repository required. Ideal for deploying a local directory.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/deploys/sources
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field        | Type    | Required | Description                                     |
+| ------------ | ------- | -------- | ----------------------------------------------- |
+| `byteLength` | integer | Yes      | Exact size of the gzipped tar archive in bytes. |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/deploys/sources" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "byteLength": 24576
+}'
+```
+
+### Responses
+
+| Status | Description                                                        |
+| ------ | ------------------------------------------------------------------ |
+| `201`  | Signed upload. PUT the archive bytes to the URL before it expires. |
+| `402`  | Organization billing is not active.                                |
+| `404`  | No such project in this organization.                              |
+| `422`  | Invalid archive size.                                              |
+
+### Response body (201)
+
+| Field       | Type   | Description                                                           |
+| ----------- | ------ | --------------------------------------------------------------------- |
+| `key`       | string | Opaque source key — pass it to deploys.create as sourceKey.           |
+| `url`       | string | —                                                                     |
+| `method`    | string | One of: `PUT`.                                                        |
+| `headers`   | object | Headers that must accompany the upload request. Map of string values. |
+| `expiresAt` | string | Format: `date-time`.                                                  |
 
 ## deploys.create
 
-Queue a new deployment of the project. Defaults to the production environment; custom environments deploy to their own managed subdomain ("https://&lt;project-slug>-&lt;environment>.korve.app").
+Queue a new deployment of the project from a git ref or an uploaded source archive (sourceKey). Defaults to the production environment; custom environments deploy to their own managed subdomain ("https://&lt;project-slug>-&lt;environment>.korve.app").
 
 ```text
 POST /v1/orgs/{orgId}/projects/{projectId}/deploys
@@ -24,6 +73,7 @@ POST /v1/orgs/{orgId}/projects/{projectId}/deploys
 
 | Field         | Type   | Required | Description                                                                                                                                                                                                           |
 | ------------- | ------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sourceKey`   | string | No       | Key of an uploaded source archive from deploys.createSource. Builds that uploaded source instead of a repository; takes precedence over gitRepo.                                                                      |
 | `gitRepo`     | string | No       | Source repository as "owner/repo". Pattern: `^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$`.                                                                                                                                      |
 | `gitRef`      | string | No       | Branch, tag, or commit. Defaults to main.                                                                                                                                                                             |
 | `environment` | string | No       | Environment to deploy to. Defaults to "production". An environment that does not exist on the project answers 404. Preview deployments are created from pull requests, never here. Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
@@ -39,12 +89,12 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/deploys
 
 ### Responses
 
-| Status | Description                                                                                       |
-| ------ | ------------------------------------------------------------------------------------------------- |
-| `202`  | Deployment accepted.                                                                              |
-| `402`  | Organization billing is not active.                                                               |
-| `404`  | No such project or environment in this organization.                                              |
-| `422`  | Invalid gitRepo, gitRef, or environment — including deploys addressed to the preview environment. |
+| Status | Description                                                                                                  |
+| ------ | ------------------------------------------------------------------------------------------------------------ |
+| `202`  | Deployment accepted.                                                                                         |
+| `402`  | Organization billing is not active.                                                                          |
+| `404`  | No such project or environment in this organization.                                                         |
+| `422`  | Invalid sourceKey, gitRepo, gitRef, or environment — including deploys addressed to the preview environment. |
 
 ### Response body (202)
 

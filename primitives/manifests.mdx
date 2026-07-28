@@ -41,7 +41,7 @@ projects:
     maintenance:
       enabled: true
       schedule: daily
-      categories: [security, reliability, performance, cost]
+      categories: [reliability]
       environments: [production]
       autoRemediation:
         enabled: false
@@ -65,8 +65,9 @@ update, no-op, deferred, invalid, or orphaned. Apply creates and updates declare
 not delete live resources omitted from the file.
 
 Omitting `access` or `maintenance` leaves the live policy unmanaged. A protected access policy cannot
-apply until the access gateway reports enforcement `ready`. Maintenance auto-remediation uses an
-exact public operation-id allowlist; dangerous and destructive actions remain human-gated.
+apply until the access gateway reports enforcement `ready`. The current maintenance contract accepts
+only `reliability`, and its only remediation operation is `deploys.create`. Dangerous and destructive
+actions remain human-gated.
 
 Exports replace secret values and encrypted destinations with `********`. Applying that placeholder
 preserves the live value. Never replace it with plaintext in version control. See the

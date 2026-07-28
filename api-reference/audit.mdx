@@ -1,0 +1,57 @@
+---
+title: "audit"
+description: "The organization's audit log. Every write operation — successful or not — is recorded with its actor, outcome, and request context; reads are not. Entries are retained for 90 days."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+The organization's audit log. Every write operation — successful or not — is recorded with its actor, outcome, and request context; reads are not. Entries are retained for 90 days.
+
+## audit.list
+
+List the organization's audit log entries, newest first. Write operations are recorded with the actor, the HTTP status they answered (failed attempts included), and small request context; reads are not recorded. Entries are retained for 90 days.
+
+```text
+GET /v1/orgs/{orgId}/audit
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name    | Type    | Required | Description          |
+| ------- | ------- | -------- | -------------------- |
+| `since` | string  | No       | Format: `date-time`. |
+| `until` | string  | No       | Format: `date-time`. |
+| `limit` | integer | No       | —                    |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/audit?since=2026-06-01T12%3A00%3A00Z" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                                    |
+| ------ | -------------------------------------------------------------- |
+| `200`  | Audit entries, newest first.                                   |
+| `422`  | Invalid since/until timestamp, empty window, or invalid limit. |
+
+### Response body (200)
+
+An array of objects with these fields:
+
+| Field         | Type           | Description                                                                                                                                            |
+| ------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `occurredAt`  | string         | Format: `date-time`.                                                                                                                                   |
+| `operation`   | string         | The operation performed, e.g. "deploys.create".                                                                                                        |
+| `actor`       | object         | Who performed the operation.                                                                                                                           |
+| `actor.kind`  | string         | One of: `user`, `api_key`, `agent_grant`.                                                                                                              |
+| `actor.label` | string or null | The user's email or the API key's name, captured when the entry was written — entries outlive removed members and revoked keys. Null for agent grants. |
+| `project`     | string or null | Slug of the project the operation addressed, resolved when listing; null when no project was addressed or the project no longer exists.                |
+| `status`      | integer        | HTTP status the operation answered — failed writes are recorded too.                                                                                   |
+| `detail`      | string or null | Request context such as a hostname, slug, or key name. Never contains secrets or environment-variable values.                                          |

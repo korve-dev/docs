@@ -123,6 +123,7 @@
           "api-reference/budgets",
           "api-reference/usage",
           "api-reference/webhooks",
+          "api-reference/audit",
           "api-reference/manifest"
         ]
       }

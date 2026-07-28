@@ -10,7 +10,7 @@ and the hard ceiling for unattended actions.
 {
   "enabled": true,
   "schedule": "daily",
-  "categories": ["security", "reliability", "performance", "cost"],
+  "categories": ["reliability"],
   "environments": ["production"],
   "autoRemediation": {
     "enabled": false,
@@ -36,9 +36,10 @@ change.
 
 ## Findings and evidence
 
-Runs retain findings in `security`, `reliability`, `performance`, and `cost`, with severity, stable
+The current launch scope retains failed-deployment findings in `reliability`, with severity, stable
 resource identity, recommendation, and first/last observed times. Evidence is immutable, redacted,
-and records whether it came from a metric, log, configuration, query, or verification step.
+and records whether it came from a metric, log, configuration, query, or verification step. Other
+maintenance categories are not accepted by the API or manifest yet.
 
 ```bash
 korve maintenance findings --status open --severity warning

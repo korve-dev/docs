@@ -254,6 +254,43 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/repo-access?rep
 | `reason`     | string  | Present when not accessible: the Korve GitHub App is not installed on that repository, or repo is not a valid "owner/repo" value. One of: `not_installed`, `invalid`. |
 | `installUrl` | string  | Where to grant the platform access to repositories.                                                                                                                   |
 
+## projects.listRepos
+
+List the repositories the organization's GitHub App installation can reach, for connecting a project. When the organization has no resolvable installation, answers an empty list with installed=false and the URL where the app can be installed.
+
+```text
+GET /v1/orgs/{orgId}/repositories
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/repositories" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                           |
+| ------ | ----------------------------------------------------- |
+| `200`  | The organization's installable repositories.          |
+| `502`  | The repository host could not be reached — try again. |
+
+### Response body (200)
+
+| Field                          | Type     | Description                                                  |
+| ------------------------------ | -------- | ------------------------------------------------------------ |
+| `installed`                    | boolean  | Whether a GitHub App installation backs this organization.   |
+| `installUrl`                   | string   | Where to install the Korve GitHub App for this organization. |
+| `repositories`                 | object[] | —                                                            |
+| `repositories[].fullName`      | string   | Repository as "owner/repo".                                  |
+| `repositories[].private`       | boolean  | —                                                            |
+| `repositories[].defaultBranch` | string   | —                                                            |
+
 ## projects.delete
 
 Delete a project, its deployments, env vars, and runtime.

@@ -183,9 +183,194 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/agent-grants/authorization-r
 | `code`        | string | One-time code; never persisted in plaintext. |
 | `state`       | string | —                                            |
 
+## agentAuth.createDeviceAuthorization
+
+Begin a device authorization flow for a browserless or sandboxed client. A human approves the short pairing code on the dashboard while the client polls the token endpoint.
+
+```text
+POST /v1/agent-auth/device-authorizations
+```
+
+- **Auth:** None — public endpoint.
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field           | Type     | Required | Description                                                                                             |
+| --------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------- |
+| `clientId`      | string   | Yes      | One of: `korve-cli`, `korve-mcp`.                                                                       |
+| `audience`      | string   | Yes      | The first-party client surface that may present the resulting token. One of: `cli`, `mcp`.              |
+| `scopes`        | string[] | Yes      | Exact public API operation ids the grant may call.                                                      |
+| `requestedRole` | string   | Yes      | Maximum organization role the grant may exercise. Owner grants do not exist. One of: `member`, `admin`. |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/agent-auth/device-authorizations" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "clientId": "korve-cli",
+  "audience": "cli",
+  "scopes": [
+    "projects.read"
+  ],
+  "requestedRole": "member"
+}'
+```
+
+### Responses
+
+| Status | Description                                                                                          |
+| ------ | ---------------------------------------------------------------------------------------------------- |
+| `201`  | Device authorization created. Show the user code, then poll the token endpoint with the device code. |
+| `422`  | Invalid client, audience, scope, or role.                                                            |
+| `429`  | Too many device authorization attempts from this network source.                                     |
+
+### Response body (201)
+
+| Field                     | Type    | Description                                                                                                                                   |
+| ------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `deviceCode`              | string  | Client-held polling secret; never shown to the approving user.                                                                                |
+| `userCode`                | string  | Human-entered pairing code in XXXX-XXXX form, from an unambiguous alphabet. Pattern: `^[BCDFGHJKLMNPQRSTVWXZ]{4}-[BCDFGHJKLMNPQRSTVWXZ]{4}$`. |
+| `verificationUri`         | string  | Format: `uri`.                                                                                                                                |
+| `verificationUriComplete` | string  | The verification page with the user code pre-filled. Format: `uri`.                                                                           |
+| `expiresIn`               | integer | —                                                                                                                                             |
+| `interval`                | integer | Minimum seconds between token polls.                                                                                                          |
+
+## agentAuth.getDeviceAuthorization
+
+Inspect a pending device authorization by its user code before approving or denying it.
+
+```text
+GET /v1/agent-auth/device-authorizations/{userCode}
+```
+
+- **Auth:** Dashboard session only — organization API keys are rejected.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Path parameters
+
+| Name       | Type   | Required | Description                                                                                                                                   |
+| ---------- | ------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `userCode` | string | Yes      | Human-entered pairing code in XXXX-XXXX form, from an unambiguous alphabet. Pattern: `^[BCDFGHJKLMNPQRSTVWXZ]{4}-[BCDFGHJKLMNPQRSTVWXZ]{4}$`. |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/agent-auth/device-authorizations/$USER_CODE" \
+  -b "$SESSION"
+```
+
+### Responses
+
+| Status | Description                                                  |
+| ------ | ------------------------------------------------------------ |
+| `200`  | Safe approval details; the device code is never returned.    |
+| `404`  | Unknown, expired, approved, denied, or consumed device code. |
+
+### Response body (200)
+
+| Field           | Type     | Description                                                                                                                                   |
+| --------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `userCode`      | string   | Human-entered pairing code in XXXX-XXXX form, from an unambiguous alphabet. Pattern: `^[BCDFGHJKLMNPQRSTVWXZ]{4}-[BCDFGHJKLMNPQRSTVWXZ]{4}$`. |
+| `clientId`      | string   | One of: `korve-cli`, `korve-mcp`.                                                                                                             |
+| `audience`      | string   | The first-party client surface that may present the resulting token. One of: `cli`, `mcp`.                                                    |
+| `scopes`        | string[] | Exact public API operation ids the grant may call.                                                                                            |
+| `requestedRole` | string   | Maximum organization role the grant may exercise. Owner grants do not exist. One of: `member`, `admin`.                                       |
+| `expiresAt`     | string   | Format: `date-time`.                                                                                                                          |
+
+## agentAuth.approveDeviceAuthorization
+
+Approve a pending device authorization as the signed-in user. The grant can never exceed the approving user's organization role; the polling client redeems it for tokens.
+
+```text
+POST /v1/orgs/{orgId}/agent-grants/device-authorizations/{userCode}/approve
+```
+
+- **Auth:** Dashboard session only — organization API keys are rejected.
+- **Minimum role:** `member`
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Path parameters
+
+| Name       | Type   | Required | Description                                                                                                                                   |
+| ---------- | ------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `userCode` | string | Yes      | Human-entered pairing code in XXXX-XXXX form, from an unambiguous alphabet. Pattern: `^[BCDFGHJKLMNPQRSTVWXZ]{4}-[BCDFGHJKLMNPQRSTVWXZ]{4}$`. |
+
+### Request body
+
+A `object` value.
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/agent-grants/device-authorizations/$USER_CODE/approve" \
+  -b "$SESSION" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### Responses
+
+| Status | Description                                                           |
+| ------ | --------------------------------------------------------------------- |
+| `200`  | Device authorization approved; the device completes on its next poll. |
+| `404`  | Unknown, expired, approved, denied, or consumed device code.          |
+
+### Response body (200)
+
+| Field      | Type    | Description     |
+| ---------- | ------- | --------------- |
+| `approved` | boolean | One of: `true`. |
+
+## agentAuth.denyDeviceAuthorization
+
+Deny a pending device authorization. The polling client stops with an error.
+
+```text
+POST /v1/agent-auth/device-authorizations/{userCode}/deny
+```
+
+- **Auth:** Dashboard session only — organization API keys are rejected.
+- **Minimum role:** `member`
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Path parameters
+
+| Name       | Type   | Required | Description                                                                                                                                   |
+| ---------- | ------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `userCode` | string | Yes      | Human-entered pairing code in XXXX-XXXX form, from an unambiguous alphabet. Pattern: `^[BCDFGHJKLMNPQRSTVWXZ]{4}-[BCDFGHJKLMNPQRSTVWXZ]{4}$`. |
+
+### Request body
+
+A `object` value.
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/agent-auth/device-authorizations/$USER_CODE/deny" \
+  -b "$SESSION" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### Responses
+
+| Status | Description                                                  |
+| ------ | ------------------------------------------------------------ |
+| `200`  | Device authorization denied.                                 |
+| `404`  | Unknown, expired, approved, denied, or consumed device code. |
+
+### Response body (200)
+
+| Field    | Type    | Description     |
+| -------- | ------- | --------------- |
+| `denied` | boolean | One of: `true`. |
+
 ## agentAuth.exchangeToken
 
-Exchange an authorization code with its PKCE verifier, or rotate a refresh token. Refresh-token reuse revokes the entire grant.
+Exchange an authorization code with its PKCE verifier, poll an approved device authorization, or rotate a refresh token. Refresh-token reuse revokes the entire grant.
 
 ```text
 POST /v1/agent-auth/token
@@ -196,14 +381,15 @@ POST /v1/agent-auth/token
 
 ### Request body
 
-| Field          | Type   | Required | Description                                    |
-| -------------- | ------ | -------- | ---------------------------------------------- |
-| `grantType`    | string | Yes      | One of: `authorization_code`, `refresh_token`. |
-| `clientId`     | string | Yes      | One of: `korve-cli`, `korve-mcp`.              |
-| `redirectUri`  | string | No       | Format: `uri`.                                 |
-| `code`         | string | No       | —                                              |
-| `codeVerifier` | string | No       | —                                              |
-| `refreshToken` | string | No       | —                                              |
+| Field          | Type   | Required | Description                                                   |
+| -------------- | ------ | -------- | ------------------------------------------------------------- |
+| `grantType`    | string | Yes      | One of: `authorization_code`, `device_code`, `refresh_token`. |
+| `clientId`     | string | Yes      | One of: `korve-cli`, `korve-mcp`.                             |
+| `redirectUri`  | string | No       | Format: `uri`.                                                |
+| `code`         | string | No       | —                                                             |
+| `codeVerifier` | string | No       | —                                                             |
+| `deviceCode`   | string | No       | The device authorization's client-held polling secret.        |
+| `refreshToken` | string | No       | —                                                             |
 
 ### Example
 
@@ -218,10 +404,10 @@ curl -X POST "https://api.korve.dev/v1/agent-auth/token" \
 
 ### Responses
 
-| Status | Description                                                         |
-| ------ | ------------------------------------------------------------------- |
-| `200`  | A short-lived access token and a single-use rotating refresh token. |
-| `400`  | Invalid, expired, consumed, replayed, or mis-bound grant.           |
+| Status | Description                                                                                                                                                              |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `200`  | A short-lived access token and a single-use rotating refresh token.                                                                                                      |
+| `400`  | Invalid, expired, consumed, replayed, or mis-bound grant. Device polling answers with the error codes AUTHORIZATION_PENDING, SLOW_DOWN, ACCESS_DENIED, or EXPIRED_TOKEN. |
 
 ### Response body (200)
 
