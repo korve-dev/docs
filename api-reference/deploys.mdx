@@ -89,12 +89,13 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/deploys
 
 ### Responses
 
-| Status | Description                                                                                                  |
-| ------ | ------------------------------------------------------------------------------------------------------------ |
-| `202`  | Deployment accepted.                                                                                         |
-| `402`  | Organization billing is not active.                                                                          |
-| `404`  | No such project or environment in this organization.                                                         |
-| `422`  | Invalid sourceKey, gitRepo, gitRef, or environment — including deploys addressed to the preview environment. |
+| Status | Description                                                                                                                                                           |
+| ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `202`  | Deployment accepted.                                                                                                                                                  |
+| `402`  | Organization billing is not active.                                                                                                                                   |
+| `404`  | No such project or environment in this organization.                                                                                                                  |
+| `422`  | Invalid sourceKey, gitRepo, gitRef, or environment — including deploys addressed to the preview environment or repositories outside this organization's installation. |
+| `502`  | Repository access could not be verified — try again.                                                                                                                  |
 
 ### Response body (202)
 
