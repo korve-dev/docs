@@ -20836,7 +20836,10 @@
             "description": "No such project or environment in this organization."
           },
           "422": {
-            "description": "Invalid sourceKey, gitRepo, gitRef, or environment — including deploys addressed to the preview environment."
+            "description": "Invalid sourceKey, gitRepo, gitRef, or environment — including deploys addressed to the preview environment or repositories outside this organization's installation."
+          },
+          "502": {
+            "description": "Repository access could not be verified — try again."
           }
         },
         "x-korve-risk": "write",
@@ -27553,6 +27556,9 @@
           },
           "404": {
             "description": "No such project in this organization."
+          },
+          "502": {
+            "description": "Repository access could not be verified — try again."
           }
         },
         "x-korve-risk": "read",
@@ -28508,7 +28514,10 @@
             "description": "No such project in this organization."
           },
           "422": {
-            "description": "Invalid name, gitRepo, or gitRef — or no fields to update."
+            "description": "Invalid name, gitRepo, gitRef, or repository access — or no fields to update."
+          },
+          "502": {
+            "description": "Repository access could not be verified — try again."
           }
         },
         "x-korve-risk": "write",
@@ -28720,7 +28729,10 @@
             "description": "Slug already taken."
           },
           "422": {
-            "description": "Invalid name, slug, runtime class, or region — including any region on a scale-to-zero project."
+            "description": "Invalid name, slug, runtime class, region, or repository access — including any region on a scale-to-zero project. A repository installed for another organization is never accepted."
+          },
+          "502": {
+            "description": "Repository access could not be verified — try again."
           }
         },
         "x-korve-risk": "write",

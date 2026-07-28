@@ -87,12 +87,13 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects" \
 
 ### Responses
 
-| Status | Description                                                                                     |
-| ------ | ----------------------------------------------------------------------------------------------- |
-| `201`  | Project created.                                                                                |
-| `402`  | Organization billing is not active.                                                             |
-| `409`  | Slug already taken.                                                                             |
-| `422`  | Invalid name, slug, runtime class, or region — including any region on a scale-to-zero project. |
+| Status | Description                                                                                                                                                                           |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `201`  | Project created.                                                                                                                                                                      |
+| `402`  | Organization billing is not active.                                                                                                                                                   |
+| `409`  | Slug already taken.                                                                                                                                                                   |
+| `422`  | Invalid name, slug, runtime class, region, or repository access — including any region on a scale-to-zero project. A repository installed for another organization is never accepted. |
+| `502`  | Repository access could not be verified — try again.                                                                                                                                  |
 
 ### Response body (201)
 
@@ -194,11 +195,12 @@ curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID" \
 
 ### Responses
 
-| Status | Description                                                |
-| ------ | ---------------------------------------------------------- |
-| `200`  | The updated project.                                       |
-| `404`  | No such project in this organization.                      |
-| `422`  | Invalid name, gitRepo, or gitRef — or no fields to update. |
+| Status | Description                                                                   |
+| ------ | ----------------------------------------------------------------------------- |
+| `200`  | The updated project.                                                          |
+| `404`  | No such project in this organization.                                         |
+| `422`  | Invalid name, gitRepo, gitRef, or repository access — or no fields to update. |
+| `502`  | Repository access could not be verified — try again.                          |
 
 ### Response body (200)
 
@@ -241,10 +243,11 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/repo-access?rep
 
 ### Responses
 
-| Status | Description                           |
-| ------ | ------------------------------------- |
-| `200`  | The access check result.              |
-| `404`  | No such project in this organization. |
+| Status | Description                                          |
+| ------ | ---------------------------------------------------- |
+| `200`  | The access check result.                             |
+| `404`  | No such project in this organization.                |
+| `502`  | Repository access could not be verified — try again. |
 
 ### Response body (200)
 
