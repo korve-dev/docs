@@ -110,6 +110,7 @@
           "api-reference/projectMaintenance",
           "api-reference/environments",
           "api-reference/deploys",
+          "api-reference/executions",
           "api-reference/deploymentAgent",
           "api-reference/previews",
           "api-reference/env",
