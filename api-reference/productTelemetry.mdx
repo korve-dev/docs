@@ -20,17 +20,17 @@ POST /v1/telemetry/events
 
 ### Request body
 
-| Field                         | Type                                                                                               | Required | Description                                                                                                                    |
-| ----------------------------- | -------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `events`                      | object or object or object or object or object or object or object or object or object or object[] | Yes      | —                                                                                                                              |
-| `events[].name`               | string                                                                                             | Yes      | One of: `cli_installed`.                                                                                                       |
-| `events[].at`                 | string                                                                                             | Yes      | When the event occurred. Events outside the accepted clock window are rejected. Format: `date-time`.                           |
-| `events[].anonymousId`        | string                                                                                             | No       | Optional random installation UUID. The service stores only a one-way digest. Format: `uuid`.                                   |
-| `events[].organizationId`     | string                                                                                             | No       | Optional post-auth correlation claim. Public claims are digested and never trusted for organization reporting. Format: `uuid`. |
-| `events[].properties`         | object                                                                                             | Yes      | —                                                                                                                              |
-| `events[].properties.channel` | string                                                                                             | Yes      | One of: `shell`.                                                                                                               |
-| `events[].properties.os`      | string                                                                                             | Yes      | One of: `Darwin`, `Linux`.                                                                                                     |
-| `events[].properties.arch`    | string                                                                                             | Yes      | One of: `arm64`, `aarch64`, `x86_64`.                                                                                          |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `events` | object or object or object or object or object or object or object or object or object or object[] | Yes | — |
+| `events[].name` | string | Yes | One of: `cli_installed`. |
+| `events[].at` | string | Yes | When the event occurred. Events outside the accepted clock window are rejected. Format: `date-time`. |
+| `events[].anonymousId` | string | No | Optional random installation UUID. The service stores only a one-way digest. Format: `uuid`. |
+| `events[].organizationId` | string | No | Optional post-auth correlation claim. Public claims are digested and never trusted for organization reporting. Format: `uuid`. |
+| `events[].properties` | object | Yes | — |
+| `events[].properties.channel` | string | Yes | One of: `shell`. |
+| `events[].properties.os` | string | Yes | One of: `Darwin`, `Linux`. |
+| `events[].properties.arch` | string | Yes | One of: `arm64`, `aarch64`, `x86_64`. |
 
 ### Example
 
@@ -54,19 +54,19 @@ curl -X POST "https://api.korve.dev/v1/telemetry/events" \
 
 ### Responses
 
-| Status | Description                                                   |
-| ------ | ------------------------------------------------------------- |
-| `202`  | The bounded event batch was accepted for first-party storage. |
-| `413`  | The encoded request exceeds 65,536 bytes.                     |
-| `422`  | The event batch is malformed or outside the privacy bounds.   |
-| `429`  | The global or trusted-edge network budget is exhausted.       |
-| `503`  | The keyed privacy boundary is not configured.                 |
+| Status | Description |
+| ------ | ----------- |
+| `202` | The bounded event batch was accepted for first-party storage. |
+| `413` | The encoded request exceeds 65,536 bytes. |
+| `422` | The event batch is malformed or outside the privacy bounds. |
+| `429` | The global or trusted-edge network budget is exhausted. |
+| `503` | The keyed privacy boundary is not configured. |
 
 ### Response body (202)
 
-| Field      | Type    | Description |
-| ---------- | ------- | ----------- |
-| `accepted` | integer | —           |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `accepted` | integer | — |
 
 ## productTelemetry.getFunnel
 
@@ -82,10 +82,10 @@ GET /v1/orgs/{orgId}/telemetry/funnel
 
 ### Query parameters
 
-| Name    | Type   | Required | Description          |
-| ------- | ------ | -------- | -------------------- |
-| `since` | string | No       | Format: `date-time`. |
-| `until` | string | No       | Format: `date-time`. |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `since` | string | No | Format: `date-time`. |
+| `until` | string | No | Format: `date-time`. |
 
 ### Example
 
@@ -96,20 +96,20 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/telemetry/funnel?since=2026-06-01T12
 
 ### Responses
 
-| Status | Description                                                                                |
-| ------ | ------------------------------------------------------------------------------------------ |
-| `200`  | Aggregate authoritative event counts, explicit grains, and first/last evidence timestamps. |
-| `422`  | The requested window is invalid or exceeds 90 days.                                        |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Aggregate authoritative event counts, explicit grains, and first/last evidence timestamps. |
+| `422` | The requested window is invalid or exceeds 90 days. |
 
 ### Response body (200)
 
-| Field             | Type           | Description                                                           |
-| ----------------- | -------------- | --------------------------------------------------------------------- |
-| `since`           | string         | Format: `date-time`.                                                  |
-| `until`           | string         | Format: `date-time`.                                                  |
-| `steps`           | object[]       | —                                                                     |
-| `steps[].name`    | string         | One of: `billing_activated`, `first_deploy_ready`, `agent_connected`. |
-| `steps[].grain`   | string         | One of: `organization`, `agent_grant`.                                |
-| `steps[].count`   | integer        | —                                                                     |
-| `steps[].firstAt` | string or null | Format: `date-time`.                                                  |
-| `steps[].lastAt`  | string or null | Format: `date-time`.                                                  |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `since` | string | Format: `date-time`. |
+| `until` | string | Format: `date-time`. |
+| `steps` | object[] | — |
+| `steps[].name` | string | One of: `billing_activated`, `first_deploy_ready`, `agent_connected`. |
+| `steps[].grain` | string | One of: `organization`, `agent_grant`. |
+| `steps[].count` | integer | — |
+| `steps[].firstAt` | string or null | Format: `date-time`. |
+| `steps[].lastAt` | string or null | Format: `date-time`. |

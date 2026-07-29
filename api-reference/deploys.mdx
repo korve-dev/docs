@@ -22,9 +22,9 @@ POST /v1/orgs/{orgId}/projects/{projectId}/deploys/sources
 
 ### Request body
 
-| Field        | Type    | Required | Description                                     |
-| ------------ | ------- | -------- | ----------------------------------------------- |
-| `byteLength` | integer | Yes      | Exact size of the gzipped tar archive in bytes. |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `byteLength` | integer | Yes | Exact size of the gzipped tar archive in bytes. |
 
 ### Example
 
@@ -39,22 +39,22 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/deploys
 
 ### Responses
 
-| Status | Description                                                        |
-| ------ | ------------------------------------------------------------------ |
-| `201`  | Signed upload. PUT the archive bytes to the URL before it expires. |
-| `402`  | Organization billing is not active.                                |
-| `404`  | No such project in this organization.                              |
-| `422`  | Invalid archive size.                                              |
+| Status | Description |
+| ------ | ----------- |
+| `201` | Signed upload. PUT the archive bytes to the URL before it expires. |
+| `402` | Organization billing is not active. |
+| `404` | No such project in this organization. |
+| `422` | Invalid archive size. |
 
 ### Response body (201)
 
-| Field       | Type   | Description                                                           |
-| ----------- | ------ | --------------------------------------------------------------------- |
-| `key`       | string | Opaque source key — pass it to deploys.create as sourceKey.           |
-| `url`       | string | —                                                                     |
-| `method`    | string | One of: `PUT`.                                                        |
-| `headers`   | object | Headers that must accompany the upload request. Map of string values. |
-| `expiresAt` | string | Format: `date-time`.                                                  |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `key` | string | Opaque source key — pass it to deploys.create as sourceKey. |
+| `url` | string | — |
+| `method` | string | One of: `PUT`. |
+| `headers` | object | Headers that must accompany the upload request. Map of string values. |
+| `expiresAt` | string | Format: `date-time`. |
 
 ## deploys.create
 
@@ -71,12 +71,12 @@ POST /v1/orgs/{orgId}/projects/{projectId}/deploys
 
 ### Request body (optional)
 
-| Field         | Type   | Required | Description                                                                                                                                                                                                           |
-| ------------- | ------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sourceKey`   | string | No       | Key of an uploaded source archive from deploys.createSource. Builds that uploaded source instead of a repository; takes precedence over gitRepo.                                                                      |
-| `gitRepo`     | string | No       | Source repository as "owner/repo". Pattern: `^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$`.                                                                                                                                      |
-| `gitRef`      | string | No       | Branch, tag, or commit. Defaults to main.                                                                                                                                                                             |
-| `environment` | string | No       | Environment to deploy to. Defaults to "production". An environment that does not exist on the project answers 404. Preview deployments are created from pull requests, never here. Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `sourceKey` | string | No | Key of an uploaded source archive from deploys.createSource. Builds that uploaded source instead of a repository; takes precedence over gitRepo. |
+| `gitRepo` | string | No | Source repository as "owner/repo". Pattern: `^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$`. |
+| `gitRef` | string | No | Branch, tag, or commit. Defaults to main. |
+| `environment` | string | No | Environment to deploy to. Defaults to "production". An environment that does not exist on the project answers 404. Preview deployments are created from pull requests, never here. Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Example
 
@@ -89,19 +89,19 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/deploys
 
 ### Responses
 
-| Status | Description                                                                                                                                                           |
-| ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `202`  | Deployment accepted.                                                                                                                                                  |
-| `402`  | Organization billing is not active.                                                                                                                                   |
-| `404`  | No such project or environment in this organization.                                                                                                                  |
-| `422`  | Invalid sourceKey, gitRepo, gitRef, or environment — including deploys addressed to the preview environment or repositories outside this organization's installation. |
-| `502`  | Repository access could not be verified — try again.                                                                                                                  |
+| Status | Description |
+| ------ | ----------- |
+| `202` | Deployment accepted. |
+| `402` | Organization billing is not active. |
+| `404` | No such project or environment in this organization. |
+| `422` | Invalid sourceKey, gitRepo, gitRef, or environment — including deploys addressed to the preview environment or repositories outside this organization's installation. |
+| `502` | Repository access could not be verified — try again. |
 
 ### Response body (202)
 
-| Field    | Type   | Description                                                   |
-| -------- | ------ | ------------------------------------------------------------- |
-| `id`     | string | —                                                             |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
 | `status` | string | One of: `queued`, `building`, `deploying`, `ready`, `failed`. |
 
 ## deploys.rollback
@@ -126,18 +126,18 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/deploys
 
 ### Responses
 
-| Status | Description                                                               |
-| ------ | ------------------------------------------------------------------------- |
-| `202`  | Rollback deployment accepted.                                             |
-| `402`  | Organization billing is not active.                                       |
-| `404`  | No such deployment in this project.                                       |
-| `422`  | Only successful deployments with a recorded commit can be rolled back to. |
+| Status | Description |
+| ------ | ----------- |
+| `202` | Rollback deployment accepted. |
+| `402` | Organization billing is not active. |
+| `404` | No such deployment in this project. |
+| `422` | Only successful deployments with a recorded commit can be rolled back to. |
 
 ### Response body (202)
 
-| Field    | Type   | Description                                                   |
-| -------- | ------ | ------------------------------------------------------------- |
-| `id`     | string | —                                                             |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
 | `status` | string | One of: `queued`, `building`, `deploying`, `ready`, `failed`. |
 
 ## deploys.list
@@ -161,31 +161,31 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/deploys" \
 
 ### Responses
 
-| Status | Description                           |
-| ------ | ------------------------------------- |
-| `200`  | Deployments.                          |
-| `404`  | No such project in this organization. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Deployments. |
+| `404` | No such project in this organization. |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field                     | Type           | Description                                                                                                                                                                                    |
-| ------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `id`                      | string         | —                                                                                                                                                                                              |
-| `status`                  | string         | One of: `queued`, `building`, `deploying`, `ready`, `failed`.                                                                                                                                  |
-| `environment`             | string or null | Slug of the environment the deployment targets. Null only for deployments that predate environment tracking.                                                                                   |
-| `trigger`                 | object or null | What queued the deployment. Null for deployments that predate trigger tracking.                                                                                                                |
-| `trigger.kind`            | string         | push = a push to a connected branch, pr = a pull-request preview, manual = the API/CLI, rollback = a redeploy of an earlier successful deployment. One of: `push`, `pr`, `manual`, `rollback`. |
-| `trigger.actor`           | object         | Who triggered it — present for repository-driven deploys.                                                                                                                                      |
-| `trigger.actor.login`     | string         | —                                                                                                                                                                                              |
-| `trigger.actor.avatarUrl` | string or null | —                                                                                                                                                                                              |
-| `gitRepo`                 | string or null | Source repository as "owner/repo"; null for non-git deploys.                                                                                                                                   |
-| `gitRef`                  | string         | —                                                                                                                                                                                              |
-| `commitSha`               | string or null | —                                                                                                                                                                                              |
-| `createdAt`               | string         | Format: `date-time`.                                                                                                                                                                           |
-| `finishedAt`              | string or null | Format: `date-time`.                                                                                                                                                                           |
-| `error`                   | string or null | —                                                                                                                                                                                              |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `status` | string | One of: `queued`, `building`, `deploying`, `ready`, `failed`. |
+| `environment` | string or null | Slug of the environment the deployment targets. Null only for deployments that predate environment tracking. |
+| `trigger` | object or null | What queued the deployment. Null for deployments that predate trigger tracking. |
+| `trigger.kind` | string | push = a push to a connected branch, pr = a pull-request preview, manual = the API/CLI, rollback = a redeploy of an earlier successful deployment. One of: `push`, `pr`, `manual`, `rollback`. |
+| `trigger.actor` | object | Who triggered it — present for repository-driven deploys. |
+| `trigger.actor.login` | string | — |
+| `trigger.actor.avatarUrl` | string or null | — |
+| `gitRepo` | string or null | Source repository as "owner/repo"; null for non-git deploys. |
+| `gitRef` | string | — |
+| `commitSha` | string or null | — |
+| `createdAt` | string | Format: `date-time`. |
+| `finishedAt` | string or null | Format: `date-time`. |
+| `error` | string or null | — |
 
 ## deploys.get
 
@@ -208,30 +208,30 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/deploys/$DEPLOY
 
 ### Responses
 
-| Status | Description                         |
-| ------ | ----------------------------------- |
-| `200`  | The deployment.                     |
-| `404`  | No such deployment in this project. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | The deployment. |
+| `404` | No such deployment in this project. |
 
 ### Response body (200)
 
-| Field                     | Type           | Description                                                                                                                                                                                    |
-| ------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `id`                      | string         | —                                                                                                                                                                                              |
-| `status`                  | string         | One of: `queued`, `building`, `deploying`, `ready`, `failed`.                                                                                                                                  |
-| `environment`             | string or null | Slug of the environment the deployment targets. Null only for deployments that predate environment tracking.                                                                                   |
-| `trigger`                 | object or null | What queued the deployment. Null for deployments that predate trigger tracking.                                                                                                                |
-| `trigger.kind`            | string         | push = a push to a connected branch, pr = a pull-request preview, manual = the API/CLI, rollback = a redeploy of an earlier successful deployment. One of: `push`, `pr`, `manual`, `rollback`. |
-| `trigger.actor`           | object         | Who triggered it — present for repository-driven deploys.                                                                                                                                      |
-| `trigger.actor.login`     | string         | —                                                                                                                                                                                              |
-| `trigger.actor.avatarUrl` | string or null | —                                                                                                                                                                                              |
-| `gitRepo`                 | string or null | Source repository as "owner/repo"; null for non-git deploys.                                                                                                                                   |
-| `gitRef`                  | string         | —                                                                                                                                                                                              |
-| `commitSha`               | string or null | —                                                                                                                                                                                              |
-| `createdAt`               | string         | Format: `date-time`.                                                                                                                                                                           |
-| `finishedAt`              | string or null | Format: `date-time`.                                                                                                                                                                           |
-| `error`                   | string or null | —                                                                                                                                                                                              |
-| `buildLog`                | string         | Accumulated build output.                                                                                                                                                                      |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `status` | string | One of: `queued`, `building`, `deploying`, `ready`, `failed`. |
+| `environment` | string or null | Slug of the environment the deployment targets. Null only for deployments that predate environment tracking. |
+| `trigger` | object or null | What queued the deployment. Null for deployments that predate trigger tracking. |
+| `trigger.kind` | string | push = a push to a connected branch, pr = a pull-request preview, manual = the API/CLI, rollback = a redeploy of an earlier successful deployment. One of: `push`, `pr`, `manual`, `rollback`. |
+| `trigger.actor` | object | Who triggered it — present for repository-driven deploys. |
+| `trigger.actor.login` | string | — |
+| `trigger.actor.avatarUrl` | string or null | — |
+| `gitRepo` | string or null | Source repository as "owner/repo"; null for non-git deploys. |
+| `gitRef` | string | — |
+| `commitSha` | string or null | — |
+| `createdAt` | string | Format: `date-time`. |
+| `finishedAt` | string or null | Format: `date-time`. |
+| `error` | string or null | — |
+| `buildLog` | string | Accumulated build output. |
 
 ## deploys.diagnose
 
@@ -255,25 +255,25 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/deploys
 
 ### Responses
 
-| Status | Description                                                   |
-| ------ | ------------------------------------------------------------- |
-| `200`  | The diagnosis — freshly produced or served from the cache.    |
-| `402`  | Organization billing is not active.                           |
-| `404`  | No such deployment in this project.                           |
-| `409`  | The deployment did not fail, so there is nothing to diagnose. |
-| `502`  | The platform agent could not analyze this deploy — try again. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | The diagnosis — freshly produced or served from the cache. |
+| `402` | Organization billing is not active. |
+| `404` | No such deployment in this project. |
+| `409` | The deployment did not fail, so there is nothing to diagnose. |
+| `502` | The platform agent could not analyze this deploy — try again. |
 
 ### Response body (200)
 
-| Field                             | Type     | Description                                                  |
-| --------------------------------- | -------- | ------------------------------------------------------------ |
-| `diagnosis`                       | object   | Structured failure diagnosis produced by the platform agent. |
-| `diagnosis.summary`               | string   | 1-2 sentence plain-language explanation of what went wrong.  |
-| `diagnosis.probableCause`         | string   | —                                                            |
-| `diagnosis.suggestedFix`          | object   | —                                                            |
-| `diagnosis.suggestedFix.kind`     | string   | One of: `env`, `code`, `config`, `retry`.                    |
-| `diagnosis.suggestedFix.title`    | string   | —                                                            |
-| `diagnosis.suggestedFix.detail`   | string   | —                                                            |
-| `diagnosis.suggestedFix.commands` | string[] | Optional shell commands to apply the fix.                    |
-| `diagnosis.confidence`            | string   | One of: `low`, `medium`, `high`.                             |
-| `cached`                          | boolean  | True when a previously stored diagnosis was returned.        |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `diagnosis` | object | Structured failure diagnosis produced by the platform agent. |
+| `diagnosis.summary` | string | 1-2 sentence plain-language explanation of what went wrong. |
+| `diagnosis.probableCause` | string | — |
+| `diagnosis.suggestedFix` | object | — |
+| `diagnosis.suggestedFix.kind` | string | One of: `env`, `code`, `config`, `retry`. |
+| `diagnosis.suggestedFix.title` | string | — |
+| `diagnosis.suggestedFix.detail` | string | — |
+| `diagnosis.suggestedFix.commands` | string[] | Optional shell commands to apply the fix. |
+| `diagnosis.confidence` | string | One of: `low`, `medium`, `high`. |
+| `cached` | boolean | True when a previously stored diagnosis was returned. |

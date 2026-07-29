@@ -28,28 +28,28 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/backup-destinations" \
 
 ### Responses
 
-| Status | Description                          |
-| ------ | ------------------------------------ |
-| `200`  | Backup destinations ordered by name. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Backup destinations ordered by name. |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field          | Type           | Description                             |
-| -------------- | -------------- | --------------------------------------- |
-| `id`           | string         | —                                       |
-| `name`         | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.      |
-| `kind`         | string         | One of: `custom_object_storage`.        |
-| `endpoint`     | string         | Format: `uri`.                          |
-| `bucket`       | string         | —                                       |
-| `prefix`       | string         | —                                       |
-| `region`       | string or null | —                                       |
-| `version`      | integer        | Active immutable configuration version. |
-| `status`       | string         | One of: `pending`, `ready`, `failed`.   |
-| `lastTestedAt` | string or null | Format: `date-time`.                    |
-| `createdAt`    | string         | Format: `date-time`.                    |
-| `updatedAt`    | string         | Format: `date-time`.                    |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `kind` | string | One of: `custom_object_storage`. |
+| `endpoint` | string | Format: `uri`. |
+| `bucket` | string | — |
+| `prefix` | string | — |
+| `region` | string or null | — |
+| `version` | integer | Active immutable configuration version. |
+| `status` | string | One of: `pending`, `ready`, `failed`. |
+| `lastTestedAt` | string or null | Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
 
 ## backupDestinations.create
 
@@ -66,17 +66,17 @@ POST /v1/orgs/{orgId}/backup-destinations
 
 ### Request body
 
-| Field                         | Type           | Required | Description                                                         |
-| ----------------------------- | -------------- | -------- | ------------------------------------------------------------------- |
-| `name`                        | string         | Yes      | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                  |
-| `endpoint`                    | string         | Yes      | HTTPS endpoint for compatible custom object storage. Format: `uri`. |
-| `bucket`                      | string         | Yes      | —                                                                   |
-| `prefix`                      | string         | No       | —                                                                   |
-| `region`                      | string or null | No       | —                                                                   |
-| `credentials`                 | object         | Yes      | —                                                                   |
-| `credentials.accessKeyId`     | string         | Yes      | —                                                                   |
-| `credentials.secretAccessKey` | string         | Yes      | —                                                                   |
-| `credentials.sessionToken`    | string         | No       | —                                                                   |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `name` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `endpoint` | string | Yes | HTTPS endpoint for compatible custom object storage. Format: `uri`. |
+| `bucket` | string | Yes | — |
+| `prefix` | string | No | — |
+| `region` | string or null | No | — |
+| `credentials` | object | Yes | — |
+| `credentials.accessKeyId` | string | Yes | — |
+| `credentials.secretAccessKey` | string | Yes | — |
+| `credentials.sessionToken` | string | No | — |
 
 ### Example
 
@@ -97,28 +97,28 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/backup-destinations" \
 
 ### Responses
 
-| Status | Description                                           |
-| ------ | ----------------------------------------------------- |
-| `201`  | Destination registered; credentials are not returned. |
-| `409`  | A destination with that name already exists.          |
-| `422`  | Invalid endpoint or credentials.                      |
+| Status | Description |
+| ------ | ----------- |
+| `201` | Destination registered; credentials are not returned. |
+| `409` | A destination with that name already exists. |
+| `422` | Invalid endpoint or credentials. |
 
 ### Response body (201)
 
-| Field          | Type           | Description                             |
-| -------------- | -------------- | --------------------------------------- |
-| `id`           | string         | —                                       |
-| `name`         | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.      |
-| `kind`         | string         | One of: `custom_object_storage`.        |
-| `endpoint`     | string         | Format: `uri`.                          |
-| `bucket`       | string         | —                                       |
-| `prefix`       | string         | —                                       |
-| `region`       | string or null | —                                       |
-| `version`      | integer        | Active immutable configuration version. |
-| `status`       | string         | One of: `pending`, `ready`, `failed`.   |
-| `lastTestedAt` | string or null | Format: `date-time`.                    |
-| `createdAt`    | string         | Format: `date-time`.                    |
-| `updatedAt`    | string         | Format: `date-time`.                    |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `kind` | string | One of: `custom_object_storage`. |
+| `endpoint` | string | Format: `uri`. |
+| `bucket` | string | — |
+| `prefix` | string | — |
+| `region` | string or null | — |
+| `version` | integer | Active immutable configuration version. |
+| `status` | string | One of: `pending`, `ready`, `failed`. |
+| `lastTestedAt` | string or null | Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
 
 ## backupDestinations.get
 
@@ -141,27 +141,27 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/backup-destinations/$DESTINATION_ID"
 
 ### Responses
 
-| Status | Description                               |
-| ------ | ----------------------------------------- |
-| `200`  | Backup destination.                       |
-| `404`  | No such destination in this organization. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Backup destination. |
+| `404` | No such destination in this organization. |
 
 ### Response body (200)
 
-| Field          | Type           | Description                             |
-| -------------- | -------------- | --------------------------------------- |
-| `id`           | string         | —                                       |
-| `name`         | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.      |
-| `kind`         | string         | One of: `custom_object_storage`.        |
-| `endpoint`     | string         | Format: `uri`.                          |
-| `bucket`       | string         | —                                       |
-| `prefix`       | string         | —                                       |
-| `region`       | string or null | —                                       |
-| `version`      | integer        | Active immutable configuration version. |
-| `status`       | string         | One of: `pending`, `ready`, `failed`.   |
-| `lastTestedAt` | string or null | Format: `date-time`.                    |
-| `createdAt`    | string         | Format: `date-time`.                    |
-| `updatedAt`    | string         | Format: `date-time`.                    |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `kind` | string | One of: `custom_object_storage`. |
+| `endpoint` | string | Format: `uri`. |
+| `bucket` | string | — |
+| `prefix` | string | — |
+| `region` | string or null | — |
+| `version` | integer | Active immutable configuration version. |
+| `status` | string | One of: `pending`, `ready`, `failed`. |
+| `lastTestedAt` | string or null | Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
 
 ## backupDestinations.update
 
@@ -178,17 +178,17 @@ PATCH /v1/orgs/{orgId}/backup-destinations/{destinationId}
 
 ### Request body
 
-| Field                         | Type           | Required | Description                                                         |
-| ----------------------------- | -------------- | -------- | ------------------------------------------------------------------- |
-| `name`                        | string         | No       | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                  |
-| `endpoint`                    | string         | No       | HTTPS endpoint for compatible custom object storage. Format: `uri`. |
-| `bucket`                      | string         | No       | —                                                                   |
-| `prefix`                      | string         | No       | —                                                                   |
-| `region`                      | string or null | No       | —                                                                   |
-| `credentials`                 | object         | No       | —                                                                   |
-| `credentials.accessKeyId`     | string         | Yes      | —                                                                   |
-| `credentials.secretAccessKey` | string         | Yes      | —                                                                   |
-| `credentials.sessionToken`    | string         | No       | —                                                                   |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `name` | string | No | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `endpoint` | string | No | HTTPS endpoint for compatible custom object storage. Format: `uri`. |
+| `bucket` | string | No | — |
+| `prefix` | string | No | — |
+| `region` | string or null | No | — |
+| `credentials` | object | No | — |
+| `credentials.accessKeyId` | string | Yes | — |
+| `credentials.secretAccessKey` | string | Yes | — |
+| `credentials.sessionToken` | string | No | — |
 
 ### Example
 
@@ -201,28 +201,28 @@ curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/backup-destinations/$DESTIN
 
 ### Responses
 
-| Status | Description                               |
-| ------ | ----------------------------------------- |
-| `200`  | Updated destination.                      |
-| `404`  | No such destination in this organization. |
-| `422`  | Invalid endpoint or credentials.          |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Updated destination. |
+| `404` | No such destination in this organization. |
+| `422` | Invalid endpoint or credentials. |
 
 ### Response body (200)
 
-| Field          | Type           | Description                             |
-| -------------- | -------------- | --------------------------------------- |
-| `id`           | string         | —                                       |
-| `name`         | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.      |
-| `kind`         | string         | One of: `custom_object_storage`.        |
-| `endpoint`     | string         | Format: `uri`.                          |
-| `bucket`       | string         | —                                       |
-| `prefix`       | string         | —                                       |
-| `region`       | string or null | —                                       |
-| `version`      | integer        | Active immutable configuration version. |
-| `status`       | string         | One of: `pending`, `ready`, `failed`.   |
-| `lastTestedAt` | string or null | Format: `date-time`.                    |
-| `createdAt`    | string         | Format: `date-time`.                    |
-| `updatedAt`    | string         | Format: `date-time`.                    |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `kind` | string | One of: `custom_object_storage`. |
+| `endpoint` | string | Format: `uri`. |
+| `bucket` | string | — |
+| `prefix` | string | — |
+| `region` | string or null | — |
+| `version` | integer | Active immutable configuration version. |
+| `status` | string | One of: `pending`, `ready`, `failed`. |
+| `lastTestedAt` | string or null | Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
 
 ## backupDestinations.delete
 
@@ -245,11 +245,11 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/backup-destinations/$DESTI
 
 ### Responses
 
-| Status | Description                                             |
-| ------ | ------------------------------------------------------- |
-| `200`  | Destination configuration deleted.                      |
-| `404`  | No such destination in this organization.               |
-| `409`  | An active policy or export still uses this destination. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Destination configuration deleted. |
+| `404` | No such destination in this organization. |
+| `409` | An active policy or export still uses this destination. |
 
 ## backupDestinations.test
 
@@ -272,15 +272,15 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/backup-destinations/$DESTINA
 
 ### Responses
 
-| Status | Description                               |
-| ------ | ----------------------------------------- |
-| `200`  | Access test result.                       |
-| `404`  | No such destination in this organization. |
-| `422`  | Destination access test failed.           |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Access test result. |
+| `404` | No such destination in this organization. |
+| `422` | Destination access test failed. |
 
 ### Response body (200)
 
-| Field      | Type    | Description          |
-| ---------- | ------- | -------------------- |
-| `ok`       | boolean | —                    |
-| `testedAt` | string  | Format: `date-time`. |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `ok` | boolean | — |
+| `testedAt` | string | Format: `date-time`. |
