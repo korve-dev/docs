@@ -58,6 +58,7 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATA
 | `items[].expiresAt`     | string or null  | Format: `date-time`.                                                                                                                                                                     |
 | `items[].createdAt`     | string          | Format: `date-time`.                                                                                                                                                                     |
 | `items[].completedAt`   | string or null  | Format: `date-time`.                                                                                                                                                                     |
+| `items[].purgedAt`      | string or null  | Set after the backing repository confirms physical deletion of this recovery point. Format: `date-time`.                                                                                 |
 | `nextCursor`            | string or null  | —                                                                                                                                                                                        |
 
 ## databaseBackups.create
@@ -115,6 +116,7 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databas
 | `expiresAt`     | string or null  | Format: `date-time`.                                                                                                                                                                     |
 | `createdAt`     | string          | Format: `date-time`.                                                                                                                                                                     |
 | `completedAt`   | string or null  | Format: `date-time`.                                                                                                                                                                     |
+| `purgedAt`      | string or null  | Set after the backing repository confirms physical deletion of this recovery point. Format: `date-time`.                                                                                 |
 
 ## databaseBackups.get
 
@@ -158,6 +160,7 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATA
 | `expiresAt`     | string or null  | Format: `date-time`.                                                                                                                                                                     |
 | `createdAt`     | string          | Format: `date-time`.                                                                                                                                                                     |
 | `completedAt`   | string or null  | Format: `date-time`.                                                                                                                                                                     |
+| `purgedAt`      | string or null  | Set after the backing repository confirms physical deletion of this recovery point. Format: `date-time`.                                                                                 |
 
 ## databaseBackups.delete
 

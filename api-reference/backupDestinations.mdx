@@ -36,20 +36,20 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/backup-destinations" \
 
 An array of objects with these fields:
 
-| Field          | Type           | Description                             |
-| -------------- | -------------- | --------------------------------------- |
-| `id`           | string         | —                                       |
-| `name`         | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.      |
-| `kind`         | string         | One of: `custom_object_storage`.        |
-| `endpoint`     | string         | Format: `uri`.                          |
-| `bucket`       | string         | —                                       |
-| `prefix`       | string         | —                                       |
-| `region`       | string or null | —                                       |
-| `version`      | integer        | Active immutable configuration version. |
-| `status`       | string         | One of: `pending`, `ready`, `failed`.   |
-| `lastTestedAt` | string or null | Format: `date-time`.                    |
-| `createdAt`    | string         | Format: `date-time`.                    |
-| `updatedAt`    | string         | Format: `date-time`.                    |
+| Field          | Type           | Description                                                                                                                                                                                            |
+| -------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `id`           | string         | —                                                                                                                                                                                                      |
+| `name`         | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                                                                                                     |
+| `kind`         | string         | One of: `custom_object_storage`.                                                                                                                                                                       |
+| `endpoint`     | string         | Format: `uri`.                                                                                                                                                                                         |
+| `bucket`       | string         | —                                                                                                                                                                                                      |
+| `prefix`       | string         | Optional repository prefix using ASCII letters, digits, dot, underscore, slash, or hyphen. It cannot begin with a slash or contain two consecutive dots. Pattern: `^(?!/)(?!.*\.\.)[A-Za-z0-9._/-]*$`. |
+| `region`       | string or null | —                                                                                                                                                                                                      |
+| `version`      | integer        | Active immutable configuration version.                                                                                                                                                                |
+| `status`       | string         | One of: `pending`, `ready`, `failed`.                                                                                                                                                                  |
+| `lastTestedAt` | string or null | Format: `date-time`.                                                                                                                                                                                   |
+| `createdAt`    | string         | Format: `date-time`.                                                                                                                                                                                   |
+| `updatedAt`    | string         | Format: `date-time`.                                                                                                                                                                                   |
 
 ## backupDestinations.create
 
@@ -66,17 +66,17 @@ POST /v1/orgs/{orgId}/backup-destinations
 
 ### Request body
 
-| Field                         | Type           | Required | Description                                                         |
-| ----------------------------- | -------------- | -------- | ------------------------------------------------------------------- |
-| `name`                        | string         | Yes      | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                  |
-| `endpoint`                    | string         | Yes      | HTTPS endpoint for compatible custom object storage. Format: `uri`. |
-| `bucket`                      | string         | Yes      | —                                                                   |
-| `prefix`                      | string         | No       | —                                                                   |
-| `region`                      | string or null | No       | —                                                                   |
-| `credentials`                 | object         | Yes      | —                                                                   |
-| `credentials.accessKeyId`     | string         | Yes      | —                                                                   |
-| `credentials.secretAccessKey` | string         | Yes      | —                                                                   |
-| `credentials.sessionToken`    | string         | No       | —                                                                   |
+| Field                         | Type           | Required | Description                                                                                                                                                                                            |
+| ----------------------------- | -------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `name`                        | string         | Yes      | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                                                                                                     |
+| `endpoint`                    | string         | Yes      | HTTPS endpoint for compatible custom object storage. Format: `uri`.                                                                                                                                    |
+| `bucket`                      | string         | Yes      | —                                                                                                                                                                                                      |
+| `prefix`                      | string         | No       | Optional repository prefix using ASCII letters, digits, dot, underscore, slash, or hyphen. It cannot begin with a slash or contain two consecutive dots. Pattern: `^(?!/)(?!.*\.\.)[A-Za-z0-9._/-]*$`. |
+| `region`                      | string or null | No       | —                                                                                                                                                                                                      |
+| `credentials`                 | object         | Yes      | —                                                                                                                                                                                                      |
+| `credentials.accessKeyId`     | string         | Yes      | —                                                                                                                                                                                                      |
+| `credentials.secretAccessKey` | string         | Yes      | —                                                                                                                                                                                                      |
+| `credentials.sessionToken`    | string         | No       | —                                                                                                                                                                                                      |
 
 ### Example
 
@@ -105,20 +105,20 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/backup-destinations" \
 
 ### Response body (201)
 
-| Field          | Type           | Description                             |
-| -------------- | -------------- | --------------------------------------- |
-| `id`           | string         | —                                       |
-| `name`         | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.      |
-| `kind`         | string         | One of: `custom_object_storage`.        |
-| `endpoint`     | string         | Format: `uri`.                          |
-| `bucket`       | string         | —                                       |
-| `prefix`       | string         | —                                       |
-| `region`       | string or null | —                                       |
-| `version`      | integer        | Active immutable configuration version. |
-| `status`       | string         | One of: `pending`, `ready`, `failed`.   |
-| `lastTestedAt` | string or null | Format: `date-time`.                    |
-| `createdAt`    | string         | Format: `date-time`.                    |
-| `updatedAt`    | string         | Format: `date-time`.                    |
+| Field          | Type           | Description                                                                                                                                                                                            |
+| -------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `id`           | string         | —                                                                                                                                                                                                      |
+| `name`         | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                                                                                                     |
+| `kind`         | string         | One of: `custom_object_storage`.                                                                                                                                                                       |
+| `endpoint`     | string         | Format: `uri`.                                                                                                                                                                                         |
+| `bucket`       | string         | —                                                                                                                                                                                                      |
+| `prefix`       | string         | Optional repository prefix using ASCII letters, digits, dot, underscore, slash, or hyphen. It cannot begin with a slash or contain two consecutive dots. Pattern: `^(?!/)(?!.*\.\.)[A-Za-z0-9._/-]*$`. |
+| `region`       | string or null | —                                                                                                                                                                                                      |
+| `version`      | integer        | Active immutable configuration version.                                                                                                                                                                |
+| `status`       | string         | One of: `pending`, `ready`, `failed`.                                                                                                                                                                  |
+| `lastTestedAt` | string or null | Format: `date-time`.                                                                                                                                                                                   |
+| `createdAt`    | string         | Format: `date-time`.                                                                                                                                                                                   |
+| `updatedAt`    | string         | Format: `date-time`.                                                                                                                                                                                   |
 
 ## backupDestinations.get
 
@@ -148,20 +148,20 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/backup-destinations/$DESTINATION_ID"
 
 ### Response body (200)
 
-| Field          | Type           | Description                             |
-| -------------- | -------------- | --------------------------------------- |
-| `id`           | string         | —                                       |
-| `name`         | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.      |
-| `kind`         | string         | One of: `custom_object_storage`.        |
-| `endpoint`     | string         | Format: `uri`.                          |
-| `bucket`       | string         | —                                       |
-| `prefix`       | string         | —                                       |
-| `region`       | string or null | —                                       |
-| `version`      | integer        | Active immutable configuration version. |
-| `status`       | string         | One of: `pending`, `ready`, `failed`.   |
-| `lastTestedAt` | string or null | Format: `date-time`.                    |
-| `createdAt`    | string         | Format: `date-time`.                    |
-| `updatedAt`    | string         | Format: `date-time`.                    |
+| Field          | Type           | Description                                                                                                                                                                                            |
+| -------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `id`           | string         | —                                                                                                                                                                                                      |
+| `name`         | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                                                                                                     |
+| `kind`         | string         | One of: `custom_object_storage`.                                                                                                                                                                       |
+| `endpoint`     | string         | Format: `uri`.                                                                                                                                                                                         |
+| `bucket`       | string         | —                                                                                                                                                                                                      |
+| `prefix`       | string         | Optional repository prefix using ASCII letters, digits, dot, underscore, slash, or hyphen. It cannot begin with a slash or contain two consecutive dots. Pattern: `^(?!/)(?!.*\.\.)[A-Za-z0-9._/-]*$`. |
+| `region`       | string or null | —                                                                                                                                                                                                      |
+| `version`      | integer        | Active immutable configuration version.                                                                                                                                                                |
+| `status`       | string         | One of: `pending`, `ready`, `failed`.                                                                                                                                                                  |
+| `lastTestedAt` | string or null | Format: `date-time`.                                                                                                                                                                                   |
+| `createdAt`    | string         | Format: `date-time`.                                                                                                                                                                                   |
+| `updatedAt`    | string         | Format: `date-time`.                                                                                                                                                                                   |
 
 ## backupDestinations.update
 
@@ -178,17 +178,17 @@ PATCH /v1/orgs/{orgId}/backup-destinations/{destinationId}
 
 ### Request body
 
-| Field                         | Type           | Required | Description                                                         |
-| ----------------------------- | -------------- | -------- | ------------------------------------------------------------------- |
-| `name`                        | string         | No       | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                  |
-| `endpoint`                    | string         | No       | HTTPS endpoint for compatible custom object storage. Format: `uri`. |
-| `bucket`                      | string         | No       | —                                                                   |
-| `prefix`                      | string         | No       | —                                                                   |
-| `region`                      | string or null | No       | —                                                                   |
-| `credentials`                 | object         | No       | —                                                                   |
-| `credentials.accessKeyId`     | string         | Yes      | —                                                                   |
-| `credentials.secretAccessKey` | string         | Yes      | —                                                                   |
-| `credentials.sessionToken`    | string         | No       | —                                                                   |
+| Field                         | Type           | Required | Description                                                                                                                                                                                            |
+| ----------------------------- | -------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `name`                        | string         | No       | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                                                                                                     |
+| `endpoint`                    | string         | No       | HTTPS endpoint for compatible custom object storage. Format: `uri`.                                                                                                                                    |
+| `bucket`                      | string         | No       | —                                                                                                                                                                                                      |
+| `prefix`                      | string         | No       | Optional repository prefix using ASCII letters, digits, dot, underscore, slash, or hyphen. It cannot begin with a slash or contain two consecutive dots. Pattern: `^(?!/)(?!.*\.\.)[A-Za-z0-9._/-]*$`. |
+| `region`                      | string or null | No       | —                                                                                                                                                                                                      |
+| `credentials`                 | object         | No       | —                                                                                                                                                                                                      |
+| `credentials.accessKeyId`     | string         | Yes      | —                                                                                                                                                                                                      |
+| `credentials.secretAccessKey` | string         | Yes      | —                                                                                                                                                                                                      |
+| `credentials.sessionToken`    | string         | No       | —                                                                                                                                                                                                      |
 
 ### Example
 
@@ -209,20 +209,20 @@ curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/backup-destinations/$DESTIN
 
 ### Response body (200)
 
-| Field          | Type           | Description                             |
-| -------------- | -------------- | --------------------------------------- |
-| `id`           | string         | —                                       |
-| `name`         | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.      |
-| `kind`         | string         | One of: `custom_object_storage`.        |
-| `endpoint`     | string         | Format: `uri`.                          |
-| `bucket`       | string         | —                                       |
-| `prefix`       | string         | —                                       |
-| `region`       | string or null | —                                       |
-| `version`      | integer        | Active immutable configuration version. |
-| `status`       | string         | One of: `pending`, `ready`, `failed`.   |
-| `lastTestedAt` | string or null | Format: `date-time`.                    |
-| `createdAt`    | string         | Format: `date-time`.                    |
-| `updatedAt`    | string         | Format: `date-time`.                    |
+| Field          | Type           | Description                                                                                                                                                                                            |
+| -------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `id`           | string         | —                                                                                                                                                                                                      |
+| `name`         | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                                                                                                     |
+| `kind`         | string         | One of: `custom_object_storage`.                                                                                                                                                                       |
+| `endpoint`     | string         | Format: `uri`.                                                                                                                                                                                         |
+| `bucket`       | string         | —                                                                                                                                                                                                      |
+| `prefix`       | string         | Optional repository prefix using ASCII letters, digits, dot, underscore, slash, or hyphen. It cannot begin with a slash or contain two consecutive dots. Pattern: `^(?!/)(?!.*\.\.)[A-Za-z0-9._/-]*$`. |
+| `region`       | string or null | —                                                                                                                                                                                                      |
+| `version`      | integer        | Active immutable configuration version.                                                                                                                                                                |
+| `status`       | string         | One of: `pending`, `ready`, `failed`.                                                                                                                                                                  |
+| `lastTestedAt` | string or null | Format: `date-time`.                                                                                                                                                                                   |
+| `createdAt`    | string         | Format: `date-time`.                                                                                                                                                                                   |
+| `updatedAt`    | string         | Format: `date-time`.                                                                                                                                                                                   |
 
 ## backupDestinations.delete
 
