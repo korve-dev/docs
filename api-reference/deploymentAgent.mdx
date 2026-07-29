@@ -28,39 +28,39 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/deploys/$DEPLOY
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | The deployment conversation. |
-| `404` | No such deployment in this project. |
+| Status | Description                         |
+| ------ | ----------------------------------- |
+| `200`  | The deployment conversation.        |
+| `404`  | No such deployment in this project. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | Format: `uuid`. |
-| `deploymentId` | string | Format: `uuid`. |
-| `projectThreadId` | string | Format: `uuid`. |
-| `messages` | object[] | — |
-| `messages[].id` | string | Format: `uuid`. |
-| `messages[].role` | string | One of: `user`, `assistant`, `system`. |
-| `messages[].content` | string | — |
-| `messages[].createdAt` | string | Format: `date-time`. |
-| `actions` | object[] | — |
-| `actions[].id` | string | Format: `uuid`. |
-| `actions[].operationId` | string | — |
-| `actions[].method` | string | One of: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`. |
-| `actions[].path` | string | — |
-| `actions[].risk` | string | One of: `write`, `dangerous`, `destructive`. |
-| `actions[].status` | string | One of: `pending`, `rejected`, `running`, `succeeded`, `failed`. |
-| `actions[].query` | object or null | — |
-| `actions[].body` | object | — |
-| `actions[].result` | object | — |
-| `actions[].error` | string or null | — |
-| `actions[].createdAt` | string | Format: `date-time`. |
-| `actions[].decidedAt` | string or null | Format: `date-time`. |
-| `actions[].executedAt` | string or null | Format: `date-time`. |
-| `createdAt` | string | Format: `date-time`. |
-| `updatedAt` | string | Format: `date-time`. |
+| Field                   | Type           | Description                                                      |
+| ----------------------- | -------------- | ---------------------------------------------------------------- |
+| `id`                    | string         | Format: `uuid`.                                                  |
+| `deploymentId`          | string         | Format: `uuid`.                                                  |
+| `projectThreadId`       | string         | Format: `uuid`.                                                  |
+| `messages`              | object[]       | —                                                                |
+| `messages[].id`         | string         | Format: `uuid`.                                                  |
+| `messages[].role`       | string         | One of: `user`, `assistant`, `system`.                           |
+| `messages[].content`    | string         | —                                                                |
+| `messages[].createdAt`  | string         | Format: `date-time`.                                             |
+| `actions`               | object[]       | —                                                                |
+| `actions[].id`          | string         | Format: `uuid`.                                                  |
+| `actions[].operationId` | string         | —                                                                |
+| `actions[].method`      | string         | One of: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`.                 |
+| `actions[].path`        | string         | —                                                                |
+| `actions[].risk`        | string         | One of: `write`, `dangerous`, `destructive`.                     |
+| `actions[].status`      | string         | One of: `pending`, `rejected`, `running`, `succeeded`, `failed`. |
+| `actions[].query`       | object or null | —                                                                |
+| `actions[].body`        | object         | —                                                                |
+| `actions[].result`      | object         | —                                                                |
+| `actions[].error`       | string or null | —                                                                |
+| `actions[].createdAt`   | string         | Format: `date-time`.                                             |
+| `actions[].decidedAt`   | string or null | Format: `date-time`.                                             |
+| `actions[].executedAt`  | string or null | Format: `date-time`.                                             |
+| `createdAt`             | string         | Format: `date-time`.                                             |
+| `updatedAt`             | string         | Format: `date-time`.                                             |
 
 ## deploymentAgent.message
 
@@ -77,9 +77,9 @@ POST /v1/orgs/{orgId}/projects/{projectId}/deploys/{deployId}/agent/messages
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `message` | string | Yes | — |
+| Field     | Type   | Required | Description |
+| --------- | ------ | -------- | ----------- |
+| `message` | string | Yes      | —           |
 
 ### Example
 
@@ -94,41 +94,41 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/deploys
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | The updated conversation, or a text/event-stream when requested. |
-| `404` | No such failed deployment in this project. |
-| `422` | The message was invalid. |
-| `502` | The platform agent could not answer. |
+| Status | Description                                                      |
+| ------ | ---------------------------------------------------------------- |
+| `200`  | The updated conversation, or a text/event-stream when requested. |
+| `404`  | No such failed deployment in this project.                       |
+| `422`  | The message was invalid.                                         |
+| `502`  | The platform agent could not answer.                             |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | Format: `uuid`. |
-| `deploymentId` | string | Format: `uuid`. |
-| `projectThreadId` | string | Format: `uuid`. |
-| `messages` | object[] | — |
-| `messages[].id` | string | Format: `uuid`. |
-| `messages[].role` | string | One of: `user`, `assistant`, `system`. |
-| `messages[].content` | string | — |
-| `messages[].createdAt` | string | Format: `date-time`. |
-| `actions` | object[] | — |
-| `actions[].id` | string | Format: `uuid`. |
-| `actions[].operationId` | string | — |
-| `actions[].method` | string | One of: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`. |
-| `actions[].path` | string | — |
-| `actions[].risk` | string | One of: `write`, `dangerous`, `destructive`. |
-| `actions[].status` | string | One of: `pending`, `rejected`, `running`, `succeeded`, `failed`. |
-| `actions[].query` | object or null | — |
-| `actions[].body` | object | — |
-| `actions[].result` | object | — |
-| `actions[].error` | string or null | — |
-| `actions[].createdAt` | string | Format: `date-time`. |
-| `actions[].decidedAt` | string or null | Format: `date-time`. |
-| `actions[].executedAt` | string or null | Format: `date-time`. |
-| `createdAt` | string | Format: `date-time`. |
-| `updatedAt` | string | Format: `date-time`. |
+| Field                   | Type           | Description                                                      |
+| ----------------------- | -------------- | ---------------------------------------------------------------- |
+| `id`                    | string         | Format: `uuid`.                                                  |
+| `deploymentId`          | string         | Format: `uuid`.                                                  |
+| `projectThreadId`       | string         | Format: `uuid`.                                                  |
+| `messages`              | object[]       | —                                                                |
+| `messages[].id`         | string         | Format: `uuid`.                                                  |
+| `messages[].role`       | string         | One of: `user`, `assistant`, `system`.                           |
+| `messages[].content`    | string         | —                                                                |
+| `messages[].createdAt`  | string         | Format: `date-time`.                                             |
+| `actions`               | object[]       | —                                                                |
+| `actions[].id`          | string         | Format: `uuid`.                                                  |
+| `actions[].operationId` | string         | —                                                                |
+| `actions[].method`      | string         | One of: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`.                 |
+| `actions[].path`        | string         | —                                                                |
+| `actions[].risk`        | string         | One of: `write`, `dangerous`, `destructive`.                     |
+| `actions[].status`      | string         | One of: `pending`, `rejected`, `running`, `succeeded`, `failed`. |
+| `actions[].query`       | object or null | —                                                                |
+| `actions[].body`        | object         | —                                                                |
+| `actions[].result`      | object         | —                                                                |
+| `actions[].error`       | string or null | —                                                                |
+| `actions[].createdAt`   | string         | Format: `date-time`.                                             |
+| `actions[].decidedAt`   | string or null | Format: `date-time`.                                             |
+| `actions[].executedAt`  | string or null | Format: `date-time`.                                             |
+| `createdAt`             | string         | Format: `date-time`.                                             |
+| `updatedAt`             | string         | Format: `date-time`.                                             |
 
 ## deploymentAgent.decideAction
 
@@ -145,9 +145,9 @@ POST /v1/orgs/{orgId}/projects/{projectId}/deploys/{deployId}/agent/actions/{act
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `decision` | string | Yes | One of: `approve`, `reject`. |
+| Field      | Type   | Required | Description                  |
+| ---------- | ------ | -------- | ---------------------------- |
+| `decision` | string | Yes      | One of: `approve`, `reject`. |
 
 ### Example
 
@@ -162,38 +162,38 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/deploys
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | The updated conversation. |
-| `403` | The current actor cannot approve the target operation. |
-| `404` | No such deployment or pending action. |
-| `409` | The action has already been decided. |
+| Status | Description                                            |
+| ------ | ------------------------------------------------------ |
+| `200`  | The updated conversation.                              |
+| `403`  | The current actor cannot approve the target operation. |
+| `404`  | No such deployment or pending action.                  |
+| `409`  | The action has already been decided.                   |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | Format: `uuid`. |
-| `deploymentId` | string | Format: `uuid`. |
-| `projectThreadId` | string | Format: `uuid`. |
-| `messages` | object[] | — |
-| `messages[].id` | string | Format: `uuid`. |
-| `messages[].role` | string | One of: `user`, `assistant`, `system`. |
-| `messages[].content` | string | — |
-| `messages[].createdAt` | string | Format: `date-time`. |
-| `actions` | object[] | — |
-| `actions[].id` | string | Format: `uuid`. |
-| `actions[].operationId` | string | — |
-| `actions[].method` | string | One of: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`. |
-| `actions[].path` | string | — |
-| `actions[].risk` | string | One of: `write`, `dangerous`, `destructive`. |
-| `actions[].status` | string | One of: `pending`, `rejected`, `running`, `succeeded`, `failed`. |
-| `actions[].query` | object or null | — |
-| `actions[].body` | object | — |
-| `actions[].result` | object | — |
-| `actions[].error` | string or null | — |
-| `actions[].createdAt` | string | Format: `date-time`. |
-| `actions[].decidedAt` | string or null | Format: `date-time`. |
-| `actions[].executedAt` | string or null | Format: `date-time`. |
-| `createdAt` | string | Format: `date-time`. |
-| `updatedAt` | string | Format: `date-time`. |
+| Field                   | Type           | Description                                                      |
+| ----------------------- | -------------- | ---------------------------------------------------------------- |
+| `id`                    | string         | Format: `uuid`.                                                  |
+| `deploymentId`          | string         | Format: `uuid`.                                                  |
+| `projectThreadId`       | string         | Format: `uuid`.                                                  |
+| `messages`              | object[]       | —                                                                |
+| `messages[].id`         | string         | Format: `uuid`.                                                  |
+| `messages[].role`       | string         | One of: `user`, `assistant`, `system`.                           |
+| `messages[].content`    | string         | —                                                                |
+| `messages[].createdAt`  | string         | Format: `date-time`.                                             |
+| `actions`               | object[]       | —                                                                |
+| `actions[].id`          | string         | Format: `uuid`.                                                  |
+| `actions[].operationId` | string         | —                                                                |
+| `actions[].method`      | string         | One of: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`.                 |
+| `actions[].path`        | string         | —                                                                |
+| `actions[].risk`        | string         | One of: `write`, `dangerous`, `destructive`.                     |
+| `actions[].status`      | string         | One of: `pending`, `rejected`, `running`, `succeeded`, `failed`. |
+| `actions[].query`       | object or null | —                                                                |
+| `actions[].body`        | object         | —                                                                |
+| `actions[].result`      | object         | —                                                                |
+| `actions[].error`       | string or null | —                                                                |
+| `actions[].createdAt`   | string         | Format: `date-time`.                                             |
+| `actions[].decidedAt`   | string or null | Format: `date-time`.                                             |
+| `actions[].executedAt`  | string or null | Format: `date-time`.                                             |
+| `createdAt`             | string         | Format: `date-time`.                                             |
+| `updatedAt`             | string         | Format: `date-time`.                                             |

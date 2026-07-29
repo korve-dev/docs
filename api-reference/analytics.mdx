@@ -21,12 +21,12 @@ GET /v1/orgs/{orgId}/projects/{projectId}/analytics
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `since` | string | No | Format: `date-time`. |
-| `until` | string | No | Format: `date-time`. |
-| `granularity` | string | No | One of: `hour`, `day`. |
-| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `since`       | string | No       | Format: `date-time`.               |
+| `until`       | string | No       | Format: `date-time`.               |
+| `granularity` | string | No       | One of: `hour`, `day`.             |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Example
 
@@ -37,24 +37,24 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/analytics?since
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Bucketed traffic series with window totals. |
-| `404` | No such project or environment in this organization. |
-| `422` | Invalid since, until, or granularity. |
+| Status | Description                                          |
+| ------ | ---------------------------------------------------- |
+| `200`  | Bucketed traffic series with window totals.          |
+| `404`  | No such project or environment in this organization. |
+| `422`  | Invalid since, until, or granularity.                |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `series` | object[] | Ascending by bucket. Buckets the window saw no traffic for are omitted. |
-| `series[].bucket` | string | Start of the bucket (UTC). Format: `date-time`. |
-| `series[].requests` | number | — |
-| `series[].errors` | number | — |
-| `series[].cpuP50Us` | number or null | Median CPU time per request in microseconds — execution time, not wall-clock latency. Null when the bucket reports none; always-on apps never do. |
+| Field               | Type           | Description                                                                                                                                                |
+| ------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `series`            | object[]       | Ascending by bucket. Buckets the window saw no traffic for are omitted.                                                                                    |
+| `series[].bucket`   | string         | Start of the bucket (UTC). Format: `date-time`.                                                                                                            |
+| `series[].requests` | number         | —                                                                                                                                                          |
+| `series[].errors`   | number         | —                                                                                                                                                          |
+| `series[].cpuP50Us` | number or null | Median CPU time per request in microseconds — execution time, not wall-clock latency. Null when the bucket reports none; always-on apps never do.          |
 | `series[].cpuP99Us` | number or null | 99th-percentile CPU time per request in microseconds — execution time, not wall-clock latency. Null when the bucket reports none; always-on apps never do. |
-| `totals` | object | — |
-| `totals.requests` | number | — |
-| `totals.errors` | number | — |
-| `totals.errorRate` | number | errors / requests across the window; 0 when the window saw no requests. |
-| `note` | string | Present when there is context worth surfacing — for example the environment has no runtime yet. |
+| `totals`            | object         | —                                                                                                                                                          |
+| `totals.requests`   | number         | —                                                                                                                                                          |
+| `totals.errors`     | number         | —                                                                                                                                                          |
+| `totals.errorRate`  | number         | errors / requests across the window; 0 when the window saw no requests.                                                                                    |
+| `note`              | string         | Present when there is context worth surfacing — for example the environment has no runtime yet.                                                            |

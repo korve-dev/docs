@@ -21,9 +21,9 @@ GET /v1/orgs/{orgId}/projects/{projectId}/caches
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Example
 
@@ -34,29 +34,29 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/caches?environm
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Caches ordered by name. |
+| Status | Description             |
+| ------ | ----------------------- |
+| `200`  | Caches ordered by name. |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
-| `environment` | string | — |
-| `status` | string | One of: `provisioning`, `ready`, `failed`. |
-| `region` | string | — |
-| `sku` | string | — |
-| `memoryMb` | integer | — |
-| `persistence` | string | One of: `none`, `aof`. |
-| `evictionPolicy` | string | One of: `allkeys-lru`, `allkeys-lfu`, `volatile-lru`, `noeviction`. |
-| `host` | string | Branded TLS cache endpoint. |
-| `port` | integer | — |
-| `tls` | boolean | — |
-| `createdAt` | string | Format: `date-time`. |
+| Field            | Type    | Description                                                         |
+| ---------------- | ------- | ------------------------------------------------------------------- |
+| `id`             | string  | —                                                                   |
+| `name`           | string  | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                  |
+| `environment`    | string  | —                                                                   |
+| `status`         | string  | One of: `provisioning`, `ready`, `failed`.                          |
+| `region`         | string  | —                                                                   |
+| `sku`            | string  | —                                                                   |
+| `memoryMb`       | integer | —                                                                   |
+| `persistence`    | string  | One of: `none`, `aof`.                                              |
+| `evictionPolicy` | string  | One of: `allkeys-lru`, `allkeys-lfu`, `volatile-lru`, `noeviction`. |
+| `host`           | string  | Branded TLS cache endpoint.                                         |
+| `port`           | integer | —                                                                   |
+| `tls`            | boolean | —                                                                   |
+| `createdAt`      | string  | Format: `date-time`.                                                |
 
 ## caches.create
 
@@ -73,19 +73,19 @@ POST /v1/orgs/{orgId}/projects/{projectId}/caches
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `name` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
-| `sku` | string | Yes | One of: `cache-n1`, `cache-s1`, `cache-s2`. |
-| `region` | string | Yes | — |
-| `persistence` | string | No | One of: `none`, `aof`. |
-| `evictionPolicy` | string | No | One of: `allkeys-lru`, `allkeys-lfu`, `volatile-lru`, `noeviction`. |
+| Field            | Type   | Required | Description                                                         |
+| ---------------- | ------ | -------- | ------------------------------------------------------------------- |
+| `name`           | string | Yes      | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                  |
+| `sku`            | string | Yes      | One of: `cache-n1`, `cache-s1`, `cache-s2`.                         |
+| `region`         | string | Yes      | —                                                                   |
+| `persistence`    | string | No       | One of: `none`, `aof`.                                              |
+| `evictionPolicy` | string | No       | One of: `allkeys-lru`, `allkeys-lfu`, `volatile-lru`, `noeviction`. |
 
 ### Example
 
@@ -102,19 +102,19 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/caches?
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `201` | Cache provisioned and credentials issued. |
-| `409` | The cache name already exists. |
-| `422` | Invalid cache configuration. |
+| Status | Description                               |
+| ------ | ----------------------------------------- |
+| `201`  | Cache provisioned and credentials issued. |
+| `409`  | The cache name already exists.            |
+| `422`  | Invalid cache configuration.              |
 
 ### Response body (201)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `name` | string | — |
-| `status` | string | One of: `provisioning`, `ready`, `failed`. |
+| Field              | Type   | Description                                                              |
+| ------------------ | ------ | ------------------------------------------------------------------------ |
+| `id`               | string | —                                                                        |
+| `name`             | string | —                                                                        |
+| `status`           | string | One of: `provisioning`, `ready`, `failed`.                               |
 | `connectionString` | string | A rediss:// URL shown exactly once. Rotate credentials to issue another. |
 
 ## caches.get
@@ -138,28 +138,28 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/caches/$CACHE_I
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Cache configuration. |
-| `404` | No such cache. |
+| Status | Description          |
+| ------ | -------------------- |
+| `200`  | Cache configuration. |
+| `404`  | No such cache.       |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
-| `environment` | string | — |
-| `status` | string | One of: `provisioning`, `ready`, `failed`. |
-| `region` | string | — |
-| `sku` | string | — |
-| `memoryMb` | integer | — |
-| `persistence` | string | One of: `none`, `aof`. |
-| `evictionPolicy` | string | One of: `allkeys-lru`, `allkeys-lfu`, `volatile-lru`, `noeviction`. |
-| `host` | string | Branded TLS cache endpoint. |
-| `port` | integer | — |
-| `tls` | boolean | — |
-| `createdAt` | string | Format: `date-time`. |
+| Field            | Type    | Description                                                         |
+| ---------------- | ------- | ------------------------------------------------------------------- |
+| `id`             | string  | —                                                                   |
+| `name`           | string  | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                  |
+| `environment`    | string  | —                                                                   |
+| `status`         | string  | One of: `provisioning`, `ready`, `failed`.                          |
+| `region`         | string  | —                                                                   |
+| `sku`            | string  | —                                                                   |
+| `memoryMb`       | integer | —                                                                   |
+| `persistence`    | string  | One of: `none`, `aof`.                                              |
+| `evictionPolicy` | string  | One of: `allkeys-lru`, `allkeys-lfu`, `volatile-lru`, `noeviction`. |
+| `host`           | string  | Branded TLS cache endpoint.                                         |
+| `port`           | integer | —                                                                   |
+| `tls`            | boolean | —                                                                   |
+| `createdAt`      | string  | Format: `date-time`.                                                |
 
 ## caches.rotateCredentials
 
@@ -183,18 +183,18 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/caches/
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | New credentials. |
-| `404` | No such cache. |
+| Status | Description      |
+| ------ | ---------------- |
+| `200`  | New credentials. |
+| `404`  | No such cache.   |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `name` | string | — |
-| `status` | string | One of: `provisioning`, `ready`, `failed`. |
+| Field              | Type   | Description                                                              |
+| ------------------ | ------ | ------------------------------------------------------------------------ |
+| `id`               | string | —                                                                        |
+| `name`             | string | —                                                                        |
+| `status`           | string | One of: `provisioning`, `ready`, `failed`.                               |
 | `connectionString` | string | A rediss:// URL shown exactly once. Rotate credentials to issue another. |
 
 ## caches.delete
@@ -218,7 +218,7 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/cache
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Cache deleted. |
-| `404` | No such cache. |
+| Status | Description    |
+| ------ | -------------- |
+| `200`  | Cache deleted. |
+| `404`  | No such cache. |
