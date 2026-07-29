@@ -29988,6 +29988,7 @@
                     "description": "Exact Korve operation allowlist. These values constrain Korve and are not self-attested processor permission claims.",
                     "minItems": 5,
                     "maxItems": 5,
+                    "uniqueItems": true,
                     "items": {
                       "type": "string",
                       "enum": [
