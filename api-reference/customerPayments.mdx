@@ -21,9 +21,9 @@ GET /v1/orgs/{orgId}/projects/{projectId}/payments
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Example
 
@@ -34,29 +34,29 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments?enviro
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Payment configuration. |
-| `402` | Organization billing is not active. |
-| `404` | Project or payment resource not found. |
-| `409` | Duplicate idempotency key or conflicting resource state. |
-| `422` | Invalid payment request. |
-| `502` | The payment processor rejected the request. |
-| `503` | The payment processor is temporarily unavailable. |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Payment configuration.                                   |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `status` | string | One of: `not_configured`, `ready`, `disabled`. |
-| `credentialConfigured` | boolean | — |
-| `credentialHint` | string or null | — |
-| `webhookUrl` | string or null | Format: `uri`. |
-| `webhookSecretConfigured` | boolean | — |
-| `credentialScopes` | string[] | — |
-| `allowedRedirectOrigins` | string[] | — |
-| `connectedAt` | string or null | Format: `date-time`. |
-| `updatedAt` | string or null | Format: `date-time`. |
+| Field                     | Type           | Description                                    |
+| ------------------------- | -------------- | ---------------------------------------------- |
+| `status`                  | string         | One of: `not_configured`, `ready`, `disabled`. |
+| `credentialConfigured`    | boolean        | —                                              |
+| `credentialHint`          | string or null | —                                              |
+| `webhookUrl`              | string or null | Format: `uri`.                                 |
+| `webhookSecretConfigured` | boolean        | —                                              |
+| `credentialScopes`        | string[]       | —                                              |
+| `allowedRedirectOrigins`  | string[]       | —                                              |
+| `connectedAt`             | string or null | Format: `date-time`.                           |
+| `updatedAt`               | string or null | Format: `date-time`.                           |
 
 ## customerPayments.connect
 
@@ -73,18 +73,18 @@ PUT /v1/orgs/{orgId}/projects/{projectId}/payments
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `secretKey` | string | Yes | — |
-| `webhookSecret` | string | Yes | — |
-| `credentialScopes` | string[] | Yes | — |
-| `allowedRedirectOrigins` | string[] | Yes | — |
+| Field                    | Type     | Required | Description |
+| ------------------------ | -------- | -------- | ----------- |
+| `secretKey`              | string   | Yes      | —           |
+| `webhookSecret`          | string   | Yes      | —           |
+| `credentialScopes`       | string[] | Yes      | —           |
+| `allowedRedirectOrigins` | string[] | Yes      | —           |
 
 ### Example
 
@@ -106,29 +106,29 @@ curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Connected configuration. |
-| `402` | Organization billing is not active. |
-| `404` | Project or payment resource not found. |
-| `409` | Duplicate idempotency key or conflicting resource state. |
-| `422` | Invalid payment request. |
-| `502` | The payment processor rejected the request. |
-| `503` | The payment processor is temporarily unavailable. |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Connected configuration.                                 |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `status` | string | One of: `not_configured`, `ready`, `disabled`. |
-| `credentialConfigured` | boolean | — |
-| `credentialHint` | string or null | — |
-| `webhookUrl` | string or null | Format: `uri`. |
-| `webhookSecretConfigured` | boolean | — |
-| `credentialScopes` | string[] | — |
-| `allowedRedirectOrigins` | string[] | — |
-| `connectedAt` | string or null | Format: `date-time`. |
-| `updatedAt` | string or null | Format: `date-time`. |
+| Field                     | Type           | Description                                    |
+| ------------------------- | -------------- | ---------------------------------------------- |
+| `status`                  | string         | One of: `not_configured`, `ready`, `disabled`. |
+| `credentialConfigured`    | boolean        | —                                              |
+| `credentialHint`          | string or null | —                                              |
+| `webhookUrl`              | string or null | Format: `uri`.                                 |
+| `webhookSecretConfigured` | boolean        | —                                              |
+| `credentialScopes`        | string[]       | —                                              |
+| `allowedRedirectOrigins`  | string[]       | —                                              |
+| `connectedAt`             | string or null | Format: `date-time`.                           |
+| `updatedAt`               | string or null | Format: `date-time`.                           |
 
 ## customerPayments.disconnect
 
@@ -144,9 +144,9 @@ DELETE /v1/orgs/{orgId}/projects/{projectId}/payments
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Example
 
@@ -157,15 +157,15 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payme
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Payments disconnected. |
-| `402` | Organization billing is not active. |
-| `404` | Project or payment resource not found. |
-| `409` | Duplicate idempotency key or conflicting resource state. |
-| `422` | Invalid payment request. |
-| `502` | The payment processor rejected the request. |
-| `503` | The payment processor is temporarily unavailable. |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Payments disconnected.                                   |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
 
 ## customerPayments.listProducts
 
@@ -181,11 +181,11 @@ GET /v1/orgs/{orgId}/projects/{projectId}/payments/products
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
-| `cursor` | string | No | — |
-| `limit` | integer | No | — |
+| Name          | Type    | Required | Description                        |
+| ------------- | ------- | -------- | ---------------------------------- |
+| `environment` | string  | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `cursor`      | string  | No       | —                                  |
+| `limit`       | integer | No       | —                                  |
 
 ### Example
 
@@ -196,29 +196,29 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/produc
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Product page. |
-| `402` | Organization billing is not active. |
-| `404` | Project or payment resource not found. |
-| `409` | Duplicate idempotency key or conflicting resource state. |
-| `422` | Invalid payment request. |
-| `502` | The payment processor rejected the request. |
-| `503` | The payment processor is temporarily unavailable. |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Product page.                                            |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `items` | object[] | — |
-| `items[].id` | string | Format: `uuid`. |
-| `items[].name` | string | — |
-| `items[].description` | string or null | — |
-| `items[].active` | boolean | — |
-| `items[].metadata` | object | At most 20 application-defined string entries. Map of string values. |
-| `items[].createdAt` | string | Format: `date-time`. |
-| `items[].updatedAt` | string | Format: `date-time`. |
-| `nextCursor` | string or null | — |
+| Field                 | Type           | Description                                                          |
+| --------------------- | -------------- | -------------------------------------------------------------------- |
+| `items`               | object[]       | —                                                                    |
+| `items[].id`          | string         | Format: `uuid`.                                                      |
+| `items[].name`        | string         | —                                                                    |
+| `items[].description` | string or null | —                                                                    |
+| `items[].active`      | boolean        | —                                                                    |
+| `items[].metadata`    | object         | At most 20 application-defined string entries. Map of string values. |
+| `items[].createdAt`   | string         | Format: `date-time`.                                                 |
+| `items[].updatedAt`   | string         | Format: `date-time`.                                                 |
+| `nextCursor`          | string or null | —                                                                    |
 
 ## customerPayments.createProduct
 
@@ -235,17 +235,17 @@ POST /v1/orgs/{orgId}/projects/{projectId}/payments/products
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `name` | string | Yes | — |
-| `description` | string | No | — |
-| `metadata` | object | No | At most 20 application-defined string entries. Map of string values. |
+| Field         | Type   | Required | Description                                                          |
+| ------------- | ------ | -------- | -------------------------------------------------------------------- |
+| `name`        | string | Yes      | —                                                                    |
+| `description` | string | No       | —                                                                    |
+| `metadata`    | object | No       | At most 20 application-defined string entries. Map of string values. |
 
 ### Example
 
@@ -260,27 +260,27 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payment
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `201` | Created product. |
-| `402` | Organization billing is not active. |
-| `404` | Project or payment resource not found. |
-| `409` | Duplicate idempotency key or conflicting resource state. |
-| `422` | Invalid payment request. |
-| `502` | The payment processor rejected the request. |
-| `503` | The payment processor is temporarily unavailable. |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `201`  | Created product.                                         |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
 
 ### Response body (201)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | Format: `uuid`. |
-| `name` | string | — |
-| `description` | string or null | — |
-| `active` | boolean | — |
-| `metadata` | object | At most 20 application-defined string entries. Map of string values. |
-| `createdAt` | string | Format: `date-time`. |
-| `updatedAt` | string | Format: `date-time`. |
+| Field         | Type           | Description                                                          |
+| ------------- | -------------- | -------------------------------------------------------------------- |
+| `id`          | string         | Format: `uuid`.                                                      |
+| `name`        | string         | —                                                                    |
+| `description` | string or null | —                                                                    |
+| `active`      | boolean        | —                                                                    |
+| `metadata`    | object         | At most 20 application-defined string entries. Map of string values. |
+| `createdAt`   | string         | Format: `date-time`.                                                 |
+| `updatedAt`   | string         | Format: `date-time`.                                                 |
 
 ## customerPayments.updateProduct
 
@@ -296,18 +296,18 @@ PATCH /v1/orgs/{orgId}/projects/{projectId}/payments/products/{productId}
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `name` | string | Yes | — |
-| `description` | string | No | — |
-| `metadata` | object | No | At most 20 application-defined string entries. Map of string values. |
-| `active` | boolean | No | — |
+| Field         | Type    | Required | Description                                                          |
+| ------------- | ------- | -------- | -------------------------------------------------------------------- |
+| `name`        | string  | Yes      | —                                                                    |
+| `description` | string  | No       | —                                                                    |
+| `metadata`    | object  | No       | At most 20 application-defined string entries. Map of string values. |
+| `active`      | boolean | No       | —                                                                    |
 
 ### Example
 
@@ -322,27 +322,27 @@ curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/paymen
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Updated product. |
-| `402` | Organization billing is not active. |
-| `404` | Project or payment resource not found. |
-| `409` | Duplicate idempotency key or conflicting resource state. |
-| `422` | Invalid payment request. |
-| `502` | The payment processor rejected the request. |
-| `503` | The payment processor is temporarily unavailable. |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Updated product.                                         |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | Format: `uuid`. |
-| `name` | string | — |
-| `description` | string or null | — |
-| `active` | boolean | — |
-| `metadata` | object | At most 20 application-defined string entries. Map of string values. |
-| `createdAt` | string | Format: `date-time`. |
-| `updatedAt` | string | Format: `date-time`. |
+| Field         | Type           | Description                                                          |
+| ------------- | -------------- | -------------------------------------------------------------------- |
+| `id`          | string         | Format: `uuid`.                                                      |
+| `name`        | string         | —                                                                    |
+| `description` | string or null | —                                                                    |
+| `active`      | boolean        | —                                                                    |
+| `metadata`    | object         | At most 20 application-defined string entries. Map of string values. |
+| `createdAt`   | string         | Format: `date-time`.                                                 |
+| `updatedAt`   | string         | Format: `date-time`.                                                 |
 
 ## customerPayments.listPrices
 
@@ -358,11 +358,11 @@ GET /v1/orgs/{orgId}/projects/{projectId}/payments/prices
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
-| `cursor` | string | No | — |
-| `limit` | integer | No | — |
+| Name          | Type    | Required | Description                        |
+| ------------- | ------- | -------- | ---------------------------------- |
+| `environment` | string  | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `cursor`      | string  | No       | —                                  |
+| `limit`       | integer | No       | —                                  |
 
 ### Example
 
@@ -373,32 +373,32 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/prices
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Price page. |
-| `402` | Organization billing is not active. |
-| `404` | Project or payment resource not found. |
-| `409` | Duplicate idempotency key or conflicting resource state. |
-| `422` | Invalid payment request. |
-| `502` | The payment processor rejected the request. |
-| `503` | The payment processor is temporarily unavailable. |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Price page.                                              |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `items` | object[] | — |
-| `items[].id` | string | Format: `uuid`. |
-| `items[].productId` | string | Format: `uuid`. |
-| `items[].currency` | string | Pattern: `^[a-z]{3}$`. |
-| `items[].unitAmount` | integer | — |
-| `items[].mode` | string | One of: `one_time`, `subscription`. |
-| `items[].interval` | string or null | One of: `day`, `week`, `month`, `year`, `null`. |
-| `items[].intervalCount` | integer or null | — |
-| `items[].active` | boolean | — |
-| `items[].metadata` | object | At most 20 application-defined string entries. Map of string values. |
-| `items[].createdAt` | string | Format: `date-time`. |
-| `nextCursor` | string or null | — |
+| Field                   | Type            | Description                                                          |
+| ----------------------- | --------------- | -------------------------------------------------------------------- |
+| `items`                 | object[]        | —                                                                    |
+| `items[].id`            | string          | Format: `uuid`.                                                      |
+| `items[].productId`     | string          | Format: `uuid`.                                                      |
+| `items[].currency`      | string          | Pattern: `^[a-z]{3}$`.                                               |
+| `items[].unitAmount`    | integer         | —                                                                    |
+| `items[].mode`          | string          | One of: `one_time`, `subscription`.                                  |
+| `items[].interval`      | string or null  | One of: `day`, `week`, `month`, `year`, `null`.                      |
+| `items[].intervalCount` | integer or null | —                                                                    |
+| `items[].active`        | boolean         | —                                                                    |
+| `items[].metadata`      | object          | At most 20 application-defined string entries. Map of string values. |
+| `items[].createdAt`     | string          | Format: `date-time`.                                                 |
+| `nextCursor`            | string or null  | —                                                                    |
 
 ## customerPayments.createPrice
 
@@ -415,21 +415,21 @@ POST /v1/orgs/{orgId}/projects/{projectId}/payments/prices
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `productId` | string | Yes | Format: `uuid`. |
-| `currency` | string | Yes | Pattern: `^[A-Za-z]{3}$`. |
-| `unitAmount` | integer | Yes | — |
-| `mode` | string | Yes | One of: `one_time`, `subscription`. |
-| `interval` | string | No | One of: `day`, `week`, `month`, `year`. |
-| `intervalCount` | integer | No | — |
-| `metadata` | object | No | At most 20 application-defined string entries. Map of string values. |
+| Field           | Type    | Required | Description                                                          |
+| --------------- | ------- | -------- | -------------------------------------------------------------------- |
+| `productId`     | string  | Yes      | Format: `uuid`.                                                      |
+| `currency`      | string  | Yes      | Pattern: `^[A-Za-z]{3}$`.                                            |
+| `unitAmount`    | integer | Yes      | —                                                                    |
+| `mode`          | string  | Yes      | One of: `one_time`, `subscription`.                                  |
+| `interval`      | string  | No       | One of: `day`, `week`, `month`, `year`.                              |
+| `intervalCount` | integer | No       | —                                                                    |
+| `metadata`      | object  | No       | At most 20 application-defined string entries. Map of string values. |
 
 ### Example
 
@@ -447,30 +447,30 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payment
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `201` | Created price. |
-| `402` | Organization billing is not active. |
-| `404` | Project or payment resource not found. |
-| `409` | Duplicate idempotency key or conflicting resource state. |
-| `422` | Invalid payment request. |
-| `502` | The payment processor rejected the request. |
-| `503` | The payment processor is temporarily unavailable. |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `201`  | Created price.                                           |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
 
 ### Response body (201)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | Format: `uuid`. |
-| `productId` | string | Format: `uuid`. |
-| `currency` | string | Pattern: `^[a-z]{3}$`. |
-| `unitAmount` | integer | — |
-| `mode` | string | One of: `one_time`, `subscription`. |
-| `interval` | string or null | One of: `day`, `week`, `month`, `year`, `null`. |
-| `intervalCount` | integer or null | — |
-| `active` | boolean | — |
-| `metadata` | object | At most 20 application-defined string entries. Map of string values. |
-| `createdAt` | string | Format: `date-time`. |
+| Field           | Type            | Description                                                          |
+| --------------- | --------------- | -------------------------------------------------------------------- |
+| `id`            | string          | Format: `uuid`.                                                      |
+| `productId`     | string          | Format: `uuid`.                                                      |
+| `currency`      | string          | Pattern: `^[a-z]{3}$`.                                               |
+| `unitAmount`    | integer         | —                                                                    |
+| `mode`          | string          | One of: `one_time`, `subscription`.                                  |
+| `interval`      | string or null  | One of: `day`, `week`, `month`, `year`, `null`.                      |
+| `intervalCount` | integer or null | —                                                                    |
+| `active`        | boolean         | —                                                                    |
+| `metadata`      | object          | At most 20 application-defined string entries. Map of string values. |
+| `createdAt`     | string          | Format: `date-time`.                                                 |
 
 ## customerPayments.archivePrice
 
@@ -486,9 +486,9 @@ DELETE /v1/orgs/{orgId}/projects/{projectId}/payments/prices/{priceId}
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Example
 
@@ -499,30 +499,30 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payme
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Archived price. |
-| `402` | Organization billing is not active. |
-| `404` | Project or payment resource not found. |
-| `409` | Duplicate idempotency key or conflicting resource state. |
-| `422` | Invalid payment request. |
-| `502` | The payment processor rejected the request. |
-| `503` | The payment processor is temporarily unavailable. |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Archived price.                                          |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | Format: `uuid`. |
-| `productId` | string | Format: `uuid`. |
-| `currency` | string | Pattern: `^[a-z]{3}$`. |
-| `unitAmount` | integer | — |
-| `mode` | string | One of: `one_time`, `subscription`. |
-| `interval` | string or null | One of: `day`, `week`, `month`, `year`, `null`. |
-| `intervalCount` | integer or null | — |
-| `active` | boolean | — |
-| `metadata` | object | At most 20 application-defined string entries. Map of string values. |
-| `createdAt` | string | Format: `date-time`. |
+| Field           | Type            | Description                                                          |
+| --------------- | --------------- | -------------------------------------------------------------------- |
+| `id`            | string          | Format: `uuid`.                                                      |
+| `productId`     | string          | Format: `uuid`.                                                      |
+| `currency`      | string          | Pattern: `^[a-z]{3}$`.                                               |
+| `unitAmount`    | integer         | —                                                                    |
+| `mode`          | string          | One of: `one_time`, `subscription`.                                  |
+| `interval`      | string or null  | One of: `day`, `week`, `month`, `year`, `null`.                      |
+| `intervalCount` | integer or null | —                                                                    |
+| `active`        | boolean         | —                                                                    |
+| `metadata`      | object          | At most 20 application-defined string entries. Map of string values. |
+| `createdAt`     | string          | Format: `date-time`.                                                 |
 
 ## customerPayments.listCustomers
 
@@ -538,11 +538,11 @@ GET /v1/orgs/{orgId}/projects/{projectId}/payments/customers
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
-| `cursor` | string | No | — |
-| `limit` | integer | No | — |
+| Name          | Type    | Required | Description                        |
+| ------------- | ------- | -------- | ---------------------------------- |
+| `environment` | string  | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `cursor`      | string  | No       | —                                  |
+| `limit`       | integer | No       | —                                  |
 
 ### Example
 
@@ -553,28 +553,28 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/custom
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Customer page. |
-| `402` | Organization billing is not active. |
-| `404` | Project or payment resource not found. |
-| `409` | Duplicate idempotency key or conflicting resource state. |
-| `422` | Invalid payment request. |
-| `502` | The payment processor rejected the request. |
-| `503` | The payment processor is temporarily unavailable. |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Customer page.                                           |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `items` | object[] | — |
-| `items[].id` | string | Format: `uuid`. |
-| `items[].email` | string | Format: `email`. |
-| `items[].name` | string or null | — |
-| `items[].externalId` | string or null | — |
-| `items[].metadata` | object | At most 20 application-defined string entries. Map of string values. |
-| `items[].createdAt` | string | Format: `date-time`. |
-| `nextCursor` | string or null | — |
+| Field                | Type           | Description                                                          |
+| -------------------- | -------------- | -------------------------------------------------------------------- |
+| `items`              | object[]       | —                                                                    |
+| `items[].id`         | string         | Format: `uuid`.                                                      |
+| `items[].email`      | string         | Format: `email`.                                                     |
+| `items[].name`       | string or null | —                                                                    |
+| `items[].externalId` | string or null | —                                                                    |
+| `items[].metadata`   | object         | At most 20 application-defined string entries. Map of string values. |
+| `items[].createdAt`  | string         | Format: `date-time`.                                                 |
+| `nextCursor`         | string or null | —                                                                    |
 
 ## customerPayments.createCustomer
 
@@ -591,18 +591,18 @@ POST /v1/orgs/{orgId}/projects/{projectId}/payments/customers
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `email` | string | Yes | Format: `email`. |
-| `name` | string | No | — |
-| `externalId` | string | No | — |
-| `metadata` | object | No | At most 20 application-defined string entries. Map of string values. |
+| Field        | Type   | Required | Description                                                          |
+| ------------ | ------ | -------- | -------------------------------------------------------------------- |
+| `email`      | string | Yes      | Format: `email`.                                                     |
+| `name`       | string | No       | —                                                                    |
+| `externalId` | string | No       | —                                                                    |
+| `metadata`   | object | No       | At most 20 application-defined string entries. Map of string values. |
 
 ### Example
 
@@ -617,26 +617,26 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payment
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `201` | Created customer. |
-| `402` | Organization billing is not active. |
-| `404` | Project or payment resource not found. |
-| `409` | Duplicate idempotency key or conflicting resource state. |
-| `422` | Invalid payment request. |
-| `502` | The payment processor rejected the request. |
-| `503` | The payment processor is temporarily unavailable. |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `201`  | Created customer.                                        |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
 
 ### Response body (201)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | Format: `uuid`. |
-| `email` | string | Format: `email`. |
-| `name` | string or null | — |
-| `externalId` | string or null | — |
-| `metadata` | object | At most 20 application-defined string entries. Map of string values. |
-| `createdAt` | string | Format: `date-time`. |
+| Field        | Type           | Description                                                          |
+| ------------ | -------------- | -------------------------------------------------------------------- |
+| `id`         | string         | Format: `uuid`.                                                      |
+| `email`      | string         | Format: `email`.                                                     |
+| `name`       | string or null | —                                                                    |
+| `externalId` | string or null | —                                                                    |
+| `metadata`   | object         | At most 20 application-defined string entries. Map of string values. |
+| `createdAt`  | string         | Format: `date-time`.                                                 |
 
 ## customerPayments.eraseCustomer
 
@@ -652,9 +652,9 @@ DELETE /v1/orgs/{orgId}/projects/{projectId}/payments/customers/{customerId}
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Example
 
@@ -665,15 +665,15 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payme
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Customer erased. |
-| `402` | Organization billing is not active. |
-| `404` | Project or payment resource not found. |
-| `409` | Duplicate idempotency key or conflicting resource state. |
-| `422` | Invalid payment request. |
-| `502` | The payment processor rejected the request. |
-| `503` | The payment processor is temporarily unavailable. |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Customer erased.                                         |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
 
 ## customerPayments.runtimeCreateCustomer
 
@@ -689,12 +689,12 @@ POST /v1/runtime/payments/customers
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `email` | string | Yes | Format: `email`. |
-| `name` | string | No | — |
-| `externalId` | string | No | — |
-| `metadata` | object | No | At most 20 application-defined string entries. Map of string values. |
+| Field        | Type   | Required | Description                                                          |
+| ------------ | ------ | -------- | -------------------------------------------------------------------- |
+| `email`      | string | Yes      | Format: `email`.                                                     |
+| `name`       | string | No       | —                                                                    |
+| `externalId` | string | No       | —                                                                    |
+| `metadata`   | object | No       | At most 20 application-defined string entries. Map of string values. |
 
 ### Example
 
@@ -709,26 +709,26 @@ curl -X POST "https://api.korve.dev/v1/runtime/payments/customers" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `201` | Created customer. |
-| `402` | Organization billing is not active. |
-| `404` | Project or payment resource not found. |
-| `409` | Duplicate idempotency key or conflicting resource state. |
-| `422` | Invalid payment request. |
-| `502` | The payment processor rejected the request. |
-| `503` | The payment processor is temporarily unavailable. |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `201`  | Created customer.                                        |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
 
 ### Response body (201)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | Format: `uuid`. |
-| `email` | string | Format: `email`. |
-| `name` | string or null | — |
-| `externalId` | string or null | — |
-| `metadata` | object | At most 20 application-defined string entries. Map of string values. |
-| `createdAt` | string | Format: `date-time`. |
+| Field        | Type           | Description                                                          |
+| ------------ | -------------- | -------------------------------------------------------------------- |
+| `id`         | string         | Format: `uuid`.                                                      |
+| `email`      | string         | Format: `email`.                                                     |
+| `name`       | string or null | —                                                                    |
+| `externalId` | string or null | —                                                                    |
+| `metadata`   | object         | At most 20 application-defined string entries. Map of string values. |
+| `createdAt`  | string         | Format: `date-time`.                                                 |
 
 ## customerPayments.listCheckouts
 
@@ -744,11 +744,11 @@ GET /v1/orgs/{orgId}/projects/{projectId}/payments/checkouts
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
-| `cursor` | string | No | — |
-| `limit` | integer | No | — |
+| Name          | Type    | Required | Description                        |
+| ------------- | ------- | -------- | ---------------------------------- |
+| `environment` | string  | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `cursor`      | string  | No       | —                                  |
+| `limit`       | integer | No       | —                                  |
 
 ### Example
 
@@ -759,34 +759,34 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/checko
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Checkout page. |
-| `402` | Organization billing is not active. |
-| `404` | Project or payment resource not found. |
-| `409` | Duplicate idempotency key or conflicting resource state. |
-| `422` | Invalid payment request. |
-| `502` | The payment processor rejected the request. |
-| `503` | The payment processor is temporarily unavailable. |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Checkout page.                                           |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `items` | object[] | — |
-| `items[].id` | string | Format: `uuid`. |
-| `items[].priceId` | string | Format: `uuid`. |
-| `items[].customerId` | string or null | Format: `uuid`. |
-| `items[].mode` | string | One of: `one_time`, `subscription`. |
-| `items[].quantity` | integer | — |
-| `items[].status` | string | One of: `open`, `complete`, `expired`. |
-| `items[].paymentStatus` | string | One of: `unpaid`, `paid`, `no_payment_required`, `refunded`, `partially_refunded`. |
-| `items[].settlementStatus` | string | One of: `pending`, `available`, `paid`, `failed`, `not_applicable`. |
-| `items[].url` | string or null | Hosted checkout URL. Present only on the create response. Format: `uri`. |
-| `items[].clientReferenceId` | string or null | — |
-| `items[].expiresAt` | string | Format: `date-time`. |
-| `items[].createdAt` | string | Format: `date-time`. |
-| `nextCursor` | string or null | — |
+| Field                       | Type           | Description                                                                        |
+| --------------------------- | -------------- | ---------------------------------------------------------------------------------- |
+| `items`                     | object[]       | —                                                                                  |
+| `items[].id`                | string         | Format: `uuid`.                                                                    |
+| `items[].priceId`           | string         | Format: `uuid`.                                                                    |
+| `items[].customerId`        | string or null | Format: `uuid`.                                                                    |
+| `items[].mode`              | string         | One of: `one_time`, `subscription`.                                                |
+| `items[].quantity`          | integer        | —                                                                                  |
+| `items[].status`            | string         | One of: `open`, `complete`, `expired`.                                             |
+| `items[].paymentStatus`     | string         | One of: `unpaid`, `paid`, `no_payment_required`, `refunded`, `partially_refunded`. |
+| `items[].settlementStatus`  | string         | One of: `pending`, `available`, `paid`, `failed`, `not_applicable`.                |
+| `items[].url`               | string or null | Hosted checkout URL. Present only on the create response. Format: `uri`.           |
+| `items[].clientReferenceId` | string or null | —                                                                                  |
+| `items[].expiresAt`         | string         | Format: `date-time`.                                                               |
+| `items[].createdAt`         | string         | Format: `date-time`.                                                               |
+| `nextCursor`                | string or null | —                                                                                  |
 
 ## customerPayments.createCheckout
 
@@ -803,22 +803,22 @@ POST /v1/orgs/{orgId}/projects/{projectId}/payments/checkouts
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `priceId` | string | Yes | Format: `uuid`. |
-| `quantity` | integer | No | — |
-| `successUrl` | string | Yes | Format: `uri`. |
-| `cancelUrl` | string | Yes | Format: `uri`. |
-| `customerId` | string | No | Format: `uuid`. |
-| `customerEmail` | string | No | Format: `email`. |
-| `clientReferenceId` | string | No | — |
-| `metadata` | object | No | At most 20 application-defined string entries. Map of string values. |
+| Field               | Type    | Required | Description                                                          |
+| ------------------- | ------- | -------- | -------------------------------------------------------------------- |
+| `priceId`           | string  | Yes      | Format: `uuid`.                                                      |
+| `quantity`          | integer | No       | —                                                                    |
+| `successUrl`        | string  | Yes      | Format: `uri`.                                                       |
+| `cancelUrl`         | string  | Yes      | Format: `uri`.                                                       |
+| `customerId`        | string  | No       | Format: `uuid`.                                                      |
+| `customerEmail`     | string  | No       | Format: `email`.                                                     |
+| `clientReferenceId` | string  | No       | —                                                                    |
+| `metadata`          | object  | No       | At most 20 application-defined string entries. Map of string values. |
 
 ### Example
 
@@ -835,32 +835,32 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payment
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `201` | Created checkout. |
-| `402` | Organization billing is not active. |
-| `404` | Project or payment resource not found. |
-| `409` | Duplicate idempotency key or conflicting resource state. |
-| `422` | Invalid payment request. |
-| `502` | The payment processor rejected the request. |
-| `503` | The payment processor is temporarily unavailable. |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `201`  | Created checkout.                                        |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
 
 ### Response body (201)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | Format: `uuid`. |
-| `priceId` | string | Format: `uuid`. |
-| `customerId` | string or null | Format: `uuid`. |
-| `mode` | string | One of: `one_time`, `subscription`. |
-| `quantity` | integer | — |
-| `status` | string | One of: `open`, `complete`, `expired`. |
-| `paymentStatus` | string | One of: `unpaid`, `paid`, `no_payment_required`, `refunded`, `partially_refunded`. |
-| `settlementStatus` | string | One of: `pending`, `available`, `paid`, `failed`, `not_applicable`. |
-| `url` | string or null | Hosted checkout URL. Present only on the create response. Format: `uri`. |
-| `clientReferenceId` | string or null | — |
-| `expiresAt` | string | Format: `date-time`. |
-| `createdAt` | string | Format: `date-time`. |
+| Field               | Type           | Description                                                                        |
+| ------------------- | -------------- | ---------------------------------------------------------------------------------- |
+| `id`                | string         | Format: `uuid`.                                                                    |
+| `priceId`           | string         | Format: `uuid`.                                                                    |
+| `customerId`        | string or null | Format: `uuid`.                                                                    |
+| `mode`              | string         | One of: `one_time`, `subscription`.                                                |
+| `quantity`          | integer        | —                                                                                  |
+| `status`            | string         | One of: `open`, `complete`, `expired`.                                             |
+| `paymentStatus`     | string         | One of: `unpaid`, `paid`, `no_payment_required`, `refunded`, `partially_refunded`. |
+| `settlementStatus`  | string         | One of: `pending`, `available`, `paid`, `failed`, `not_applicable`.                |
+| `url`               | string or null | Hosted checkout URL. Present only on the create response. Format: `uri`.           |
+| `clientReferenceId` | string or null | —                                                                                  |
+| `expiresAt`         | string         | Format: `date-time`.                                                               |
+| `createdAt`         | string         | Format: `date-time`.                                                               |
 
 ## customerPayments.runtimeCreateCheckout
 
@@ -876,16 +876,16 @@ POST /v1/runtime/payments/checkouts
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `priceId` | string | Yes | Format: `uuid`. |
-| `quantity` | integer | No | — |
-| `successUrl` | string | Yes | Format: `uri`. |
-| `cancelUrl` | string | Yes | Format: `uri`. |
-| `customerId` | string | No | Format: `uuid`. |
-| `customerEmail` | string | No | Format: `email`. |
-| `clientReferenceId` | string | No | — |
-| `metadata` | object | No | At most 20 application-defined string entries. Map of string values. |
+| Field               | Type    | Required | Description                                                          |
+| ------------------- | ------- | -------- | -------------------------------------------------------------------- |
+| `priceId`           | string  | Yes      | Format: `uuid`.                                                      |
+| `quantity`          | integer | No       | —                                                                    |
+| `successUrl`        | string  | Yes      | Format: `uri`.                                                       |
+| `cancelUrl`         | string  | Yes      | Format: `uri`.                                                       |
+| `customerId`        | string  | No       | Format: `uuid`.                                                      |
+| `customerEmail`     | string  | No       | Format: `email`.                                                     |
+| `clientReferenceId` | string  | No       | —                                                                    |
+| `metadata`          | object  | No       | At most 20 application-defined string entries. Map of string values. |
 
 ### Example
 
@@ -902,32 +902,32 @@ curl -X POST "https://api.korve.dev/v1/runtime/payments/checkouts" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `201` | Created checkout. |
-| `402` | Organization billing is not active. |
-| `404` | Project or payment resource not found. |
-| `409` | Duplicate idempotency key or conflicting resource state. |
-| `422` | Invalid payment request. |
-| `502` | The payment processor rejected the request. |
-| `503` | The payment processor is temporarily unavailable. |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `201`  | Created checkout.                                        |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
 
 ### Response body (201)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | Format: `uuid`. |
-| `priceId` | string | Format: `uuid`. |
-| `customerId` | string or null | Format: `uuid`. |
-| `mode` | string | One of: `one_time`, `subscription`. |
-| `quantity` | integer | — |
-| `status` | string | One of: `open`, `complete`, `expired`. |
-| `paymentStatus` | string | One of: `unpaid`, `paid`, `no_payment_required`, `refunded`, `partially_refunded`. |
-| `settlementStatus` | string | One of: `pending`, `available`, `paid`, `failed`, `not_applicable`. |
-| `url` | string or null | Hosted checkout URL. Present only on the create response. Format: `uri`. |
-| `clientReferenceId` | string or null | — |
-| `expiresAt` | string | Format: `date-time`. |
-| `createdAt` | string | Format: `date-time`. |
+| Field               | Type           | Description                                                                        |
+| ------------------- | -------------- | ---------------------------------------------------------------------------------- |
+| `id`                | string         | Format: `uuid`.                                                                    |
+| `priceId`           | string         | Format: `uuid`.                                                                    |
+| `customerId`        | string or null | Format: `uuid`.                                                                    |
+| `mode`              | string         | One of: `one_time`, `subscription`.                                                |
+| `quantity`          | integer        | —                                                                                  |
+| `status`            | string         | One of: `open`, `complete`, `expired`.                                             |
+| `paymentStatus`     | string         | One of: `unpaid`, `paid`, `no_payment_required`, `refunded`, `partially_refunded`. |
+| `settlementStatus`  | string         | One of: `pending`, `available`, `paid`, `failed`, `not_applicable`.                |
+| `url`               | string or null | Hosted checkout URL. Present only on the create response. Format: `uri`.           |
+| `clientReferenceId` | string or null | —                                                                                  |
+| `expiresAt`         | string         | Format: `date-time`.                                                               |
+| `createdAt`         | string         | Format: `date-time`.                                                               |
 
 ## customerPayments.listSubscriptions
 
@@ -943,11 +943,11 @@ GET /v1/orgs/{orgId}/projects/{projectId}/payments/subscriptions
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
-| `cursor` | string | No | — |
-| `limit` | integer | No | — |
+| Name          | Type    | Required | Description                        |
+| ------------- | ------- | -------- | ---------------------------------- |
+| `environment` | string  | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `cursor`      | string  | No       | —                                  |
+| `limit`       | integer | No       | —                                  |
 
 ### Example
 
@@ -958,30 +958,30 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/subscr
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Subscription page. |
-| `402` | Organization billing is not active. |
-| `404` | Project or payment resource not found. |
-| `409` | Duplicate idempotency key or conflicting resource state. |
-| `422` | Invalid payment request. |
-| `502` | The payment processor rejected the request. |
-| `503` | The payment processor is temporarily unavailable. |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Subscription page.                                       |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `items` | object[] | — |
-| `items[].id` | string | Format: `uuid`. |
-| `items[].customerId` | string or null | Format: `uuid`. |
-| `items[].priceId` | string or null | Format: `uuid`. |
-| `items[].status` | string | One of: `incomplete`, `trialing`, `active`, `past_due`, `canceled`, `unpaid`. |
-| `items[].cancelAtPeriodEnd` | boolean | — |
-| `items[].currentPeriodEnd` | string or null | Format: `date-time`. |
-| `items[].createdAt` | string | Format: `date-time`. |
-| `items[].updatedAt` | string | Format: `date-time`. |
-| `nextCursor` | string or null | — |
+| Field                       | Type           | Description                                                                   |
+| --------------------------- | -------------- | ----------------------------------------------------------------------------- |
+| `items`                     | object[]       | —                                                                             |
+| `items[].id`                | string         | Format: `uuid`.                                                               |
+| `items[].customerId`        | string or null | Format: `uuid`.                                                               |
+| `items[].priceId`           | string or null | Format: `uuid`.                                                               |
+| `items[].status`            | string         | One of: `incomplete`, `trialing`, `active`, `past_due`, `canceled`, `unpaid`. |
+| `items[].cancelAtPeriodEnd` | boolean        | —                                                                             |
+| `items[].currentPeriodEnd`  | string or null | Format: `date-time`.                                                          |
+| `items[].createdAt`         | string         | Format: `date-time`.                                                          |
+| `items[].updatedAt`         | string         | Format: `date-time`.                                                          |
+| `nextCursor`                | string or null | —                                                                             |
 
 ## customerPayments.cancelSubscription
 
@@ -997,15 +997,15 @@ POST /v1/orgs/{orgId}/projects/{projectId}/payments/subscriptions/{subscriptionI
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `atPeriodEnd` | boolean | Yes | — |
+| Field         | Type    | Required | Description |
+| ------------- | ------- | -------- | ----------- |
+| `atPeriodEnd` | boolean | Yes      | —           |
 
 ### Example
 
@@ -1020,28 +1020,28 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payment
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Updated subscription. |
-| `402` | Organization billing is not active. |
-| `404` | Project or payment resource not found. |
-| `409` | Duplicate idempotency key or conflicting resource state. |
-| `422` | Invalid payment request. |
-| `502` | The payment processor rejected the request. |
-| `503` | The payment processor is temporarily unavailable. |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Updated subscription.                                    |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | Format: `uuid`. |
-| `customerId` | string or null | Format: `uuid`. |
-| `priceId` | string or null | Format: `uuid`. |
-| `status` | string | One of: `incomplete`, `trialing`, `active`, `past_due`, `canceled`, `unpaid`. |
-| `cancelAtPeriodEnd` | boolean | — |
-| `currentPeriodEnd` | string or null | Format: `date-time`. |
-| `createdAt` | string | Format: `date-time`. |
-| `updatedAt` | string | Format: `date-time`. |
+| Field               | Type           | Description                                                                   |
+| ------------------- | -------------- | ----------------------------------------------------------------------------- |
+| `id`                | string         | Format: `uuid`.                                                               |
+| `customerId`        | string or null | Format: `uuid`.                                                               |
+| `priceId`           | string or null | Format: `uuid`.                                                               |
+| `status`            | string         | One of: `incomplete`, `trialing`, `active`, `past_due`, `canceled`, `unpaid`. |
+| `cancelAtPeriodEnd` | boolean        | —                                                                             |
+| `currentPeriodEnd`  | string or null | Format: `date-time`.                                                          |
+| `createdAt`         | string         | Format: `date-time`.                                                          |
+| `updatedAt`         | string         | Format: `date-time`.                                                          |
 
 ## customerPayments.listEvents
 
@@ -1057,11 +1057,11 @@ GET /v1/orgs/{orgId}/projects/{projectId}/payments/events
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
-| `cursor` | string | No | — |
-| `limit` | integer | No | — |
+| Name          | Type    | Required | Description                        |
+| ------------- | ------- | -------- | ---------------------------------- |
+| `environment` | string  | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `cursor`      | string  | No       | —                                  |
+| `limit`       | integer | No       | —                                  |
 
 ### Example
 
@@ -1072,24 +1072,24 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/events
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Event page. |
-| `402` | Organization billing is not active. |
-| `404` | Project or payment resource not found. |
-| `409` | Duplicate idempotency key or conflicting resource state. |
-| `422` | Invalid payment request. |
-| `502` | The payment processor rejected the request. |
-| `503` | The payment processor is temporarily unavailable. |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Event page.                                              |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `items` | object[] | — |
-| `items[].id` | string | Format: `uuid`. |
-| `items[].type` | string | — |
-| `items[].processingStatus` | string | One of: `pending`, `processing`, `processed`, `ignored`, `failed`. |
-| `items[].occurredAt` | string | Format: `date-time`. |
-| `items[].receivedAt` | string | Format: `date-time`. |
-| `nextCursor` | string or null | — |
+| Field                      | Type           | Description                                                        |
+| -------------------------- | -------------- | ------------------------------------------------------------------ |
+| `items`                    | object[]       | —                                                                  |
+| `items[].id`               | string         | Format: `uuid`.                                                    |
+| `items[].type`             | string         | —                                                                  |
+| `items[].processingStatus` | string         | One of: `pending`, `processing`, `processed`, `ignored`, `failed`. |
+| `items[].occurredAt`       | string         | Format: `date-time`.                                               |
+| `items[].receivedAt`       | string         | Format: `date-time`.                                               |
+| `nextCursor`               | string or null | —                                                                  |

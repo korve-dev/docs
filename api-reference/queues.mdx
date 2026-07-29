@@ -21,9 +21,9 @@ GET /v1/orgs/{orgId}/projects/{projectId}/queues
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Example
 
@@ -34,35 +34,35 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/queues?environm
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Queues ordered by name. |
-| `404` | No such project or environment in this organization. |
+| Status | Description                                          |
+| ------ | ---------------------------------------------------- |
+| `200`  | Queues ordered by name.                              |
+| `404`  | No such project or environment in this organization. |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
-| `environment` | string | — |
-| `status` | string | One of: `provisioning`, `ready`, `paused`, `failed`. |
-| `retentionSeconds` | integer | Message retention. Configurable up to 14 days. |
-| `deliveryDelaySeconds` | integer | Default delivery delay, at most 86400 seconds. |
-| `deadLetterQueueId` | string or null | — |
-| `consumer` | object | Signed push consumer. A delivery invokes this project-relative HTTPS path with one message envelope or `&#123; messages: [...] &#125;` for a logical batch. Deliveries are at least once; a successful 2xx response acknowledges every message in that request. |
-| `consumer.path` | string | Project-relative HTTP path. Absolute URLs and cross-project delivery are refused. Pattern: `^/`. |
-| `consumer.maxBatchSize` | integer | Maximum messages in one signed consumer request, from 1 to 100. |
-| `consumer.maxBatchWaitSeconds` | integer | Maximum time an underfilled logical batch may wait after its first message becomes available, from 0 to 60 seconds. |
-| `consumer.maxRetries` | integer | Delivery retries, from 0 to 100. Defaults to 3. |
-| `consumer.retryDelaySeconds` | integer | Delay before retry, from 0 to 86400 seconds. |
-| `consumer.maxConcurrency` | integer or null | Maximum concurrent signed batch requests for this logical queue across all platform replicas; null lets the platform scale automatically. |
-| `deliveryGuarantee` | string | One of: `at-least-once`. |
-| `orderingGuarantee` | string | One of: `none`. |
-| `createdAt` | string | Format: `date-time`. |
-| `updatedAt` | string | Format: `date-time`. |
+| Field                          | Type            | Description                                                                                                                                                                                                                                                     |
+| ------------------------------ | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                           | string          | —                                                                                                                                                                                                                                                               |
+| `name`                         | string          | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                                                                                                                                                              |
+| `environment`                  | string          | —                                                                                                                                                                                                                                                               |
+| `status`                       | string          | One of: `provisioning`, `ready`, `paused`, `failed`.                                                                                                                                                                                                            |
+| `retentionSeconds`             | integer         | Message retention. Configurable up to 14 days.                                                                                                                                                                                                                  |
+| `deliveryDelaySeconds`         | integer         | Default delivery delay, at most 86400 seconds.                                                                                                                                                                                                                  |
+| `deadLetterQueueId`            | string or null  | —                                                                                                                                                                                                                                                               |
+| `consumer`                     | object          | Signed push consumer. A delivery invokes this project-relative HTTPS path with one message envelope or `&#123; messages: [...] &#125;` for a logical batch. Deliveries are at least once; a successful 2xx response acknowledges every message in that request. |
+| `consumer.path`                | string          | Project-relative HTTP path. Absolute URLs and cross-project delivery are refused. Pattern: `^/`.                                                                                                                                                                |
+| `consumer.maxBatchSize`        | integer         | Maximum messages in one signed consumer request, from 1 to 100.                                                                                                                                                                                                 |
+| `consumer.maxBatchWaitSeconds` | integer         | Maximum time an underfilled logical batch may wait after its first message becomes available, from 0 to 60 seconds.                                                                                                                                             |
+| `consumer.maxRetries`          | integer         | Delivery retries, from 0 to 100. Defaults to 3.                                                                                                                                                                                                                 |
+| `consumer.retryDelaySeconds`   | integer         | Delay before retry, from 0 to 86400 seconds.                                                                                                                                                                                                                    |
+| `consumer.maxConcurrency`      | integer or null | Maximum concurrent signed batch requests for this logical queue across all platform replicas; null lets the platform scale automatically.                                                                                                                       |
+| `deliveryGuarantee`            | string          | One of: `at-least-once`.                                                                                                                                                                                                                                        |
+| `orderingGuarantee`            | string          | One of: `none`.                                                                                                                                                                                                                                                 |
+| `createdAt`                    | string          | Format: `date-time`.                                                                                                                                                                                                                                            |
+| `updatedAt`                    | string          | Format: `date-time`.                                                                                                                                                                                                                                            |
 
 ## queues.create
 
@@ -79,25 +79,25 @@ POST /v1/orgs/{orgId}/projects/{projectId}/queues
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `name` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
-| `retentionSeconds` | integer | No | Retention from 60 seconds through 14 days. Defaults to four days. |
-| `deliveryDelaySeconds` | integer | No | Default delay from 0 through 86400 seconds. |
-| `deadLetterQueueId` | string or null | No | — |
-| `consumer` | object | Yes | Signed push consumer. A delivery invokes this project-relative HTTPS path with one message envelope or `&#123; messages: [...] &#125;` for a logical batch. Deliveries are at least once; a successful 2xx response acknowledges every message in that request. |
-| `consumer.path` | string | Yes | Project-relative HTTP path. Absolute URLs and cross-project delivery are refused. Pattern: `^/`. |
-| `consumer.maxBatchSize` | integer | No | Maximum messages in one signed consumer request, from 1 to 100. |
-| `consumer.maxBatchWaitSeconds` | integer | No | Maximum time an underfilled logical batch may wait after its first message becomes available, from 0 to 60 seconds. |
-| `consumer.maxRetries` | integer | No | Delivery retries, from 0 to 100. Defaults to 3. |
-| `consumer.retryDelaySeconds` | integer | No | Delay before retry, from 0 to 86400 seconds. |
-| `consumer.maxConcurrency` | integer or null | No | Maximum concurrent signed batch requests for this logical queue across all platform replicas; null lets the platform scale automatically. |
+| Field                          | Type            | Required | Description                                                                                                                                                                                                                                                     |
+| ------------------------------ | --------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`                         | string          | Yes      | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                                                                                                                                                              |
+| `retentionSeconds`             | integer         | No       | Retention from 60 seconds through 14 days. Defaults to four days.                                                                                                                                                                                               |
+| `deliveryDelaySeconds`         | integer         | No       | Default delay from 0 through 86400 seconds.                                                                                                                                                                                                                     |
+| `deadLetterQueueId`            | string or null  | No       | —                                                                                                                                                                                                                                                               |
+| `consumer`                     | object          | Yes      | Signed push consumer. A delivery invokes this project-relative HTTPS path with one message envelope or `&#123; messages: [...] &#125;` for a logical batch. Deliveries are at least once; a successful 2xx response acknowledges every message in that request. |
+| `consumer.path`                | string          | Yes      | Project-relative HTTP path. Absolute URLs and cross-project delivery are refused. Pattern: `^/`.                                                                                                                                                                |
+| `consumer.maxBatchSize`        | integer         | No       | Maximum messages in one signed consumer request, from 1 to 100.                                                                                                                                                                                                 |
+| `consumer.maxBatchWaitSeconds` | integer         | No       | Maximum time an underfilled logical batch may wait after its first message becomes available, from 0 to 60 seconds.                                                                                                                                             |
+| `consumer.maxRetries`          | integer         | No       | Delivery retries, from 0 to 100. Defaults to 3.                                                                                                                                                                                                                 |
+| `consumer.retryDelaySeconds`   | integer         | No       | Delay before retry, from 0 to 86400 seconds.                                                                                                                                                                                                                    |
+| `consumer.maxConcurrency`      | integer or null | No       | Maximum concurrent signed batch requests for this logical queue across all platform replicas; null lets the platform scale automatically.                                                                                                                       |
 
 ### Example
 
@@ -115,35 +115,35 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/queues?
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `201` | Queue provisioning started. |
-| `404` | No such project, environment, or dead-letter queue. |
-| `409` | A queue with that name already exists in the environment. |
-| `422` | Invalid queue or consumer configuration. |
+| Status | Description                                               |
+| ------ | --------------------------------------------------------- |
+| `201`  | Queue provisioning started.                               |
+| `404`  | No such project, environment, or dead-letter queue.       |
+| `409`  | A queue with that name already exists in the environment. |
+| `422`  | Invalid queue or consumer configuration.                  |
 
 ### Response body (201)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
-| `environment` | string | — |
-| `status` | string | One of: `provisioning`, `ready`, `paused`, `failed`. |
-| `retentionSeconds` | integer | Message retention. Configurable up to 14 days. |
-| `deliveryDelaySeconds` | integer | Default delivery delay, at most 86400 seconds. |
-| `deadLetterQueueId` | string or null | — |
-| `consumer` | object | Signed push consumer. A delivery invokes this project-relative HTTPS path with one message envelope or `&#123; messages: [...] &#125;` for a logical batch. Deliveries are at least once; a successful 2xx response acknowledges every message in that request. |
-| `consumer.path` | string | Project-relative HTTP path. Absolute URLs and cross-project delivery are refused. Pattern: `^/`. |
-| `consumer.maxBatchSize` | integer | Maximum messages in one signed consumer request, from 1 to 100. |
-| `consumer.maxBatchWaitSeconds` | integer | Maximum time an underfilled logical batch may wait after its first message becomes available, from 0 to 60 seconds. |
-| `consumer.maxRetries` | integer | Delivery retries, from 0 to 100. Defaults to 3. |
-| `consumer.retryDelaySeconds` | integer | Delay before retry, from 0 to 86400 seconds. |
-| `consumer.maxConcurrency` | integer or null | Maximum concurrent signed batch requests for this logical queue across all platform replicas; null lets the platform scale automatically. |
-| `deliveryGuarantee` | string | One of: `at-least-once`. |
-| `orderingGuarantee` | string | One of: `none`. |
-| `createdAt` | string | Format: `date-time`. |
-| `updatedAt` | string | Format: `date-time`. |
+| Field                          | Type            | Description                                                                                                                                                                                                                                                     |
+| ------------------------------ | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                           | string          | —                                                                                                                                                                                                                                                               |
+| `name`                         | string          | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                                                                                                                                                              |
+| `environment`                  | string          | —                                                                                                                                                                                                                                                               |
+| `status`                       | string          | One of: `provisioning`, `ready`, `paused`, `failed`.                                                                                                                                                                                                            |
+| `retentionSeconds`             | integer         | Message retention. Configurable up to 14 days.                                                                                                                                                                                                                  |
+| `deliveryDelaySeconds`         | integer         | Default delivery delay, at most 86400 seconds.                                                                                                                                                                                                                  |
+| `deadLetterQueueId`            | string or null  | —                                                                                                                                                                                                                                                               |
+| `consumer`                     | object          | Signed push consumer. A delivery invokes this project-relative HTTPS path with one message envelope or `&#123; messages: [...] &#125;` for a logical batch. Deliveries are at least once; a successful 2xx response acknowledges every message in that request. |
+| `consumer.path`                | string          | Project-relative HTTP path. Absolute URLs and cross-project delivery are refused. Pattern: `^/`.                                                                                                                                                                |
+| `consumer.maxBatchSize`        | integer         | Maximum messages in one signed consumer request, from 1 to 100.                                                                                                                                                                                                 |
+| `consumer.maxBatchWaitSeconds` | integer         | Maximum time an underfilled logical batch may wait after its first message becomes available, from 0 to 60 seconds.                                                                                                                                             |
+| `consumer.maxRetries`          | integer         | Delivery retries, from 0 to 100. Defaults to 3.                                                                                                                                                                                                                 |
+| `consumer.retryDelaySeconds`   | integer         | Delay before retry, from 0 to 86400 seconds.                                                                                                                                                                                                                    |
+| `consumer.maxConcurrency`      | integer or null | Maximum concurrent signed batch requests for this logical queue across all platform replicas; null lets the platform scale automatically.                                                                                                                       |
+| `deliveryGuarantee`            | string          | One of: `at-least-once`.                                                                                                                                                                                                                                        |
+| `orderingGuarantee`            | string          | One of: `none`.                                                                                                                                                                                                                                                 |
+| `createdAt`                    | string          | Format: `date-time`.                                                                                                                                                                                                                                            |
+| `updatedAt`                    | string          | Format: `date-time`.                                                                                                                                                                                                                                            |
 
 ## queues.get
 
@@ -166,33 +166,33 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/queues/$QUEUE_I
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Queue configuration. |
-| `404` | No such queue in this project. |
+| Status | Description                    |
+| ------ | ------------------------------ |
+| `200`  | Queue configuration.           |
+| `404`  | No such queue in this project. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
-| `environment` | string | — |
-| `status` | string | One of: `provisioning`, `ready`, `paused`, `failed`. |
-| `retentionSeconds` | integer | Message retention. Configurable up to 14 days. |
-| `deliveryDelaySeconds` | integer | Default delivery delay, at most 86400 seconds. |
-| `deadLetterQueueId` | string or null | — |
-| `consumer` | object | Signed push consumer. A delivery invokes this project-relative HTTPS path with one message envelope or `&#123; messages: [...] &#125;` for a logical batch. Deliveries are at least once; a successful 2xx response acknowledges every message in that request. |
-| `consumer.path` | string | Project-relative HTTP path. Absolute URLs and cross-project delivery are refused. Pattern: `^/`. |
-| `consumer.maxBatchSize` | integer | Maximum messages in one signed consumer request, from 1 to 100. |
-| `consumer.maxBatchWaitSeconds` | integer | Maximum time an underfilled logical batch may wait after its first message becomes available, from 0 to 60 seconds. |
-| `consumer.maxRetries` | integer | Delivery retries, from 0 to 100. Defaults to 3. |
-| `consumer.retryDelaySeconds` | integer | Delay before retry, from 0 to 86400 seconds. |
-| `consumer.maxConcurrency` | integer or null | Maximum concurrent signed batch requests for this logical queue across all platform replicas; null lets the platform scale automatically. |
-| `deliveryGuarantee` | string | One of: `at-least-once`. |
-| `orderingGuarantee` | string | One of: `none`. |
-| `createdAt` | string | Format: `date-time`. |
-| `updatedAt` | string | Format: `date-time`. |
+| Field                          | Type            | Description                                                                                                                                                                                                                                                     |
+| ------------------------------ | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                           | string          | —                                                                                                                                                                                                                                                               |
+| `name`                         | string          | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                                                                                                                                                              |
+| `environment`                  | string          | —                                                                                                                                                                                                                                                               |
+| `status`                       | string          | One of: `provisioning`, `ready`, `paused`, `failed`.                                                                                                                                                                                                            |
+| `retentionSeconds`             | integer         | Message retention. Configurable up to 14 days.                                                                                                                                                                                                                  |
+| `deliveryDelaySeconds`         | integer         | Default delivery delay, at most 86400 seconds.                                                                                                                                                                                                                  |
+| `deadLetterQueueId`            | string or null  | —                                                                                                                                                                                                                                                               |
+| `consumer`                     | object          | Signed push consumer. A delivery invokes this project-relative HTTPS path with one message envelope or `&#123; messages: [...] &#125;` for a logical batch. Deliveries are at least once; a successful 2xx response acknowledges every message in that request. |
+| `consumer.path`                | string          | Project-relative HTTP path. Absolute URLs and cross-project delivery are refused. Pattern: `^/`.                                                                                                                                                                |
+| `consumer.maxBatchSize`        | integer         | Maximum messages in one signed consumer request, from 1 to 100.                                                                                                                                                                                                 |
+| `consumer.maxBatchWaitSeconds` | integer         | Maximum time an underfilled logical batch may wait after its first message becomes available, from 0 to 60 seconds.                                                                                                                                             |
+| `consumer.maxRetries`          | integer         | Delivery retries, from 0 to 100. Defaults to 3.                                                                                                                                                                                                                 |
+| `consumer.retryDelaySeconds`   | integer         | Delay before retry, from 0 to 86400 seconds.                                                                                                                                                                                                                    |
+| `consumer.maxConcurrency`      | integer or null | Maximum concurrent signed batch requests for this logical queue across all platform replicas; null lets the platform scale automatically.                                                                                                                       |
+| `deliveryGuarantee`            | string          | One of: `at-least-once`.                                                                                                                                                                                                                                        |
+| `orderingGuarantee`            | string          | One of: `none`.                                                                                                                                                                                                                                                 |
+| `createdAt`                    | string          | Format: `date-time`.                                                                                                                                                                                                                                            |
+| `updatedAt`                    | string          | Format: `date-time`.                                                                                                                                                                                                                                            |
 
 ## queues.update
 
@@ -209,19 +209,19 @@ PATCH /v1/orgs/{orgId}/projects/{projectId}/queues/{queueId}
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `retentionSeconds` | integer | No | — |
-| `deliveryDelaySeconds` | integer | No | — |
-| `deadLetterQueueId` | string or null | No | — |
-| `consumer` | object | No | Signed push consumer. A delivery invokes this project-relative HTTPS path with one message envelope or `&#123; messages: [...] &#125;` for a logical batch. Deliveries are at least once; a successful 2xx response acknowledges every message in that request. |
-| `consumer.path` | string | Yes | Project-relative HTTP path. Absolute URLs and cross-project delivery are refused. Pattern: `^/`. |
-| `consumer.maxBatchSize` | integer | No | Maximum messages in one signed consumer request, from 1 to 100. |
-| `consumer.maxBatchWaitSeconds` | integer | No | Maximum time an underfilled logical batch may wait after its first message becomes available, from 0 to 60 seconds. |
-| `consumer.maxRetries` | integer | No | Delivery retries, from 0 to 100. Defaults to 3. |
-| `consumer.retryDelaySeconds` | integer | No | Delay before retry, from 0 to 86400 seconds. |
-| `consumer.maxConcurrency` | integer or null | No | Maximum concurrent signed batch requests for this logical queue across all platform replicas; null lets the platform scale automatically. |
-| `paused` | boolean | No | — |
+| Field                          | Type            | Required | Description                                                                                                                                                                                                                                                     |
+| ------------------------------ | --------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `retentionSeconds`             | integer         | No       | —                                                                                                                                                                                                                                                               |
+| `deliveryDelaySeconds`         | integer         | No       | —                                                                                                                                                                                                                                                               |
+| `deadLetterQueueId`            | string or null  | No       | —                                                                                                                                                                                                                                                               |
+| `consumer`                     | object          | No       | Signed push consumer. A delivery invokes this project-relative HTTPS path with one message envelope or `&#123; messages: [...] &#125;` for a logical batch. Deliveries are at least once; a successful 2xx response acknowledges every message in that request. |
+| `consumer.path`                | string          | Yes      | Project-relative HTTP path. Absolute URLs and cross-project delivery are refused. Pattern: `^/`.                                                                                                                                                                |
+| `consumer.maxBatchSize`        | integer         | No       | Maximum messages in one signed consumer request, from 1 to 100.                                                                                                                                                                                                 |
+| `consumer.maxBatchWaitSeconds` | integer         | No       | Maximum time an underfilled logical batch may wait after its first message becomes available, from 0 to 60 seconds.                                                                                                                                             |
+| `consumer.maxRetries`          | integer         | No       | Delivery retries, from 0 to 100. Defaults to 3.                                                                                                                                                                                                                 |
+| `consumer.retryDelaySeconds`   | integer         | No       | Delay before retry, from 0 to 86400 seconds.                                                                                                                                                                                                                    |
+| `consumer.maxConcurrency`      | integer or null | No       | Maximum concurrent signed batch requests for this logical queue across all platform replicas; null lets the platform scale automatically.                                                                                                                       |
+| `paused`                       | boolean         | No       | —                                                                                                                                                                                                                                                               |
 
 ### Example
 
@@ -234,34 +234,34 @@ curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/queues
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Updated queue. |
-| `404` | No such queue in this project. |
-| `422` | Invalid queue configuration. |
+| Status | Description                    |
+| ------ | ------------------------------ |
+| `200`  | Updated queue.                 |
+| `404`  | No such queue in this project. |
+| `422`  | Invalid queue configuration.   |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
-| `environment` | string | — |
-| `status` | string | One of: `provisioning`, `ready`, `paused`, `failed`. |
-| `retentionSeconds` | integer | Message retention. Configurable up to 14 days. |
-| `deliveryDelaySeconds` | integer | Default delivery delay, at most 86400 seconds. |
-| `deadLetterQueueId` | string or null | — |
-| `consumer` | object | Signed push consumer. A delivery invokes this project-relative HTTPS path with one message envelope or `&#123; messages: [...] &#125;` for a logical batch. Deliveries are at least once; a successful 2xx response acknowledges every message in that request. |
-| `consumer.path` | string | Project-relative HTTP path. Absolute URLs and cross-project delivery are refused. Pattern: `^/`. |
-| `consumer.maxBatchSize` | integer | Maximum messages in one signed consumer request, from 1 to 100. |
-| `consumer.maxBatchWaitSeconds` | integer | Maximum time an underfilled logical batch may wait after its first message becomes available, from 0 to 60 seconds. |
-| `consumer.maxRetries` | integer | Delivery retries, from 0 to 100. Defaults to 3. |
-| `consumer.retryDelaySeconds` | integer | Delay before retry, from 0 to 86400 seconds. |
-| `consumer.maxConcurrency` | integer or null | Maximum concurrent signed batch requests for this logical queue across all platform replicas; null lets the platform scale automatically. |
-| `deliveryGuarantee` | string | One of: `at-least-once`. |
-| `orderingGuarantee` | string | One of: `none`. |
-| `createdAt` | string | Format: `date-time`. |
-| `updatedAt` | string | Format: `date-time`. |
+| Field                          | Type            | Description                                                                                                                                                                                                                                                     |
+| ------------------------------ | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                           | string          | —                                                                                                                                                                                                                                                               |
+| `name`                         | string          | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                                                                                                                                                              |
+| `environment`                  | string          | —                                                                                                                                                                                                                                                               |
+| `status`                       | string          | One of: `provisioning`, `ready`, `paused`, `failed`.                                                                                                                                                                                                            |
+| `retentionSeconds`             | integer         | Message retention. Configurable up to 14 days.                                                                                                                                                                                                                  |
+| `deliveryDelaySeconds`         | integer         | Default delivery delay, at most 86400 seconds.                                                                                                                                                                                                                  |
+| `deadLetterQueueId`            | string or null  | —                                                                                                                                                                                                                                                               |
+| `consumer`                     | object          | Signed push consumer. A delivery invokes this project-relative HTTPS path with one message envelope or `&#123; messages: [...] &#125;` for a logical batch. Deliveries are at least once; a successful 2xx response acknowledges every message in that request. |
+| `consumer.path`                | string          | Project-relative HTTP path. Absolute URLs and cross-project delivery are refused. Pattern: `^/`.                                                                                                                                                                |
+| `consumer.maxBatchSize`        | integer         | Maximum messages in one signed consumer request, from 1 to 100.                                                                                                                                                                                                 |
+| `consumer.maxBatchWaitSeconds` | integer         | Maximum time an underfilled logical batch may wait after its first message becomes available, from 0 to 60 seconds.                                                                                                                                             |
+| `consumer.maxRetries`          | integer         | Delivery retries, from 0 to 100. Defaults to 3.                                                                                                                                                                                                                 |
+| `consumer.retryDelaySeconds`   | integer         | Delay before retry, from 0 to 86400 seconds.                                                                                                                                                                                                                    |
+| `consumer.maxConcurrency`      | integer or null | Maximum concurrent signed batch requests for this logical queue across all platform replicas; null lets the platform scale automatically.                                                                                                                       |
+| `deliveryGuarantee`            | string          | One of: `at-least-once`.                                                                                                                                                                                                                                        |
+| `orderingGuarantee`            | string          | One of: `none`.                                                                                                                                                                                                                                                 |
+| `createdAt`                    | string          | Format: `date-time`.                                                                                                                                                                                                                                            |
+| `updatedAt`                    | string          | Format: `date-time`.                                                                                                                                                                                                                                            |
 
 ## queues.delete
 
@@ -284,11 +284,11 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/queue
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Queue deleted. |
-| `404` | No such queue in this project. |
-| `409` | Another queue still routes dead letters here. |
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| `200`  | Queue deleted.                                |
+| `404`  | No such queue in this project.                |
+| `409`  | Another queue still routes dead letters here. |
 
 ## queues.publish
 
@@ -305,12 +305,12 @@ POST /v1/orgs/{orgId}/projects/{projectId}/queues/{queueId}/messages
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `body` | object | Yes | JSON message body may not exceed 122,880 bytes; the complete encoded message may not exceed 128,000 bytes. |
-| `contentType` | string | No | Application media type. Defaults to application/json. |
-| `delaySeconds` | integer | No | Per-message delay, from 0 to 86400 seconds. |
-| `idempotencyKey` | string | No | Caller key for safely retrying publication without creating another message. |
+| Field            | Type    | Required | Description                                                                                                |
+| ---------------- | ------- | -------- | ---------------------------------------------------------------------------------------------------------- |
+| `body`           | object  | Yes      | JSON message body may not exceed 122,880 bytes; the complete encoded message may not exceed 128,000 bytes. |
+| `contentType`    | string  | No       | Application media type. Defaults to application/json.                                                      |
+| `delaySeconds`   | integer | No       | Per-message delay, from 0 to 86400 seconds.                                                                |
+| `idempotencyKey` | string  | No       | Caller key for safely retrying publication without creating another message.                               |
 
 ### Example
 
@@ -325,20 +325,20 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/queues/
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `202` | Message accepted. |
-| `404` | No such queue in this project. |
-| `409` | Queue is not accepting messages in its current state. |
-| `413` | Customer body exceeds 122,880 bytes or its encoded envelope exceeds 128,000 bytes. |
-| `422` | Invalid message or delay. |
-| `429` | Queue throughput or capacity limit reached. |
+| Status | Description                                                                        |
+| ------ | ---------------------------------------------------------------------------------- |
+| `202`  | Message accepted.                                                                  |
+| `404`  | No such queue in this project.                                                     |
+| `409`  | Queue is not accepting messages in its current state.                              |
+| `413`  | Customer body exceeds 122,880 bytes or its encoded envelope exceeds 128,000 bytes. |
+| `422`  | Invalid message or delay.                                                          |
+| `429`  | Queue throughput or capacity limit reached.                                        |
 
 ### Response body (202)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `messageId` | string | — |
+| Field        | Type   | Description          |
+| ------------ | ------ | -------------------- |
+| `messageId`  | string | —                    |
 | `acceptedAt` | string | Format: `date-time`. |
 
 ## queues.publishBatch
@@ -356,13 +356,13 @@ POST /v1/orgs/{orgId}/projects/{projectId}/queues/{queueId}/messages/batch
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `messages` | object[] | Yes | — |
-| `messages[].body` | object | Yes | JSON message body may not exceed 122,880 bytes; the complete encoded message may not exceed 128,000 bytes. |
-| `messages[].contentType` | string | No | Application media type. Defaults to application/json. |
-| `messages[].delaySeconds` | integer | No | Per-message delay, from 0 to 86400 seconds. |
-| `messages[].idempotencyKey` | string | No | Caller key for safely retrying publication without creating another message. |
+| Field                       | Type     | Required | Description                                                                                                |
+| --------------------------- | -------- | -------- | ---------------------------------------------------------------------------------------------------------- |
+| `messages`                  | object[] | Yes      | —                                                                                                          |
+| `messages[].body`           | object   | Yes      | JSON message body may not exceed 122,880 bytes; the complete encoded message may not exceed 128,000 bytes. |
+| `messages[].contentType`    | string   | No       | Application media type. Defaults to application/json.                                                      |
+| `messages[].delaySeconds`   | integer  | No       | Per-message delay, from 0 to 86400 seconds.                                                                |
+| `messages[].idempotencyKey` | string   | No       | Caller key for safely retrying publication without creating another message.                               |
 
 ### Example
 
@@ -381,22 +381,22 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/queues/
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `202` | Messages accepted in input order. |
-| `404` | No such queue in this project. |
-| `409` | Queue is not accepting messages in its current state. |
-| `413` | A customer body exceeds 122,880 bytes, an encoded envelope exceeds 128,000 bytes, or the encoded batch exceeds 256,000 bytes. |
-| `422` | Batch is empty, too large, or invalid. |
-| `429` | Queue throughput or capacity limit reached. |
+| Status | Description                                                                                                                   |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| `202`  | Messages accepted in input order.                                                                                             |
+| `404`  | No such queue in this project.                                                                                                |
+| `409`  | Queue is not accepting messages in its current state.                                                                         |
+| `413`  | A customer body exceeds 122,880 bytes, an encoded envelope exceeds 128,000 bytes, or the encoded batch exceeds 256,000 bytes. |
+| `422`  | Batch is empty, too large, or invalid.                                                                                        |
+| `429`  | Queue throughput or capacity limit reached.                                                                                   |
 
 ### Response body (202)
 
 An array of objects with these fields:
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `messageId` | string | — |
+| Field        | Type   | Description          |
+| ------------ | ------ | -------------------- |
+| `messageId`  | string | —                    |
 | `acceptedAt` | string | Format: `date-time`. |
 
 ## queues.stats
@@ -413,10 +413,10 @@ GET /v1/orgs/{orgId}/projects/{projectId}/queues/{queueId}/stats
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `since` | string | No | Format: `date-time`. |
-| `until` | string | No | Format: `date-time`. |
+| Name    | Type   | Required | Description          |
+| ------- | ------ | -------- | -------------------- |
+| `since` | string | No       | Format: `date-time`. |
+| `until` | string | No       | Format: `date-time`. |
 
 ### Example
 
@@ -427,24 +427,24 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/queues/$QUEUE_I
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Queue statistics. |
-| `404` | No such queue in this project. |
-| `422` | Invalid time window. |
+| Status | Description                    |
+| ------ | ------------------------------ |
+| `200`  | Queue statistics.              |
+| `404`  | No such queue in this project. |
+| `422`  | Invalid time window.           |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `sampledAt` | string | Format: `date-time`. |
-| `backlogMessages` | integer | — |
-| `backlogBytes` | integer | — |
-| `published` | integer | — |
-| `delivered` | integer | — |
-| `retried` | integer | — |
-| `deadLettered` | integer | — |
-| `oldestMessageAgeSeconds` | integer or null | — |
+| Field                     | Type            | Description          |
+| ------------------------- | --------------- | -------------------- |
+| `sampledAt`               | string          | Format: `date-time`. |
+| `backlogMessages`         | integer         | —                    |
+| `backlogBytes`            | integer         | —                    |
+| `published`               | integer         | —                    |
+| `delivered`               | integer         | —                    |
+| `retried`                 | integer         | —                    |
+| `deadLettered`            | integer         | —                    |
+| `oldestMessageAgeSeconds` | integer or null | —                    |
 
 ## queues.listDeadLetters
 
@@ -460,10 +460,10 @@ GET /v1/orgs/{orgId}/projects/{projectId}/queues/{queueId}/dead-letters
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `cursor` | string | No | — |
-| `limit` | integer | No | — |
+| Name     | Type    | Required | Description |
+| -------- | ------- | -------- | ----------- |
+| `cursor` | string  | No       | —           |
+| `limit`  | integer | No       | —           |
 
 ### Example
 
@@ -474,22 +474,22 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/queues/$QUEUE_I
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Dead-letter page. |
-| `404` | No such queue in this project. |
+| Status | Description                    |
+| ------ | ------------------------------ |
+| `200`  | Dead-letter page.              |
+| `404`  | No such queue in this project. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `items` | object[] | — |
-| `items[].messageId` | string | — |
-| `items[].body` | object | — |
-| `items[].attempts` | integer | — |
-| `items[].failedAt` | string | Format: `date-time`. |
-| `items[].lastError` | string or null | — |
-| `nextCursor` | string or null | — |
+| Field               | Type           | Description          |
+| ------------------- | -------------- | -------------------- |
+| `items`             | object[]       | —                    |
+| `items[].messageId` | string         | —                    |
+| `items[].body`      | object         | —                    |
+| `items[].attempts`  | integer        | —                    |
+| `items[].failedAt`  | string         | Format: `date-time`. |
+| `items[].lastError` | string or null | —                    |
+| `nextCursor`        | string or null | —                    |
 
 ## queues.replayDeadLetters
 
@@ -506,10 +506,10 @@ POST /v1/orgs/{orgId}/projects/{projectId}/queues/{queueId}/dead-letters/replay
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `messageIds` | string[] | No | — |
-| `all` | boolean | No | — |
+| Field        | Type     | Required | Description |
+| ------------ | -------- | -------- | ----------- |
+| `messageIds` | string[] | No       | —           |
+| `all`        | boolean  | No       | —           |
 
 ### Example
 
@@ -522,17 +522,17 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/queues/
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `202` | Replay accepted. |
-| `404` | No such queue or message in this project. |
-| `422` | Select messageIds or all, but not both. |
+| Status | Description                               |
+| ------ | ----------------------------------------- |
+| `202`  | Replay accepted.                          |
+| `404`  | No such queue or message in this project. |
+| `422`  | Select messageIds or all, but not both.   |
 
 ### Response body (202)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `accepted` | integer | — |
+| Field      | Type    | Description |
+| ---------- | ------- | ----------- |
+| `accepted` | integer | —           |
 
 ## queues.purgeDeadLetters
 
@@ -555,16 +555,16 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/queue
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Dead letters purged. |
-| `404` | No such queue in this project. |
+| Status | Description                    |
+| ------ | ------------------------------ |
+| `200`  | Dead letters purged.           |
+| `404`  | No such queue in this project. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `deleted` | integer | — |
+| Field     | Type    | Description |
+| --------- | ------- | ----------- |
+| `deleted` | integer | —           |
 
 ## queues.runtimeSend
 
@@ -580,12 +580,12 @@ POST /v1/runtime/queues/{queueName}/messages
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `body` | object | Yes | JSON message body may not exceed 122,880 bytes; the complete encoded message may not exceed 128,000 bytes. |
-| `contentType` | string | No | Application media type. Defaults to application/json. |
-| `delaySeconds` | integer | No | Per-message delay, from 0 to 86400 seconds. |
-| `idempotencyKey` | string | No | Caller key for safely retrying publication without creating another message. |
+| Field            | Type    | Required | Description                                                                                                |
+| ---------------- | ------- | -------- | ---------------------------------------------------------------------------------------------------------- |
+| `body`           | object  | Yes      | JSON message body may not exceed 122,880 bytes; the complete encoded message may not exceed 128,000 bytes. |
+| `contentType`    | string  | No       | Application media type. Defaults to application/json.                                                      |
+| `delaySeconds`   | integer | No       | Per-message delay, from 0 to 86400 seconds.                                                                |
+| `idempotencyKey` | string  | No       | Caller key for safely retrying publication without creating another message.                               |
 
 ### Example
 
@@ -600,21 +600,21 @@ curl -X POST "https://api.korve.dev/v1/runtime/queues/$QUEUE_NAME/messages" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `202` | Message accepted. |
-| `401` | Runtime token is absent, invalid, expired, or outside this environment. |
-| `404` | No such queue in the runtime environment. |
-| `409` | Queue is not accepting messages in its current state. |
-| `413` | Customer body exceeds 122,880 bytes or its encoded envelope exceeds 128,000 bytes. |
-| `422` | Invalid message or delay. |
-| `429` | Queue throughput or capacity limit reached. |
+| Status | Description                                                                        |
+| ------ | ---------------------------------------------------------------------------------- |
+| `202`  | Message accepted.                                                                  |
+| `401`  | Runtime token is absent, invalid, expired, or outside this environment.            |
+| `404`  | No such queue in the runtime environment.                                          |
+| `409`  | Queue is not accepting messages in its current state.                              |
+| `413`  | Customer body exceeds 122,880 bytes or its encoded envelope exceeds 128,000 bytes. |
+| `422`  | Invalid message or delay.                                                          |
+| `429`  | Queue throughput or capacity limit reached.                                        |
 
 ### Response body (202)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `messageId` | string | — |
+| Field        | Type   | Description          |
+| ------------ | ------ | -------------------- |
+| `messageId`  | string | —                    |
 | `acceptedAt` | string | Format: `date-time`. |
 
 ## queues.runtimeSendBatch
@@ -631,13 +631,13 @@ POST /v1/runtime/queues/{queueName}/messages/batch
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `messages` | object[] | Yes | — |
-| `messages[].body` | object | Yes | JSON message body may not exceed 122,880 bytes; the complete encoded message may not exceed 128,000 bytes. |
-| `messages[].contentType` | string | No | Application media type. Defaults to application/json. |
-| `messages[].delaySeconds` | integer | No | Per-message delay, from 0 to 86400 seconds. |
-| `messages[].idempotencyKey` | string | No | Caller key for safely retrying publication without creating another message. |
+| Field                       | Type     | Required | Description                                                                                                |
+| --------------------------- | -------- | -------- | ---------------------------------------------------------------------------------------------------------- |
+| `messages`                  | object[] | Yes      | —                                                                                                          |
+| `messages[].body`           | object   | Yes      | JSON message body may not exceed 122,880 bytes; the complete encoded message may not exceed 128,000 bytes. |
+| `messages[].contentType`    | string   | No       | Application media type. Defaults to application/json.                                                      |
+| `messages[].delaySeconds`   | integer  | No       | Per-message delay, from 0 to 86400 seconds.                                                                |
+| `messages[].idempotencyKey` | string   | No       | Caller key for safely retrying publication without creating another message.                               |
 
 ### Example
 
@@ -656,21 +656,21 @@ curl -X POST "https://api.korve.dev/v1/runtime/queues/$QUEUE_NAME/messages/batch
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `202` | Messages accepted in input order. |
-| `401` | Runtime token is absent, invalid, expired, or outside this environment. |
-| `404` | No such queue in the runtime environment. |
-| `409` | Queue is not accepting messages in its current state. |
-| `413` | A customer body exceeds 122,880 bytes, an encoded envelope exceeds 128,000 bytes, or the encoded batch exceeds 256,000 bytes. |
-| `422` | Batch is empty, too large, or invalid. |
-| `429` | Queue throughput or capacity limit reached. |
+| Status | Description                                                                                                                   |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| `202`  | Messages accepted in input order.                                                                                             |
+| `401`  | Runtime token is absent, invalid, expired, or outside this environment.                                                       |
+| `404`  | No such queue in the runtime environment.                                                                                     |
+| `409`  | Queue is not accepting messages in its current state.                                                                         |
+| `413`  | A customer body exceeds 122,880 bytes, an encoded envelope exceeds 128,000 bytes, or the encoded batch exceeds 256,000 bytes. |
+| `422`  | Batch is empty, too large, or invalid.                                                                                        |
+| `429`  | Queue throughput or capacity limit reached.                                                                                   |
 
 ### Response body (202)
 
 An array of objects with these fields:
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `messageId` | string | — |
+| Field        | Type   | Description          |
+| ------------ | ------ | -------------------- |
+| `messageId`  | string | —                    |
 | `acceptedAt` | string | Format: `date-time`. |
