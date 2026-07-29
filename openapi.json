@@ -27493,7 +27493,7 @@
       "get": {
         "operationId": "customerPayments.listCheckouts",
         "summary": "List Checkouts",
-        "description": "List checkout sessions. Hosted URLs are not retained or returned.",
+        "description": "List checkout sessions in ascending creation order, with UUID as the stable tie-breaker. Hosted URLs are not retained or returned.",
         "tags": ["customerPayments"],
         "parameters": [
           {
@@ -27959,7 +27959,7 @@
       "get": {
         "operationId": "customerPayments.listCustomers",
         "summary": "List Customers",
-        "description": "List end-customer projections.",
+        "description": "List end-customer projections in ascending creation order, with UUID as the stable tie-breaker.",
         "tags": ["customerPayments"],
         "parameters": [
           {
@@ -28242,7 +28242,7 @@
       "get": {
         "operationId": "customerPayments.listEvents",
         "summary": "List Events",
-        "description": "List bounded, deduplicated payment lifecycle events for audit and debugging.",
+        "description": "List bounded, deduplicated payment lifecycle events in descending receipt order, with UUID as the stable tie-breaker.",
         "tags": ["customerPayments"],
         "parameters": [
           {
@@ -28521,7 +28521,7 @@
       "get": {
         "operationId": "customerPayments.listPrices",
         "summary": "List Prices",
-        "description": "List immutable prices and their active state.",
+        "description": "List immutable prices in ascending creation order, with UUID as the stable tie-breaker.",
         "tags": ["customerPayments"],
         "parameters": [
           {
@@ -29036,7 +29036,7 @@
       "get": {
         "operationId": "customerPayments.listProducts",
         "summary": "List Products",
-        "description": "List products in stable creation order.",
+        "description": "List products in ascending creation order, with UUID as the stable tie-breaker.",
         "tags": ["customerPayments"],
         "parameters": [
           {
@@ -29485,7 +29485,7 @@
       "get": {
         "operationId": "customerPayments.listSubscriptions",
         "summary": "List Subscriptions",
-        "description": "List webhook-reconciled subscriptions.",
+        "description": "List webhook-reconciled subscriptions in ascending creation order, with UUID as the stable tie-breaker.",
         "tags": ["customerPayments"],
         "parameters": [
           {
@@ -29781,6 +29781,7 @@
                     },
                     "credentialScopes": {
                       "type": "array",
+                      "description": "Korve-side operation allowlist. This does not claim or replace the connected processor's credential permissions.",
                       "items": {
                         "type": "string"
                       }
@@ -29842,7 +29843,7 @@
       "put": {
         "operationId": "customerPayments.connect",
         "summary": "Connect",
-        "description": "Connect a customer-owned payment account with write-only restricted credentials.",
+        "description": "Connect a customer-owned payment account with a write-only restricted credential. Korve rejects full-access credentials, validates authenticated resource access, and enforces the declared Korve operation allowlist; the connected processor remains authoritative for credential permissions.",
         "tags": ["customerPayments"],
         "parameters": [
           {
@@ -29906,6 +29907,7 @@
                     },
                     "credentialScopes": {
                       "type": "array",
+                      "description": "Korve-side operation allowlist. This does not claim or replace the connected processor's credential permissions.",
                       "items": {
                         "type": "string"
                       }
@@ -29983,6 +29985,7 @@
                   },
                   "credentialScopes": {
                     "type": "array",
+                    "description": "Exact Korve operation allowlist. These values constrain Korve and are not self-attested processor permission claims.",
                     "minItems": 5,
                     "maxItems": 5,
                     "items": {

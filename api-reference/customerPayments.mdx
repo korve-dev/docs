@@ -46,21 +46,21 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments?enviro
 
 ### Response body (200)
 
-| Field                     | Type           | Description                                    |
-| ------------------------- | -------------- | ---------------------------------------------- |
-| `status`                  | string         | One of: `not_configured`, `ready`, `disabled`. |
-| `credentialConfigured`    | boolean        | —                                              |
-| `credentialHint`          | string or null | —                                              |
-| `webhookUrl`              | string or null | Format: `uri`.                                 |
-| `webhookSecretConfigured` | boolean        | —                                              |
-| `credentialScopes`        | string[]       | —                                              |
-| `allowedRedirectOrigins`  | string[]       | —                                              |
-| `connectedAt`             | string or null | Format: `date-time`.                           |
-| `updatedAt`               | string or null | Format: `date-time`.                           |
+| Field                     | Type           | Description                                                                                                      |
+| ------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `status`                  | string         | One of: `not_configured`, `ready`, `disabled`.                                                                   |
+| `credentialConfigured`    | boolean        | —                                                                                                                |
+| `credentialHint`          | string or null | —                                                                                                                |
+| `webhookUrl`              | string or null | Format: `uri`.                                                                                                   |
+| `webhookSecretConfigured` | boolean        | —                                                                                                                |
+| `credentialScopes`        | string[]       | Korve-side operation allowlist. This does not claim or replace the connected processor's credential permissions. |
+| `allowedRedirectOrigins`  | string[]       | —                                                                                                                |
+| `connectedAt`             | string or null | Format: `date-time`.                                                                                             |
+| `updatedAt`               | string or null | Format: `date-time`.                                                                                             |
 
 ## customerPayments.connect
 
-Connect a customer-owned payment account with write-only restricted credentials.
+Connect a customer-owned payment account with a write-only restricted credential. Korve rejects full-access credentials, validates authenticated resource access, and enforces the declared Korve operation allowlist; the connected processor remains authoritative for credential permissions.
 
 ```text
 PUT /v1/orgs/{orgId}/projects/{projectId}/payments
@@ -79,12 +79,12 @@ PUT /v1/orgs/{orgId}/projects/{projectId}/payments
 
 ### Request body
 
-| Field                    | Type     | Required | Description |
-| ------------------------ | -------- | -------- | ----------- |
-| `secretKey`              | string   | Yes      | —           |
-| `webhookSecret`          | string   | Yes      | —           |
-| `credentialScopes`       | string[] | Yes      | —           |
-| `allowedRedirectOrigins` | string[] | Yes      | —           |
+| Field                    | Type     | Required | Description                                                                                                          |
+| ------------------------ | -------- | -------- | -------------------------------------------------------------------------------------------------------------------- |
+| `secretKey`              | string   | Yes      | —                                                                                                                    |
+| `webhookSecret`          | string   | Yes      | —                                                                                                                    |
+| `credentialScopes`       | string[] | Yes      | Exact Korve operation allowlist. These values constrain Korve and are not self-attested processor permission claims. |
+| `allowedRedirectOrigins` | string[] | Yes      | —                                                                                                                    |
 
 ### Example
 
@@ -122,17 +122,17 @@ curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments
 
 ### Response body (200)
 
-| Field                     | Type           | Description                                    |
-| ------------------------- | -------------- | ---------------------------------------------- |
-| `status`                  | string         | One of: `not_configured`, `ready`, `disabled`. |
-| `credentialConfigured`    | boolean        | —                                              |
-| `credentialHint`          | string or null | —                                              |
-| `webhookUrl`              | string or null | Format: `uri`.                                 |
-| `webhookSecretConfigured` | boolean        | —                                              |
-| `credentialScopes`        | string[]       | —                                              |
-| `allowedRedirectOrigins`  | string[]       | —                                              |
-| `connectedAt`             | string or null | Format: `date-time`.                           |
-| `updatedAt`               | string or null | Format: `date-time`.                           |
+| Field                     | Type           | Description                                                                                                      |
+| ------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `status`                  | string         | One of: `not_configured`, `ready`, `disabled`.                                                                   |
+| `credentialConfigured`    | boolean        | —                                                                                                                |
+| `credentialHint`          | string or null | —                                                                                                                |
+| `webhookUrl`              | string or null | Format: `uri`.                                                                                                   |
+| `webhookSecretConfigured` | boolean        | —                                                                                                                |
+| `credentialScopes`        | string[]       | Korve-side operation allowlist. This does not claim or replace the connected processor's credential permissions. |
+| `allowedRedirectOrigins`  | string[]       | —                                                                                                                |
+| `connectedAt`             | string or null | Format: `date-time`.                                                                                             |
+| `updatedAt`               | string or null | Format: `date-time`.                                                                                             |
 
 ## customerPayments.disconnect
 
@@ -173,7 +173,7 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payme
 
 ## customerPayments.listProducts
 
-List products in stable creation order.
+List products in ascending creation order, with UUID as the stable tie-breaker.
 
 ```text
 GET /v1/orgs/{orgId}/projects/{projectId}/payments/products
@@ -350,7 +350,7 @@ curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/paymen
 
 ## customerPayments.listPrices
 
-List immutable prices and their active state.
+List immutable prices in ascending creation order, with UUID as the stable tie-breaker.
 
 ```text
 GET /v1/orgs/{orgId}/projects/{projectId}/payments/prices
@@ -530,7 +530,7 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payme
 
 ## customerPayments.listCustomers
 
-List end-customer projections.
+List end-customer projections in ascending creation order, with UUID as the stable tie-breaker.
 
 ```text
 GET /v1/orgs/{orgId}/projects/{projectId}/payments/customers
@@ -736,7 +736,7 @@ curl -X POST "https://api.korve.dev/v1/runtime/payments/customers" \
 
 ## customerPayments.listCheckouts
 
-List checkout sessions. Hosted URLs are not retained or returned.
+List checkout sessions in ascending creation order, with UUID as the stable tie-breaker. Hosted URLs are not retained or returned.
 
 ```text
 GET /v1/orgs/{orgId}/projects/{projectId}/payments/checkouts
@@ -935,7 +935,7 @@ curl -X POST "https://api.korve.dev/v1/runtime/payments/checkouts" \
 
 ## customerPayments.listSubscriptions
 
-List webhook-reconciled subscriptions.
+List webhook-reconciled subscriptions in ascending creation order, with UUID as the stable tie-breaker.
 
 ```text
 GET /v1/orgs/{orgId}/projects/{projectId}/payments/subscriptions
@@ -1049,7 +1049,7 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payment
 
 ## customerPayments.listEvents
 
-List bounded, deduplicated payment lifecycle events for audit and debugging.
+List bounded, deduplicated payment lifecycle events in descending receipt order, with UUID as the stable tie-breaker.
 
 ```text
 GET /v1/orgs/{orgId}/projects/{projectId}/payments/events
