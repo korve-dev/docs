@@ -31,7 +31,12 @@ projects:
       - name: primary
         sku: db-s1
         region: us-east
-        backup: { pitrDays: 14, dailyDays: 30, weeklyWeeks: 12, monthlyMonths: 12 }
+        backup:
+          pitrDays: 14
+          dailyDays: 30
+          weeklyWeeks: 12
+          monthlyMonths: 12
+          copyRegions: [weur, apac]
     caches:
       - { name: sessions, sku: cache-n1, region: us-east, persistence: aof }
     realtime:

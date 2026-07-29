@@ -37,19 +37,18 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATA
 
 An array of objects with these fields:
 
-| Field                | Type            | Description                                                               |
-| -------------------- | --------------- | ------------------------------------------------------------------------- |
-| `id`                 | string          | —                                                                         |
-| `databaseId`         | string          | —                                                                         |
-| `format`             | string          | One of: `logical_sql`, `logical_archive`, `physical_archive`.             |
-| `status`             | string          | One of: `queued`, `running`, `ready`, `failed`, `expired`.                |
-| `destinationId`      | string or null  | —                                                                         |
-| `destinationVersion` | integer or null | Exact immutable destination configuration used by this export.            |
-| `sizeBytes`          | integer or null | —                                                                         |
-| `transferBytes`      | integer or null | Bytes transferred to a customer destination and billed as metered egress. |
-| `expiresAt`          | string or null  | Format: `date-time`.                                                      |
-| `error`              | string or null  | —                                                                         |
-| `createdAt`          | string          | Format: `date-time`.                                                      |
+| Field           | Type            | Description                                                               |
+| --------------- | --------------- | ------------------------------------------------------------------------- |
+| `id`            | string          | —                                                                         |
+| `databaseId`    | string          | —                                                                         |
+| `format`        | string          | One of: `logical_sql`, `logical_archive`, `physical_archive`.             |
+| `status`        | string          | One of: `queued`, `running`, `ready`, `failed`, `expired`.                |
+| `destinationId` | string or null  | —                                                                         |
+| `sizeBytes`     | integer or null | —                                                                         |
+| `transferBytes` | integer or null | Bytes transferred to a customer destination and billed as metered egress. |
+| `expiresAt`     | string or null  | Format: `date-time`.                                                      |
+| `error`         | string or null  | —                                                                         |
+| `createdAt`     | string          | Format: `date-time`.                                                      |
 
 ## databaseExports.create
 
@@ -94,19 +93,18 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databas
 
 ### Response body (202)
 
-| Field                | Type            | Description                                                               |
-| -------------------- | --------------- | ------------------------------------------------------------------------- |
-| `id`                 | string          | —                                                                         |
-| `databaseId`         | string          | —                                                                         |
-| `format`             | string          | One of: `logical_sql`, `logical_archive`, `physical_archive`.             |
-| `status`             | string          | One of: `queued`, `running`, `ready`, `failed`, `expired`.                |
-| `destinationId`      | string or null  | —                                                                         |
-| `destinationVersion` | integer or null | Exact immutable destination configuration used by this export.            |
-| `sizeBytes`          | integer or null | —                                                                         |
-| `transferBytes`      | integer or null | Bytes transferred to a customer destination and billed as metered egress. |
-| `expiresAt`          | string or null  | Format: `date-time`.                                                      |
-| `error`              | string or null  | —                                                                         |
-| `createdAt`          | string          | Format: `date-time`.                                                      |
+| Field           | Type            | Description                                                               |
+| --------------- | --------------- | ------------------------------------------------------------------------- |
+| `id`            | string          | —                                                                         |
+| `databaseId`    | string          | —                                                                         |
+| `format`        | string          | One of: `logical_sql`, `logical_archive`, `physical_archive`.             |
+| `status`        | string          | One of: `queued`, `running`, `ready`, `failed`, `expired`.                |
+| `destinationId` | string or null  | —                                                                         |
+| `sizeBytes`     | integer or null | —                                                                         |
+| `transferBytes` | integer or null | Bytes transferred to a customer destination and billed as metered egress. |
+| `expiresAt`     | string or null  | Format: `date-time`.                                                      |
+| `error`         | string or null  | —                                                                         |
+| `createdAt`     | string          | Format: `date-time`.                                                      |
 
 ## databaseExports.get
 
@@ -136,19 +134,18 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATA
 
 ### Response body (200)
 
-| Field                | Type            | Description                                                               |
-| -------------------- | --------------- | ------------------------------------------------------------------------- |
-| `id`                 | string          | —                                                                         |
-| `databaseId`         | string          | —                                                                         |
-| `format`             | string          | One of: `logical_sql`, `logical_archive`, `physical_archive`.             |
-| `status`             | string          | One of: `queued`, `running`, `ready`, `failed`, `expired`.                |
-| `destinationId`      | string or null  | —                                                                         |
-| `destinationVersion` | integer or null | Exact immutable destination configuration used by this export.            |
-| `sizeBytes`          | integer or null | —                                                                         |
-| `transferBytes`      | integer or null | Bytes transferred to a customer destination and billed as metered egress. |
-| `expiresAt`          | string or null  | Format: `date-time`.                                                      |
-| `error`              | string or null  | —                                                                         |
-| `createdAt`          | string          | Format: `date-time`.                                                      |
+| Field           | Type            | Description                                                               |
+| --------------- | --------------- | ------------------------------------------------------------------------- |
+| `id`            | string          | —                                                                         |
+| `databaseId`    | string          | —                                                                         |
+| `format`        | string          | One of: `logical_sql`, `logical_archive`, `physical_archive`.             |
+| `status`        | string          | One of: `queued`, `running`, `ready`, `failed`, `expired`.                |
+| `destinationId` | string or null  | —                                                                         |
+| `sizeBytes`     | integer or null | —                                                                         |
+| `transferBytes` | integer or null | Bytes transferred to a customer destination and billed as metered egress. |
+| `expiresAt`     | string or null  | Format: `date-time`.                                                      |
+| `error`         | string or null  | —                                                                         |
+| `createdAt`     | string          | Format: `date-time`.                                                      |
 
 ## databaseExports.createDownload
 

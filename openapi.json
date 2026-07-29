@@ -5188,10 +5188,12 @@
                                   "copyRegions": {
                                     "type": "array",
                                     "items": {
-                                      "type": "string"
+                                      "type": "string",
+                                      "enum": ["enam", "weur", "eeur", "apac", "oc"]
                                     },
-                                    "maxItems": 0,
-                                    "description": "Reserved for regional backup-copy execution; must remain empty."
+                                    "maxItems": 5,
+                                    "uniqueItems": true,
+                                    "description": "Managed disaster-recovery snapshots with best-effort area placement; area hints are not data-residency guarantees."
                                   }
                                 },
                                 "additionalProperties": false
@@ -5808,10 +5810,12 @@
                                   "copyRegions": {
                                     "type": "array",
                                     "items": {
-                                      "type": "string"
+                                      "type": "string",
+                                      "enum": ["enam", "weur", "eeur", "apac", "oc"]
                                     },
-                                    "maxItems": 0,
-                                    "description": "Reserved for regional backup-copy execution; must remain empty."
+                                    "maxItems": 5,
+                                    "uniqueItems": true,
+                                    "description": "Managed disaster-recovery snapshots with best-effort area placement; area hints are not data-residency guarantees."
                                   }
                                 },
                                 "additionalProperties": false
@@ -6360,10 +6364,12 @@
                                     "copyRegions": {
                                       "type": "array",
                                       "items": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "enum": ["enam", "weur", "eeur", "apac", "oc"]
                                       },
-                                      "maxItems": 0,
-                                      "description": "Reserved for regional backup-copy execution; must remain empty."
+                                      "maxItems": 5,
+                                      "uniqueItems": true,
+                                      "description": "Managed disaster-recovery snapshots with best-effort area placement; area hints are not data-residency guarantees."
                                     }
                                   },
                                   "additionalProperties": false
@@ -15728,11 +15734,13 @@
                     },
                     "copyRegions": {
                       "type": "array",
-                      "maxItems": 0,
+                      "maxItems": 5,
+                      "uniqueItems": true,
                       "items": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": ["enam", "weur", "eeur", "apac", "oc"]
                       },
-                      "description": "Reserved for future regional copy placement. Must remain empty until regional copy execution is available."
+                      "description": "Additional managed disaster-recovery snapshots requesting best-effort placement near each selected area. Area hints are not data-residency guarantees. The primary managed repository requests Western North America."
                     }
                   },
                   "required": [
@@ -15830,11 +15838,13 @@
                     },
                     "copyRegions": {
                       "type": "array",
-                      "maxItems": 0,
+                      "maxItems": 5,
+                      "uniqueItems": true,
                       "items": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": ["enam", "weur", "eeur", "apac", "oc"]
                       },
-                      "description": "Reserved for future regional copy placement. Must remain empty until regional copy execution is available."
+                      "description": "Additional managed disaster-recovery snapshots requesting best-effort placement near each selected area. Area hints are not data-residency guarantees. The primary managed repository requests Western North America."
                     }
                   },
                   "required": [
@@ -15893,11 +15903,13 @@
                   },
                   "copyRegions": {
                     "type": "array",
-                    "maxItems": 0,
+                    "maxItems": 5,
+                    "uniqueItems": true,
                     "items": {
-                      "type": "string"
+                      "type": "string",
+                      "enum": ["enam", "weur", "eeur", "apac", "oc"]
                     },
-                    "description": "Reserved for future regional copy placement. Must remain empty until regional copy execution is available."
+                    "description": "Additional managed disaster-recovery snapshots requesting best-effort placement near each selected area. Area hints are not data-residency guarantees. The primary managed repository requests Western North America."
                   }
                 },
                 "required": [
@@ -16061,9 +16073,10 @@
                     "destinationId": {
                       "type": ["string", "null"]
                     },
-                    "destinationVersion": {
-                      "type": ["integer", "null"],
-                      "description": "Exact immutable destination configuration used by this recovery point."
+                    "copyRegion": {
+                      "type": ["string", "null"],
+                      "enum": ["enam", "weur", "eeur", "apac", "oc", null],
+                      "description": "Korve storage area holding this managed disaster-recovery copy; null for the primary managed repository or a customer destination."
                     },
                     "error": {
                       "type": ["string", "null"]
@@ -16089,7 +16102,7 @@
                     "recoveryPoint",
                     "sizeBytes",
                     "destinationId",
-                    "destinationVersion",
+                    "copyRegion",
                     "error",
                     "expiresAt",
                     "createdAt",
@@ -16212,9 +16225,10 @@
                           "destinationId": {
                             "type": ["string", "null"]
                           },
-                          "destinationVersion": {
-                            "type": ["integer", "null"],
-                            "description": "Exact immutable destination configuration used by this recovery point."
+                          "copyRegion": {
+                            "type": ["string", "null"],
+                            "enum": ["enam", "weur", "eeur", "apac", "oc", null],
+                            "description": "Korve storage area holding this managed disaster-recovery copy; null for the primary managed repository or a customer destination."
                           },
                           "error": {
                             "type": ["string", "null"]
@@ -16240,7 +16254,7 @@
                           "recoveryPoint",
                           "sizeBytes",
                           "destinationId",
-                          "destinationVersion",
+                          "copyRegion",
                           "error",
                           "expiresAt",
                           "createdAt",
@@ -16268,7 +16282,7 @@
       "post": {
         "operationId": "databaseBackups.create",
         "summary": "Create",
-        "description": "Create an on-demand recovery point, optionally copied to a configured destination.",
+        "description": "Create an on-demand recovery point in the primary managed repository, one additional managed storage area, or one configured customer destination.",
         "tags": ["databaseBackups"],
         "parameters": [
           {
@@ -16338,9 +16352,10 @@
                     "destinationId": {
                       "type": ["string", "null"]
                     },
-                    "destinationVersion": {
-                      "type": ["integer", "null"],
-                      "description": "Exact immutable destination configuration used by this recovery point."
+                    "copyRegion": {
+                      "type": ["string", "null"],
+                      "enum": ["enam", "weur", "eeur", "apac", "oc", null],
+                      "description": "Korve storage area holding this managed disaster-recovery copy; null for the primary managed repository or a customer destination."
                     },
                     "error": {
                       "type": ["string", "null"]
@@ -16366,7 +16381,7 @@
                     "recoveryPoint",
                     "sizeBytes",
                     "destinationId",
-                    "destinationVersion",
+                    "copyRegion",
                     "error",
                     "expiresAt",
                     "createdAt",
@@ -16383,7 +16398,7 @@
             "description": "A backup is already running."
           },
           "422": {
-            "description": "Database is not ready or retention is invalid."
+            "description": "Database is not ready, retention is invalid, or the managed copy area is invalid or unavailable."
           }
         },
         "x-korve-risk": "write",
@@ -16398,13 +16413,49 @@
                 "type": "object",
                 "properties": {
                   "destinationId": {
-                    "type": ["string", "null"]
+                    "type": ["string", "null"],
+                    "description": "Configured customer destination. Omit or set null for the primary managed repository. Mutually exclusive with copyRegion."
+                  },
+                  "copyRegion": {
+                    "type": "string",
+                    "enum": ["enam", "weur", "eeur", "apac", "oc"],
+                    "description": "Managed disaster-recovery storage area for this on-demand recovery point. Mutually exclusive with destinationId."
                   },
                   "retentionDays": {
                     "type": "integer"
                   }
                 },
-                "additionalProperties": false
+                "additionalProperties": false,
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "destinationId": {
+                        "type": ["string", "null"],
+                        "description": "Configured customer destination. Omit or set null for the primary managed repository."
+                      },
+                      "retentionDays": {
+                        "type": "integer"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "copyRegion": {
+                        "type": "string",
+                        "enum": ["enam", "weur", "eeur", "apac", "oc"],
+                        "description": "Managed disaster-recovery storage area for this on-demand recovery point."
+                      },
+                      "retentionDays": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": ["copyRegion"],
+                    "additionalProperties": false
+                  }
+                ]
               }
             }
           }
@@ -17762,10 +17813,6 @@
                     "destinationId": {
                       "type": ["string", "null"]
                     },
-                    "destinationVersion": {
-                      "type": ["integer", "null"],
-                      "description": "Exact immutable destination configuration used by this export."
-                    },
                     "sizeBytes": {
                       "type": ["integer", "null"]
                     },
@@ -17791,7 +17838,6 @@
                     "format",
                     "status",
                     "destinationId",
-                    "destinationVersion",
                     "sizeBytes",
                     "transferBytes",
                     "expiresAt",
@@ -17880,10 +17926,6 @@
                       "destinationId": {
                         "type": ["string", "null"]
                       },
-                      "destinationVersion": {
-                        "type": ["integer", "null"],
-                        "description": "Exact immutable destination configuration used by this export."
-                      },
                       "sizeBytes": {
                         "type": ["integer", "null"]
                       },
@@ -17909,7 +17951,6 @@
                       "format",
                       "status",
                       "destinationId",
-                      "destinationVersion",
                       "sizeBytes",
                       "transferBytes",
                       "expiresAt",
@@ -17995,10 +18036,6 @@
                     "destinationId": {
                       "type": ["string", "null"]
                     },
-                    "destinationVersion": {
-                      "type": ["integer", "null"],
-                      "description": "Exact immutable destination configuration used by this export."
-                    },
                     "sizeBytes": {
                       "type": ["integer", "null"]
                     },
@@ -18024,7 +18061,6 @@
                     "format",
                     "status",
                     "destinationId",
-                    "destinationVersion",
                     "sizeBytes",
                     "transferBytes",
                     "expiresAt",

@@ -7,11 +7,48 @@ Each database has a recovery policy for point-in-time, daily, weekly, and monthl
 the recovery window before promising an RPO, and test restores instead of treating backup success as
 proof of recoverability.
 
+The primary managed repository requests best-effort placement near Western North America. Add
+`copyRegions` to request independently restorable managed snapshots near Eastern North America,
+Western Europe, Eastern Europe, Asia-Pacific, or Oceania. Area placement is best effort and is not a
+data-residency guarantee. Korve records each copy as a separate recovery point with its requested
+area and status, retries it through the durable backup worker, and removes its exact repository
+objects when the recovery point or database is deleted. Regional copies are periodic snapshots with a target
+RPO of six hours; continuous WAL-based point-in-time recovery remains in the primary repository.
+The primary PITR stream and discrete daily, weekly, monthly, or manual recovery points use separate
+repository prefixes. Bounded PITR housekeeping therefore cannot expire a longer-lived discrete
+point, whose exact label is removed only when its own retention ends.
+Regional copy storage is billed after a copy completes. Network egress uses the backup payload
+bytes reported by the database engine and excludes transport protocol and WAL overhead.
+
+Korve provisions a distinct managed repository with the selected best-effort area hint. Production uses one
+account-scoped, least-privilege object-storage credential for the primary and regional repositories;
+deployment proves read, write, and delete access to every required repository before the control
+plane is rolled out.
+
+```yaml
+backup:
+  pitrDays: 14
+  dailyDays: 30
+  weeklyWeeks: 12
+  monthlyMonths: 12
+  copyRegions: [weur, apac]
+```
+
 ```bash
 korve backups policy-show --database primary
-korve backups create --database primary --data '{"kind":"manual"}'
+korve backups policy-update --database primary --data @backup-policy.json --yes
+korve backups create --database primary --data '{"retentionDays":30}'
+korve backups create --database primary --data '{"copyRegion":"weur","retentionDays":45}'
 korve backups recovery-window --database primary
 ```
+
+An on-demand recovery point accepts exactly one placement: omit both placement fields for the
+primary repository, provide `copyRegion` for one available managed area, or provide
+`destinationId` for one ready customer destination. Managed regional and customer-destination
+copies can incur transfer usage according to the destination's billing policy. Korve bills stored
+backup bytes for managed repositories; storage in a customer destination is billed by that
+destination. The response records the selected `copyRegion` or `destinationId`, so
+API, CLI, MCP, and dashboard callers can track the exact repository independently.
 
 Restores are asynchronous and create an isolated target. Promotion is a separate two-step operation:
 preview the binding swap to receive a one-use confirmation token, then submit the exact token and
