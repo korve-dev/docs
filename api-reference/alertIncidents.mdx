@@ -21,11 +21,11 @@ GET /v1/orgs/{orgId}/projects/{projectId}/alert-incidents
 
 ### Query parameters
 
-| Name     | Type    | Required | Description                                 |
-| -------- | ------- | -------- | ------------------------------------------- |
-| `cursor` | string  | No       | —                                           |
-| `limit`  | integer | No       | —                                           |
-| `status` | string  | No       | One of: `open`, `acknowledged`, `resolved`. |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `cursor` | string | No | — |
+| `limit` | integer | No | — |
+| `status` | string | No | One of: `open`, `acknowledged`, `resolved`. |
 
 ### Example
 
@@ -36,33 +36,33 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/alert-incidents
 
 ### Responses
 
-| Status | Description                           |
-| ------ | ------------------------------------- |
-| `200`  | Alert incident page.                  |
-| `404`  | No such project in this organization. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Alert incident page. |
+| `404` | No such project in this organization. |
 
 ### Response body (200)
 
-| Field                       | Type                                | Description                                 |
-| --------------------------- | ----------------------------------- | ------------------------------------------- |
-| `items`                     | object[]                            | —                                           |
-| `items[].id`                | string                              | —                                           |
-| `items[].policyId`          | string                              | —                                           |
-| `items[].status`            | string                              | One of: `open`, `acknowledged`, `resolved`. |
-| `items[].severity`          | string                              | One of: `info`, `warning`, `critical`.      |
-| `items[].title`             | string                              | —                                           |
-| `items[].summary`           | string                              | —                                           |
-| `items[].scope`             | object                              | —                                           |
-| `items[].scope.environment` | string                              | —                                           |
-| `items[].scope.databaseId`  | string or null                      | —                                           |
-| `items[].scope.queueId`     | string or null                      | —                                           |
-| `items[].scope.cronId`      | string or null                      | —                                           |
-| `items[].observedValue`     | number or string or boolean or null | —                                           |
-| `items[].openedAt`          | string                              | Format: `date-time`.                        |
-| `items[].acknowledgedAt`    | string or null                      | Format: `date-time`.                        |
-| `items[].acknowledgedBy`    | string or null                      | —                                           |
-| `items[].resolvedAt`        | string or null                      | Format: `date-time`.                        |
-| `nextCursor`                | string or null                      | —                                           |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `items` | object[] | — |
+| `items[].id` | string | — |
+| `items[].policyId` | string | — |
+| `items[].status` | string | One of: `open`, `acknowledged`, `resolved`. |
+| `items[].severity` | string | One of: `info`, `warning`, `critical`. |
+| `items[].title` | string | — |
+| `items[].summary` | string | — |
+| `items[].scope` | object | — |
+| `items[].scope.environment` | string | — |
+| `items[].scope.databaseId` | string or null | — |
+| `items[].scope.queueId` | string or null | — |
+| `items[].scope.cronId` | string or null | — |
+| `items[].observedValue` | number or string or boolean or null | — |
+| `items[].openedAt` | string | Format: `date-time`. |
+| `items[].acknowledgedAt` | string or null | Format: `date-time`. |
+| `items[].acknowledgedBy` | string or null | — |
+| `items[].resolvedAt` | string or null | Format: `date-time`. |
+| `nextCursor` | string or null | — |
 
 ## alertIncidents.get
 
@@ -85,31 +85,31 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/alert-incidents
 
 ### Responses
 
-| Status | Description                       |
-| ------ | --------------------------------- |
-| `200`  | Alert incident.                   |
-| `404`  | No such incident in this project. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Alert incident. |
+| `404` | No such incident in this project. |
 
 ### Response body (200)
 
-| Field               | Type                                | Description                                 |
-| ------------------- | ----------------------------------- | ------------------------------------------- |
-| `id`                | string                              | —                                           |
-| `policyId`          | string                              | —                                           |
-| `status`            | string                              | One of: `open`, `acknowledged`, `resolved`. |
-| `severity`          | string                              | One of: `info`, `warning`, `critical`.      |
-| `title`             | string                              | —                                           |
-| `summary`           | string                              | —                                           |
-| `scope`             | object                              | —                                           |
-| `scope.environment` | string                              | —                                           |
-| `scope.databaseId`  | string or null                      | —                                           |
-| `scope.queueId`     | string or null                      | —                                           |
-| `scope.cronId`      | string or null                      | —                                           |
-| `observedValue`     | number or string or boolean or null | —                                           |
-| `openedAt`          | string                              | Format: `date-time`.                        |
-| `acknowledgedAt`    | string or null                      | Format: `date-time`.                        |
-| `acknowledgedBy`    | string or null                      | —                                           |
-| `resolvedAt`        | string or null                      | Format: `date-time`.                        |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `policyId` | string | — |
+| `status` | string | One of: `open`, `acknowledged`, `resolved`. |
+| `severity` | string | One of: `info`, `warning`, `critical`. |
+| `title` | string | — |
+| `summary` | string | — |
+| `scope` | object | — |
+| `scope.environment` | string | — |
+| `scope.databaseId` | string or null | — |
+| `scope.queueId` | string or null | — |
+| `scope.cronId` | string or null | — |
+| `observedValue` | number or string or boolean or null | — |
+| `openedAt` | string | Format: `date-time`. |
+| `acknowledgedAt` | string or null | Format: `date-time`. |
+| `acknowledgedBy` | string or null | — |
+| `resolvedAt` | string or null | Format: `date-time`. |
 
 ## alertIncidents.acknowledge
 
@@ -125,9 +125,9 @@ POST /v1/orgs/{orgId}/projects/{projectId}/alert-incidents/{incidentId}/acknowle
 
 ### Request body
 
-| Field  | Type   | Required | Description |
-| ------ | ------ | -------- | ----------- |
-| `note` | string | No       | —           |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `note` | string | No | — |
 
 ### Example
 
@@ -140,29 +140,29 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/alert-i
 
 ### Responses
 
-| Status | Description                       |
-| ------ | --------------------------------- |
-| `200`  | Acknowledged incident.            |
-| `404`  | No such incident in this project. |
-| `409`  | Incident is already resolved.     |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Acknowledged incident. |
+| `404` | No such incident in this project. |
+| `409` | Incident is already resolved. |
 
 ### Response body (200)
 
-| Field               | Type                                | Description                                 |
-| ------------------- | ----------------------------------- | ------------------------------------------- |
-| `id`                | string                              | —                                           |
-| `policyId`          | string                              | —                                           |
-| `status`            | string                              | One of: `open`, `acknowledged`, `resolved`. |
-| `severity`          | string                              | One of: `info`, `warning`, `critical`.      |
-| `title`             | string                              | —                                           |
-| `summary`           | string                              | —                                           |
-| `scope`             | object                              | —                                           |
-| `scope.environment` | string                              | —                                           |
-| `scope.databaseId`  | string or null                      | —                                           |
-| `scope.queueId`     | string or null                      | —                                           |
-| `scope.cronId`      | string or null                      | —                                           |
-| `observedValue`     | number or string or boolean or null | —                                           |
-| `openedAt`          | string                              | Format: `date-time`.                        |
-| `acknowledgedAt`    | string or null                      | Format: `date-time`.                        |
-| `acknowledgedBy`    | string or null                      | —                                           |
-| `resolvedAt`        | string or null                      | Format: `date-time`.                        |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `policyId` | string | — |
+| `status` | string | One of: `open`, `acknowledged`, `resolved`. |
+| `severity` | string | One of: `info`, `warning`, `critical`. |
+| `title` | string | — |
+| `summary` | string | — |
+| `scope` | object | — |
+| `scope.environment` | string | — |
+| `scope.databaseId` | string or null | — |
+| `scope.queueId` | string or null | — |
+| `scope.cronId` | string or null | — |
+| `observedValue` | number or string or boolean or null | — |
+| `openedAt` | string | Format: `date-time`. |
+| `acknowledgedAt` | string or null | Format: `date-time`. |
+| `acknowledgedBy` | string or null | — |
+| `resolvedAt` | string or null | Format: `date-time`. |
