@@ -96,7 +96,11 @@ curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments
   "secretKey": "examplexxxxxxxxx",
   "webhookSecret": "examplexxxxxxxxx",
   "credentialScopes": [
-    "customers:write"
+    "customers:write",
+    "products:write",
+    "prices:write",
+    "checkout_sessions:write",
+    "subscriptions:write"
   ],
   "allowedRedirectOrigins": [
     "https://app.acme.com/callback"
@@ -438,8 +442,8 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payment
   -H "Authorization: Bearer korve_..." \
   -H "Content-Type: application/json" \
   -d '{
-  "productId": "example",
-  "currency": "example",
+  "productId": "00000000-0000-4000-8000-000000000001",
+  "currency": "USD",
   "unitAmount": 1,
   "mode": "one_time"
 }'
@@ -827,7 +831,7 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payment
   -H "Authorization: Bearer korve_..." \
   -H "Content-Type: application/json" \
   -d '{
-  "priceId": "example",
+  "priceId": "00000000-0000-4000-8000-000000000001",
   "successUrl": "https://app.acme.com/callback",
   "cancelUrl": "https://app.acme.com/callback"
 }'
@@ -894,7 +898,7 @@ curl -X POST "https://api.korve.dev/v1/runtime/payments/checkouts" \
   -H "Authorization: Bearer $APP_SERVICE_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-  "priceId": "example",
+  "priceId": "00000000-0000-4000-8000-000000000001",
   "successUrl": "https://app.acme.com/callback",
   "cancelUrl": "https://app.acme.com/callback"
 }'
