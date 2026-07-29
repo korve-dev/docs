@@ -28,28 +28,28 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/maintenance/pol
 
 ### Responses
 
-| Status | Description              |
-| ------ | ------------------------ |
-| `200`  | Maintenance policy.      |
-| `404`  | No policy is configured. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Maintenance policy. |
+| `404` | No policy is configured. |
 
 ### Response body (200)
 
-| Field                                 | Type     | Description                                                                                                                      |
-| ------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `enabled`                             | boolean  | —                                                                                                                                |
-| `schedule`                            | string   | One of: `hourly`, `daily`, `weekly`.                                                                                             |
-| `categories`                          | string[] | —                                                                                                                                |
-| `environments`                        | string[] | —                                                                                                                                |
-| `autoRemediation`                     | object   | —                                                                                                                                |
-| `autoRemediation.enabled`             | boolean  | —                                                                                                                                |
-| `autoRemediation.maximumRisk`         | string   | Hard ceiling for unattended actions. Dangerous and destructive actions always require a human decision. One of: `read`, `write`. |
-| `autoRemediation.allowedOperationIds` | string[] | —                                                                                                                                |
-| `autoRemediation.maxActionsPerRun`    | integer  | —                                                                                                                                |
-| `version`                             | integer  | —                                                                                                                                |
-| `updatedBy`                           | string   | —                                                                                                                                |
-| `createdAt`                           | string   | Format: `date-time`.                                                                                                             |
-| `updatedAt`                           | string   | Format: `date-time`.                                                                                                             |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `enabled` | boolean | — |
+| `schedule` | string | One of: `hourly`, `daily`, `weekly`. |
+| `categories` | string[] | — |
+| `environments` | string[] | — |
+| `autoRemediation` | object | — |
+| `autoRemediation.enabled` | boolean | — |
+| `autoRemediation.maximumRisk` | string | Hard ceiling for unattended actions. Dangerous and destructive actions always require a human decision. One of: `read`, `write`. |
+| `autoRemediation.allowedOperationIds` | string[] | — |
+| `autoRemediation.maxActionsPerRun` | integer | — |
+| `version` | integer | — |
+| `updatedBy` | string | — |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
 
 ## projectMaintenance.updatePolicy
 
@@ -65,18 +65,18 @@ PUT /v1/orgs/{orgId}/projects/{projectId}/maintenance/policy
 
 ### Request body
 
-| Field                                 | Type            | Required | Description                                                                                                                      |
-| ------------------------------------- | --------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `enabled`                             | boolean         | Yes      | —                                                                                                                                |
-| `schedule`                            | string          | Yes      | One of: `hourly`, `daily`, `weekly`.                                                                                             |
-| `categories`                          | string[]        | Yes      | —                                                                                                                                |
-| `environments`                        | string[]        | Yes      | —                                                                                                                                |
-| `autoRemediation`                     | object          | Yes      | —                                                                                                                                |
-| `autoRemediation.enabled`             | boolean         | Yes      | —                                                                                                                                |
-| `autoRemediation.maximumRisk`         | string          | Yes      | Hard ceiling for unattended actions. Dangerous and destructive actions always require a human decision. One of: `read`, `write`. |
-| `autoRemediation.allowedOperationIds` | string[]        | Yes      | —                                                                                                                                |
-| `autoRemediation.maxActionsPerRun`    | integer         | Yes      | —                                                                                                                                |
-| `expectedVersion`                     | integer or null | Yes      | —                                                                                                                                |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `enabled` | boolean | Yes | — |
+| `schedule` | string | Yes | One of: `hourly`, `daily`, `weekly`. |
+| `categories` | string[] | Yes | — |
+| `environments` | string[] | Yes | — |
+| `autoRemediation` | object | Yes | — |
+| `autoRemediation.enabled` | boolean | Yes | — |
+| `autoRemediation.maximumRisk` | string | Yes | Hard ceiling for unattended actions. Dangerous and destructive actions always require a human decision. One of: `read`, `write`. |
+| `autoRemediation.allowedOperationIds` | string[] | Yes | — |
+| `autoRemediation.maxActionsPerRun` | integer | Yes | — |
+| `expectedVersion` | integer or null | Yes | — |
 
 ### Example
 
@@ -107,28 +107,28 @@ curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/maintena
 
 ### Responses
 
-| Status | Description                            |
-| ------ | -------------------------------------- |
-| `200`  | Updated maintenance policy.            |
-| `409`  | The submitted policy version is stale. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Updated maintenance policy. |
+| `409` | The submitted policy version is stale. |
 
 ### Response body (200)
 
-| Field                                 | Type     | Description                                                                                                                      |
-| ------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `enabled`                             | boolean  | —                                                                                                                                |
-| `schedule`                            | string   | One of: `hourly`, `daily`, `weekly`.                                                                                             |
-| `categories`                          | string[] | —                                                                                                                                |
-| `environments`                        | string[] | —                                                                                                                                |
-| `autoRemediation`                     | object   | —                                                                                                                                |
-| `autoRemediation.enabled`             | boolean  | —                                                                                                                                |
-| `autoRemediation.maximumRisk`         | string   | Hard ceiling for unattended actions. Dangerous and destructive actions always require a human decision. One of: `read`, `write`. |
-| `autoRemediation.allowedOperationIds` | string[] | —                                                                                                                                |
-| `autoRemediation.maxActionsPerRun`    | integer  | —                                                                                                                                |
-| `version`                             | integer  | —                                                                                                                                |
-| `updatedBy`                           | string   | —                                                                                                                                |
-| `createdAt`                           | string   | Format: `date-time`.                                                                                                             |
-| `updatedAt`                           | string   | Format: `date-time`.                                                                                                             |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `enabled` | boolean | — |
+| `schedule` | string | One of: `hourly`, `daily`, `weekly`. |
+| `categories` | string[] | — |
+| `environments` | string[] | — |
+| `autoRemediation` | object | — |
+| `autoRemediation.enabled` | boolean | — |
+| `autoRemediation.maximumRisk` | string | Hard ceiling for unattended actions. Dangerous and destructive actions always require a human decision. One of: `read`, `write`. |
+| `autoRemediation.allowedOperationIds` | string[] | — |
+| `autoRemediation.maxActionsPerRun` | integer | — |
+| `version` | integer | — |
+| `updatedBy` | string | — |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
 
 ## projectMaintenance.listRuns
 
@@ -144,11 +144,11 @@ GET /v1/orgs/{orgId}/projects/{projectId}/maintenance/runs
 
 ### Query parameters
 
-| Name     | Type    | Required | Description                                                                              |
-| -------- | ------- | -------- | ---------------------------------------------------------------------------------------- |
-| `cursor` | string  | No       | —                                                                                        |
-| `limit`  | integer | No       | —                                                                                        |
-| `status` | string  | No       | One of: `queued`, `running`, `waiting_for_approval`, `succeeded`, `failed`, `cancelled`. |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `cursor` | string | No | — |
+| `limit` | integer | No | — |
+| `status` | string | No | One of: `queued`, `running`, `waiting_for_approval`, `succeeded`, `failed`, `cancelled`. |
 
 ### Example
 
@@ -159,28 +159,28 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/maintenance/run
 
 ### Responses
 
-| Status | Description       |
-| ------ | ----------------- |
-| `200`  | Maintenance runs. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Maintenance runs. |
 
 ### Response body (200)
 
-| Field                        | Type           | Description                                                                              |
-| ---------------------------- | -------------- | ---------------------------------------------------------------------------------------- |
-| `items`                      | object[]       | —                                                                                        |
-| `items[].id`                 | string         | Format: `uuid`.                                                                          |
-| `items[].trigger`            | string         | One of: `scheduled`, `manual`, `deployment`.                                             |
-| `items[].status`             | string         | One of: `queued`, `running`, `waiting_for_approval`, `succeeded`, `failed`, `cancelled`. |
-| `items[].categories`         | string[]       | —                                                                                        |
-| `items[].environments`       | string[]       | —                                                                                        |
-| `items[].policyVersion`      | integer        | —                                                                                        |
-| `items[].findingCount`       | integer        | —                                                                                        |
-| `items[].pendingActionCount` | integer        | —                                                                                        |
-| `items[].error`              | string or null | —                                                                                        |
-| `items[].startedAt`          | string or null | Format: `date-time`.                                                                     |
-| `items[].finishedAt`         | string or null | Format: `date-time`.                                                                     |
-| `items[].createdAt`          | string         | Format: `date-time`.                                                                     |
-| `nextCursor`                 | string or null | —                                                                                        |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `items` | object[] | — |
+| `items[].id` | string | Format: `uuid`. |
+| `items[].trigger` | string | One of: `scheduled`, `manual`, `deployment`. |
+| `items[].status` | string | One of: `queued`, `running`, `waiting_for_approval`, `succeeded`, `failed`, `cancelled`. |
+| `items[].categories` | string[] | — |
+| `items[].environments` | string[] | — |
+| `items[].policyVersion` | integer | — |
+| `items[].findingCount` | integer | — |
+| `items[].pendingActionCount` | integer | — |
+| `items[].error` | string or null | — |
+| `items[].startedAt` | string or null | Format: `date-time`. |
+| `items[].finishedAt` | string or null | Format: `date-time`. |
+| `items[].createdAt` | string | Format: `date-time`. |
+| `nextCursor` | string or null | — |
 
 ## projectMaintenance.createRun
 
@@ -197,10 +197,10 @@ POST /v1/orgs/{orgId}/projects/{projectId}/maintenance/runs
 
 ### Request body
 
-| Field          | Type     | Required | Description |
-| -------------- | -------- | -------- | ----------- |
-| `categories`   | string[] | No       | —           |
-| `environments` | string[] | No       | —           |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `categories` | string[] | No | — |
+| `environments` | string[] | No | — |
 
 ### Example
 
@@ -213,27 +213,27 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/mainten
 
 ### Responses
 
-| Status | Description                          |
-| ------ | ------------------------------------ |
-| `202`  | Queued maintenance run.              |
-| `409`  | An equivalent run is already active. |
+| Status | Description |
+| ------ | ----------- |
+| `202` | Queued maintenance run. |
+| `409` | An equivalent run is already active. |
 
 ### Response body (202)
 
-| Field                | Type           | Description                                                                              |
-| -------------------- | -------------- | ---------------------------------------------------------------------------------------- |
-| `id`                 | string         | Format: `uuid`.                                                                          |
-| `trigger`            | string         | One of: `scheduled`, `manual`, `deployment`.                                             |
-| `status`             | string         | One of: `queued`, `running`, `waiting_for_approval`, `succeeded`, `failed`, `cancelled`. |
-| `categories`         | string[]       | —                                                                                        |
-| `environments`       | string[]       | —                                                                                        |
-| `policyVersion`      | integer        | —                                                                                        |
-| `findingCount`       | integer        | —                                                                                        |
-| `pendingActionCount` | integer        | —                                                                                        |
-| `error`              | string or null | —                                                                                        |
-| `startedAt`          | string or null | Format: `date-time`.                                                                     |
-| `finishedAt`         | string or null | Format: `date-time`.                                                                     |
-| `createdAt`          | string         | Format: `date-time`.                                                                     |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | Format: `uuid`. |
+| `trigger` | string | One of: `scheduled`, `manual`, `deployment`. |
+| `status` | string | One of: `queued`, `running`, `waiting_for_approval`, `succeeded`, `failed`, `cancelled`. |
+| `categories` | string[] | — |
+| `environments` | string[] | — |
+| `policyVersion` | integer | — |
+| `findingCount` | integer | — |
+| `pendingActionCount` | integer | — |
+| `error` | string or null | — |
+| `startedAt` | string or null | Format: `date-time`. |
+| `finishedAt` | string or null | Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
 
 ## projectMaintenance.getRun
 
@@ -256,27 +256,27 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/maintenance/run
 
 ### Responses
 
-| Status | Description                  |
-| ------ | ---------------------------- |
-| `200`  | Maintenance run.             |
-| `404`  | No such run in this project. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Maintenance run. |
+| `404` | No such run in this project. |
 
 ### Response body (200)
 
-| Field                | Type           | Description                                                                              |
-| -------------------- | -------------- | ---------------------------------------------------------------------------------------- |
-| `id`                 | string         | Format: `uuid`.                                                                          |
-| `trigger`            | string         | One of: `scheduled`, `manual`, `deployment`.                                             |
-| `status`             | string         | One of: `queued`, `running`, `waiting_for_approval`, `succeeded`, `failed`, `cancelled`. |
-| `categories`         | string[]       | —                                                                                        |
-| `environments`       | string[]       | —                                                                                        |
-| `policyVersion`      | integer        | —                                                                                        |
-| `findingCount`       | integer        | —                                                                                        |
-| `pendingActionCount` | integer        | —                                                                                        |
-| `error`              | string or null | —                                                                                        |
-| `startedAt`          | string or null | Format: `date-time`.                                                                     |
-| `finishedAt`         | string or null | Format: `date-time`.                                                                     |
-| `createdAt`          | string         | Format: `date-time`.                                                                     |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | Format: `uuid`. |
+| `trigger` | string | One of: `scheduled`, `manual`, `deployment`. |
+| `status` | string | One of: `queued`, `running`, `waiting_for_approval`, `succeeded`, `failed`, `cancelled`. |
+| `categories` | string[] | — |
+| `environments` | string[] | — |
+| `policyVersion` | integer | — |
+| `findingCount` | integer | — |
+| `pendingActionCount` | integer | — |
+| `error` | string or null | — |
+| `startedAt` | string or null | Format: `date-time`. |
+| `finishedAt` | string or null | Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
 
 ## projectMaintenance.cancelRun
 
@@ -292,9 +292,9 @@ POST /v1/orgs/{orgId}/projects/{projectId}/maintenance/runs/{runId}/cancel
 
 ### Request body
 
-| Field    | Type   | Required | Description |
-| -------- | ------ | -------- | ----------- |
-| `reason` | string | Yes      | —           |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `reason` | string | Yes | — |
 
 ### Example
 
@@ -309,28 +309,28 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/mainten
 
 ### Responses
 
-| Status | Description                  |
-| ------ | ---------------------------- |
-| `200`  | Cancelled maintenance run.   |
-| `404`  | No such run in this project. |
-| `409`  | The run is already terminal. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Cancelled maintenance run. |
+| `404` | No such run in this project. |
+| `409` | The run is already terminal. |
 
 ### Response body (200)
 
-| Field                | Type           | Description                                                                              |
-| -------------------- | -------------- | ---------------------------------------------------------------------------------------- |
-| `id`                 | string         | Format: `uuid`.                                                                          |
-| `trigger`            | string         | One of: `scheduled`, `manual`, `deployment`.                                             |
-| `status`             | string         | One of: `queued`, `running`, `waiting_for_approval`, `succeeded`, `failed`, `cancelled`. |
-| `categories`         | string[]       | —                                                                                        |
-| `environments`       | string[]       | —                                                                                        |
-| `policyVersion`      | integer        | —                                                                                        |
-| `findingCount`       | integer        | —                                                                                        |
-| `pendingActionCount` | integer        | —                                                                                        |
-| `error`              | string or null | —                                                                                        |
-| `startedAt`          | string or null | Format: `date-time`.                                                                     |
-| `finishedAt`         | string or null | Format: `date-time`.                                                                     |
-| `createdAt`          | string         | Format: `date-time`.                                                                     |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | Format: `uuid`. |
+| `trigger` | string | One of: `scheduled`, `manual`, `deployment`. |
+| `status` | string | One of: `queued`, `running`, `waiting_for_approval`, `succeeded`, `failed`, `cancelled`. |
+| `categories` | string[] | — |
+| `environments` | string[] | — |
+| `policyVersion` | integer | — |
+| `findingCount` | integer | — |
+| `pendingActionCount` | integer | — |
+| `error` | string or null | — |
+| `startedAt` | string or null | Format: `date-time`. |
+| `finishedAt` | string or null | Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
 
 ## projectMaintenance.listFindings
 
@@ -346,14 +346,14 @@ GET /v1/orgs/{orgId}/projects/{projectId}/maintenance/findings
 
 ### Query parameters
 
-| Name       | Type    | Required | Description                              |
-| ---------- | ------- | -------- | ---------------------------------------- |
-| `cursor`   | string  | No       | —                                        |
-| `limit`    | integer | No       | —                                        |
-| `runId`    | string  | No       | Format: `uuid`.                          |
-| `status`   | string  | No       | One of: `open`, `dismissed`, `resolved`. |
-| `severity` | string  | No       | One of: `info`, `warning`, `critical`.   |
-| `category` | string  | No       | One of: `reliability`.                   |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `cursor` | string | No | — |
+| `limit` | integer | No | — |
+| `runId` | string | No | Format: `uuid`. |
+| `status` | string | No | One of: `open`, `dismissed`, `resolved`. |
+| `severity` | string | No | One of: `info`, `warning`, `critical`. |
+| `category` | string | No | One of: `reliability`. |
 
 ### Example
 
@@ -364,29 +364,29 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/maintenance/fin
 
 ### Responses
 
-| Status | Description           |
-| ------ | --------------------- |
-| `200`  | Maintenance findings. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Maintenance findings. |
 
 ### Response body (200)
 
-| Field                     | Type           | Description                              |
-| ------------------------- | -------------- | ---------------------------------------- |
-| `items`                   | object[]       | —                                        |
-| `items[].id`              | string         | Format: `uuid`.                          |
-| `items[].runId`           | string         | Format: `uuid`.                          |
-| `items[].category`        | string         | One of: `reliability`.                   |
-| `items[].severity`        | string         | One of: `info`, `warning`, `critical`.   |
-| `items[].status`          | string         | One of: `open`, `dismissed`, `resolved`. |
-| `items[].title`           | string         | —                                        |
-| `items[].summary`         | string         | —                                        |
-| `items[].recommendation`  | string         | —                                        |
-| `items[].resourceType`    | string         | —                                        |
-| `items[].resourceId`      | string or null | —                                        |
-| `items[].firstObservedAt` | string         | Format: `date-time`.                     |
-| `items[].lastObservedAt`  | string         | Format: `date-time`.                     |
-| `items[].resolvedAt`      | string or null | Format: `date-time`.                     |
-| `nextCursor`              | string or null | —                                        |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `items` | object[] | — |
+| `items[].id` | string | Format: `uuid`. |
+| `items[].runId` | string | Format: `uuid`. |
+| `items[].category` | string | One of: `reliability`. |
+| `items[].severity` | string | One of: `info`, `warning`, `critical`. |
+| `items[].status` | string | One of: `open`, `dismissed`, `resolved`. |
+| `items[].title` | string | — |
+| `items[].summary` | string | — |
+| `items[].recommendation` | string | — |
+| `items[].resourceType` | string | — |
+| `items[].resourceId` | string or null | — |
+| `items[].firstObservedAt` | string | Format: `date-time`. |
+| `items[].lastObservedAt` | string | Format: `date-time`. |
+| `items[].resolvedAt` | string or null | Format: `date-time`. |
+| `nextCursor` | string or null | — |
 
 ## projectMaintenance.getFinding
 
@@ -409,28 +409,28 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/maintenance/fin
 
 ### Responses
 
-| Status | Description                      |
-| ------ | -------------------------------- |
-| `200`  | Maintenance finding.             |
-| `404`  | No such finding in this project. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Maintenance finding. |
+| `404` | No such finding in this project. |
 
 ### Response body (200)
 
-| Field             | Type           | Description                              |
-| ----------------- | -------------- | ---------------------------------------- |
-| `id`              | string         | Format: `uuid`.                          |
-| `runId`           | string         | Format: `uuid`.                          |
-| `category`        | string         | One of: `reliability`.                   |
-| `severity`        | string         | One of: `info`, `warning`, `critical`.   |
-| `status`          | string         | One of: `open`, `dismissed`, `resolved`. |
-| `title`           | string         | —                                        |
-| `summary`         | string         | —                                        |
-| `recommendation`  | string         | —                                        |
-| `resourceType`    | string         | —                                        |
-| `resourceId`      | string or null | —                                        |
-| `firstObservedAt` | string         | Format: `date-time`.                     |
-| `lastObservedAt`  | string         | Format: `date-time`.                     |
-| `resolvedAt`      | string or null | Format: `date-time`.                     |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | Format: `uuid`. |
+| `runId` | string | Format: `uuid`. |
+| `category` | string | One of: `reliability`. |
+| `severity` | string | One of: `info`, `warning`, `critical`. |
+| `status` | string | One of: `open`, `dismissed`, `resolved`. |
+| `title` | string | — |
+| `summary` | string | — |
+| `recommendation` | string | — |
+| `resourceType` | string | — |
+| `resourceId` | string or null | — |
+| `firstObservedAt` | string | Format: `date-time`. |
+| `lastObservedAt` | string | Format: `date-time`. |
+| `resolvedAt` | string or null | Format: `date-time`. |
 
 ## projectMaintenance.updateFinding
 
@@ -446,10 +446,10 @@ PATCH /v1/orgs/{orgId}/projects/{projectId}/maintenance/findings/{findingId}
 
 ### Request body
 
-| Field    | Type   | Required | Description                              |
-| -------- | ------ | -------- | ---------------------------------------- |
-| `status` | string | Yes      | One of: `open`, `dismissed`, `resolved`. |
-| `reason` | string | Yes      | —                                        |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `status` | string | Yes | One of: `open`, `dismissed`, `resolved`. |
+| `reason` | string | Yes | — |
 
 ### Example
 
@@ -465,28 +465,28 @@ curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/mainte
 
 ### Responses
 
-| Status | Description                      |
-| ------ | -------------------------------- |
-| `200`  | Updated maintenance finding.     |
-| `404`  | No such finding in this project. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Updated maintenance finding. |
+| `404` | No such finding in this project. |
 
 ### Response body (200)
 
-| Field             | Type           | Description                              |
-| ----------------- | -------------- | ---------------------------------------- |
-| `id`              | string         | Format: `uuid`.                          |
-| `runId`           | string         | Format: `uuid`.                          |
-| `category`        | string         | One of: `reliability`.                   |
-| `severity`        | string         | One of: `info`, `warning`, `critical`.   |
-| `status`          | string         | One of: `open`, `dismissed`, `resolved`. |
-| `title`           | string         | —                                        |
-| `summary`         | string         | —                                        |
-| `recommendation`  | string         | —                                        |
-| `resourceType`    | string         | —                                        |
-| `resourceId`      | string or null | —                                        |
-| `firstObservedAt` | string         | Format: `date-time`.                     |
-| `lastObservedAt`  | string         | Format: `date-time`.                     |
-| `resolvedAt`      | string or null | Format: `date-time`.                     |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | Format: `uuid`. |
+| `runId` | string | Format: `uuid`. |
+| `category` | string | One of: `reliability`. |
+| `severity` | string | One of: `info`, `warning`, `critical`. |
+| `status` | string | One of: `open`, `dismissed`, `resolved`. |
+| `title` | string | — |
+| `summary` | string | — |
+| `recommendation` | string | — |
+| `resourceType` | string | — |
+| `resourceId` | string or null | — |
+| `firstObservedAt` | string | Format: `date-time`. |
+| `lastObservedAt` | string | Format: `date-time`. |
+| `resolvedAt` | string or null | Format: `date-time`. |
 
 ## projectMaintenance.listEvidence
 
@@ -502,10 +502,10 @@ GET /v1/orgs/{orgId}/projects/{projectId}/maintenance/findings/{findingId}/evide
 
 ### Query parameters
 
-| Name     | Type    | Required | Description |
-| -------- | ------- | -------- | ----------- |
-| `cursor` | string  | No       | —           |
-| `limit`  | integer | No       | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `cursor` | string | No | — |
+| `limit` | integer | No | — |
 
 ### Example
 
@@ -516,25 +516,25 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/maintenance/fin
 
 ### Responses
 
-| Status | Description                      |
-| ------ | -------------------------------- |
-| `200`  | Finding evidence.                |
-| `404`  | No such finding in this project. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Finding evidence. |
+| `404` | No such finding in this project. |
 
 ### Response body (200)
 
-| Field                       | Type           | Description                                                        |
-| --------------------------- | -------------- | ------------------------------------------------------------------ |
-| `items`                     | object[]       | —                                                                  |
-| `items[].id`                | string         | Format: `uuid`.                                                    |
-| `items[].runId`             | string         | Format: `uuid`.                                                    |
-| `items[].findingId`         | string or null | Format: `uuid`.                                                    |
-| `items[].kind`              | string         | One of: `metric`, `log`, `configuration`, `query`, `verification`. |
-| `items[].sourceOperationId` | string or null | —                                                                  |
-| `items[].summary`           | string         | —                                                                  |
-| `items[].data`              | object         | —                                                                  |
-| `items[].capturedAt`        | string         | Format: `date-time`.                                               |
-| `nextCursor`                | string or null | —                                                                  |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `items` | object[] | — |
+| `items[].id` | string | Format: `uuid`. |
+| `items[].runId` | string | Format: `uuid`. |
+| `items[].findingId` | string or null | Format: `uuid`. |
+| `items[].kind` | string | One of: `metric`, `log`, `configuration`, `query`, `verification`. |
+| `items[].sourceOperationId` | string or null | — |
+| `items[].summary` | string | — |
+| `items[].data` | object | — |
+| `items[].capturedAt` | string | Format: `date-time`. |
+| `nextCursor` | string or null | — |
 
 ## projectMaintenance.listActions
 
@@ -550,12 +550,12 @@ GET /v1/orgs/{orgId}/projects/{projectId}/maintenance/actions
 
 ### Query parameters
 
-| Name     | Type    | Required | Description                                                                                                       |
-| -------- | ------- | -------- | ----------------------------------------------------------------------------------------------------------------- |
-| `cursor` | string  | No       | —                                                                                                                 |
-| `limit`  | integer | No       | —                                                                                                                 |
-| `runId`  | string  | No       | Format: `uuid`.                                                                                                   |
-| `status` | string  | No       | One of: `proposed`, `approval_required`, `approved`, `rejected`, `running`, `succeeded`, `failed`, `rolled_back`. |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `cursor` | string | No | — |
+| `limit` | integer | No | — |
+| `runId` | string | No | Format: `uuid`. |
+| `status` | string | No | One of: `proposed`, `approval_required`, `approved`, `rejected`, `running`, `succeeded`, `failed`, `rolled_back`. |
 
 ### Example
 
@@ -566,32 +566,32 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/maintenance/act
 
 ### Responses
 
-| Status | Description          |
-| ------ | -------------------- |
-| `200`  | Maintenance actions. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Maintenance actions. |
 
 ### Response body (200)
 
-| Field                    | Type           | Description                                                                                                       |
-| ------------------------ | -------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `items`                  | object[]       | —                                                                                                                 |
-| `items[].id`             | string         | Format: `uuid`.                                                                                                   |
-| `items[].runId`          | string         | Format: `uuid`.                                                                                                   |
-| `items[].findingId`      | string or null | Format: `uuid`.                                                                                                   |
-| `items[].operationId`    | string         | —                                                                                                                 |
-| `items[].risk`           | string         | One of: `read`, `write`, `dangerous`, `destructive`.                                                              |
-| `items[].status`         | string         | One of: `proposed`, `approval_required`, `approved`, `rejected`, `running`, `succeeded`, `failed`, `rolled_back`. |
-| `items[].version`        | integer        | —                                                                                                                 |
-| `items[].input`          | object         | —                                                                                                                 |
-| `items[].preview`        | object         | —                                                                                                                 |
-| `items[].result`         | object         | —                                                                                                                 |
-| `items[].error`          | string or null | —                                                                                                                 |
-| `items[].decidedBy`      | string or null | —                                                                                                                 |
-| `items[].decisionReason` | string or null | —                                                                                                                 |
-| `items[].decidedAt`      | string or null | Format: `date-time`.                                                                                              |
-| `items[].executedAt`     | string or null | Format: `date-time`.                                                                                              |
-| `items[].createdAt`      | string         | Format: `date-time`.                                                                                              |
-| `nextCursor`             | string or null | —                                                                                                                 |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `items` | object[] | — |
+| `items[].id` | string | Format: `uuid`. |
+| `items[].runId` | string | Format: `uuid`. |
+| `items[].findingId` | string or null | Format: `uuid`. |
+| `items[].operationId` | string | — |
+| `items[].risk` | string | One of: `read`, `write`, `dangerous`, `destructive`. |
+| `items[].status` | string | One of: `proposed`, `approval_required`, `approved`, `rejected`, `running`, `succeeded`, `failed`, `rolled_back`. |
+| `items[].version` | integer | — |
+| `items[].input` | object | — |
+| `items[].preview` | object | — |
+| `items[].result` | object | — |
+| `items[].error` | string or null | — |
+| `items[].decidedBy` | string or null | — |
+| `items[].decisionReason` | string or null | — |
+| `items[].decidedAt` | string or null | Format: `date-time`. |
+| `items[].executedAt` | string or null | Format: `date-time`. |
+| `items[].createdAt` | string | Format: `date-time`. |
+| `nextCursor` | string or null | — |
 
 ## projectMaintenance.listAudit
 
@@ -607,10 +607,10 @@ GET /v1/orgs/{orgId}/projects/{projectId}/maintenance/audit
 
 ### Query parameters
 
-| Name     | Type    | Required | Description |
-| -------- | ------- | -------- | ----------- |
-| `cursor` | string  | No       | —           |
-| `limit`  | integer | No       | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `cursor` | string | No | — |
+| `limit` | integer | No | — |
 
 ### Example
 
@@ -621,24 +621,24 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/maintenance/aud
 
 ### Responses
 
-| Status | Description               |
-| ------ | ------------------------- |
-| `200`  | Maintenance audit events. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Maintenance audit events. |
 
 ### Response body (200)
 
-| Field               | Type           | Description          |
-| ------------------- | -------------- | -------------------- |
-| `items`             | object[]       | —                    |
-| `items[].id`        | string         | Format: `uuid`.      |
-| `items[].projectId` | string         | Format: `uuid`.      |
-| `items[].runId`     | string or null | Format: `uuid`.      |
-| `items[].actionId`  | string or null | Format: `uuid`.      |
-| `items[].actorId`   | string or null | —                    |
-| `items[].event`     | string         | —                    |
-| `items[].metadata`  | object         | —                    |
-| `items[].createdAt` | string         | Format: `date-time`. |
-| `nextCursor`        | string or null | —                    |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `items` | object[] | — |
+| `items[].id` | string | Format: `uuid`. |
+| `items[].projectId` | string | Format: `uuid`. |
+| `items[].runId` | string or null | Format: `uuid`. |
+| `items[].actionId` | string or null | Format: `uuid`. |
+| `items[].actorId` | string or null | — |
+| `items[].event` | string | — |
+| `items[].metadata` | object | — |
+| `items[].createdAt` | string | Format: `date-time`. |
+| `nextCursor` | string or null | — |
 
 ## projectMaintenance.decideAction
 
@@ -655,11 +655,11 @@ POST /v1/orgs/{orgId}/projects/{projectId}/maintenance/actions/{actionId}/decisi
 
 ### Request body
 
-| Field           | Type    | Required | Description                  |
-| --------------- | ------- | -------- | ---------------------------- |
-| `decision`      | string  | Yes      | One of: `approve`, `reject`. |
-| `actionVersion` | integer | Yes      | —                            |
-| `reason`        | string  | Yes      | —                            |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `decision` | string | Yes | One of: `approve`, `reject`. |
+| `actionVersion` | integer | Yes | — |
+| `reason` | string | Yes | — |
 
 ### Example
 
@@ -676,30 +676,30 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/mainten
 
 ### Responses
 
-| Status | Description                                                  |
-| ------ | ------------------------------------------------------------ |
-| `200`  | Decided maintenance action.                                  |
-| `403`  | Current actor cannot execute the target operation.           |
-| `404`  | No such action in this project.                              |
-| `409`  | The action was already decided, expired, or changed version. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Decided maintenance action. |
+| `403` | Current actor cannot execute the target operation. |
+| `404` | No such action in this project. |
+| `409` | The action was already decided, expired, or changed version. |
 
 ### Response body (200)
 
-| Field            | Type           | Description                                                                                                       |
-| ---------------- | -------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `id`             | string         | Format: `uuid`.                                                                                                   |
-| `runId`          | string         | Format: `uuid`.                                                                                                   |
-| `findingId`      | string or null | Format: `uuid`.                                                                                                   |
-| `operationId`    | string         | —                                                                                                                 |
-| `risk`           | string         | One of: `read`, `write`, `dangerous`, `destructive`.                                                              |
-| `status`         | string         | One of: `proposed`, `approval_required`, `approved`, `rejected`, `running`, `succeeded`, `failed`, `rolled_back`. |
-| `version`        | integer        | —                                                                                                                 |
-| `input`          | object         | —                                                                                                                 |
-| `preview`        | object         | —                                                                                                                 |
-| `result`         | object         | —                                                                                                                 |
-| `error`          | string or null | —                                                                                                                 |
-| `decidedBy`      | string or null | —                                                                                                                 |
-| `decisionReason` | string or null | —                                                                                                                 |
-| `decidedAt`      | string or null | Format: `date-time`.                                                                                              |
-| `executedAt`     | string or null | Format: `date-time`.                                                                                              |
-| `createdAt`      | string         | Format: `date-time`.                                                                                              |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | Format: `uuid`. |
+| `runId` | string | Format: `uuid`. |
+| `findingId` | string or null | Format: `uuid`. |
+| `operationId` | string | — |
+| `risk` | string | One of: `read`, `write`, `dangerous`, `destructive`. |
+| `status` | string | One of: `proposed`, `approval_required`, `approved`, `rejected`, `running`, `succeeded`, `failed`, `rolled_back`. |
+| `version` | integer | — |
+| `input` | object | — |
+| `preview` | object | — |
+| `result` | object | — |
+| `error` | string or null | — |
+| `decidedBy` | string or null | — |
+| `decisionReason` | string or null | — |
+| `decidedAt` | string or null | Format: `date-time`. |
+| `executedAt` | string or null | Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |

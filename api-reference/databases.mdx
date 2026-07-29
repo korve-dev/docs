@@ -21,9 +21,9 @@ GET /v1/orgs/{orgId}/projects/{projectId}/databases
 
 ### Query parameters
 
-| Name          | Type   | Required | Description                        |
-| ------------- | ------ | -------- | ---------------------------------- |
-| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Example
 
@@ -34,34 +34,34 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases?envir
 
 ### Responses
 
-| Status | Description                                          |
-| ------ | ---------------------------------------------------- |
-| `200`  | Databases, oldest first.                             |
-| `404`  | No such project or environment in this organization. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Databases, oldest first. |
+| `404` | No such project or environment in this organization. |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field                         | Type            | Description                                                                                                                                                                     |
-| ----------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `id`                          | string          | —                                                                                                                                                                               |
-| `name`                        | string          | Customer-chosen database name — unique within the environment. 2-62 chars of lowercase letters, digits, and hyphens, starting with a letter. Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
-| `environment`                 | string          | Slug of the environment the database belongs to. Pattern: `^[a-z][a-z0-9-]{0,38}$`.                                                                                             |
-| `provider`                    | string          | Database backend generation the row lives on. Set at provisioning.                                                                                                              |
-| `sku`                         | string or null  | Database SKU id (see the rate card via billing.get); null on legacy databases.                                                                                                  |
-| `targetSku`                   | string or null  | Requested SKU while a zero-downtime HA resize is running; otherwise null.                                                                                                       |
-| `allocatedStorageGb`          | integer or null | Actual allocated data-disk capacity; durable volumes grow but do not shrink.                                                                                                    |
-| `resize`                      | object or null  | Durable progress for an active rolling resize; null when no resize is running.                                                                                                  |
-| `resize.direction`            | string          | One of: `up`, `down`.                                                                                                                                                           |
-| `resize.phase`                | string          | One of: `queued`, `preparing`, `growing-storage`, `resizing-replicas`, `switching-primary`, `resizing-former-primary`, `verifying`, `retrying`.                                 |
-| `resize.progressPercent`      | integer         | —                                                                                                                                                                               |
-| `resize.startedAt`            | string          | Format: `date-time`.                                                                                                                                                            |
-| `resize.estimatedCompletedAt` | string          | Format: `date-time`.                                                                                                                                                            |
-| `region`                      | string          | Database region id (see regions.list). Immutable after provisioning.                                                                                                            |
-| `status`                      | string          | One of: `provisioning`, `resizing`, `ready`, `failed`.                                                                                                                          |
-| `replicas`                    | integer         | Topology: 0 creates a single-node database; 2 creates one primary plus two data replicas with synchronous quorum commits and continuous recovery. One of: `0`, `2`.             |
-| `createdAt`                   | string          | Format: `date-time`.                                                                                                                                                            |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | Customer-chosen database name — unique within the environment. 2-62 chars of lowercase letters, digits, and hyphens, starting with a letter. Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `environment` | string | Slug of the environment the database belongs to. Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `provider` | string | Database backend generation the row lives on. Set at provisioning. |
+| `sku` | string or null | Database SKU id (see the rate card via billing.get); null on legacy databases. |
+| `targetSku` | string or null | Requested SKU while a zero-downtime HA resize is running; otherwise null. |
+| `allocatedStorageGb` | integer or null | Actual allocated data-disk capacity; durable volumes grow but do not shrink. |
+| `resize` | object or null | Durable progress for an active rolling resize; null when no resize is running. |
+| `resize.direction` | string | One of: `up`, `down`. |
+| `resize.phase` | string | One of: `queued`, `preparing`, `growing-storage`, `resizing-replicas`, `switching-primary`, `resizing-former-primary`, `verifying`, `retrying`. |
+| `resize.progressPercent` | integer | — |
+| `resize.startedAt` | string | Format: `date-time`. |
+| `resize.estimatedCompletedAt` | string | Format: `date-time`. |
+| `region` | string | Database region id (see regions.list). Immutable after provisioning. |
+| `status` | string | One of: `provisioning`, `resizing`, `ready`, `failed`. |
+| `replicas` | integer | Topology: 0 creates a single-node database; 2 creates one primary plus two data replicas with synchronous quorum commits and continuous recovery. One of: `0`, `2`. |
+| `createdAt` | string | Format: `date-time`. |
 
 ## databases.get
 
@@ -77,9 +77,9 @@ GET /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}
 
 ### Path parameters
 
-| Name         | Type   | Required | Description |
-| ------------ | ------ | -------- | ----------- |
-| `databaseId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `databaseId` | string | Yes | — |
 
 ### Example
 
@@ -90,75 +90,75 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATA
 
 ### Responses
 
-| Status | Description                       |
-| ------ | --------------------------------- |
-| `200`  | The database.                     |
-| `404`  | No such database in this project. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | The database. |
+| `404` | No such database in this project. |
 
 ### Response body (200)
 
-| Field                                            | Type            | Description                                                                                                                                                                           |
-| ------------------------------------------------ | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `id`                                             | string          | —                                                                                                                                                                                     |
-| `name`                                           | string          | Customer-chosen database name — unique within the environment. 2-62 chars of lowercase letters, digits, and hyphens, starting with a letter. Pattern: `^[a-z][a-z0-9-]{1,61}$`.       |
-| `environment`                                    | string          | Slug of the environment the database belongs to. Pattern: `^[a-z][a-z0-9-]{0,38}$`.                                                                                                   |
-| `status`                                         | string          | One of: `provisioning`, `resizing`, `ready`, `failed`.                                                                                                                                |
-| `region`                                         | string          | Database region id (see regions.list). Immutable after provisioning.                                                                                                                  |
-| `replicas`                                       | integer         | Topology: 0 creates a single-node database; 2 creates one primary plus two data replicas with synchronous quorum commits and continuous recovery. One of: `0`, `2`.                   |
-| `host`                                           | string          | Managed database endpoint — the in-platform hostname for SKU databases, "db.korve.app" for legacy ones.                                                                               |
-| `port`                                           | integer         | —                                                                                                                                                                                     |
-| `poolerPort`                                     | integer         | PgBouncer transaction-pooling port. The primary port remains available for session-mode clients.                                                                                      |
-| `dbName`                                         | string          | —                                                                                                                                                                                     |
-| `user`                                           | string          | —                                                                                                                                                                                     |
-| `provider`                                       | string          | Database backend generation the row lives on. Set at provisioning.                                                                                                                    |
-| `sku`                                            | string or null  | Database SKU id (see the rate card via billing.get); null on legacy databases.                                                                                                        |
-| `targetSku`                                      | string or null  | Requested SKU while a zero-downtime HA resize is running; otherwise null.                                                                                                             |
-| `allocatedStorageGb`                             | integer or null | Actual allocated data-disk capacity. It grows with larger SKUs and remains allocated after a compute downsize because durable volumes cannot shrink.                                  |
-| `resize`                                         | object or null  | Durable progress for an active rolling resize; null when no resize is running.                                                                                                        |
-| `resize.direction`                               | string          | One of: `up`, `down`.                                                                                                                                                                 |
-| `resize.phase`                                   | string          | One of: `queued`, `preparing`, `growing-storage`, `resizing-replicas`, `switching-primary`, `resizing-former-primary`, `verifying`, `retrying`.                                       |
-| `resize.progressPercent`                         | integer         | —                                                                                                                                                                                     |
-| `resize.startedAt`                               | string          | Format: `date-time`.                                                                                                                                                                  |
-| `resize.estimatedCompletedAt`                    | string          | Format: `date-time`.                                                                                                                                                                  |
-| `liveStatus`                                     | string          | Liveness from the instance's heartbeat: live when the last report is recent, stale once it lapses, unknown before the instance has ever reported. One of: `live`, `stale`, `unknown`. |
-| `lastSeenAt`                                     | string or null  | When the instance last reported in; null until the first heartbeat. Format: `date-time`.                                                                                              |
-| `sizeBytes`                                      | integer or null | On-disk size in bytes from the latest heartbeat; null until the first report.                                                                                                         |
-| `nodes`                                          | object[]        | Instance topology for managed databases. Empty for legacy databases.                                                                                                                  |
-| `nodes[].ordinal`                                | integer         | —                                                                                                                                                                                     |
-| `nodes[].role`                                   | string          | One of: `primary`, `replica`, `witness`.                                                                                                                                              |
-| `nodes[].region`                                 | string          | —                                                                                                                                                                                     |
-| `nodes[].status`                                 | string          | —                                                                                                                                                                                     |
-| `nodes[].metrics`                                | object or null  | Latest one-minute operational sample; null until the node agent reports one.                                                                                                          |
-| `nodes[].metrics.sampledAt`                      | string          | Format: `date-time`.                                                                                                                                                                  |
-| `nodes[].metrics.qps`                            | number or null  | Queries per second in the sample window.                                                                                                                                              |
-| `nodes[].metrics.readIops`                       | number or null  | —                                                                                                                                                                                     |
-| `nodes[].metrics.writeIops`                      | number or null  | —                                                                                                                                                                                     |
-| `nodes[].metrics.cpuPercent`                     | number or null  | —                                                                                                                                                                                     |
-| `nodes[].metrics.memoryUsedBytes`                | integer or null | —                                                                                                                                                                                     |
-| `nodes[].metrics.memoryLimitBytes`               | integer or null | —                                                                                                                                                                                     |
-| `nodes[].metrics.directConnections`              | integer or null | —                                                                                                                                                                                     |
-| `nodes[].metrics.pgbouncer`                      | object          | —                                                                                                                                                                                     |
-| `nodes[].metrics.pgbouncer.clientActive`         | integer or null | —                                                                                                                                                                                     |
-| `nodes[].metrics.pgbouncer.clientWaiting`        | integer or null | —                                                                                                                                                                                     |
-| `nodes[].metrics.pgbouncer.serverActive`         | integer or null | —                                                                                                                                                                                     |
-| `nodes[].metrics.pgbouncer.serverIdle`           | integer or null | —                                                                                                                                                                                     |
-| `nodes[].metrics.pgbouncer.maxClientConnections` | integer or null | —                                                                                                                                                                                     |
-| `metrics`                                        | object or null  | Latest one-minute operational sample; null until the node agent reports one.                                                                                                          |
-| `metrics.sampledAt`                              | string          | Format: `date-time`.                                                                                                                                                                  |
-| `metrics.qps`                                    | number or null  | Queries per second in the sample window.                                                                                                                                              |
-| `metrics.readIops`                               | number or null  | —                                                                                                                                                                                     |
-| `metrics.writeIops`                              | number or null  | —                                                                                                                                                                                     |
-| `metrics.cpuPercent`                             | number or null  | —                                                                                                                                                                                     |
-| `metrics.memoryUsedBytes`                        | integer or null | —                                                                                                                                                                                     |
-| `metrics.memoryLimitBytes`                       | integer or null | —                                                                                                                                                                                     |
-| `metrics.directConnections`                      | integer or null | —                                                                                                                                                                                     |
-| `metrics.pgbouncer`                              | object          | —                                                                                                                                                                                     |
-| `metrics.pgbouncer.clientActive`                 | integer or null | —                                                                                                                                                                                     |
-| `metrics.pgbouncer.clientWaiting`                | integer or null | —                                                                                                                                                                                     |
-| `metrics.pgbouncer.serverActive`                 | integer or null | —                                                                                                                                                                                     |
-| `metrics.pgbouncer.serverIdle`                   | integer or null | —                                                                                                                                                                                     |
-| `metrics.pgbouncer.maxClientConnections`         | integer or null | —                                                                                                                                                                                     |
-| `createdAt`                                      | string          | Format: `date-time`.                                                                                                                                                                  |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | Customer-chosen database name — unique within the environment. 2-62 chars of lowercase letters, digits, and hyphens, starting with a letter. Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `environment` | string | Slug of the environment the database belongs to. Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `status` | string | One of: `provisioning`, `resizing`, `ready`, `failed`. |
+| `region` | string | Database region id (see regions.list). Immutable after provisioning. |
+| `replicas` | integer | Topology: 0 creates a single-node database; 2 creates one primary plus two data replicas with synchronous quorum commits and continuous recovery. One of: `0`, `2`. |
+| `host` | string | Managed database endpoint — the in-platform hostname for SKU databases, "db.korve.app" for legacy ones. |
+| `port` | integer | — |
+| `poolerPort` | integer | PgBouncer transaction-pooling port. The primary port remains available for session-mode clients. |
+| `dbName` | string | — |
+| `user` | string | — |
+| `provider` | string | Database backend generation the row lives on. Set at provisioning. |
+| `sku` | string or null | Database SKU id (see the rate card via billing.get); null on legacy databases. |
+| `targetSku` | string or null | Requested SKU while a zero-downtime HA resize is running; otherwise null. |
+| `allocatedStorageGb` | integer or null | Actual allocated data-disk capacity. It grows with larger SKUs and remains allocated after a compute downsize because durable volumes cannot shrink. |
+| `resize` | object or null | Durable progress for an active rolling resize; null when no resize is running. |
+| `resize.direction` | string | One of: `up`, `down`. |
+| `resize.phase` | string | One of: `queued`, `preparing`, `growing-storage`, `resizing-replicas`, `switching-primary`, `resizing-former-primary`, `verifying`, `retrying`. |
+| `resize.progressPercent` | integer | — |
+| `resize.startedAt` | string | Format: `date-time`. |
+| `resize.estimatedCompletedAt` | string | Format: `date-time`. |
+| `liveStatus` | string | Liveness from the instance's heartbeat: live when the last report is recent, stale once it lapses, unknown before the instance has ever reported. One of: `live`, `stale`, `unknown`. |
+| `lastSeenAt` | string or null | When the instance last reported in; null until the first heartbeat. Format: `date-time`. |
+| `sizeBytes` | integer or null | On-disk size in bytes from the latest heartbeat; null until the first report. |
+| `nodes` | object[] | Instance topology for managed databases. Empty for legacy databases. |
+| `nodes[].ordinal` | integer | — |
+| `nodes[].role` | string | One of: `primary`, `replica`, `witness`. |
+| `nodes[].region` | string | — |
+| `nodes[].status` | string | — |
+| `nodes[].metrics` | object or null | Latest one-minute operational sample; null until the node agent reports one. |
+| `nodes[].metrics.sampledAt` | string | Format: `date-time`. |
+| `nodes[].metrics.qps` | number or null | Queries per second in the sample window. |
+| `nodes[].metrics.readIops` | number or null | — |
+| `nodes[].metrics.writeIops` | number or null | — |
+| `nodes[].metrics.cpuPercent` | number or null | — |
+| `nodes[].metrics.memoryUsedBytes` | integer or null | — |
+| `nodes[].metrics.memoryLimitBytes` | integer or null | — |
+| `nodes[].metrics.directConnections` | integer or null | — |
+| `nodes[].metrics.pgbouncer` | object | — |
+| `nodes[].metrics.pgbouncer.clientActive` | integer or null | — |
+| `nodes[].metrics.pgbouncer.clientWaiting` | integer or null | — |
+| `nodes[].metrics.pgbouncer.serverActive` | integer or null | — |
+| `nodes[].metrics.pgbouncer.serverIdle` | integer or null | — |
+| `nodes[].metrics.pgbouncer.maxClientConnections` | integer or null | — |
+| `metrics` | object or null | Latest one-minute operational sample; null until the node agent reports one. |
+| `metrics.sampledAt` | string | Format: `date-time`. |
+| `metrics.qps` | number or null | Queries per second in the sample window. |
+| `metrics.readIops` | number or null | — |
+| `metrics.writeIops` | number or null | — |
+| `metrics.cpuPercent` | number or null | — |
+| `metrics.memoryUsedBytes` | integer or null | — |
+| `metrics.memoryLimitBytes` | integer or null | — |
+| `metrics.directConnections` | integer or null | — |
+| `metrics.pgbouncer` | object | — |
+| `metrics.pgbouncer.clientActive` | integer or null | — |
+| `metrics.pgbouncer.clientWaiting` | integer or null | — |
+| `metrics.pgbouncer.serverActive` | integer or null | — |
+| `metrics.pgbouncer.serverIdle` | integer or null | — |
+| `metrics.pgbouncer.maxClientConnections` | integer or null | — |
+| `createdAt` | string | Format: `date-time`. |
 
 ## databases.insights
 
@@ -174,15 +174,15 @@ GET /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/insights/querie
 
 ### Path parameters
 
-| Name         | Type   | Required | Description |
-| ------------ | ------ | -------- | ----------- |
-| `databaseId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `databaseId` | string | Yes | — |
 
 ### Query parameters
 
-| Name    | Type    | Required | Description |
-| ------- | ------- | -------- | ----------- |
-| `limit` | integer | No       | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `limit` | integer | No | — |
 
 ### Example
 
@@ -193,28 +193,28 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATA
 
 ### Responses
 
-| Status | Description                       |
-| ------ | --------------------------------- |
-| `200`  | Query stats, slowest first.       |
-| `404`  | No such database in this project. |
-| `422`  | Invalid limit.                    |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Query stats, slowest first. |
+| `404` | No such database in this project. |
+| `422` | Invalid limit. |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field           | Type            | Description                                             |
-| --------------- | --------------- | ------------------------------------------------------- |
-| `queryId`       | string or null  | Stable identifier of the normalized statement.          |
-| `normalizedSql` | string or null  | The statement with literals parameterized.              |
-| `calls`         | integer or null | Times the statement ran in the window.                  |
-| `totalTimeMs`   | number or null  | Total execution time across all calls, in milliseconds. |
-| `meanMs`        | number or null  | Mean execution time, in milliseconds.                   |
-| `p50Ms`         | number or null  | Median (p50) execution time, in milliseconds.           |
-| `p99Ms`         | number or null  | 99th-percentile execution time, in milliseconds.        |
-| `rowsRead`      | integer or null | Rows read across all calls.                             |
-| `rowsWritten`   | integer or null | Rows written across all calls.                          |
-| `capturedAt`    | string          | When this drain was captured. Format: `date-time`.      |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `queryId` | string or null | Stable identifier of the normalized statement. |
+| `normalizedSql` | string or null | The statement with literals parameterized. |
+| `calls` | integer or null | Times the statement ran in the window. |
+| `totalTimeMs` | number or null | Total execution time across all calls, in milliseconds. |
+| `meanMs` | number or null | Mean execution time, in milliseconds. |
+| `p50Ms` | number or null | Median (p50) execution time, in milliseconds. |
+| `p99Ms` | number or null | 99th-percentile execution time, in milliseconds. |
+| `rowsRead` | integer or null | Rows read across all calls. |
+| `rowsWritten` | integer or null | Rows written across all calls. |
+| `capturedAt` | string | When this drain was captured. Format: `date-time`. |
 
 ## databases.schema
 
@@ -230,9 +230,9 @@ GET /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/schema
 
 ### Path parameters
 
-| Name         | Type   | Required | Description |
-| ------------ | ------ | -------- | ----------- |
-| `databaseId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `databaseId` | string | Yes | — |
 
 ### Example
 
@@ -243,33 +243,33 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATA
 
 ### Responses
 
-| Status | Description                                                 |
-| ------ | ----------------------------------------------------------- |
-| `200`  | Database relations sorted by schema and name.               |
-| `404`  | No ready database in this project.                          |
-| `429`  | Database explorer concurrency or rate limit reached.        |
-| `504`  | Read-only schema inspection exceeded its statement timeout. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Database relations sorted by schema and name. |
+| `404` | No ready database in this project. |
+| `429` | Database explorer concurrency or rate limit reached. |
+| `504` | Read-only schema inspection exceeded its statement timeout. |
 
 ### Response body (200)
 
-| Field                              | Type           | Description                                   |
-| ---------------------------------- | -------------- | --------------------------------------------- |
-| `relations`                        | object[]       | —                                             |
-| `relations[].schema`               | string         | —                                             |
-| `relations[].name`                 | string         | —                                             |
-| `relations[].kind`                 | string         | One of: `table`, `view`, `materialized_view`. |
-| `relations[].columns`              | object[]       | —                                             |
-| `relations[].columns[].name`       | string         | —                                             |
-| `relations[].columns[].dataType`   | string         | —                                             |
-| `relations[].columns[].nullable`   | boolean        | —                                             |
-| `relations[].columns[].default`    | string or null | —                                             |
-| `relations[].columns[].primaryKey` | boolean        | —                                             |
-| `relations[].columns[].unique`     | boolean        | —                                             |
-| `relations[].indexes`              | object[]       | —                                             |
-| `relations[].indexes[].name`       | string         | —                                             |
-| `relations[].indexes[].unique`     | boolean        | —                                             |
-| `relations[].indexes[].primary`    | boolean        | —                                             |
-| `relations[].indexes[].columns`    | string[]       | —                                             |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `relations` | object[] | — |
+| `relations[].schema` | string | — |
+| `relations[].name` | string | — |
+| `relations[].kind` | string | One of: `table`, `view`, `materialized_view`. |
+| `relations[].columns` | object[] | — |
+| `relations[].columns[].name` | string | — |
+| `relations[].columns[].dataType` | string | — |
+| `relations[].columns[].nullable` | boolean | — |
+| `relations[].columns[].default` | string or null | — |
+| `relations[].columns[].primaryKey` | boolean | — |
+| `relations[].columns[].unique` | boolean | — |
+| `relations[].indexes` | object[] | — |
+| `relations[].indexes[].name` | string | — |
+| `relations[].indexes[].unique` | boolean | — |
+| `relations[].indexes[].primary` | boolean | — |
+| `relations[].indexes[].columns` | string[] | — |
 
 ## databases.browseRows
 
@@ -285,25 +285,25 @@ POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/rows
 
 ### Path parameters
 
-| Name         | Type   | Required | Description |
-| ------------ | ------ | -------- | ----------- |
-| `databaseId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `databaseId` | string | Yes | — |
 
 ### Request body
 
-| Field                | Type                                                      | Required | Description                                                              |
-| -------------------- | --------------------------------------------------------- | -------- | ------------------------------------------------------------------------ |
-| `schema`             | string                                                    | Yes      | —                                                                        |
-| `relation`           | string                                                    | Yes      | —                                                                        |
-| `limit`              | integer                                                   | No       | Page size from 1 to 100. Defaults to 50.                                 |
-| `cursor`             | string                                                    | No       | Opaque cursor from the previous page.                                    |
-| `sort`               | object                                                    | No       | —                                                                        |
-| `sort.column`        | string                                                    | Yes      | —                                                                        |
-| `sort.direction`     | string                                                    | Yes      | One of: `asc`, `desc`.                                                   |
-| `filters`            | object[]                                                  | No       | At most five filters. Columns are verified and values are parameterized. |
-| `filters[].column`   | string                                                    | Yes      | —                                                                        |
-| `filters[].operator` | string                                                    | Yes      | One of: `eq`, `neq`, `lt`, `lte`, `gt`, `gte`, `contains`, `is_null`.    |
-| `filters[].value`    | null or string or number or boolean or object or object[] | No       | —                                                                        |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `schema` | string | Yes | — |
+| `relation` | string | Yes | — |
+| `limit` | integer | No | Page size from 1 to 100. Defaults to 50. |
+| `cursor` | string | No | Opaque cursor from the previous page. |
+| `sort` | object | No | — |
+| `sort.column` | string | Yes | — |
+| `sort.direction` | string | Yes | One of: `asc`, `desc`. |
+| `filters` | object[] | No | At most five filters. Columns are verified and values are parameterized. |
+| `filters[].column` | string | Yes | — |
+| `filters[].operator` | string | Yes | One of: `eq`, `neq`, `lt`, `lte`, `gt`, `gte`, `contains`, `is_null`. |
+| `filters[].value` | null or string or number or boolean or object or object[] | No | — |
 
 ### Example
 
@@ -319,27 +319,27 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databas
 
 ### Responses
 
-| Status | Description                                          |
-| ------ | ---------------------------------------------------- |
-| `200`  | A bounded row page.                                  |
-| `404`  | No such ready database or relation in this project.  |
-| `422`  | Invalid relation, cursor, filter, or sort.           |
-| `429`  | Database explorer concurrency or rate limit reached. |
-| `504`  | Read-only row browse exceeded its statement timeout. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | A bounded row page. |
+| `404` | No such ready database or relation in this project. |
+| `422` | Invalid relation, cursor, filter, or sort. |
+| `429` | Database explorer concurrency or rate limit reached. |
+| `504` | Read-only row browse exceeded its statement timeout. |
 
 ### Response body (200)
 
-| Field                | Type           | Description                                                  |
-| -------------------- | -------------- | ------------------------------------------------------------ |
-| `columns`            | object[]       | —                                                            |
-| `columns[].name`     | string         | —                                                            |
-| `columns[].dataType` | string         | —                                                            |
-| `rows`               | object[]       | —                                                            |
-| `nextCursor`         | string or null | —                                                            |
-| `durationMs`         | number         | —                                                            |
-| `rowCount`           | integer        | —                                                            |
-| `bytes`              | integer        | —                                                            |
-| `truncated`          | boolean        | True when the server row or byte ceiling stopped collection. |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `columns` | object[] | — |
+| `columns[].name` | string | — |
+| `columns[].dataType` | string | — |
+| `rows` | object[] | — |
+| `nextCursor` | string or null | — |
+| `durationMs` | number | — |
+| `rowCount` | integer | — |
+| `bytes` | integer | — |
+| `truncated` | boolean | True when the server row or byte ceiling stopped collection. |
 
 ## databases.query
 
@@ -355,17 +355,17 @@ POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/query
 
 ### Path parameters
 
-| Name         | Type   | Required | Description |
-| ------------ | ------ | -------- | ----------- |
-| `databaseId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `databaseId` | string | Yes | — |
 
 ### Request body
 
-| Field     | Type    | Required | Description                                                      |
-| --------- | ------- | -------- | ---------------------------------------------------------------- |
-| `queryId` | string  | Yes      | Caller-generated UUID used for cancellation.                     |
-| `sql`     | string  | Yes      | One SELECT, VALUES, SHOW, EXPLAIN, or WITH ... SELECT statement. |
-| `limit`   | integer | No       | Maximum rows from 1 to 500. Defaults to 500.                     |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `queryId` | string | Yes | Caller-generated UUID used for cancellation. |
+| `sql` | string | Yes | One SELECT, VALUES, SHOW, EXPLAIN, or WITH ... SELECT statement. |
+| `limit` | integer | No | Maximum rows from 1 to 500. Defaults to 500. |
 
 ### Example
 
@@ -381,28 +381,28 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databas
 
 ### Responses
 
-| Status | Description                                                               |
-| ------ | ------------------------------------------------------------------------- |
-| `200`  | Bounded query results and measurements.                                   |
-| `404`  | No ready database in this project.                                        |
-| `409`  | The query id already exists for this database.                            |
-| `422`  | Empty, multi-statement, locking, data-modifying, or otherwise unsafe SQL. |
-| `429`  | Database explorer concurrency or rate limit reached.                      |
-| `504`  | Read-only query exceeded its statement timeout.                           |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Bounded query results and measurements. |
+| `404` | No ready database in this project. |
+| `409` | The query id already exists for this database. |
+| `422` | Empty, multi-statement, locking, data-modifying, or otherwise unsafe SQL. |
+| `429` | Database explorer concurrency or rate limit reached. |
+| `504` | Read-only query exceeded its statement timeout. |
 
 ### Response body (200)
 
-| Field                | Type           | Description                                                  |
-| -------------------- | -------------- | ------------------------------------------------------------ |
-| `columns`            | object[]       | —                                                            |
-| `columns[].name`     | string         | —                                                            |
-| `columns[].dataType` | string         | —                                                            |
-| `rows`               | object[]       | —                                                            |
-| `nextCursor`         | string or null | —                                                            |
-| `durationMs`         | number         | —                                                            |
-| `rowCount`           | integer        | —                                                            |
-| `bytes`              | integer        | —                                                            |
-| `truncated`          | boolean        | True when the server row or byte ceiling stopped collection. |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `columns` | object[] | — |
+| `columns[].name` | string | — |
+| `columns[].dataType` | string | — |
+| `rows` | object[] | — |
+| `nextCursor` | string or null | — |
+| `durationMs` | number | — |
+| `rowCount` | integer | — |
+| `bytes` | integer | — |
+| `truncated` | boolean | True when the server row or byte ceiling stopped collection. |
 
 ## databases.cancelQuery
 
@@ -418,9 +418,9 @@ POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/queries/{query
 
 ### Path parameters
 
-| Name         | Type   | Required | Description |
-| ------------ | ------ | -------- | ----------- |
-| `databaseId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `databaseId` | string | Yes | — |
 
 ### Example
 
@@ -431,16 +431,16 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databas
 
 ### Responses
 
-| Status | Description                                             |
-| ------ | ------------------------------------------------------- |
-| `200`  | Cancellation result.                                    |
-| `404`  | No matching running query in this project and database. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Cancellation result. |
+| `404` | No matching running query in this project and database. |
 
 ### Response body (200)
 
-| Field      | Type    | Description |
-| ---------- | ------- | ----------- |
-| `canceled` | boolean | —           |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `canceled` | boolean | — |
 
 ## databases.queryHistory
 
@@ -456,16 +456,16 @@ GET /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/query-history
 
 ### Path parameters
 
-| Name         | Type   | Required | Description |
-| ------------ | ------ | -------- | ----------- |
-| `databaseId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `databaseId` | string | Yes | — |
 
 ### Query parameters
 
-| Name     | Type    | Required | Description |
-| -------- | ------- | -------- | ----------- |
-| `cursor` | string  | No       | —           |
-| `limit`  | integer | No       | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `cursor` | string | No | — |
+| `limit` | integer | No | — |
 
 ### Example
 
@@ -476,27 +476,27 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATA
 
 ### Responses
 
-| Status | Description                       |
-| ------ | --------------------------------- |
-| `200`  | A page of query history.          |
-| `404`  | No such database in this project. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | A page of query history. |
+| `404` | No such database in this project. |
 
 ### Response body (200)
 
-| Field                | Type            | Description                                           |
-| -------------------- | --------------- | ----------------------------------------------------- |
-| `items`              | object[]        | —                                                     |
-| `items[].id`         | string          | —                                                     |
-| `items[].statement`  | string          | —                                                     |
-| `items[].status`     | string          | One of: `running`, `succeeded`, `failed`, `canceled`. |
-| `items[].durationMs` | number or null  | —                                                     |
-| `items[].rowCount`   | integer or null | —                                                     |
-| `items[].bytes`      | integer or null | —                                                     |
-| `items[].truncated`  | boolean         | —                                                     |
-| `items[].errorCode`  | string or null  | —                                                     |
-| `items[].createdAt`  | string          | Format: `date-time`.                                  |
-| `items[].finishedAt` | string or null  | Format: `date-time`.                                  |
-| `nextCursor`         | string or null  | —                                                     |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `items` | object[] | — |
+| `items[].id` | string | — |
+| `items[].statement` | string | — |
+| `items[].status` | string | One of: `running`, `succeeded`, `failed`, `canceled`. |
+| `items[].durationMs` | number or null | — |
+| `items[].rowCount` | integer or null | — |
+| `items[].bytes` | integer or null | — |
+| `items[].truncated` | boolean | — |
+| `items[].errorCode` | string or null | — |
+| `items[].createdAt` | string | Format: `date-time`. |
+| `items[].finishedAt` | string or null | Format: `date-time`. |
+| `nextCursor` | string or null | — |
 
 ## databases.provision
 
@@ -513,18 +513,18 @@ POST /v1/orgs/{orgId}/projects/{projectId}/databases
 
 ### Query parameters
 
-| Name          | Type   | Required | Description                        |
-| ------------- | ------ | -------- | ---------------------------------- |
-| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Request body
 
-| Field      | Type    | Required | Description                                                                                                                                                      |
-| ---------- | ------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`     | string  | Yes      | Database name: 2-62 chars of lowercase letters, digits, and hyphens, starting with a letter. Unique within the environment. Pattern: `^[a-z][a-z0-9-]{1,61}$`.   |
-| `sku`      | string  | Yes      | Database SKU id (see the rate card via billing.get). Sizes the dedicated instance. Required — there is no default size.                                          |
-| `region`   | string  | Yes      | Database region id (see regions.list). Required; immutable after provisioning.                                                                                   |
-| `replicas` | integer | No       | Topology: 0 is single-node; 2 is HA with two replicas. Defaults to 0. HA requires the platform continuous-backup destination to be configured. One of: `0`, `2`. |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `name` | string | Yes | Database name: 2-62 chars of lowercase letters, digits, and hyphens, starting with a letter. Unique within the environment. Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `sku` | string | Yes | Database SKU id (see the rate card via billing.get). Sizes the dedicated instance. Required — there is no default size. |
+| `region` | string | Yes | Database region id (see regions.list). Required; immutable after provisioning. |
+| `replicas` | integer | No | Topology: 0 is single-node; 2 is HA with two replicas. Defaults to 0. HA requires the platform continuous-backup destination to be configured. One of: `0`, `2`. |
 
 ### Example
 
@@ -541,22 +541,22 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databas
 
 ### Responses
 
-| Status | Description                                                                                                                                       |
-| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `201`  | Database provisioned. The connection string is shown once; store it securely. Rotate to obtain a new one.                                         |
-| `402`  | Organization billing is not active.                                                                                                               |
-| `404`  | No such project or environment in this organization.                                                                                              |
-| `409`  | A database with that name already exists in this environment.                                                                                     |
-| `422`  | Invalid name, unknown or unavailable database region or SKU, unsupported replica count, or HA requested before continuous recovery is configured. |
+| Status | Description |
+| ------ | ----------- |
+| `201` | Database provisioned. The connection string is shown once; store it securely. Rotate to obtain a new one. |
+| `402` | Organization billing is not active. |
+| `404` | No such project or environment in this organization. |
+| `409` | A database with that name already exists in this environment. |
+| `422` | Invalid name, unknown or unavailable database region or SKU, unsupported replica count, or HA requested before continuous recovery is configured. |
 
 ### Response body (201)
 
-| Field              | Type   | Description                                                                                                                                                                     |
-| ------------------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `id`               | string | The database's id — addresses it in every other operation.                                                                                                                      |
-| `name`             | string | Customer-chosen database name — unique within the environment. 2-62 chars of lowercase letters, digits, and hyphens, starting with a letter. Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
-| `status`           | string | One of: `provisioning`, `resizing`, `ready`, `failed`.                                                                                                                          |
-| `connectionString` | string | Full postgres:// connection string including the password. Shown exactly once — it is never retrievable later.                                                                  |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | The database's id — addresses it in every other operation. |
+| `name` | string | Customer-chosen database name — unique within the environment. 2-62 chars of lowercase letters, digits, and hyphens, starting with a letter. Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `status` | string | One of: `provisioning`, `resizing`, `ready`, `failed`. |
+| `connectionString` | string | Full postgres:// connection string including the password. Shown exactly once — it is never retrievable later. |
 
 ## databases.resize
 
@@ -573,15 +573,15 @@ POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/resize
 
 ### Path parameters
 
-| Name         | Type   | Required | Description |
-| ------------ | ------ | -------- | ----------- |
-| `databaseId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `databaseId` | string | Yes | — |
 
 ### Request body
 
-| Field | Type   | Required | Description                                                 |
-| ----- | ------ | -------- | ----------------------------------------------------------- |
-| `sku` | string | Yes      | Target database SKU id (see the rate card via billing.get). |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `sku` | string | Yes | Target database SKU id (see the rate card via billing.get). |
 
 ### Example
 
@@ -596,78 +596,78 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databas
 
 ### Responses
 
-| Status | Description                                                             |
-| ------ | ----------------------------------------------------------------------- |
-| `202`  | Rolling resize queued or already converging on the requested SKU.       |
-| `402`  | Organization billing is not active.                                     |
-| `404`  | No such database in this project.                                       |
-| `409`  | Another resize is already targeting a different SKU.                    |
-| `422`  | Unknown SKU, non-HA database, or database not ready for rolling resize. |
+| Status | Description |
+| ------ | ----------- |
+| `202` | Rolling resize queued or already converging on the requested SKU. |
+| `402` | Organization billing is not active. |
+| `404` | No such database in this project. |
+| `409` | Another resize is already targeting a different SKU. |
+| `422` | Unknown SKU, non-HA database, or database not ready for rolling resize. |
 
 ### Response body (202)
 
-| Field                                            | Type            | Description                                                                                                                                                                           |
-| ------------------------------------------------ | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `id`                                             | string          | —                                                                                                                                                                                     |
-| `name`                                           | string          | Customer-chosen database name — unique within the environment. 2-62 chars of lowercase letters, digits, and hyphens, starting with a letter. Pattern: `^[a-z][a-z0-9-]{1,61}$`.       |
-| `environment`                                    | string          | Slug of the environment the database belongs to. Pattern: `^[a-z][a-z0-9-]{0,38}$`.                                                                                                   |
-| `status`                                         | string          | One of: `provisioning`, `resizing`, `ready`, `failed`.                                                                                                                                |
-| `region`                                         | string          | Database region id (see regions.list). Immutable after provisioning.                                                                                                                  |
-| `replicas`                                       | integer         | Topology: 0 creates a single-node database; 2 creates one primary plus two data replicas with synchronous quorum commits and continuous recovery. One of: `0`, `2`.                   |
-| `host`                                           | string          | Managed database endpoint — the in-platform hostname for SKU databases, "db.korve.app" for legacy ones.                                                                               |
-| `port`                                           | integer         | —                                                                                                                                                                                     |
-| `poolerPort`                                     | integer         | PgBouncer transaction-pooling port. The primary port remains available for session-mode clients.                                                                                      |
-| `dbName`                                         | string          | —                                                                                                                                                                                     |
-| `user`                                           | string          | —                                                                                                                                                                                     |
-| `provider`                                       | string          | Database backend generation the row lives on. Set at provisioning.                                                                                                                    |
-| `sku`                                            | string or null  | Database SKU id (see the rate card via billing.get); null on legacy databases.                                                                                                        |
-| `targetSku`                                      | string or null  | Requested SKU while a zero-downtime HA resize is running; otherwise null.                                                                                                             |
-| `allocatedStorageGb`                             | integer or null | Actual allocated data-disk capacity. It grows with larger SKUs and remains allocated after a compute downsize because durable volumes cannot shrink.                                  |
-| `resize`                                         | object or null  | Durable progress for an active rolling resize; null when no resize is running.                                                                                                        |
-| `resize.direction`                               | string          | One of: `up`, `down`.                                                                                                                                                                 |
-| `resize.phase`                                   | string          | One of: `queued`, `preparing`, `growing-storage`, `resizing-replicas`, `switching-primary`, `resizing-former-primary`, `verifying`, `retrying`.                                       |
-| `resize.progressPercent`                         | integer         | —                                                                                                                                                                                     |
-| `resize.startedAt`                               | string          | Format: `date-time`.                                                                                                                                                                  |
-| `resize.estimatedCompletedAt`                    | string          | Format: `date-time`.                                                                                                                                                                  |
-| `liveStatus`                                     | string          | Liveness from the instance's heartbeat: live when the last report is recent, stale once it lapses, unknown before the instance has ever reported. One of: `live`, `stale`, `unknown`. |
-| `lastSeenAt`                                     | string or null  | When the instance last reported in; null until the first heartbeat. Format: `date-time`.                                                                                              |
-| `sizeBytes`                                      | integer or null | On-disk size in bytes from the latest heartbeat; null until the first report.                                                                                                         |
-| `nodes`                                          | object[]        | Instance topology for managed databases. Empty for legacy databases.                                                                                                                  |
-| `nodes[].ordinal`                                | integer         | —                                                                                                                                                                                     |
-| `nodes[].role`                                   | string          | One of: `primary`, `replica`, `witness`.                                                                                                                                              |
-| `nodes[].region`                                 | string          | —                                                                                                                                                                                     |
-| `nodes[].status`                                 | string          | —                                                                                                                                                                                     |
-| `nodes[].metrics`                                | object or null  | Latest one-minute operational sample; null until the node agent reports one.                                                                                                          |
-| `nodes[].metrics.sampledAt`                      | string          | Format: `date-time`.                                                                                                                                                                  |
-| `nodes[].metrics.qps`                            | number or null  | Queries per second in the sample window.                                                                                                                                              |
-| `nodes[].metrics.readIops`                       | number or null  | —                                                                                                                                                                                     |
-| `nodes[].metrics.writeIops`                      | number or null  | —                                                                                                                                                                                     |
-| `nodes[].metrics.cpuPercent`                     | number or null  | —                                                                                                                                                                                     |
-| `nodes[].metrics.memoryUsedBytes`                | integer or null | —                                                                                                                                                                                     |
-| `nodes[].metrics.memoryLimitBytes`               | integer or null | —                                                                                                                                                                                     |
-| `nodes[].metrics.directConnections`              | integer or null | —                                                                                                                                                                                     |
-| `nodes[].metrics.pgbouncer`                      | object          | —                                                                                                                                                                                     |
-| `nodes[].metrics.pgbouncer.clientActive`         | integer or null | —                                                                                                                                                                                     |
-| `nodes[].metrics.pgbouncer.clientWaiting`        | integer or null | —                                                                                                                                                                                     |
-| `nodes[].metrics.pgbouncer.serverActive`         | integer or null | —                                                                                                                                                                                     |
-| `nodes[].metrics.pgbouncer.serverIdle`           | integer or null | —                                                                                                                                                                                     |
-| `nodes[].metrics.pgbouncer.maxClientConnections` | integer or null | —                                                                                                                                                                                     |
-| `metrics`                                        | object or null  | Latest one-minute operational sample; null until the node agent reports one.                                                                                                          |
-| `metrics.sampledAt`                              | string          | Format: `date-time`.                                                                                                                                                                  |
-| `metrics.qps`                                    | number or null  | Queries per second in the sample window.                                                                                                                                              |
-| `metrics.readIops`                               | number or null  | —                                                                                                                                                                                     |
-| `metrics.writeIops`                              | number or null  | —                                                                                                                                                                                     |
-| `metrics.cpuPercent`                             | number or null  | —                                                                                                                                                                                     |
-| `metrics.memoryUsedBytes`                        | integer or null | —                                                                                                                                                                                     |
-| `metrics.memoryLimitBytes`                       | integer or null | —                                                                                                                                                                                     |
-| `metrics.directConnections`                      | integer or null | —                                                                                                                                                                                     |
-| `metrics.pgbouncer`                              | object          | —                                                                                                                                                                                     |
-| `metrics.pgbouncer.clientActive`                 | integer or null | —                                                                                                                                                                                     |
-| `metrics.pgbouncer.clientWaiting`                | integer or null | —                                                                                                                                                                                     |
-| `metrics.pgbouncer.serverActive`                 | integer or null | —                                                                                                                                                                                     |
-| `metrics.pgbouncer.serverIdle`                   | integer or null | —                                                                                                                                                                                     |
-| `metrics.pgbouncer.maxClientConnections`         | integer or null | —                                                                                                                                                                                     |
-| `createdAt`                                      | string          | Format: `date-time`.                                                                                                                                                                  |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | Customer-chosen database name — unique within the environment. 2-62 chars of lowercase letters, digits, and hyphens, starting with a letter. Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `environment` | string | Slug of the environment the database belongs to. Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `status` | string | One of: `provisioning`, `resizing`, `ready`, `failed`. |
+| `region` | string | Database region id (see regions.list). Immutable after provisioning. |
+| `replicas` | integer | Topology: 0 creates a single-node database; 2 creates one primary plus two data replicas with synchronous quorum commits and continuous recovery. One of: `0`, `2`. |
+| `host` | string | Managed database endpoint — the in-platform hostname for SKU databases, "db.korve.app" for legacy ones. |
+| `port` | integer | — |
+| `poolerPort` | integer | PgBouncer transaction-pooling port. The primary port remains available for session-mode clients. |
+| `dbName` | string | — |
+| `user` | string | — |
+| `provider` | string | Database backend generation the row lives on. Set at provisioning. |
+| `sku` | string or null | Database SKU id (see the rate card via billing.get); null on legacy databases. |
+| `targetSku` | string or null | Requested SKU while a zero-downtime HA resize is running; otherwise null. |
+| `allocatedStorageGb` | integer or null | Actual allocated data-disk capacity. It grows with larger SKUs and remains allocated after a compute downsize because durable volumes cannot shrink. |
+| `resize` | object or null | Durable progress for an active rolling resize; null when no resize is running. |
+| `resize.direction` | string | One of: `up`, `down`. |
+| `resize.phase` | string | One of: `queued`, `preparing`, `growing-storage`, `resizing-replicas`, `switching-primary`, `resizing-former-primary`, `verifying`, `retrying`. |
+| `resize.progressPercent` | integer | — |
+| `resize.startedAt` | string | Format: `date-time`. |
+| `resize.estimatedCompletedAt` | string | Format: `date-time`. |
+| `liveStatus` | string | Liveness from the instance's heartbeat: live when the last report is recent, stale once it lapses, unknown before the instance has ever reported. One of: `live`, `stale`, `unknown`. |
+| `lastSeenAt` | string or null | When the instance last reported in; null until the first heartbeat. Format: `date-time`. |
+| `sizeBytes` | integer or null | On-disk size in bytes from the latest heartbeat; null until the first report. |
+| `nodes` | object[] | Instance topology for managed databases. Empty for legacy databases. |
+| `nodes[].ordinal` | integer | — |
+| `nodes[].role` | string | One of: `primary`, `replica`, `witness`. |
+| `nodes[].region` | string | — |
+| `nodes[].status` | string | — |
+| `nodes[].metrics` | object or null | Latest one-minute operational sample; null until the node agent reports one. |
+| `nodes[].metrics.sampledAt` | string | Format: `date-time`. |
+| `nodes[].metrics.qps` | number or null | Queries per second in the sample window. |
+| `nodes[].metrics.readIops` | number or null | — |
+| `nodes[].metrics.writeIops` | number or null | — |
+| `nodes[].metrics.cpuPercent` | number or null | — |
+| `nodes[].metrics.memoryUsedBytes` | integer or null | — |
+| `nodes[].metrics.memoryLimitBytes` | integer or null | — |
+| `nodes[].metrics.directConnections` | integer or null | — |
+| `nodes[].metrics.pgbouncer` | object | — |
+| `nodes[].metrics.pgbouncer.clientActive` | integer or null | — |
+| `nodes[].metrics.pgbouncer.clientWaiting` | integer or null | — |
+| `nodes[].metrics.pgbouncer.serverActive` | integer or null | — |
+| `nodes[].metrics.pgbouncer.serverIdle` | integer or null | — |
+| `nodes[].metrics.pgbouncer.maxClientConnections` | integer or null | — |
+| `metrics` | object or null | Latest one-minute operational sample; null until the node agent reports one. |
+| `metrics.sampledAt` | string | Format: `date-time`. |
+| `metrics.qps` | number or null | Queries per second in the sample window. |
+| `metrics.readIops` | number or null | — |
+| `metrics.writeIops` | number or null | — |
+| `metrics.cpuPercent` | number or null | — |
+| `metrics.memoryUsedBytes` | integer or null | — |
+| `metrics.memoryLimitBytes` | integer or null | — |
+| `metrics.directConnections` | integer or null | — |
+| `metrics.pgbouncer` | object | — |
+| `metrics.pgbouncer.clientActive` | integer or null | — |
+| `metrics.pgbouncer.clientWaiting` | integer or null | — |
+| `metrics.pgbouncer.serverActive` | integer or null | — |
+| `metrics.pgbouncer.serverIdle` | integer or null | — |
+| `metrics.pgbouncer.maxClientConnections` | integer or null | — |
+| `createdAt` | string | Format: `date-time`. |
 
 ## databases.rotatePassword
 
@@ -683,9 +683,9 @@ POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/rotate
 
 ### Path parameters
 
-| Name         | Type   | Required | Description |
-| ------------ | ------ | -------- | ----------- |
-| `databaseId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `databaseId` | string | Yes | — |
 
 ### Example
 
@@ -696,15 +696,15 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databas
 
 ### Responses
 
-| Status | Description                                                                                                 |
-| ------ | ----------------------------------------------------------------------------------------------------------- |
-| `200`  | New credentials issued. The connection string is shown once; store it securely. Rotate to obtain a new one. |
-| `404`  | No such database in this project.                                                                           |
+| Status | Description |
+| ------ | ----------- |
+| `200` | New credentials issued. The connection string is shown once; store it securely. Rotate to obtain a new one. |
+| `404` | No such database in this project. |
 
 ### Response body (200)
 
-| Field              | Type   | Description                                                                                                    |
-| ------------------ | ------ | -------------------------------------------------------------------------------------------------------------- |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
 | `connectionString` | string | Full postgres:// connection string including the password. Shown exactly once — it is never retrievable later. |
 
 ## databases.delete
@@ -721,9 +721,9 @@ DELETE /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}
 
 ### Path parameters
 
-| Name         | Type   | Required | Description |
-| ------------ | ------ | -------- | ----------- |
-| `databaseId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `databaseId` | string | Yes | — |
 
 ### Example
 
@@ -734,7 +734,7 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/datab
 
 ### Responses
 
-| Status | Description                       |
-| ------ | --------------------------------- |
-| `200`  | Database deleted.                 |
-| `404`  | No such database in this project. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Database deleted. |
+| `404` | No such database in this project. |
