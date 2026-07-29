@@ -20,16 +20,16 @@ POST /v1/agent-auth/authorization-requests
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `clientId` | string | Yes | One of: `korve-cli`, `korve-mcp`. |
-| `redirectUri` | string | Yes | Format: `uri`. |
-| `state` | string | Yes | — |
-| `codeChallenge` | string | Yes | Base64url SHA-256 digest of the client's PKCE verifier. Pattern: `^[A-Za-z0-9_-]{43}$`. |
-| `codeChallengeMethod` | string | Yes | One of: `S256`. |
-| `audience` | string | Yes | The first-party client surface that may present the resulting token. One of: `cli`, `mcp`. |
-| `scopes` | string[] | Yes | Exact public API operation ids the grant may call. |
-| `requestedRole` | string | Yes | Maximum organization role the grant may exercise. Owner grants do not exist. One of: `member`, `admin`. |
+| Field                 | Type     | Required | Description                                                                                             |
+| --------------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------- |
+| `clientId`            | string   | Yes      | One of: `korve-cli`, `korve-mcp`.                                                                       |
+| `redirectUri`         | string   | Yes      | Format: `uri`.                                                                                          |
+| `state`               | string   | Yes      | —                                                                                                       |
+| `codeChallenge`       | string   | Yes      | Base64url SHA-256 digest of the client's PKCE verifier. Pattern: `^[A-Za-z0-9_-]{43}$`.                 |
+| `codeChallengeMethod` | string   | Yes      | One of: `S256`.                                                                                         |
+| `audience`            | string   | Yes      | The first-party client surface that may present the resulting token. One of: `cli`, `mcp`.              |
+| `scopes`              | string[] | Yes      | Exact public API operation ids the grant may call.                                                      |
+| `requestedRole`       | string   | Yes      | Maximum organization role the grant may exercise. Owner grants do not exist. One of: `member`, `admin`. |
 
 ### Example
 
@@ -52,19 +52,19 @@ curl -X POST "https://api.korve.dev/v1/agent-auth/authorization-requests" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `201` | Authorization request created; open authorizationUrl in a browser. |
-| `422` | Invalid client, redirect, state, PKCE challenge, scope, or role. |
-| `429` | Too many authorization attempts from this network source. |
+| Status | Description                                                        |
+| ------ | ------------------------------------------------------------------ |
+| `201`  | Authorization request created; open authorizationUrl in a browser. |
+| `422`  | Invalid client, redirect, state, PKCE challenge, scope, or role.   |
+| `429`  | Too many authorization attempts from this network source.          |
 
 ### Response body (201)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `requestId` | string | Format: `uuid`. |
-| `authorizationUrl` | string | Format: `uri`. |
-| `expiresAt` | string | Format: `date-time`. |
+| Field              | Type   | Description          |
+| ------------------ | ------ | -------------------- |
+| `requestId`        | string | Format: `uuid`.      |
+| `authorizationUrl` | string | Format: `uri`.       |
+| `expiresAt`        | string | Format: `date-time`. |
 
 ## agentAuth.getAuthorizationRequest
 
@@ -87,21 +87,21 @@ curl "https://api.korve.dev/v1/agent-auth/authorization-requests/$REQUEST_ID" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Safe approval details; redirect and credential material are omitted. |
-| `404` | Unknown, expired, approved, denied, or consumed request. |
+| Status | Description                                                          |
+| ------ | -------------------------------------------------------------------- |
+| `200`  | Safe approval details; redirect and credential material are omitted. |
+| `404`  | Unknown, expired, approved, denied, or consumed request.             |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `requestId` | string | Format: `uuid`. |
-| `clientId` | string | One of: `korve-cli`, `korve-mcp`. |
-| `audience` | string | The first-party client surface that may present the resulting token. One of: `cli`, `mcp`. |
-| `scopes` | string[] | Exact public API operation ids the grant may call. |
-| `requestedRole` | string | Maximum organization role the grant may exercise. Owner grants do not exist. One of: `member`, `admin`. |
-| `expiresAt` | string | Format: `date-time`. |
+| Field           | Type     | Description                                                                                             |
+| --------------- | -------- | ------------------------------------------------------------------------------------------------------- |
+| `requestId`     | string   | Format: `uuid`.                                                                                         |
+| `clientId`      | string   | One of: `korve-cli`, `korve-mcp`.                                                                       |
+| `audience`      | string   | The first-party client surface that may present the resulting token. One of: `cli`, `mcp`.              |
+| `scopes`        | string[] | Exact public API operation ids the grant may call.                                                      |
+| `requestedRole` | string   | Maximum organization role the grant may exercise. Owner grants do not exist. One of: `member`, `admin`. |
+| `expiresAt`     | string   | Format: `date-time`.                                                                                    |
 
 ## agentAuth.denyAuthorizationRequest
 
@@ -130,18 +130,18 @@ curl -X POST "https://api.korve.dev/v1/agent-auth/authorization-requests/$REQUES
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Request denied; redirect the browser to the exact bound client URI. |
-| `404` | Unknown, expired, approved, denied, or consumed request. |
+| Status | Description                                                         |
+| ------ | ------------------------------------------------------------------- |
+| `200`  | Request denied; redirect the browser to the exact bound client URI. |
+| `404`  | Unknown, expired, approved, denied, or consumed request.            |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `denied` | boolean | One of: `true`. |
-| `redirectUri` | string | Format: `uri`. |
-| `state` | string | — |
+| Field         | Type    | Description     |
+| ------------- | ------- | --------------- |
+| `denied`      | boolean | One of: `true`. |
+| `redirectUri` | string  | Format: `uri`.  |
+| `state`       | string  | —               |
 
 ## agentAuth.approveAuthorizationRequest
 
@@ -170,18 +170,18 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/agent-grants/authorization-r
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | One-time authorization code and exact client state bound to the redirect. |
-| `404` | Unknown, expired, consumed, or cross-organization request. |
+| Status | Description                                                               |
+| ------ | ------------------------------------------------------------------------- |
+| `200`  | One-time authorization code and exact client state bound to the redirect. |
+| `404`  | Unknown, expired, consumed, or cross-organization request.                |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `redirectUri` | string | Format: `uri`. |
-| `code` | string | One-time code; never persisted in plaintext. |
-| `state` | string | — |
+| Field         | Type   | Description                                  |
+| ------------- | ------ | -------------------------------------------- |
+| `redirectUri` | string | Format: `uri`.                               |
+| `code`        | string | One-time code; never persisted in plaintext. |
+| `state`       | string | —                                            |
 
 ## agentAuth.createDeviceAuthorization
 
@@ -196,12 +196,12 @@ POST /v1/agent-auth/device-authorizations
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `clientId` | string | Yes | One of: `korve-cli`, `korve-mcp`. |
-| `audience` | string | Yes | The first-party client surface that may present the resulting token. One of: `cli`, `mcp`. |
-| `scopes` | string[] | Yes | Exact public API operation ids the grant may call. |
-| `requestedRole` | string | Yes | Maximum organization role the grant may exercise. Owner grants do not exist. One of: `member`, `admin`. |
+| Field           | Type     | Required | Description                                                                                             |
+| --------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------- |
+| `clientId`      | string   | Yes      | One of: `korve-cli`, `korve-mcp`.                                                                       |
+| `audience`      | string   | Yes      | The first-party client surface that may present the resulting token. One of: `cli`, `mcp`.              |
+| `scopes`        | string[] | Yes      | Exact public API operation ids the grant may call.                                                      |
+| `requestedRole` | string   | Yes      | Maximum organization role the grant may exercise. Owner grants do not exist. One of: `member`, `admin`. |
 
 ### Example
 
@@ -220,22 +220,22 @@ curl -X POST "https://api.korve.dev/v1/agent-auth/device-authorizations" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `201` | Device authorization created. Show the user code, then poll the token endpoint with the device code. |
-| `422` | Invalid client, audience, scope, or role. |
-| `429` | Too many device authorization attempts from this network source. |
+| Status | Description                                                                                          |
+| ------ | ---------------------------------------------------------------------------------------------------- |
+| `201`  | Device authorization created. Show the user code, then poll the token endpoint with the device code. |
+| `422`  | Invalid client, audience, scope, or role.                                                            |
+| `429`  | Too many device authorization attempts from this network source.                                     |
 
 ### Response body (201)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `deviceCode` | string | Client-held polling secret; never shown to the approving user. |
-| `userCode` | string | Human-entered pairing code in XXXX-XXXX form, from an unambiguous alphabet. Pattern: `^[BCDFGHJKLMNPQRSTVWXZ]{4}-[BCDFGHJKLMNPQRSTVWXZ]{4}$`. |
-| `verificationUri` | string | Format: `uri`. |
-| `verificationUriComplete` | string | The verification page with the user code pre-filled. Format: `uri`. |
-| `expiresIn` | integer | — |
-| `interval` | integer | Minimum seconds between token polls. |
+| Field                     | Type    | Description                                                                                                                                   |
+| ------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `deviceCode`              | string  | Client-held polling secret; never shown to the approving user.                                                                                |
+| `userCode`                | string  | Human-entered pairing code in XXXX-XXXX form, from an unambiguous alphabet. Pattern: `^[BCDFGHJKLMNPQRSTVWXZ]{4}-[BCDFGHJKLMNPQRSTVWXZ]{4}$`. |
+| `verificationUri`         | string  | Format: `uri`.                                                                                                                                |
+| `verificationUriComplete` | string  | The verification page with the user code pre-filled. Format: `uri`.                                                                           |
+| `expiresIn`               | integer | —                                                                                                                                             |
+| `interval`                | integer | Minimum seconds between token polls.                                                                                                          |
 
 ## agentAuth.getDeviceAuthorization
 
@@ -251,9 +251,9 @@ GET /v1/agent-auth/device-authorizations/{userCode}
 
 ### Path parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `userCode` | string | Yes | Human-entered pairing code in XXXX-XXXX form, from an unambiguous alphabet. Pattern: `^[BCDFGHJKLMNPQRSTVWXZ]{4}-[BCDFGHJKLMNPQRSTVWXZ]{4}$`. |
+| Name       | Type   | Required | Description                                                                                                                                   |
+| ---------- | ------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `userCode` | string | Yes      | Human-entered pairing code in XXXX-XXXX form, from an unambiguous alphabet. Pattern: `^[BCDFGHJKLMNPQRSTVWXZ]{4}-[BCDFGHJKLMNPQRSTVWXZ]{4}$`. |
 
 ### Example
 
@@ -264,21 +264,21 @@ curl "https://api.korve.dev/v1/agent-auth/device-authorizations/$USER_CODE" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Safe approval details; the device code is never returned. |
-| `404` | Unknown, expired, approved, denied, or consumed device code. |
+| Status | Description                                                  |
+| ------ | ------------------------------------------------------------ |
+| `200`  | Safe approval details; the device code is never returned.    |
+| `404`  | Unknown, expired, approved, denied, or consumed device code. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `userCode` | string | Human-entered pairing code in XXXX-XXXX form, from an unambiguous alphabet. Pattern: `^[BCDFGHJKLMNPQRSTVWXZ]{4}-[BCDFGHJKLMNPQRSTVWXZ]{4}$`. |
-| `clientId` | string | One of: `korve-cli`, `korve-mcp`. |
-| `audience` | string | The first-party client surface that may present the resulting token. One of: `cli`, `mcp`. |
-| `scopes` | string[] | Exact public API operation ids the grant may call. |
-| `requestedRole` | string | Maximum organization role the grant may exercise. Owner grants do not exist. One of: `member`, `admin`. |
-| `expiresAt` | string | Format: `date-time`. |
+| Field           | Type     | Description                                                                                                                                   |
+| --------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `userCode`      | string   | Human-entered pairing code in XXXX-XXXX form, from an unambiguous alphabet. Pattern: `^[BCDFGHJKLMNPQRSTVWXZ]{4}-[BCDFGHJKLMNPQRSTVWXZ]{4}$`. |
+| `clientId`      | string   | One of: `korve-cli`, `korve-mcp`.                                                                                                             |
+| `audience`      | string   | The first-party client surface that may present the resulting token. One of: `cli`, `mcp`.                                                    |
+| `scopes`        | string[] | Exact public API operation ids the grant may call.                                                                                            |
+| `requestedRole` | string   | Maximum organization role the grant may exercise. Owner grants do not exist. One of: `member`, `admin`.                                       |
+| `expiresAt`     | string   | Format: `date-time`.                                                                                                                          |
 
 ## agentAuth.approveDeviceAuthorization
 
@@ -294,9 +294,9 @@ POST /v1/orgs/{orgId}/agent-grants/device-authorizations/{userCode}/approve
 
 ### Path parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `userCode` | string | Yes | Human-entered pairing code in XXXX-XXXX form, from an unambiguous alphabet. Pattern: `^[BCDFGHJKLMNPQRSTVWXZ]{4}-[BCDFGHJKLMNPQRSTVWXZ]{4}$`. |
+| Name       | Type   | Required | Description                                                                                                                                   |
+| ---------- | ------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `userCode` | string | Yes      | Human-entered pairing code in XXXX-XXXX form, from an unambiguous alphabet. Pattern: `^[BCDFGHJKLMNPQRSTVWXZ]{4}-[BCDFGHJKLMNPQRSTVWXZ]{4}$`. |
 
 ### Request body
 
@@ -313,15 +313,15 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/agent-grants/device-authoriz
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Device authorization approved; the device completes on its next poll. |
-| `404` | Unknown, expired, approved, denied, or consumed device code. |
+| Status | Description                                                           |
+| ------ | --------------------------------------------------------------------- |
+| `200`  | Device authorization approved; the device completes on its next poll. |
+| `404`  | Unknown, expired, approved, denied, or consumed device code.          |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field      | Type    | Description     |
+| ---------- | ------- | --------------- |
 | `approved` | boolean | One of: `true`. |
 
 ## agentAuth.denyDeviceAuthorization
@@ -338,9 +338,9 @@ POST /v1/agent-auth/device-authorizations/{userCode}/deny
 
 ### Path parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `userCode` | string | Yes | Human-entered pairing code in XXXX-XXXX form, from an unambiguous alphabet. Pattern: `^[BCDFGHJKLMNPQRSTVWXZ]{4}-[BCDFGHJKLMNPQRSTVWXZ]{4}$`. |
+| Name       | Type   | Required | Description                                                                                                                                   |
+| ---------- | ------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `userCode` | string | Yes      | Human-entered pairing code in XXXX-XXXX form, from an unambiguous alphabet. Pattern: `^[BCDFGHJKLMNPQRSTVWXZ]{4}-[BCDFGHJKLMNPQRSTVWXZ]{4}$`. |
 
 ### Request body
 
@@ -357,15 +357,15 @@ curl -X POST "https://api.korve.dev/v1/agent-auth/device-authorizations/$USER_CO
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Device authorization denied. |
-| `404` | Unknown, expired, approved, denied, or consumed device code. |
+| Status | Description                                                  |
+| ------ | ------------------------------------------------------------ |
+| `200`  | Device authorization denied.                                 |
+| `404`  | Unknown, expired, approved, denied, or consumed device code. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field    | Type    | Description     |
+| -------- | ------- | --------------- |
 | `denied` | boolean | One of: `true`. |
 
 ## agentAuth.exchangeToken
@@ -381,15 +381,15 @@ POST /v1/agent-auth/token
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `grantType` | string | Yes | One of: `authorization_code`, `device_code`, `refresh_token`. |
-| `clientId` | string | Yes | One of: `korve-cli`, `korve-mcp`. |
-| `redirectUri` | string | No | Format: `uri`. |
-| `code` | string | No | — |
-| `codeVerifier` | string | No | — |
-| `deviceCode` | string | No | The device authorization's client-held polling secret. |
-| `refreshToken` | string | No | — |
+| Field          | Type   | Required | Description                                                   |
+| -------------- | ------ | -------- | ------------------------------------------------------------- |
+| `grantType`    | string | Yes      | One of: `authorization_code`, `device_code`, `refresh_token`. |
+| `clientId`     | string | Yes      | One of: `korve-cli`, `korve-mcp`.                             |
+| `redirectUri`  | string | No       | Format: `uri`.                                                |
+| `code`         | string | No       | —                                                             |
+| `codeVerifier` | string | No       | —                                                             |
+| `deviceCode`   | string | No       | The device authorization's client-held polling secret.        |
+| `refreshToken` | string | No       | —                                                             |
 
 ### Example
 
@@ -404,25 +404,25 @@ curl -X POST "https://api.korve.dev/v1/agent-auth/token" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | A short-lived access token and a single-use rotating refresh token. |
-| `400` | Invalid, expired, consumed, replayed, or mis-bound grant. Device polling answers with the error codes AUTHORIZATION_PENDING, SLOW_DOWN, ACCESS_DENIED, or EXPIRED_TOKEN. |
+| Status | Description                                                                                                                                                              |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `200`  | A short-lived access token and a single-use rotating refresh token.                                                                                                      |
+| `400`  | Invalid, expired, consumed, replayed, or mis-bound grant. Device polling answers with the error codes AUTHORIZATION_PENDING, SLOW_DOWN, ACCESS_DENIED, or EXPIRED_TOKEN. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `tokenType` | string | One of: `Bearer`. |
-| `accessToken` | string | — |
-| `expiresIn` | integer | — |
-| `refreshToken` | string | — |
-| `refreshExpiresAt` | string | Format: `date-time`. |
-| `audience` | string | The first-party client surface that may present the resulting token. One of: `cli`, `mcp`. |
-| `role` | string | Maximum organization role the grant may exercise. Owner grants do not exist. One of: `member`, `admin`. |
-| `scopes` | string[] | Exact public API operation ids the grant may call. |
-| `organizationId` | string | Format: `uuid`. |
-| `grantId` | string | Format: `uuid`. |
+| Field              | Type     | Description                                                                                             |
+| ------------------ | -------- | ------------------------------------------------------------------------------------------------------- |
+| `tokenType`        | string   | One of: `Bearer`.                                                                                       |
+| `accessToken`      | string   | —                                                                                                       |
+| `expiresIn`        | integer  | —                                                                                                       |
+| `refreshToken`     | string   | —                                                                                                       |
+| `refreshExpiresAt` | string   | Format: `date-time`.                                                                                    |
+| `audience`         | string   | The first-party client surface that may present the resulting token. One of: `cli`, `mcp`.              |
+| `role`             | string   | Maximum organization role the grant may exercise. Owner grants do not exist. One of: `member`, `admin`. |
+| `scopes`           | string[] | Exact public API operation ids the grant may call.                                                      |
+| `organizationId`   | string   | Format: `uuid`.                                                                                         |
+| `grantId`          | string   | Format: `uuid`.                                                                                         |
 
 ## agentAuth.revokeToken
 
@@ -437,10 +437,10 @@ POST /v1/agent-auth/revoke
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `clientId` | string | Yes | One of: `korve-cli`, `korve-mcp`. |
-| `token` | string | Yes | — |
+| Field      | Type   | Required | Description                       |
+| ---------- | ------ | -------- | --------------------------------- |
+| `clientId` | string | Yes      | One of: `korve-cli`, `korve-mcp`. |
+| `token`    | string | Yes      | —                                 |
 
 ### Example
 
@@ -455,14 +455,14 @@ curl -X POST "https://api.korve.dev/v1/agent-auth/revoke" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | The matching grant family is revoked, if it exists. |
+| Status | Description                                         |
+| ------ | --------------------------------------------------- |
+| `200`  | The matching grant family is revoked, if it exists. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field     | Type    | Description     |
+| --------- | ------- | --------------- |
 | `revoked` | boolean | One of: `true`. |
 
 ## agentAuth.listGrants
@@ -486,25 +486,25 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/agent-grants" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Revocable agent grants. |
+| Status | Description             |
+| ------ | ----------------------- |
+| `200`  | Revocable agent grants. |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | Format: `uuid`. |
-| `clientId` | string | One of: `korve-cli`, `korve-mcp`. |
-| `audience` | string | The first-party client surface that may present the resulting token. One of: `cli`, `mcp`. |
-| `role` | string | Maximum organization role the grant may exercise. Owner grants do not exist. One of: `member`, `admin`. |
-| `scopes` | string[] | Exact public API operation ids the grant may call. |
-| `userId` | string | — |
-| `revokedAt` | string or null | Format: `date-time`. |
-| `lastUsedAt` | string or null | Format: `date-time`. |
-| `createdAt` | string | Format: `date-time`. |
+| Field        | Type           | Description                                                                                             |
+| ------------ | -------------- | ------------------------------------------------------------------------------------------------------- |
+| `id`         | string         | Format: `uuid`.                                                                                         |
+| `clientId`   | string         | One of: `korve-cli`, `korve-mcp`.                                                                       |
+| `audience`   | string         | The first-party client surface that may present the resulting token. One of: `cli`, `mcp`.              |
+| `role`       | string         | Maximum organization role the grant may exercise. Owner grants do not exist. One of: `member`, `admin`. |
+| `scopes`     | string[]       | Exact public API operation ids the grant may call.                                                      |
+| `userId`     | string         | —                                                                                                       |
+| `revokedAt`  | string or null | Format: `date-time`.                                                                                    |
+| `lastUsedAt` | string or null | Format: `date-time`.                                                                                    |
+| `createdAt`  | string         | Format: `date-time`.                                                                                    |
 
 ## agentAuth.revokeGrant
 
@@ -527,13 +527,13 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/agent-grants/$GRANT_ID" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Grant revoked, idempotently. |
-| `404` | No visible grant in this organization. |
+| Status | Description                            |
+| ------ | -------------------------------------- |
+| `200`  | Grant revoked, idempotently.           |
+| `404`  | No visible grant in this organization. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field       | Type   | Description          |
+| ----------- | ------ | -------------------- |
 | `revokedAt` | string | Format: `date-time`. |
