@@ -140,10 +140,7 @@ describe("Korve public docs", () => {
       "realtime.listChannels",
       "storage.runtimeCreateUpload",
     ]) {
-      expect(
-        operations.some((operation) => operation.operationId === operationId),
-        operationId,
-      ).toBe(true);
+      expect(operations.some((operation) => operation.operationId === operationId)).toBe(true);
     }
     expect(operations.flatMap((operation) => operation.tags ?? [])).not.toContain(
       "telemetryInternal",
@@ -159,16 +156,16 @@ describe("Korve public docs", () => {
       "realtime",
       "storage",
     ]) {
-      expect(published.has(`api-reference/${resource}`), resource).toBe(true);
+      expect(published.has(`api-reference/${resource}`)).toBe(true);
     }
   });
 
   it("does not claim the unreleased TypeScript packages are anonymously installable", () => {
     for (const page of ["sdk/runtime", "sdk/app-auth", "primitives/app-auth"]) {
       const source = fs.readFileSync(path.join(root, `${page}.mdx`), "utf8");
-      expect(source, page).toContain("not yet available from");
-      expect(source, page).toMatch(/public\s+npm\s+registry/);
-      expect(source, page).not.toMatch(/(?:npm|bun|pnpm|yarn)\s+(?:install|add)\s+@korve-dev\//);
+      expect(source).toContain("not yet available from");
+      expect(source).toMatch(/public\s+npm\s+registry/);
+      expect(source).not.toMatch(/(?:npm|bun|pnpm|yarn)\s+(?:install|add)\s+@korve-dev\//);
     }
 
     const payments = fs.readFileSync(path.join(root, "primitives/customer-payments.mdx"), "utf8");
