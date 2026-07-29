@@ -727,7 +727,7 @@ curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/sign-in/password" \
 
 ## appauth.requestMagicLink
 
-Send a single-use passwordless sign-in link. The response never reveals whether an account existed.
+Send a single-use passwordless sign-in link whose token is delivered in the URL fragment. The response never reveals whether an account existed.
 
 ```text
 POST /v1/apps/{projectId}/auth/magic-link
@@ -771,7 +771,7 @@ curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/magic-link" \
 
 ## appauth.completeMagicLink
 
-Consume a single-use email link and return a new application session.
+Consume the single-use token read from an email-link URL fragment and return a new application session.
 
 ```text
 POST /v1/apps/{projectId}/auth/magic-link/verify
@@ -830,7 +830,7 @@ curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/magic-link/verify" 
 
 ## appauth.requestPasswordReset
 
-Send a single-use password reset link. The response never reveals whether an account existed.
+Send a single-use password reset link whose token is delivered in the URL fragment. The response never reveals whether an account existed.
 
 ```text
 POST /v1/apps/{projectId}/auth/password/reset
@@ -1062,7 +1062,7 @@ curl "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/session" \
 
 ## appauth.refreshSession
 
-Atomically consume one refresh token and rotate both session tokens; reuse revokes the session.
+Atomically consume one refresh token and rotate both session tokens; reuse, idle expiry, or absolute expiry revokes the session.
 
 ```text
 POST /v1/apps/{projectId}/auth/refresh
@@ -1095,11 +1095,11 @@ curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/refresh" \
 
 ### Responses
 
-| Status | Description                                                        |
-| ------ | ------------------------------------------------------------------ |
-| `200`  | Rotated app session.                                               |
-| `401`  | Invalid, expired, reused, revoked, or cross-project refresh token. |
-| `429`  | Too many refresh attempts.                                         |
+| Status | Description                                                                      |
+| ------ | -------------------------------------------------------------------------------- |
+| `200`  | Rotated app session.                                                             |
+| `401`  | Invalid, expired, reused, idle-expired, revoked, or cross-project refresh token. |
+| `429`  | Too many refresh attempts.                                                       |
 
 ### Response body (200)
 

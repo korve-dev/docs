@@ -1027,7 +1027,7 @@
       "post": {
         "operationId": "appauth.completeMagicLink",
         "summary": "Complete Magic Link",
-        "description": "Consume a single-use email link and return a new application session.",
+        "description": "Consume the single-use token read from an email-link URL fragment and return a new application session.",
         "tags": ["appauth"],
         "parameters": [
           {
@@ -1148,7 +1148,7 @@
       "post": {
         "operationId": "appauth.requestMagicLink",
         "summary": "Request Magic Link",
-        "description": "Send a single-use passwordless sign-in link. The response never reveals whether an account existed.",
+        "description": "Send a single-use passwordless sign-in link whose token is delivered in the URL fragment. The response never reveals whether an account existed.",
         "tags": ["appauth"],
         "parameters": [
           {
@@ -1387,7 +1387,7 @@
       "post": {
         "operationId": "appauth.requestPasswordReset",
         "summary": "Request Password Reset",
-        "description": "Send a single-use password reset link. The response never reveals whether an account existed.",
+        "description": "Send a single-use password reset link whose token is delivered in the URL fragment. The response never reveals whether an account existed.",
         "tags": ["appauth"],
         "parameters": [
           {
@@ -1445,7 +1445,7 @@
       "post": {
         "operationId": "appauth.refreshSession",
         "summary": "Refresh Session",
-        "description": "Atomically consume one refresh token and rotate both session tokens; reuse revokes the session.",
+        "description": "Atomically consume one refresh token and rotate both session tokens; reuse, idle expiry, or absolute expiry revokes the session.",
         "tags": ["appauth"],
         "parameters": [
           {
@@ -1534,7 +1534,7 @@
             }
           },
           "401": {
-            "description": "Invalid, expired, reused, revoked, or cross-project refresh token."
+            "description": "Invalid, expired, reused, idle-expired, revoked, or cross-project refresh token."
           },
           "429": {
             "description": "Too many refresh attempts."
@@ -8341,7 +8341,22 @@
         ],
         "responses": {
           "200": {
-            "description": "Key revoked."
+            "description": "Key revoked.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [true]
+                    }
+                  },
+                  "required": ["ok"],
+                  "additionalProperties": false
+                }
+              }
+            }
           },
           "404": {
             "description": "No such key."
@@ -8396,7 +8411,43 @@
         ],
         "responses": {
           "200": {
-            "description": "Gateway keys."
+            "description": "Gateway keys.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "keyPrefix": {
+                        "type": "string"
+                      },
+                      "lastUsedAt": {
+                        "type": ["string", "null"],
+                        "format": "date-time"
+                      },
+                      "revokedAt": {
+                        "type": ["string", "null"],
+                        "format": "date-time"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": ["id", "name", "keyPrefix", "lastUsedAt", "revokedAt", "createdAt"],
+                    "additionalProperties": false
+                  }
+                }
+              }
+            }
           }
         },
         "x-korve-risk": "read",
@@ -8446,7 +8497,32 @@
         ],
         "responses": {
           "201": {
-            "description": "Key metadata and one-time secret."
+            "description": "Key metadata and one-time secret.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "keyPrefix": {
+                      "type": "string"
+                    },
+                    "secret": {
+                      "type": "string",
+                      "pattern": "^kvgw_[A-Za-z0-9]+$"
+                    }
+                  },
+                  "required": ["id", "name", "keyPrefix", "secret"],
+                  "additionalProperties": false
+                }
+              }
+            }
           },
           "404": {
             "description": "No such gateway."
@@ -8584,7 +8660,54 @@
         ],
         "responses": {
           "200": {
-            "description": "Gateway usage and remaining budget."
+            "description": "Gateway usage and remaining budget.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "month": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "requests": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "inputTokens": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "outputTokens": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "spentUsd": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "budgetUsd": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "remainingUsd": {
+                      "type": "number",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "month",
+                    "requests",
+                    "inputTokens",
+                    "outputTokens",
+                    "spentUsd",
+                    "budgetUsd",
+                    "remainingUsd"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
           }
         },
         "x-korve-risk": "read",
@@ -8636,7 +8759,22 @@
         ],
         "responses": {
           "200": {
-            "description": "AI gateway deleted."
+            "description": "AI gateway deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [true]
+                    }
+                  },
+                  "required": ["ok"],
+                  "additionalProperties": false
+                }
+              }
+            }
           },
           "404": {
             "description": "No such gateway."
@@ -27377,6 +27515,16 @@
             "description": "The project's id (UUID) or slug — either form is accepted."
           },
           {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,38}$"
+            },
+            "description": "Environment slug. Defaults to \"production\"; unknown environment slugs return 404."
+          },
+          {
             "name": "cursor",
             "in": "query",
             "required": false,
@@ -27444,6 +27592,20 @@
                             "type": "string",
                             "enum": ["open", "complete", "expired"]
                           },
+                          "paymentStatus": {
+                            "type": "string",
+                            "enum": [
+                              "unpaid",
+                              "paid",
+                              "no_payment_required",
+                              "refunded",
+                              "partially_refunded"
+                            ]
+                          },
+                          "settlementStatus": {
+                            "type": "string",
+                            "enum": ["pending", "available", "paid", "failed", "not_applicable"]
+                          },
                           "url": {
                             "type": ["string", "null"],
                             "format": "uri",
@@ -27468,6 +27630,8 @@
                           "mode",
                           "quantity",
                           "status",
+                          "paymentStatus",
+                          "settlementStatus",
                           "url",
                           "clientReferenceId",
                           "expiresAt",
@@ -27530,6 +27694,16 @@
               "type": "string"
             },
             "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,38}$"
+            },
+            "description": "Environment slug. Defaults to \"production\"; unknown environment slugs return 404."
           }
         ],
         "security": [
@@ -27573,6 +27747,20 @@
                       "type": "string",
                       "enum": ["open", "complete", "expired"]
                     },
+                    "paymentStatus": {
+                      "type": "string",
+                      "enum": [
+                        "unpaid",
+                        "paid",
+                        "no_payment_required",
+                        "refunded",
+                        "partially_refunded"
+                      ]
+                    },
+                    "settlementStatus": {
+                      "type": "string",
+                      "enum": ["pending", "available", "paid", "failed", "not_applicable"]
+                    },
                     "url": {
                       "type": ["string", "null"],
                       "format": "uri",
@@ -27597,6 +27785,8 @@
                     "mode",
                     "quantity",
                     "status",
+                    "paymentStatus",
+                    "settlementStatus",
                     "url",
                     "clientReferenceId",
                     "expiresAt",
@@ -27685,6 +27875,86 @@
         }
       }
     },
+    "/v1/orgs/{orgId}/projects/{projectId}/payments/customers/{customerId}": {
+      "delete": {
+        "operationId": "customerPayments.eraseCustomer",
+        "summary": "Erase Customer",
+        "description": "Erase end-customer personal data at the processor and redact the local projection.",
+        "tags": ["customerPayments"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,38}$"
+            },
+            "description": "Environment slug. Defaults to \"production\"; unknown environment slugs return 404."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Customer erased."
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "Project or payment resource not found."
+          },
+          "409": {
+            "description": "Duplicate idempotency key or conflicting resource state."
+          },
+          "422": {
+            "description": "Invalid payment request."
+          },
+          "502": {
+            "description": "The payment processor rejected the request."
+          },
+          "503": {
+            "description": "The payment processor is temporarily unavailable."
+          }
+        },
+        "x-korve-risk": "destructive",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "admin"
+      }
+    },
     "/v1/orgs/{orgId}/projects/{projectId}/payments/customers": {
       "get": {
         "operationId": "customerPayments.listCustomers",
@@ -27709,6 +27979,16 @@
               "type": "string"
             },
             "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,38}$"
+            },
+            "description": "Environment slug. Defaults to \"production\"; unknown environment slugs return 404."
           },
           {
             "name": "cursor",
@@ -27813,7 +28093,7 @@
         },
         "x-korve-risk": "read",
         "x-korve-project-scoped": true,
-        "x-korve-required-role": "member"
+        "x-korve-required-role": "admin"
       },
       "post": {
         "operationId": "customerPayments.createCustomer",
@@ -27838,6 +28118,16 @@
               "type": "string"
             },
             "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,38}$"
+            },
+            "description": "Environment slug. Defaults to \"production\"; unknown environment slugs return 404."
           }
         ],
         "security": [
@@ -27974,6 +28264,16 @@
             "description": "The project's id (UUID) or slug — either form is accepted."
           },
           {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,38}$"
+            },
+            "description": "Environment slug. Defaults to \"production\"; unknown environment slugs return 404."
+          },
+          {
             "name": "cursor",
             "in": "query",
             "required": false,
@@ -28025,7 +28325,7 @@
                           },
                           "processingStatus": {
                             "type": "string",
-                            "enum": ["processed", "ignored", "failed"]
+                            "enum": ["pending", "processing", "processed", "ignored", "failed"]
                           },
                           "occurredAt": {
                             "type": "string",
@@ -28104,6 +28404,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,38}$"
+            },
+            "description": "Environment slug. Defaults to \"production\"; unknown environment slugs return 404."
           }
         ],
         "security": [
@@ -28231,6 +28541,16 @@
               "type": "string"
             },
             "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,38}$"
+            },
+            "description": "Environment slug. Defaults to \"production\"; unknown environment slugs return 404."
           },
           {
             "name": "cursor",
@@ -28389,6 +28709,16 @@
               "type": "string"
             },
             "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,38}$"
+            },
+            "description": "Environment slug. Defaults to \"production\"; unknown environment slugs return 404."
           }
         ],
         "security": [
@@ -28572,6 +28902,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,38}$"
+            },
+            "description": "Environment slug. Defaults to \"production\"; unknown environment slugs return 404."
           }
         ],
         "security": [
@@ -28718,6 +29058,16 @@
             "description": "The project's id (UUID) or slug — either form is accepted."
           },
           {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,38}$"
+            },
+            "description": "Environment slug. Defaults to \"production\"; unknown environment slugs return 404."
+          },
+          {
             "name": "cursor",
             "in": "query",
             "required": false,
@@ -28856,6 +29206,16 @@
               "type": "string"
             },
             "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,38}$"
+            },
+            "description": "Environment slug. Defaults to \"production\"; unknown environment slugs return 404."
           }
         ],
         "security": [
@@ -29005,6 +29365,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,38}$"
+            },
+            "description": "Environment slug. Defaults to \"production\"; unknown environment slugs return 404."
           }
         ],
         "security": [
@@ -29135,6 +29505,16 @@
               "type": "string"
             },
             "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,38}$"
+            },
+            "description": "Environment slug. Defaults to \"production\"; unknown environment slugs return 404."
           },
           {
             "name": "cursor",
@@ -29287,6 +29667,16 @@
               "type": "string"
             },
             "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,38}$"
+            },
+            "description": "Environment slug. Defaults to \"production\"; unknown environment slugs return 404."
           }
         ],
         "security": [
@@ -29344,6 +29734,16 @@
               "type": "string"
             },
             "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,38}$"
+            },
+            "description": "Environment slug. Defaults to \"production\"; unknown environment slugs return 404."
           }
         ],
         "security": [
@@ -29379,6 +29779,19 @@
                     "webhookSecretConfigured": {
                       "type": "boolean"
                     },
+                    "credentialScopes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "allowedRedirectOrigins": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    },
                     "connectedAt": {
                       "type": ["string", "null"],
                       "format": "date-time"
@@ -29394,6 +29807,8 @@
                     "credentialHint",
                     "webhookUrl",
                     "webhookSecretConfigured",
+                    "credentialScopes",
+                    "allowedRedirectOrigins",
                     "connectedAt",
                     "updatedAt"
                   ]
@@ -29447,6 +29862,16 @@
               "type": "string"
             },
             "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,38}$"
+            },
+            "description": "Environment slug. Defaults to \"production\"; unknown environment slugs return 404."
           }
         ],
         "security": [
@@ -29479,6 +29904,19 @@
                     "webhookSecretConfigured": {
                       "type": "boolean"
                     },
+                    "credentialScopes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "allowedRedirectOrigins": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    },
                     "connectedAt": {
                       "type": ["string", "null"],
                       "format": "date-time"
@@ -29494,6 +29932,8 @@
                     "credentialHint",
                     "webhookUrl",
                     "webhookSecretConfigured",
+                    "credentialScopes",
+                    "allowedRedirectOrigins",
                     "connectedAt",
                     "updatedAt"
                   ]
@@ -29540,9 +29980,39 @@
                     "type": "string",
                     "minLength": 16,
                     "maxLength": 512
+                  },
+                  "credentialScopes": {
+                    "type": "array",
+                    "minItems": 5,
+                    "maxItems": 5,
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "customers:write",
+                        "products:write",
+                        "prices:write",
+                        "checkout_sessions:write",
+                        "subscriptions:write"
+                      ]
+                    }
+                  },
+                  "allowedRedirectOrigins": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 25,
+                    "items": {
+                      "type": "string",
+                      "format": "uri",
+                      "maxLength": 2048
+                    }
                   }
                 },
-                "required": ["secretKey", "webhookSecret"],
+                "required": [
+                  "secretKey",
+                  "webhookSecret",
+                  "credentialScopes",
+                  "allowedRedirectOrigins"
+                ],
                 "additionalProperties": false
               }
             }
@@ -31319,6 +31789,14 @@
                     },
                     "retainedBytes": {
                       "type": "integer"
+                    },
+                    "connectionSeconds": {
+                      "type": "integer",
+                      "description": "Cumulative connected-session seconds used for monotonic usage metering."
+                    },
+                    "retainedByteSeconds": {
+                      "type": "integer",
+                      "description": "Cumulative retained-payload byte-seconds used for monotonic usage metering."
                     }
                   },
                   "required": [
@@ -31329,7 +31807,9 @@
                     "delivered",
                     "rejected",
                     "retainedEvents",
-                    "retainedBytes"
+                    "retainedBytes",
+                    "connectionSeconds",
+                    "retainedByteSeconds"
                   ],
                   "additionalProperties": false
                 }
@@ -33369,7 +33849,7 @@
       "get": {
         "operationId": "productTelemetry.getFunnel",
         "summary": "Get Funnel",
-        "description": "Return aggregate, server-verified onboarding funnel evidence for this organization. Anonymous and untrusted public correlation data is never returned.",
+        "description": "Return aggregate, server-verified onboarding funnel evidence for this organization. Each result names its deduplication grain; anonymous and untrusted public correlation data is never returned.",
         "tags": ["productTelemetry"],
         "parameters": [
           {
@@ -33412,7 +33892,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Aggregate event counts and first/last evidence timestamps.",
+            "description": "Aggregate authoritative event counts, explicit grains, and first/last evidence timestamps.",
             "content": {
               "application/json": {
                 "schema": {
@@ -33433,25 +33913,15 @@
                       "items": {
                         "type": "object",
                         "additionalProperties": false,
-                        "required": ["name", "count", "firstAt", "lastAt"],
+                        "required": ["name", "grain", "count", "firstAt", "lastAt"],
                         "properties": {
                           "name": {
                             "type": "string",
-                            "enum": [
-                              "cli_installed",
-                              "login_started",
-                              "login_succeeded",
-                              "login_failed",
-                              "link_agent_files",
-                              "init_planned",
-                              "checkout_link_shown",
-                              "billing_activated",
-                              "first_deploy_ready",
-                              "mcp_installed",
-                              "agent_connected",
-                              "guard_nudged",
-                              "guard_briefed"
-                            ]
+                            "enum": ["billing_activated", "first_deploy_ready", "agent_connected"]
+                          },
+                          "grain": {
+                            "type": "string",
+                            "enum": ["organization", "agent_grant"]
                           },
                           "count": {
                             "type": "integer",
@@ -34619,7 +35089,7 @@
       "post": {
         "operationId": "aiGateways.runtimeChatCompletions",
         "summary": "Runtime Chat Completions",
-        "description": "Run an OpenAI-compatible chat completion from a deployed server runtime using its injected project-and-environment capability.",
+        "description": "Run an OpenAI-compatible chat completion using an injected runtime capability or a gateway-scoped key.",
         "tags": ["aiGateways"],
         "parameters": [
           {
@@ -34638,7 +35108,87 @@
         ],
         "responses": {
           "200": {
-            "description": "OpenAI-compatible JSON or text/event-stream response."
+            "description": "OpenAI-compatible JSON response when stream is false; text/event-stream chunks use the same opaque Korve completion id when stream is true.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^kvc_[a-f0-9]{32}$"
+                    },
+                    "object": {
+                      "type": "string",
+                      "enum": ["chat.completion"]
+                    },
+                    "created": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "model": {
+                      "type": "string",
+                      "enum": ["korve/fast", "korve/balanced", "korve/reasoning"]
+                    },
+                    "choices": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "index": {
+                            "type": "integer",
+                            "enum": [0]
+                          },
+                          "message": {
+                            "type": "object",
+                            "properties": {
+                              "role": {
+                                "type": "string",
+                                "enum": ["assistant"]
+                              },
+                              "content": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["role", "content"],
+                            "additionalProperties": false
+                          },
+                          "finish_reason": {
+                            "type": "string",
+                            "enum": ["stop", "length", "tool_calls"]
+                          }
+                        },
+                        "required": ["index", "message", "finish_reason"],
+                        "additionalProperties": false
+                      }
+                    },
+                    "usage": {
+                      "type": "object",
+                      "properties": {
+                        "prompt_tokens": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "completion_tokens": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "total_tokens": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "required": ["prompt_tokens", "completion_tokens", "total_tokens"],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": ["id", "object", "created", "model", "choices", "usage"],
+                  "additionalProperties": false
+                }
+              }
+            }
           },
           "403": {
             "description": "The requested model is not allowed."
@@ -34754,6 +35304,20 @@
                       "type": "string",
                       "enum": ["open", "complete", "expired"]
                     },
+                    "paymentStatus": {
+                      "type": "string",
+                      "enum": [
+                        "unpaid",
+                        "paid",
+                        "no_payment_required",
+                        "refunded",
+                        "partially_refunded"
+                      ]
+                    },
+                    "settlementStatus": {
+                      "type": "string",
+                      "enum": ["pending", "available", "paid", "failed", "not_applicable"]
+                    },
                     "url": {
                       "type": ["string", "null"],
                       "format": "uri",
@@ -34778,6 +35342,8 @@
                     "mode",
                     "quantity",
                     "status",
+                    "paymentStatus",
+                    "settlementStatus",
                     "url",
                     "clientReferenceId",
                     "expiresAt",
@@ -35582,7 +36148,7 @@
       "post": {
         "operationId": "productTelemetry.track",
         "summary": "Track",
-        "description": "Accept a bounded batch of allowlisted funnel events. Raw network addresses, secrets, nested objects, and unbounded strings are never accepted or retained.",
+        "description": "Accept a bounded batch of public allowlisted events with a closed low-cardinality property schema per event. Raw network addresses, secrets, personal data, nested objects, arbitrary property names, and authoritative lifecycle claims are rejected.",
         "tags": ["productTelemetry"],
         "parameters": [],
         "security": [],
@@ -35613,7 +36179,10 @@
             "description": "The event batch is malformed or outside the privacy bounds."
           },
           "429": {
-            "description": "Too many event batches arrived from this network source."
+            "description": "The global or trusted-edge network budget is exhausted."
+          },
+          "503": {
+            "description": "The keyed privacy boundary is not configured."
           }
         },
         "x-korve-risk": "write",
@@ -35633,67 +36202,490 @@
                     "minItems": 1,
                     "maxItems": 20,
                     "items": {
-                      "type": "object",
-                      "additionalProperties": false,
-                      "required": ["name", "at"],
-                      "properties": {
-                        "name": {
-                          "type": "string",
-                          "enum": [
-                            "cli_installed",
-                            "login_started",
-                            "login_succeeded",
-                            "login_failed",
-                            "link_agent_files",
-                            "init_planned",
-                            "checkout_link_shown",
-                            "billing_activated",
-                            "first_deploy_ready",
-                            "mcp_installed",
-                            "agent_connected",
-                            "guard_nudged",
-                            "guard_briefed"
-                          ]
-                        },
-                        "at": {
-                          "type": "string",
-                          "format": "date-time",
-                          "description": "When the event occurred. Events outside the accepted clock window are rejected."
-                        },
-                        "anonymousId": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 80,
-                          "description": "Optional installation-scoped pseudonym. The service stores only a one-way digest."
-                        },
-                        "organizationId": {
-                          "type": "string",
-                          "format": "uuid",
-                          "description": "Optional post-auth correlation claim. Public claims are digested and never trusted for organization reporting."
-                        },
-                        "properties": {
+                      "oneOf": [
+                        {
                           "type": "object",
-                          "maxProperties": 20,
-                          "additionalProperties": {
-                            "oneOf": [
-                              {
+                          "additionalProperties": false,
+                          "required": ["name", "at", "properties"],
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "enum": ["cli_installed"]
+                            },
+                            "at": {
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "When the event occurred. Events outside the accepted clock window are rejected."
+                            },
+                            "anonymousId": {
+                              "type": "string",
+                              "format": "uuid",
+                              "minLength": 1,
+                              "maxLength": 80,
+                              "description": "Optional random installation UUID. The service stores only a one-way digest."
+                            },
+                            "organizationId": {
+                              "type": "string",
+                              "format": "uuid",
+                              "description": "Optional post-auth correlation claim. Public claims are digested and never trusted for organization reporting."
+                            },
+                            "properties": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "maxProperties": 3,
+                              "propertyNames": {
                                 "type": "string",
-                                "maxLength": 80
+                                "pattern": "^[a-z][a-z0-9_]{0,63}$"
                               },
-                              {
-                                "type": "number"
-                              },
-                              {
-                                "type": "boolean"
-                              },
-                              {
-                                "type": "null"
+                              "required": ["channel", "os", "arch"],
+                              "properties": {
+                                "channel": {
+                                  "type": "string",
+                                  "enum": ["shell"]
+                                },
+                                "os": {
+                                  "type": "string",
+                                  "enum": ["Darwin", "Linux"]
+                                },
+                                "arch": {
+                                  "type": "string",
+                                  "enum": ["arm64", "aarch64", "x86_64"]
+                                }
                               }
-                            ]
-                          },
-                          "description": "At most 20 scalar values. Property names and string values are bounded; nested data is rejected."
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": ["name", "at", "properties"],
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "enum": ["login_started"]
+                            },
+                            "at": {
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "When the event occurred. Events outside the accepted clock window are rejected."
+                            },
+                            "anonymousId": {
+                              "type": "string",
+                              "format": "uuid",
+                              "minLength": 1,
+                              "maxLength": 80,
+                              "description": "Optional random installation UUID. The service stores only a one-way digest."
+                            },
+                            "organizationId": {
+                              "type": "string",
+                              "format": "uuid",
+                              "description": "Optional post-auth correlation claim. Public claims are digested and never trusted for organization reporting."
+                            },
+                            "properties": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "maxProperties": 2,
+                              "propertyNames": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9_]{0,63}$"
+                              },
+                              "required": ["method", "agent"],
+                              "properties": {
+                                "method": {
+                                  "type": "string",
+                                  "enum": ["oauth"]
+                                },
+                                "agent": {
+                                  "type": "string",
+                                  "enum": ["terminal", "codex", "cursor", "claude-code", "windsurf"]
+                                }
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": ["name", "at", "properties"],
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "enum": ["login_succeeded"]
+                            },
+                            "at": {
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "When the event occurred. Events outside the accepted clock window are rejected."
+                            },
+                            "anonymousId": {
+                              "type": "string",
+                              "format": "uuid",
+                              "minLength": 1,
+                              "maxLength": 80,
+                              "description": "Optional random installation UUID. The service stores only a one-way digest."
+                            },
+                            "organizationId": {
+                              "type": "string",
+                              "format": "uuid",
+                              "description": "Optional post-auth correlation claim. Public claims are digested and never trusted for organization reporting."
+                            },
+                            "properties": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "maxProperties": 2,
+                              "propertyNames": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9_]{0,63}$"
+                              },
+                              "required": ["method", "agent"],
+                              "properties": {
+                                "method": {
+                                  "type": "string",
+                                  "enum": ["oauth"]
+                                },
+                                "agent": {
+                                  "type": "string",
+                                  "enum": ["terminal", "codex", "cursor", "claude-code", "windsurf"]
+                                }
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": ["name", "at", "properties"],
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "enum": ["login_failed"]
+                            },
+                            "at": {
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "When the event occurred. Events outside the accepted clock window are rejected."
+                            },
+                            "anonymousId": {
+                              "type": "string",
+                              "format": "uuid",
+                              "minLength": 1,
+                              "maxLength": 80,
+                              "description": "Optional random installation UUID. The service stores only a one-way digest."
+                            },
+                            "organizationId": {
+                              "type": "string",
+                              "format": "uuid",
+                              "description": "Optional post-auth correlation claim. Public claims are digested and never trusted for organization reporting."
+                            },
+                            "properties": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "maxProperties": 2,
+                              "propertyNames": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9_]{0,63}$"
+                              },
+                              "required": ["method", "agent"],
+                              "properties": {
+                                "method": {
+                                  "type": "string",
+                                  "enum": ["oauth"]
+                                },
+                                "agent": {
+                                  "type": "string",
+                                  "enum": ["terminal", "codex", "cursor", "claude-code", "windsurf"]
+                                }
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": ["name", "at", "properties"],
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "enum": ["link_agent_files"]
+                            },
+                            "at": {
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "When the event occurred. Events outside the accepted clock window are rejected."
+                            },
+                            "anonymousId": {
+                              "type": "string",
+                              "format": "uuid",
+                              "minLength": 1,
+                              "maxLength": 80,
+                              "description": "Optional random installation UUID. The service stores only a one-way digest."
+                            },
+                            "organizationId": {
+                              "type": "string",
+                              "format": "uuid",
+                              "description": "Optional post-auth correlation claim. Public claims are digested and never trusted for organization reporting."
+                            },
+                            "properties": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "maxProperties": 2,
+                              "propertyNames": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9_]{0,63}$"
+                              },
+                              "required": ["skill_targets", "agent"],
+                              "properties": {
+                                "skill_targets": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 16
+                                },
+                                "agent": {
+                                  "type": "string",
+                                  "enum": ["terminal", "codex", "cursor", "claude-code", "windsurf"]
+                                }
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": ["name", "at", "properties"],
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "enum": ["init_planned"]
+                            },
+                            "at": {
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "When the event occurred. Events outside the accepted clock window are rejected."
+                            },
+                            "anonymousId": {
+                              "type": "string",
+                              "format": "uuid",
+                              "minLength": 1,
+                              "maxLength": 80,
+                              "description": "Optional random installation UUID. The service stores only a one-way digest."
+                            },
+                            "organizationId": {
+                              "type": "string",
+                              "format": "uuid",
+                              "description": "Optional post-auth correlation claim. Public claims are digested and never trusted for organization reporting."
+                            },
+                            "properties": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "maxProperties": 3,
+                              "propertyNames": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9_]{0,63}$"
+                              },
+                              "required": ["framework", "project_count", "agent"],
+                              "properties": {
+                                "framework": {
+                                  "type": "string",
+                                  "enum": [
+                                    "Next.js",
+                                    "Remix",
+                                    "TanStack Start",
+                                    "Vite",
+                                    "Rust",
+                                    "Dockerfile",
+                                    "generic application"
+                                  ]
+                                },
+                                "project_count": {
+                                  "type": "integer",
+                                  "minimum": 1,
+                                  "maximum": 1
+                                },
+                                "agent": {
+                                  "type": "string",
+                                  "enum": ["terminal", "codex", "cursor", "claude-code", "windsurf"]
+                                }
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": ["name", "at", "properties"],
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "enum": ["checkout_link_shown"]
+                            },
+                            "at": {
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "When the event occurred. Events outside the accepted clock window are rejected."
+                            },
+                            "anonymousId": {
+                              "type": "string",
+                              "format": "uuid",
+                              "minLength": 1,
+                              "maxLength": 80,
+                              "description": "Optional random installation UUID. The service stores only a one-way digest."
+                            },
+                            "organizationId": {
+                              "type": "string",
+                              "format": "uuid",
+                              "description": "Optional post-auth correlation claim. Public claims are digested and never trusted for organization reporting."
+                            },
+                            "properties": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "maxProperties": 1,
+                              "propertyNames": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9_]{0,63}$"
+                              },
+                              "required": ["agent"],
+                              "properties": {
+                                "agent": {
+                                  "type": "string",
+                                  "enum": ["terminal", "codex", "cursor", "claude-code", "windsurf"]
+                                }
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": ["name", "at", "properties"],
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "enum": ["mcp_installed"]
+                            },
+                            "at": {
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "When the event occurred. Events outside the accepted clock window are rejected."
+                            },
+                            "anonymousId": {
+                              "type": "string",
+                              "format": "uuid",
+                              "minLength": 1,
+                              "maxLength": 80,
+                              "description": "Optional random installation UUID. The service stores only a one-way digest."
+                            },
+                            "organizationId": {
+                              "type": "string",
+                              "format": "uuid",
+                              "description": "Optional post-auth correlation claim. Public claims are digested and never trusted for organization reporting."
+                            },
+                            "properties": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "maxProperties": 1,
+                              "propertyNames": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9_]{0,63}$"
+                              },
+                              "required": ["agent"],
+                              "properties": {
+                                "agent": {
+                                  "type": "string",
+                                  "enum": ["terminal", "codex", "cursor", "claude-code", "windsurf"]
+                                }
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": ["name", "at", "properties"],
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "enum": ["guard_nudged"]
+                            },
+                            "at": {
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "When the event occurred. Events outside the accepted clock window are rejected."
+                            },
+                            "anonymousId": {
+                              "type": "string",
+                              "format": "uuid",
+                              "minLength": 1,
+                              "maxLength": 80,
+                              "description": "Optional random installation UUID. The service stores only a one-way digest."
+                            },
+                            "organizationId": {
+                              "type": "string",
+                              "format": "uuid",
+                              "description": "Optional post-auth correlation claim. Public claims are digested and never trusted for organization reporting."
+                            },
+                            "properties": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "maxProperties": 1,
+                              "propertyNames": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9_]{0,63}$"
+                              },
+                              "required": ["agent"],
+                              "properties": {
+                                "agent": {
+                                  "type": "string",
+                                  "enum": ["terminal", "codex", "cursor", "claude-code", "windsurf"]
+                                }
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": ["name", "at", "properties"],
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "enum": ["guard_briefed"]
+                            },
+                            "at": {
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "When the event occurred. Events outside the accepted clock window are rejected."
+                            },
+                            "anonymousId": {
+                              "type": "string",
+                              "format": "uuid",
+                              "minLength": 1,
+                              "maxLength": 80,
+                              "description": "Optional random installation UUID. The service stores only a one-way digest."
+                            },
+                            "organizationId": {
+                              "type": "string",
+                              "format": "uuid",
+                              "description": "Optional post-auth correlation claim. Public claims are digested and never trusted for organization reporting."
+                            },
+                            "properties": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "maxProperties": 1,
+                              "propertyNames": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9_]{0,63}$"
+                              },
+                              "required": ["agent"],
+                              "properties": {
+                                "agent": {
+                                  "type": "string",
+                                  "enum": ["terminal", "codex", "cursor", "claude-code", "windsurf"]
+                                }
+                              }
+                            }
+                          }
                         }
-                      }
+                      ]
                     }
                   }
                 }

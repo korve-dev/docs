@@ -245,6 +245,12 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-ga
 | `200`  | AI gateway deleted. |
 | `404`  | No such gateway.    |
 
+### Response body (200)
+
+| Field | Type    | Description     |
+| ----- | ------- | --------------- |
+| `ok`  | boolean | One of: `true`. |
+
 ## aiGateways.models
 
 List provider-neutral models available through this gateway.
@@ -299,6 +305,19 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-gateways/$GA
 | ------ | ------------- |
 | `200`  | Gateway keys. |
 
+### Response body (200)
+
+An array of objects with these fields:
+
+| Field        | Type           | Description          |
+| ------------ | -------------- | -------------------- |
+| `id`         | string         | Format: `uuid`.      |
+| `name`       | string         | —                    |
+| `keyPrefix`  | string         | —                    |
+| `lastUsedAt` | string or null | Format: `date-time`. |
+| `revokedAt`  | string or null | Format: `date-time`. |
+| `createdAt`  | string         | Format: `date-time`. |
+
 ## aiGateways.keys.create
 
 Create a least-privilege gateway key. The secret is returned exactly once.
@@ -336,6 +355,15 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-gate
 | `201`  | Key metadata and one-time secret. |
 | `404`  | No such gateway.                  |
 
+### Response body (201)
+
+| Field       | Type   | Description                     |
+| ----------- | ------ | ------------------------------- |
+| `id`        | string | Format: `uuid`.                 |
+| `name`      | string | —                               |
+| `keyPrefix` | string | —                               |
+| `secret`    | string | Pattern: `^kvgw_[A-Za-z0-9]+$`. |
+
 ## aiGateways.keys.revoke
 
 Permanently revoke a gateway key.
@@ -362,6 +390,12 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-ga
 | `200`  | Key revoked. |
 | `404`  | No such key. |
 
+### Response body (200)
+
+| Field | Type    | Description     |
+| ----- | ------- | --------------- |
+| `ok`  | boolean | One of: `true`. |
+
 ## aiGateways.usage
 
 Get token and spend usage for the current billing month.
@@ -387,9 +421,21 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-gateways/$GA
 | ------ | ----------------------------------- |
 | `200`  | Gateway usage and remaining budget. |
 
+### Response body (200)
+
+| Field          | Type    | Description          |
+| -------------- | ------- | -------------------- |
+| `month`        | string  | Format: `date-time`. |
+| `requests`     | integer | —                    |
+| `inputTokens`  | integer | —                    |
+| `outputTokens` | integer | —                    |
+| `spentUsd`     | number  | —                    |
+| `budgetUsd`    | number  | —                    |
+| `remainingUsd` | number  | —                    |
+
 ## aiGateways.runtimeChatCompletions
 
-Run an OpenAI-compatible chat completion from a deployed server runtime using its injected project-and-environment capability.
+Run an OpenAI-compatible chat completion using an injected runtime capability or a gateway-scoped key.
 
 ```text
 POST /v1/runtime/ai/{gatewayName}/chat/completions
@@ -430,10 +476,29 @@ curl -X POST "https://api.korve.dev/v1/runtime/ai/$GATEWAY_NAME/chat/completions
 
 ### Responses
 
-| Status | Description                                           |
-| ------ | ----------------------------------------------------- |
-| `200`  | OpenAI-compatible JSON or text/event-stream response. |
-| `403`  | The requested model is not allowed.                   |
-| `404`  | No such gateway in the runtime environment.           |
-| `429`  | The monthly gateway budget is exhausted.              |
-| `503`  | Model inference is temporarily unavailable.           |
+| Status | Description                                                                                                                                 |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `200`  | OpenAI-compatible JSON response when stream is false; text/event-stream chunks use the same opaque Korve completion id when stream is true. |
+| `403`  | The requested model is not allowed.                                                                                                         |
+| `404`  | No such gateway in the runtime environment.                                                                                                 |
+| `429`  | The monthly gateway budget is exhausted.                                                                                                    |
+| `503`  | Model inference is temporarily unavailable.                                                                                                 |
+
+### Response body (200)
+
+| Field                       | Type     | Description                                                |
+| --------------------------- | -------- | ---------------------------------------------------------- |
+| `id`                        | string   | Pattern: `^kvc_[a-f0-9]{32}$`.                             |
+| `object`                    | string   | One of: `chat.completion`.                                 |
+| `created`                   | integer  | —                                                          |
+| `model`                     | string   | One of: `korve/fast`, `korve/balanced`, `korve/reasoning`. |
+| `choices`                   | object[] | —                                                          |
+| `choices[].index`           | integer  | One of: `0`.                                               |
+| `choices[].message`         | object   | —                                                          |
+| `choices[].message.role`    | string   | One of: `assistant`.                                       |
+| `choices[].message.content` | string   | —                                                          |
+| `choices[].finish_reason`   | string   | One of: `stop`, `length`, `tool_calls`.                    |
+| `usage`                     | object   | —                                                          |
+| `usage.prompt_tokens`       | integer  | —                                                          |
+| `usage.completion_tokens`   | integer  | —                                                          |
+| `usage.total_tokens`        | integer  | —                                                          |

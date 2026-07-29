@@ -19,10 +19,16 @@ GET /v1/orgs/{orgId}/projects/{projectId}/payments
 - **Minimum role:** `member`
 - **Risk:** `read`
 
+### Query parameters
+
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+
 ### Example
 
 ```bash
-curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments" \
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments?environment=example" \
   -H "Authorization: Bearer korve_..."
 ```
 
@@ -47,6 +53,8 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments" \
 | `credentialHint`          | string or null | —                                              |
 | `webhookUrl`              | string or null | Format: `uri`.                                 |
 | `webhookSecretConfigured` | boolean        | —                                              |
+| `credentialScopes`        | string[]       | —                                              |
+| `allowedRedirectOrigins`  | string[]       | —                                              |
 | `connectedAt`             | string or null | Format: `date-time`.                           |
 | `updatedAt`               | string or null | Format: `date-time`.                           |
 
@@ -63,22 +71,36 @@ PUT /v1/orgs/{orgId}/projects/{projectId}/payments
 - **Billing:** requires active organization billing — returns `402` otherwise.
 - **Risk:** `write` · sensitive (elevated blast radius)
 
+### Query parameters
+
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+
 ### Request body
 
-| Field           | Type   | Required | Description |
-| --------------- | ------ | -------- | ----------- |
-| `secretKey`     | string | Yes      | —           |
-| `webhookSecret` | string | Yes      | —           |
+| Field                    | Type     | Required | Description |
+| ------------------------ | -------- | -------- | ----------- |
+| `secretKey`              | string   | Yes      | —           |
+| `webhookSecret`          | string   | Yes      | —           |
+| `credentialScopes`       | string[] | Yes      | —           |
+| `allowedRedirectOrigins` | string[] | Yes      | —           |
 
 ### Example
 
 ```bash
-curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments" \
+curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments?environment=example" \
   -b "$SESSION" \
   -H "Content-Type: application/json" \
   -d '{
   "secretKey": "examplexxxxxxxxx",
-  "webhookSecret": "examplexxxxxxxxx"
+  "webhookSecret": "examplexxxxxxxxx",
+  "credentialScopes": [
+    "customers:write"
+  ],
+  "allowedRedirectOrigins": [
+    "https://app.acme.com/callback"
+  ]
 }'
 ```
 
@@ -103,6 +125,8 @@ curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments
 | `credentialHint`          | string or null | —                                              |
 | `webhookUrl`              | string or null | Format: `uri`.                                 |
 | `webhookSecretConfigured` | boolean        | —                                              |
+| `credentialScopes`        | string[]       | —                                              |
+| `allowedRedirectOrigins`  | string[]       | —                                              |
 | `connectedAt`             | string or null | Format: `date-time`.                           |
 | `updatedAt`               | string or null | Format: `date-time`.                           |
 
@@ -118,10 +142,16 @@ DELETE /v1/orgs/{orgId}/projects/{projectId}/payments
 - **Minimum role:** `owner`
 - **Risk:** `destructive` · sensitive (elevated blast radius)
 
+### Query parameters
+
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+
 ### Example
 
 ```bash
-curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments" \
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments?environment=example" \
   -b "$SESSION"
 ```
 
@@ -151,15 +181,16 @@ GET /v1/orgs/{orgId}/projects/{projectId}/payments/products
 
 ### Query parameters
 
-| Name     | Type    | Required | Description |
-| -------- | ------- | -------- | ----------- |
-| `cursor` | string  | No       | —           |
-| `limit`  | integer | No       | —           |
+| Name          | Type    | Required | Description                        |
+| ------------- | ------- | -------- | ---------------------------------- |
+| `environment` | string  | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `cursor`      | string  | No       | —                                  |
+| `limit`       | integer | No       | —                                  |
 
 ### Example
 
 ```bash
-curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/products?cursor=example" \
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/products?environment=example" \
   -H "Authorization: Bearer korve_..."
 ```
 
@@ -202,6 +233,12 @@ POST /v1/orgs/{orgId}/projects/{projectId}/payments/products
 - **Billing:** requires active organization billing — returns `402` otherwise.
 - **Risk:** `write`
 
+### Query parameters
+
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+
 ### Request body
 
 | Field         | Type   | Required | Description                                                          |
@@ -213,7 +250,7 @@ POST /v1/orgs/{orgId}/projects/{projectId}/payments/products
 ### Example
 
 ```bash
-curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/products" \
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/products?environment=example" \
   -H "Authorization: Bearer korve_..." \
   -H "Content-Type: application/json" \
   -d '{
@@ -257,6 +294,12 @@ PATCH /v1/orgs/{orgId}/projects/{projectId}/payments/products/{productId}
 - **Minimum role:** `admin`
 - **Risk:** `write`
 
+### Query parameters
+
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+
 ### Request body
 
 | Field         | Type    | Required | Description                                                          |
@@ -269,7 +312,7 @@ PATCH /v1/orgs/{orgId}/projects/{projectId}/payments/products/{productId}
 ### Example
 
 ```bash
-curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/products/$PRODUCT_ID" \
+curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/products/$PRODUCT_ID?environment=example" \
   -H "Authorization: Bearer korve_..." \
   -H "Content-Type: application/json" \
   -d '{
@@ -315,15 +358,16 @@ GET /v1/orgs/{orgId}/projects/{projectId}/payments/prices
 
 ### Query parameters
 
-| Name     | Type    | Required | Description |
-| -------- | ------- | -------- | ----------- |
-| `cursor` | string  | No       | —           |
-| `limit`  | integer | No       | —           |
+| Name          | Type    | Required | Description                        |
+| ------------- | ------- | -------- | ---------------------------------- |
+| `environment` | string  | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `cursor`      | string  | No       | —                                  |
+| `limit`       | integer | No       | —                                  |
 
 ### Example
 
 ```bash
-curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/prices?cursor=example" \
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/prices?environment=example" \
   -H "Authorization: Bearer korve_..."
 ```
 
@@ -369,6 +413,12 @@ POST /v1/orgs/{orgId}/projects/{projectId}/payments/prices
 - **Billing:** requires active organization billing — returns `402` otherwise.
 - **Risk:** `write`
 
+### Query parameters
+
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+
 ### Request body
 
 | Field           | Type    | Required | Description                                                          |
@@ -384,7 +434,7 @@ POST /v1/orgs/{orgId}/projects/{projectId}/payments/prices
 ### Example
 
 ```bash
-curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/prices" \
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/prices?environment=example" \
   -H "Authorization: Bearer korve_..." \
   -H "Content-Type: application/json" \
   -d '{
@@ -434,10 +484,16 @@ DELETE /v1/orgs/{orgId}/projects/{projectId}/payments/prices/{priceId}
 - **Minimum role:** `admin`
 - **Risk:** `destructive` · sensitive (elevated blast radius)
 
+### Query parameters
+
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+
 ### Example
 
 ```bash
-curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/prices/$PRICE_ID" \
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/prices/$PRICE_ID?environment=example" \
   -H "Authorization: Bearer korve_..."
 ```
 
@@ -477,20 +533,21 @@ GET /v1/orgs/{orgId}/projects/{projectId}/payments/customers
 ```
 
 - **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
-- **Minimum role:** `member`
+- **Minimum role:** `admin`
 - **Risk:** `read`
 
 ### Query parameters
 
-| Name     | Type    | Required | Description |
-| -------- | ------- | -------- | ----------- |
-| `cursor` | string  | No       | —           |
-| `limit`  | integer | No       | —           |
+| Name          | Type    | Required | Description                        |
+| ------------- | ------- | -------- | ---------------------------------- |
+| `environment` | string  | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `cursor`      | string  | No       | —                                  |
+| `limit`       | integer | No       | —                                  |
 
 ### Example
 
 ```bash
-curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/customers?cursor=example" \
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/customers?environment=example" \
   -H "Authorization: Bearer korve_..."
 ```
 
@@ -532,6 +589,12 @@ POST /v1/orgs/{orgId}/projects/{projectId}/payments/customers
 - **Billing:** requires active organization billing — returns `402` otherwise.
 - **Risk:** `write`
 
+### Query parameters
+
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+
 ### Request body
 
 | Field        | Type   | Required | Description                                                          |
@@ -544,7 +607,7 @@ POST /v1/orgs/{orgId}/projects/{projectId}/payments/customers
 ### Example
 
 ```bash
-curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/customers" \
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/customers?environment=example" \
   -H "Authorization: Bearer korve_..." \
   -H "Content-Type: application/json" \
   -d '{
@@ -574,6 +637,43 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payment
 | `externalId` | string or null | —                                                                    |
 | `metadata`   | object         | At most 20 application-defined string entries. Map of string values. |
 | `createdAt`  | string         | Format: `date-time`.                                                 |
+
+## customerPayments.eraseCustomer
+
+Erase end-customer personal data at the processor and redact the local projection.
+
+```text
+DELETE /v1/orgs/{orgId}/projects/{projectId}/payments/customers/{customerId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `destructive` · sensitive (elevated blast radius)
+
+### Query parameters
+
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+
+### Example
+
+```bash
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/customers/$CUSTOMER_ID?environment=example" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Customer erased.                                         |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
 
 ## customerPayments.runtimeCreateCustomer
 
@@ -644,15 +744,16 @@ GET /v1/orgs/{orgId}/projects/{projectId}/payments/checkouts
 
 ### Query parameters
 
-| Name     | Type    | Required | Description |
-| -------- | ------- | -------- | ----------- |
-| `cursor` | string  | No       | —           |
-| `limit`  | integer | No       | —           |
+| Name          | Type    | Required | Description                        |
+| ------------- | ------- | -------- | ---------------------------------- |
+| `environment` | string  | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `cursor`      | string  | No       | —                                  |
+| `limit`       | integer | No       | —                                  |
 
 ### Example
 
 ```bash
-curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/checkouts?cursor=example" \
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/checkouts?environment=example" \
   -H "Authorization: Bearer korve_..."
 ```
 
@@ -670,20 +771,22 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/checko
 
 ### Response body (200)
 
-| Field                       | Type           | Description                                                              |
-| --------------------------- | -------------- | ------------------------------------------------------------------------ |
-| `items`                     | object[]       | —                                                                        |
-| `items[].id`                | string         | Format: `uuid`.                                                          |
-| `items[].priceId`           | string         | Format: `uuid`.                                                          |
-| `items[].customerId`        | string or null | Format: `uuid`.                                                          |
-| `items[].mode`              | string         | One of: `one_time`, `subscription`.                                      |
-| `items[].quantity`          | integer        | —                                                                        |
-| `items[].status`            | string         | One of: `open`, `complete`, `expired`.                                   |
-| `items[].url`               | string or null | Hosted checkout URL. Present only on the create response. Format: `uri`. |
-| `items[].clientReferenceId` | string or null | —                                                                        |
-| `items[].expiresAt`         | string         | Format: `date-time`.                                                     |
-| `items[].createdAt`         | string         | Format: `date-time`.                                                     |
-| `nextCursor`                | string or null | —                                                                        |
+| Field                       | Type           | Description                                                                        |
+| --------------------------- | -------------- | ---------------------------------------------------------------------------------- |
+| `items`                     | object[]       | —                                                                                  |
+| `items[].id`                | string         | Format: `uuid`.                                                                    |
+| `items[].priceId`           | string         | Format: `uuid`.                                                                    |
+| `items[].customerId`        | string or null | Format: `uuid`.                                                                    |
+| `items[].mode`              | string         | One of: `one_time`, `subscription`.                                                |
+| `items[].quantity`          | integer        | —                                                                                  |
+| `items[].status`            | string         | One of: `open`, `complete`, `expired`.                                             |
+| `items[].paymentStatus`     | string         | One of: `unpaid`, `paid`, `no_payment_required`, `refunded`, `partially_refunded`. |
+| `items[].settlementStatus`  | string         | One of: `pending`, `available`, `paid`, `failed`, `not_applicable`.                |
+| `items[].url`               | string or null | Hosted checkout URL. Present only on the create response. Format: `uri`.           |
+| `items[].clientReferenceId` | string or null | —                                                                                  |
+| `items[].expiresAt`         | string         | Format: `date-time`.                                                               |
+| `items[].createdAt`         | string         | Format: `date-time`.                                                               |
+| `nextCursor`                | string or null | —                                                                                  |
 
 ## customerPayments.createCheckout
 
@@ -697,6 +800,12 @@ POST /v1/orgs/{orgId}/projects/{projectId}/payments/checkouts
 - **Minimum role:** `admin`
 - **Billing:** requires active organization billing — returns `402` otherwise.
 - **Risk:** `write` · sensitive (elevated blast radius)
+
+### Query parameters
+
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Request body
 
@@ -714,7 +823,7 @@ POST /v1/orgs/{orgId}/projects/{projectId}/payments/checkouts
 ### Example
 
 ```bash
-curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/checkouts" \
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/checkouts?environment=example" \
   -H "Authorization: Bearer korve_..." \
   -H "Content-Type: application/json" \
   -d '{
@@ -738,18 +847,20 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payment
 
 ### Response body (201)
 
-| Field               | Type           | Description                                                              |
-| ------------------- | -------------- | ------------------------------------------------------------------------ |
-| `id`                | string         | Format: `uuid`.                                                          |
-| `priceId`           | string         | Format: `uuid`.                                                          |
-| `customerId`        | string or null | Format: `uuid`.                                                          |
-| `mode`              | string         | One of: `one_time`, `subscription`.                                      |
-| `quantity`          | integer        | —                                                                        |
-| `status`            | string         | One of: `open`, `complete`, `expired`.                                   |
-| `url`               | string or null | Hosted checkout URL. Present only on the create response. Format: `uri`. |
-| `clientReferenceId` | string or null | —                                                                        |
-| `expiresAt`         | string         | Format: `date-time`.                                                     |
-| `createdAt`         | string         | Format: `date-time`.                                                     |
+| Field               | Type           | Description                                                                        |
+| ------------------- | -------------- | ---------------------------------------------------------------------------------- |
+| `id`                | string         | Format: `uuid`.                                                                    |
+| `priceId`           | string         | Format: `uuid`.                                                                    |
+| `customerId`        | string or null | Format: `uuid`.                                                                    |
+| `mode`              | string         | One of: `one_time`, `subscription`.                                                |
+| `quantity`          | integer        | —                                                                                  |
+| `status`            | string         | One of: `open`, `complete`, `expired`.                                             |
+| `paymentStatus`     | string         | One of: `unpaid`, `paid`, `no_payment_required`, `refunded`, `partially_refunded`. |
+| `settlementStatus`  | string         | One of: `pending`, `available`, `paid`, `failed`, `not_applicable`.                |
+| `url`               | string or null | Hosted checkout URL. Present only on the create response. Format: `uri`.           |
+| `clientReferenceId` | string or null | —                                                                                  |
+| `expiresAt`         | string         | Format: `date-time`.                                                               |
+| `createdAt`         | string         | Format: `date-time`.                                                               |
 
 ## customerPayments.runtimeCreateCheckout
 
@@ -803,18 +914,20 @@ curl -X POST "https://api.korve.dev/v1/runtime/payments/checkouts" \
 
 ### Response body (201)
 
-| Field               | Type           | Description                                                              |
-| ------------------- | -------------- | ------------------------------------------------------------------------ |
-| `id`                | string         | Format: `uuid`.                                                          |
-| `priceId`           | string         | Format: `uuid`.                                                          |
-| `customerId`        | string or null | Format: `uuid`.                                                          |
-| `mode`              | string         | One of: `one_time`, `subscription`.                                      |
-| `quantity`          | integer        | —                                                                        |
-| `status`            | string         | One of: `open`, `complete`, `expired`.                                   |
-| `url`               | string or null | Hosted checkout URL. Present only on the create response. Format: `uri`. |
-| `clientReferenceId` | string or null | —                                                                        |
-| `expiresAt`         | string         | Format: `date-time`.                                                     |
-| `createdAt`         | string         | Format: `date-time`.                                                     |
+| Field               | Type           | Description                                                                        |
+| ------------------- | -------------- | ---------------------------------------------------------------------------------- |
+| `id`                | string         | Format: `uuid`.                                                                    |
+| `priceId`           | string         | Format: `uuid`.                                                                    |
+| `customerId`        | string or null | Format: `uuid`.                                                                    |
+| `mode`              | string         | One of: `one_time`, `subscription`.                                                |
+| `quantity`          | integer        | —                                                                                  |
+| `status`            | string         | One of: `open`, `complete`, `expired`.                                             |
+| `paymentStatus`     | string         | One of: `unpaid`, `paid`, `no_payment_required`, `refunded`, `partially_refunded`. |
+| `settlementStatus`  | string         | One of: `pending`, `available`, `paid`, `failed`, `not_applicable`.                |
+| `url`               | string or null | Hosted checkout URL. Present only on the create response. Format: `uri`.           |
+| `clientReferenceId` | string or null | —                                                                                  |
+| `expiresAt`         | string         | Format: `date-time`.                                                               |
+| `createdAt`         | string         | Format: `date-time`.                                                               |
 
 ## customerPayments.listSubscriptions
 
@@ -830,15 +943,16 @@ GET /v1/orgs/{orgId}/projects/{projectId}/payments/subscriptions
 
 ### Query parameters
 
-| Name     | Type    | Required | Description |
-| -------- | ------- | -------- | ----------- |
-| `cursor` | string  | No       | —           |
-| `limit`  | integer | No       | —           |
+| Name          | Type    | Required | Description                        |
+| ------------- | ------- | -------- | ---------------------------------- |
+| `environment` | string  | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `cursor`      | string  | No       | —                                  |
+| `limit`       | integer | No       | —                                  |
 
 ### Example
 
 ```bash
-curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/subscriptions?cursor=example" \
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/subscriptions?environment=example" \
   -H "Authorization: Bearer korve_..."
 ```
 
@@ -881,6 +995,12 @@ POST /v1/orgs/{orgId}/projects/{projectId}/payments/subscriptions/{subscriptionI
 - **Minimum role:** `admin`
 - **Risk:** `write` · sensitive (elevated blast radius)
 
+### Query parameters
+
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+
 ### Request body
 
 | Field         | Type    | Required | Description |
@@ -890,7 +1010,7 @@ POST /v1/orgs/{orgId}/projects/{projectId}/payments/subscriptions/{subscriptionI
 ### Example
 
 ```bash
-curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/subscriptions/$SUBSCRIPTION_ID/cancel" \
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/subscriptions/$SUBSCRIPTION_ID/cancel?environment=example" \
   -H "Authorization: Bearer korve_..." \
   -H "Content-Type: application/json" \
   -d '{
@@ -937,15 +1057,16 @@ GET /v1/orgs/{orgId}/projects/{projectId}/payments/events
 
 ### Query parameters
 
-| Name     | Type    | Required | Description |
-| -------- | ------- | -------- | ----------- |
-| `cursor` | string  | No       | —           |
-| `limit`  | integer | No       | —           |
+| Name          | Type    | Required | Description                        |
+| ------------- | ------- | -------- | ---------------------------------- |
+| `environment` | string  | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `cursor`      | string  | No       | —                                  |
+| `limit`       | integer | No       | —                                  |
 
 ### Example
 
 ```bash
-curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/events?cursor=example" \
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/events?environment=example" \
   -H "Authorization: Bearer korve_..."
 ```
 
@@ -963,12 +1084,12 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/events
 
 ### Response body (200)
 
-| Field                      | Type           | Description                               |
-| -------------------------- | -------------- | ----------------------------------------- |
-| `items`                    | object[]       | —                                         |
-| `items[].id`               | string         | Format: `uuid`.                           |
-| `items[].type`             | string         | —                                         |
-| `items[].processingStatus` | string         | One of: `processed`, `ignored`, `failed`. |
-| `items[].occurredAt`       | string         | Format: `date-time`.                      |
-| `items[].receivedAt`       | string         | Format: `date-time`.                      |
-| `nextCursor`               | string or null | —                                         |
+| Field                      | Type           | Description                                                        |
+| -------------------------- | -------------- | ------------------------------------------------------------------ |
+| `items`                    | object[]       | —                                                                  |
+| `items[].id`               | string         | Format: `uuid`.                                                    |
+| `items[].type`             | string         | —                                                                  |
+| `items[].processingStatus` | string         | One of: `pending`, `processing`, `processed`, `ignored`, `failed`. |
+| `items[].occurredAt`       | string         | Format: `date-time`.                                               |
+| `items[].receivedAt`       | string         | Format: `date-time`.                                               |
+| `nextCursor`               | string or null | —                                                                  |

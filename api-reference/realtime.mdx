@@ -329,16 +329,18 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/realtime/channe
 
 ### Response body (200)
 
-| Field             | Type    | Description          |
-| ----------------- | ------- | -------------------- |
-| `sampledAt`       | string  | Format: `date-time`. |
-| `connections`     | integer | —                    |
-| `presenceMembers` | integer | —                    |
-| `published`       | integer | —                    |
-| `delivered`       | integer | —                    |
-| `rejected`        | integer | —                    |
-| `retainedEvents`  | integer | —                    |
-| `retainedBytes`   | integer | —                    |
+| Field                 | Type    | Description                                                                 |
+| --------------------- | ------- | --------------------------------------------------------------------------- |
+| `sampledAt`           | string  | Format: `date-time`.                                                        |
+| `connections`         | integer | —                                                                           |
+| `presenceMembers`     | integer | —                                                                           |
+| `published`           | integer | —                                                                           |
+| `delivered`           | integer | —                                                                           |
+| `rejected`            | integer | —                                                                           |
+| `retainedEvents`      | integer | —                                                                           |
+| `retainedBytes`       | integer | —                                                                           |
+| `connectionSeconds`   | integer | Cumulative connected-session seconds used for monotonic usage metering.     |
+| `retainedByteSeconds` | integer | Cumulative retained-payload byte-seconds used for monotonic usage metering. |
 
 ## realtime.runtimeIssueToken
 
