@@ -1,8 +1,8 @@
 # Korve documentation
 
 Korve is an agent-era application platform. Build with an agent, deploy from Git, and operate apps,
-databases, storage, queues, crons, caches, observability, budgets, and recovery through one public
-contract.
+databases, storage, queues, crons, caches, realtime, AI gateways, App Auth, customer payments,
+observability, budgets, and recovery through one public contract.
 
 Canonical docs: https://docs.korve.dev
 Dashboard and product: https://korve.dev
@@ -13,9 +13,15 @@ MCP Code Mode: https://mcp.korve.dev/mcp
 Start:
 - https://docs.korve.dev/introduction
 - https://docs.korve.dev/quickstart
+- https://docs.korve.dev/starters
 - https://docs.korve.dev/agents/agent-onboarding
 - https://docs.korve.dev/agents/mcp-setup
+- https://docs.korve.dev/agents/local-agent-setup
 - https://docs.korve.dev/agents/oauth
+- https://docs.korve.dev/primitives/app-auth
+- https://docs.korve.dev/primitives/realtime
+- https://docs.korve.dev/primitives/ai-gateway
+- https://docs.korve.dev/primitives/customer-payments
 - https://docs.korve.dev/primitives/app-access
 - https://docs.korve.dev/primitives/project-operator
 - https://docs.korve.dev/primitives/project-maintenance
@@ -29,6 +35,11 @@ Rules for agents:
   then verify the resulting state.
 - Treat shown-once secrets as secrets and exported ******** values as preserve-live-value markers.
 - Queue delivery is at least once; make durable side effects idempotent.
+- Realtime live delivery is at most once; use retained replay only within its bounded window.
+- Never expose a runtime token, storage grant, cache connection string, realtime capability,
+  App Auth refresh token, AI gateway key, or customer-payment credential to browser code or logs.
+- The TypeScript SDK packages are not yet published to npm. Do not instruct users to install them
+  until anonymous registry verification succeeds.
 - Do not assume region or metric ids. Discover them from the current regions and metrics catalogs.
 - CLI and MCP OAuth grants are audience-bound; never reuse a CLI token for MCP.
 - A protected app-access policy is safe to activate only when enforcement reports ready.

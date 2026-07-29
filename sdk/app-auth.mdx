@@ -3,7 +3,13 @@ title: "App Auth SDK"
 description: "Add project-scoped sign-in and sessions to applications deployed on Korve."
 ---
 
-Install `@korve-dev/app-auth` and use an explicit browser or server entrypoint.
+Use `@korve-dev/app-auth` through an explicit browser or server entrypoint.
+
+<Warning>
+`@korve-dev/app-auth` is release-ready in the repository but is not yet available from the public
+npm registry. Do not add it as an npm dependency until anonymous registry installation succeeds.
+The examples currently use the checked-out workspace package.
+</Warning>
 
 ```ts
 import { createKorveAuthClient } from "@korve-dev/app-auth/browser";
@@ -30,4 +36,5 @@ const user = await auth.getUser();
 ```
 
 App-user tokens are separate from operator API keys and runtime tokens. Configure policy and inspect
-the endpoint contract in the [App Auth API](/api-reference/appauth).
+password and magic-link behavior in [App Auth](/primitives/app-auth), then inspect the endpoint
+contract in the [App Auth API](/api-reference/appauth).

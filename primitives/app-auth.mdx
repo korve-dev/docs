@@ -1,0 +1,85 @@
+---
+title: "App Auth"
+description: "Project-scoped Google, email/password, magic-link, and session authentication for customer applications."
+---
+
+App Auth is the customer-facing identity realm for one Korve project. App-user sessions are
+separate from organization members, operator API keys, and deployment runtime capabilities.
+
+## Configure the policy
+
+```toml
+[projects.auth]
+enabled = true
+allowedOrigins = ["https://app.example.com"]
+redirectUrls = ["https://app.example.com/auth/callback"]
+emailPassword = true
+magicLink = true
+passwordMinLength = 14
+accessTokenTtlSeconds = 900
+refreshTokenTtlSeconds = 604800
+sessionIdleTtlSeconds = 86400
+sessionMaxTtlSeconds = 604800
+magicLinkTtlSeconds = 900
+passwordResetTtlSeconds = 900
+```
+
+Origins and redirects are exact allowlists; avoid wildcards. Password minimums can be 10–64
+characters. Access tokens last 5–60 minutes. Email links and password-reset links last 5–60
+minutes, are single-use, and must never appear in logs.
+
+Google sign-in needs a write-only provider secret configured through an owner-authorized control
+surface. It does not belong in a manifest.
+
+## Password and passwordless flows
+
+```ts
+import { createKorveAuthClient } from "@korve-dev/app-auth/browser";
+
+const auth = createKorveAuthClient({
+  apiUrl: "https://api.korve.dev",
+  project: "storefront",
+});
+
+await auth.signUpWithPassword({
+  email: "user@example.com",
+  password: "a unique strong password",
+  redirectUrl: `${location.origin}/auth/callback`,
+});
+await auth.signInWithPassword("user@example.com", "a unique strong password");
+
+await auth.requestMagicLink("user@example.com", `${location.origin}/auth/callback`);
+const session = await auth.handleEmailLinkCallback();
+```
+
+Sign-up, magic-link, and recovery requests deliberately return the same accepted response for known
+and unknown addresses. This prevents account enumeration. Password reset revokes current session
+material; the user signs in again with the new password.
+
+## Use HttpOnly cookies for sensitive apps
+
+The browser client's compatibility default stores its opaque access and refresh pair in
+`localStorage`, which an XSS bug could read. Server-rendered and security-sensitive applications
+should exchange callbacks and rotate refresh tokens only in server routes:
+
+```http
+Set-Cookie: __Host-korve-access=<opaque>; Path=/; HttpOnly; Secure; SameSite=Lax
+Set-Cookie: __Host-korve-refresh=<opaque>; Path=/; HttpOnly; Secure; SameSite=Lax
+```
+
+Do not set a `Domain` attribute, serialize tokens into HTML, or send refresh tokens to browser
+JavaScript. Apply CSRF protection to application writes. See the
+[App Auth SDK guide](/sdk/app-auth) for the browser/server split.
+
+## Operations
+
+Members can inspect configuration and users. Admins can update policy and revoke or disable
+application users. Owner session is required for provider credentials and destructive realm
+deletion. Audit events contain bounded metadata rather than passwords, links, or tokens.
+
+The App Auth TypeScript package is release-ready in the repository but is **not yet available from
+the public npm registry**. Do not add `@korve-dev/app-auth` as an npm dependency until anonymous
+registry installation succeeds; use the REST contract or checked-out workspace source during
+pre-release evaluation.
+
+See the complete [App Auth API](/api-reference/appauth).

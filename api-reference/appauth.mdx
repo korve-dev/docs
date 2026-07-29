@@ -45,6 +45,11 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth" \
 | `refreshTokenTtlSeconds`  | integer         | —                                                                                       |
 | `sessionIdleTtlSeconds`   | integer         | —                                                                                       |
 | `sessionMaxTtlSeconds`    | integer         | —                                                                                       |
+| `emailPasswordEnabled`    | boolean         | —                                                                                       |
+| `magicLinkEnabled`        | boolean         | —                                                                                       |
+| `passwordMinLength`       | integer         | —                                                                                       |
+| `magicLinkTtlSeconds`     | integer         | —                                                                                       |
+| `passwordResetTtlSeconds` | integer         | —                                                                                       |
 | `google`                  | object          | —                                                                                       |
 | `google.enabled`          | boolean         | —                                                                                       |
 | `google.clientId`         | string or null  | —                                                                                       |
@@ -69,15 +74,20 @@ PUT /v1/orgs/{orgId}/projects/{projectId}/auth
 
 ### Request body
 
-| Field                    | Type     | Required | Description                                                                             |
-| ------------------------ | -------- | -------- | --------------------------------------------------------------------------------------- |
-| `enabled`                | boolean  | Yes      | —                                                                                       |
-| `allowedOrigins`         | string[] | Yes      | Exact browser origins. Wildcards are not accepted.                                      |
-| `redirectUrls`           | string[] | Yes      | Exact post-sign-in redirect URLs. HTTPS is required except for loopback localhost URLs. |
-| `accessTokenTtlSeconds`  | integer  | No       | 300-3600 seconds.                                                                       |
-| `refreshTokenTtlSeconds` | integer  | No       | 3600-2592000 seconds.                                                                   |
-| `sessionIdleTtlSeconds`  | integer  | No       | 900-604800 seconds.                                                                     |
-| `sessionMaxTtlSeconds`   | integer  | No       | 3600-2592000 seconds.                                                                   |
+| Field                     | Type     | Required | Description                                                                             |
+| ------------------------- | -------- | -------- | --------------------------------------------------------------------------------------- |
+| `enabled`                 | boolean  | Yes      | —                                                                                       |
+| `allowedOrigins`          | string[] | Yes      | Exact browser origins. Wildcards are not accepted.                                      |
+| `redirectUrls`            | string[] | Yes      | Exact post-sign-in redirect URLs. HTTPS is required except for loopback localhost URLs. |
+| `accessTokenTtlSeconds`   | integer  | No       | 300-3600 seconds.                                                                       |
+| `refreshTokenTtlSeconds`  | integer  | No       | 3600-2592000 seconds.                                                                   |
+| `sessionIdleTtlSeconds`   | integer  | No       | 900-604800 seconds.                                                                     |
+| `sessionMaxTtlSeconds`    | integer  | No       | 3600-2592000 seconds.                                                                   |
+| `emailPasswordEnabled`    | boolean  | No       | Allow verified users to sign in with an application password.                           |
+| `magicLinkEnabled`        | boolean  | No       | Allow passwordless email sign-in and email verification links.                          |
+| `passwordMinLength`       | integer  | No       | 10-64 characters.                                                                       |
+| `magicLinkTtlSeconds`     | integer  | No       | 300-3600 seconds.                                                                       |
+| `passwordResetTtlSeconds` | integer  | No       | 300-3600 seconds.                                                                       |
 
 ### Example
 
@@ -115,6 +125,11 @@ curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth" \
 | `refreshTokenTtlSeconds`  | integer         | —                                                                                       |
 | `sessionIdleTtlSeconds`   | integer         | —                                                                                       |
 | `sessionMaxTtlSeconds`    | integer         | —                                                                                       |
+| `emailPasswordEnabled`    | boolean         | —                                                                                       |
+| `magicLinkEnabled`        | boolean         | —                                                                                       |
+| `passwordMinLength`       | integer         | —                                                                                       |
+| `magicLinkTtlSeconds`     | integer         | —                                                                                       |
+| `passwordResetTtlSeconds` | integer         | —                                                                                       |
 | `google`                  | object          | —                                                                                       |
 | `google.enabled`          | boolean         | —                                                                                       |
 | `google.clientId`         | string or null  | —                                                                                       |
@@ -331,31 +346,31 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth/users/$USE
 
 ### Response body (200)
 
-| Field                        | Type           | Description          |
-| ---------------------------- | -------------- | -------------------- |
-| `user`                       | object         | —                    |
-| `user.id`                    | string         | —                    |
-| `user.email`                 | string         | Format: `email`.     |
-| `user.emailVerified`         | boolean        | —                    |
-| `user.name`                  | string or null | —                    |
-| `user.image`                 | string or null | —                    |
-| `user.disabledAt`            | string or null | Format: `date-time`. |
-| `user.createdAt`             | string         | Format: `date-time`. |
-| `user.lastSignInAt`          | string or null | Format: `date-time`. |
-| `user.lastActiveAt`          | string or null | Format: `date-time`. |
-| `identities`                 | object[]       | —                    |
-| `identities[].provider`      | string         | One of: `google`.    |
-| `identities[].providerEmail` | string         | Format: `email`.     |
-| `identities[].emailVerified` | boolean        | —                    |
-| `identities[].createdAt`     | string         | Format: `date-time`. |
-| `identities[].lastSignInAt`  | string or null | Format: `date-time`. |
-| `sessions`                   | object[]       | —                    |
-| `sessions[].id`              | string         | —                    |
-| `sessions[].createdAt`       | string         | Format: `date-time`. |
-| `sessions[].lastActiveAt`    | string         | Format: `date-time`. |
-| `sessions[].expiresAt`       | string         | Format: `date-time`. |
-| `sessions[].revokedAt`       | string or null | Format: `date-time`. |
-| `sessions[].userAgent`       | string or null | —                    |
+| Field                        | Type           | Description                                   |
+| ---------------------------- | -------------- | --------------------------------------------- |
+| `user`                       | object         | —                                             |
+| `user.id`                    | string         | —                                             |
+| `user.email`                 | string         | Format: `email`.                              |
+| `user.emailVerified`         | boolean        | —                                             |
+| `user.name`                  | string or null | —                                             |
+| `user.image`                 | string or null | —                                             |
+| `user.disabledAt`            | string or null | Format: `date-time`.                          |
+| `user.createdAt`             | string         | Format: `date-time`.                          |
+| `user.lastSignInAt`          | string or null | Format: `date-time`.                          |
+| `user.lastActiveAt`          | string or null | Format: `date-time`.                          |
+| `identities`                 | object[]       | —                                             |
+| `identities[].provider`      | string         | One of: `google`, `credential`, `magic_link`. |
+| `identities[].providerEmail` | string         | Format: `email`.                              |
+| `identities[].emailVerified` | boolean        | —                                             |
+| `identities[].createdAt`     | string         | Format: `date-time`.                          |
+| `identities[].lastSignInAt`  | string or null | Format: `date-time`.                          |
+| `sessions`                   | object[]       | —                                             |
+| `sessions[].id`              | string         | —                                             |
+| `sessions[].createdAt`       | string         | Format: `date-time`.                          |
+| `sessions[].lastActiveAt`    | string         | Format: `date-time`.                          |
+| `sessions[].expiresAt`       | string         | Format: `date-time`.                          |
+| `sessions[].revokedAt`       | string or null | Format: `date-time`.                          |
+| `sessions[].userAgent`       | string or null | —                                             |
 
 ## appauth.revokeUserSessions
 
@@ -550,6 +565,7 @@ curl "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/config"
 | ----------------------- | -------- | ----------- |
 | `enabled`               | boolean  | —           |
 | `providers`             | string[] | —           |
+| `passwordMinLength`     | integer  | —           |
 | `accessTokenTtlSeconds` | integer  | —           |
 
 ## appauth.startGoogle
@@ -600,6 +616,305 @@ curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/oauth/google/start"
 | ------------------ | ------ | ----------- |
 | `authorizationUrl` | string | —           |
 | `state`            | string | —           |
+
+## appauth.signUpPassword
+
+Register an email credential and send a single-use verification link. The response is intentionally identical when the email already exists.
+
+```text
+POST /v1/apps/{projectId}/auth/sign-up/password
+```
+
+- **Auth:** None — public endpoint.
+- **Risk:** `write`
+
+### Path parameters
+
+| Name        | Type   | Required | Description |
+| ----------- | ------ | -------- | ----------- |
+| `projectId` | string | Yes      | —           |
+
+### Request body
+
+| Field         | Type   | Required | Description      |
+| ------------- | ------ | -------- | ---------------- |
+| `email`       | string | Yes      | Format: `email`. |
+| `password`    | string | Yes      | —                |
+| `name`        | string | No       | —                |
+| `redirectUrl` | string | Yes      | —                |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/sign-up/password" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "email": "dev@acme.com",
+  "password": "example",
+  "redirectUrl": "https://app.acme.com/auth/callback"
+}'
+```
+
+### Responses
+
+| Status | Description                                                |
+| ------ | ---------------------------------------------------------- |
+| `202`  | The verification request was accepted.                     |
+| `404`  | No such project or app-auth resource in this organization. |
+| `422`  | Invalid configuration or request.                          |
+| `429`  | Too many authentication attempts.                          |
+
+## appauth.signInPassword
+
+Sign in a verified application user with a password. Authentication failures use one enumeration-resistant response.
+
+```text
+POST /v1/apps/{projectId}/auth/sign-in/password
+```
+
+- **Auth:** None — public endpoint.
+- **Risk:** `write`
+
+### Path parameters
+
+| Name        | Type   | Required | Description |
+| ----------- | ------ | -------- | ----------- |
+| `projectId` | string | Yes      | —           |
+
+### Request body
+
+| Field      | Type   | Required | Description      |
+| ---------- | ------ | -------- | ---------------- |
+| `email`    | string | Yes      | Format: `email`. |
+| `password` | string | Yes      | —                |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/sign-in/password" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "email": "dev@acme.com",
+  "password": "example"
+}'
+```
+
+### Responses
+
+| Status | Description                                               |
+| ------ | --------------------------------------------------------- |
+| `200`  | New app session.                                          |
+| `401`  | The credentials are invalid or the email is not verified. |
+| `429`  | Too many authentication attempts.                         |
+
+### Response body (200)
+
+| Field                | Type           | Description                                                                |
+| -------------------- | -------------- | -------------------------------------------------------------------------- |
+| `accessToken`        | string         | Short-lived opaque bearer token. Only a SHA-256 digest is stored by Korve. |
+| `refreshToken`       | string         | One-time rotating token. Only a SHA-256 digest is stored by Korve.         |
+| `expiresAt`          | string         | Format: `date-time`.                                                       |
+| `user`               | object         | —                                                                          |
+| `user.id`            | string         | —                                                                          |
+| `user.email`         | string         | Format: `email`.                                                           |
+| `user.emailVerified` | boolean        | —                                                                          |
+| `user.name`          | string or null | —                                                                          |
+| `user.image`         | string or null | —                                                                          |
+| `user.disabledAt`    | string or null | Format: `date-time`.                                                       |
+| `user.createdAt`     | string         | Format: `date-time`.                                                       |
+| `user.lastSignInAt`  | string or null | Format: `date-time`.                                                       |
+| `user.lastActiveAt`  | string or null | Format: `date-time`.                                                       |
+
+## appauth.requestMagicLink
+
+Send a single-use passwordless sign-in link. The response never reveals whether an account existed.
+
+```text
+POST /v1/apps/{projectId}/auth/magic-link
+```
+
+- **Auth:** None — public endpoint.
+- **Risk:** `write`
+
+### Path parameters
+
+| Name        | Type   | Required | Description |
+| ----------- | ------ | -------- | ----------- |
+| `projectId` | string | Yes      | —           |
+
+### Request body
+
+| Field         | Type   | Required | Description      |
+| ------------- | ------ | -------- | ---------------- |
+| `email`       | string | Yes      | Format: `email`. |
+| `redirectUrl` | string | Yes      | —                |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/magic-link" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "email": "dev@acme.com",
+  "redirectUrl": "https://app.acme.com/auth/callback"
+}'
+```
+
+### Responses
+
+| Status | Description                                                |
+| ------ | ---------------------------------------------------------- |
+| `202`  | The sign-in request was accepted.                          |
+| `404`  | No such project or app-auth resource in this organization. |
+| `422`  | Invalid configuration or request.                          |
+| `429`  | Too many authentication attempts.                          |
+
+## appauth.completeMagicLink
+
+Consume a single-use email link and return a new application session.
+
+```text
+POST /v1/apps/{projectId}/auth/magic-link/verify
+```
+
+- **Auth:** None — public endpoint.
+- **Risk:** `write`
+
+### Path parameters
+
+| Name        | Type   | Required | Description |
+| ----------- | ------ | -------- | ----------- |
+| `projectId` | string | Yes      | —           |
+
+### Request body
+
+| Field   | Type   | Required | Description |
+| ------- | ------ | -------- | ----------- |
+| `token` | string | Yes      | —           |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/magic-link/verify" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "token": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}'
+```
+
+### Responses
+
+| Status | Description                                        |
+| ------ | -------------------------------------------------- |
+| `200`  | New app session.                                   |
+| `401`  | The link is invalid, expired, or already consumed. |
+| `429`  | Too many authentication attempts.                  |
+
+### Response body (200)
+
+| Field                | Type           | Description                                                                |
+| -------------------- | -------------- | -------------------------------------------------------------------------- |
+| `accessToken`        | string         | Short-lived opaque bearer token. Only a SHA-256 digest is stored by Korve. |
+| `refreshToken`       | string         | One-time rotating token. Only a SHA-256 digest is stored by Korve.         |
+| `expiresAt`          | string         | Format: `date-time`.                                                       |
+| `user`               | object         | —                                                                          |
+| `user.id`            | string         | —                                                                          |
+| `user.email`         | string         | Format: `email`.                                                           |
+| `user.emailVerified` | boolean        | —                                                                          |
+| `user.name`          | string or null | —                                                                          |
+| `user.image`         | string or null | —                                                                          |
+| `user.disabledAt`    | string or null | Format: `date-time`.                                                       |
+| `user.createdAt`     | string         | Format: `date-time`.                                                       |
+| `user.lastSignInAt`  | string or null | Format: `date-time`.                                                       |
+| `user.lastActiveAt`  | string or null | Format: `date-time`.                                                       |
+
+## appauth.requestPasswordReset
+
+Send a single-use password reset link. The response never reveals whether an account existed.
+
+```text
+POST /v1/apps/{projectId}/auth/password/reset
+```
+
+- **Auth:** None — public endpoint.
+- **Risk:** `write`
+
+### Path parameters
+
+| Name        | Type   | Required | Description |
+| ----------- | ------ | -------- | ----------- |
+| `projectId` | string | Yes      | —           |
+
+### Request body
+
+| Field         | Type   | Required | Description      |
+| ------------- | ------ | -------- | ---------------- |
+| `email`       | string | Yes      | Format: `email`. |
+| `redirectUrl` | string | Yes      | —                |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/password/reset" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "email": "dev@acme.com",
+  "redirectUrl": "https://app.acme.com/auth/callback"
+}'
+```
+
+### Responses
+
+| Status | Description                                                |
+| ------ | ---------------------------------------------------------- |
+| `202`  | The reset request was accepted.                            |
+| `404`  | No such project or app-auth resource in this organization. |
+| `422`  | Invalid configuration or request.                          |
+| `429`  | Too many authentication attempts.                          |
+
+## appauth.completePasswordReset
+
+Consume a single-use reset token, replace the password hash, and revoke existing sessions.
+
+```text
+POST /v1/apps/{projectId}/auth/password/reset/verify
+```
+
+- **Auth:** None — public endpoint.
+- **Risk:** `write`
+
+### Path parameters
+
+| Name        | Type   | Required | Description |
+| ----------- | ------ | -------- | ----------- |
+| `projectId` | string | Yes      | —           |
+
+### Request body
+
+| Field      | Type   | Required | Description |
+| ---------- | ------ | -------- | ----------- |
+| `token`    | string | Yes      | —           |
+| `password` | string | Yes      | —           |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/password/reset/verify" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "token": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "password": "example"
+}'
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Password replaced and sessions revoked.                  |
+| `401`  | The reset link is invalid, expired, or already consumed. |
+| `422`  | The password does not satisfy project policy.            |
+| `429`  | Too many authentication attempts.                        |
 
 ## appauth.googleCallback
 

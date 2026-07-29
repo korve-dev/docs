@@ -1,0 +1,72 @@
+---
+title: "Customer payments"
+description: "Project-isolated products, prices, checkout, subscriptions, and verified webhooks for an app's end users."
+---
+
+Customer payments lets an application sell to its own end users. It is deliberately separate from
+the Korve subscription that pays for infrastructure.
+
+## Connect an account
+
+An organization owner connects a customer-owned restricted secret and webhook signing secret from
+the dashboard. These values are encrypted, write-only, and returned later only as masked readiness
+metadata. Organization API keys cannot perform credential connection or disconnection.
+
+The connected credential needs only product, price, customer, checkout, and subscription
+permissions. Configure the returned project webhook URL in the payment account, then confirm that
+the project reports `ready`.
+
+## Build a catalog
+
+Products and prices are project-isolated. Create operations accept caller-stable idempotency keys;
+use a durable business identifier so a network retry cannot duplicate a product, customer, or
+checkout.
+
+Use the dashboard or the typed `customerPayments.*` REST/MCP operations to create catalog entries,
+inspect checkouts, cancel subscriptions, and page event history. See the API reference for exact
+request bodies and role requirements.
+
+Prices support one-time and recurring modes. Published prices are archived instead of rewritten so
+existing subscriptions and event history remain intelligible.
+
+## Create checkout from a deployed server
+
+```ts
+import { createKorve } from "@korve-dev/sdk";
+
+const korve = createKorve();
+const customer = await korve.payments.createCustomer({
+  email: "buyer@example.com",
+  externalId: "user_123",
+  idempotencyKey: "customer:user_123",
+});
+const checkout = await korve.payments.createCheckout({
+  priceId: "7f1f4ae9-11dd-465d-9619-bd210eeb9fc9",
+  customerId: customer.id,
+  successUrl: "https://app.example.com/billing/success",
+  cancelUrl: "https://app.example.com/billing",
+  idempotencyKey: "upgrade:order_123",
+});
+```
+
+The injected runtime capability can create only customers and hosted checkout sessions in its own
+project and environment. Catalog changes, subscription cancellation, event history, credential
+changes, and deletion remain operator-only.
+
+The shared runtime SDK is release-ready in the repository but is **not yet available from the
+public npm registry**. Use the runtime REST operations or checked-out workspace source until
+anonymous installation of `@korve-dev/sdk` succeeds.
+
+## Security and failure behavior
+
+- Webhook bodies are size-bounded, verified before parsing, and deduplicated by event identifier.
+- Errors are sanitized and provider-neutral. Retryable failures include a bounded retry delay
+  without exposing response bodies.
+- Success and cancellation URLs must be HTTPS and cannot contain embedded credentials.
+- Disconnect permanently removes local credentials, projections, and audit events. It does not
+  delete records in the connected payment account.
+- Customer payment activity belongs to the connected account's pricing. Korve organization billing
+  must also be active for write and runtime operations, but Korve infrastructure invoices and
+  customer payment proceeds never share a ledger.
+
+See the complete [Customer payments API](/api-reference/customerPayments).

@@ -1,0 +1,71 @@
+---
+title: "Local agent setup"
+description: "Install Korve MCP, project skills, AGENTS.md guidance, and local development variables safely."
+---
+
+Korve offers three complementary agent surfaces: the native CLI, the remote OAuth MCP endpoint,
+and customer skills. Local setup never writes an organization API key or OAuth token into the
+project.
+
+## Connect MCP
+
+```bash
+korve mcp install
+korve mcp status --json
+```
+
+`mcp install` is idempotent and manages only the `korve` entry. Other MCP servers and supported
+configuration comments survive. Invalid existing JSON or TOML fails closed instead of being
+replaced.
+
+| Client | Project configuration | User configuration |
+| --- | --- | --- |
+| Codex | `.codex/config.toml` | `~/.codex/config.toml` |
+| Claude Code | `.mcp.json` | `~/.claude.json` |
+| Cursor | `.cursor/mcp.json` | `~/.cursor/mcp.json` |
+| Windsurf | — | `~/.codeium/windsurf/mcp_config.json` |
+
+Use `--client <name>` for one client and `--global` for user scope. Windsurf's native location is
+user-scoped. The saved entry contains only `https://mcp.korve.dev/mcp`; the client performs browser
+OAuth on first connection. `status --json` exits `2` when an entry is missing, invalid, or points
+somewhere else.
+
+## Install project agent files
+
+```bash
+korve init
+# Or link an existing project:
+korve link my-project
+```
+
+The CLI installs three focused, offline skills (`korve`, `korve-cli`, and `korve-debug`) into
+`.claude/skills` and `.agents/skills`. It owns only its `korve*` subdirectories. Re-running restores
+Korve-managed files without touching sibling skills.
+
+It also maintains a marked block in `AGENTS.md` and adds only `.env.korve.local` to `.gitignore`.
+The committed skill and `AGENTS.md` content contain non-secret project identity and public URLs;
+credentials remain in local CLI storage or injected runtime variables.
+
+The six broader skills and their installer are documented in [Skills](/agents/skills).
+
+## Pull local environment values
+
+```bash
+korve env pull --project my-app
+korve env pull --project my-app --env staging
+```
+
+The default output is `.env.korve.local`. Korve writes it atomically with owner-only permissions on
+supported Unix systems, refuses symlink destinations, adds it to `.gitignore`, and will not replace
+it without `--force`. Output reports the path, environment, project, and count—not secret values.
+
+Environments do not inherit values. Pull or set each environment explicitly, and never commit the
+rendered local file.
+
+## Which surface to use
+
+- Use MCP for searched, typed, approval-aware agent operations.
+- Use the CLI for deterministic local scripts, repository setup, and parity with API-key
+  operations.
+- Use skills to teach the agent workflow and safety judgment.
+- Use [manifests](/primitives/manifests) for reviewable multi-resource desired state.

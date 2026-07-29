@@ -1,0 +1,974 @@
+---
+title: "customerPayments"
+description: "Project-isolated payments for a customer's end users. This is separate from Korve organization billing; processor credentials are write-only."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Project-isolated payments for a customer's end users. This is separate from Korve organization billing; processor credentials are write-only.
+
+## customerPayments.getConfig
+
+Get payment readiness and webhook configuration without returning secrets.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/payments
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Payment configuration.                                   |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
+
+### Response body (200)
+
+| Field                     | Type           | Description                                    |
+| ------------------------- | -------------- | ---------------------------------------------- |
+| `status`                  | string         | One of: `not_configured`, `ready`, `disabled`. |
+| `credentialConfigured`    | boolean        | —                                              |
+| `credentialHint`          | string or null | —                                              |
+| `webhookUrl`              | string or null | Format: `uri`.                                 |
+| `webhookSecretConfigured` | boolean        | —                                              |
+| `connectedAt`             | string or null | Format: `date-time`.                           |
+| `updatedAt`               | string or null | Format: `date-time`.                           |
+
+## customerPayments.connect
+
+Connect a customer-owned payment account with write-only restricted credentials.
+
+```text
+PUT /v1/orgs/{orgId}/projects/{projectId}/payments
+```
+
+- **Auth:** Dashboard session only — organization API keys are rejected.
+- **Minimum role:** `owner`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field           | Type   | Required | Description |
+| --------------- | ------ | -------- | ----------- |
+| `secretKey`     | string | Yes      | —           |
+| `webhookSecret` | string | Yes      | —           |
+
+### Example
+
+```bash
+curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments" \
+  -b "$SESSION" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "secretKey": "examplexxxxxxxxx",
+  "webhookSecret": "examplexxxxxxxxx"
+}'
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Connected configuration.                                 |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
+
+### Response body (200)
+
+| Field                     | Type           | Description                                    |
+| ------------------------- | -------------- | ---------------------------------------------- |
+| `status`                  | string         | One of: `not_configured`, `ready`, `disabled`. |
+| `credentialConfigured`    | boolean        | —                                              |
+| `credentialHint`          | string or null | —                                              |
+| `webhookUrl`              | string or null | Format: `uri`.                                 |
+| `webhookSecretConfigured` | boolean        | —                                              |
+| `connectedAt`             | string or null | Format: `date-time`.                           |
+| `updatedAt`               | string or null | Format: `date-time`.                           |
+
+## customerPayments.disconnect
+
+Revoke the local connection and permanently delete payment projections and audit events.
+
+```text
+DELETE /v1/orgs/{orgId}/projects/{projectId}/payments
+```
+
+- **Auth:** Dashboard session only — organization API keys are rejected.
+- **Minimum role:** `owner`
+- **Risk:** `destructive` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments" \
+  -b "$SESSION"
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Payments disconnected.                                   |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
+
+## customerPayments.listProducts
+
+List products in stable creation order.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/payments/products
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name     | Type    | Required | Description |
+| -------- | ------- | -------- | ----------- |
+| `cursor` | string  | No       | —           |
+| `limit`  | integer | No       | —           |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/products?cursor=example" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Product page.                                            |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
+
+### Response body (200)
+
+| Field                 | Type           | Description                                                          |
+| --------------------- | -------------- | -------------------------------------------------------------------- |
+| `items`               | object[]       | —                                                                    |
+| `items[].id`          | string         | Format: `uuid`.                                                      |
+| `items[].name`        | string         | —                                                                    |
+| `items[].description` | string or null | —                                                                    |
+| `items[].active`      | boolean        | —                                                                    |
+| `items[].metadata`    | object         | At most 20 application-defined string entries. Map of string values. |
+| `items[].createdAt`   | string         | Format: `date-time`.                                                 |
+| `items[].updatedAt`   | string         | Format: `date-time`.                                                 |
+| `nextCursor`          | string or null | —                                                                    |
+
+## customerPayments.createProduct
+
+Create a product idempotently.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/payments/products
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write`
+
+### Request body
+
+| Field         | Type   | Required | Description                                                          |
+| ------------- | ------ | -------- | -------------------------------------------------------------------- |
+| `name`        | string | Yes      | —                                                                    |
+| `description` | string | No       | —                                                                    |
+| `metadata`    | object | No       | At most 20 application-defined string entries. Map of string values. |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/products" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "Storefront"
+}'
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `201`  | Created product.                                         |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
+
+### Response body (201)
+
+| Field         | Type           | Description                                                          |
+| ------------- | -------------- | -------------------------------------------------------------------- |
+| `id`          | string         | Format: `uuid`.                                                      |
+| `name`        | string         | —                                                                    |
+| `description` | string or null | —                                                                    |
+| `active`      | boolean        | —                                                                    |
+| `metadata`    | object         | At most 20 application-defined string entries. Map of string values. |
+| `createdAt`   | string         | Format: `date-time`.                                                 |
+| `updatedAt`   | string         | Format: `date-time`.                                                 |
+
+## customerPayments.updateProduct
+
+Update or archive a product idempotently.
+
+```text
+PATCH /v1/orgs/{orgId}/projects/{projectId}/payments/products/{productId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `write`
+
+### Request body
+
+| Field         | Type    | Required | Description                                                          |
+| ------------- | ------- | -------- | -------------------------------------------------------------------- |
+| `name`        | string  | Yes      | —                                                                    |
+| `description` | string  | No       | —                                                                    |
+| `metadata`    | object  | No       | At most 20 application-defined string entries. Map of string values. |
+| `active`      | boolean | No       | —                                                                    |
+
+### Example
+
+```bash
+curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/products/$PRODUCT_ID" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "Storefront"
+}'
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Updated product.                                         |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
+
+### Response body (200)
+
+| Field         | Type           | Description                                                          |
+| ------------- | -------------- | -------------------------------------------------------------------- |
+| `id`          | string         | Format: `uuid`.                                                      |
+| `name`        | string         | —                                                                    |
+| `description` | string or null | —                                                                    |
+| `active`      | boolean        | —                                                                    |
+| `metadata`    | object         | At most 20 application-defined string entries. Map of string values. |
+| `createdAt`   | string         | Format: `date-time`.                                                 |
+| `updatedAt`   | string         | Format: `date-time`.                                                 |
+
+## customerPayments.listPrices
+
+List immutable prices and their active state.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/payments/prices
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name     | Type    | Required | Description |
+| -------- | ------- | -------- | ----------- |
+| `cursor` | string  | No       | —           |
+| `limit`  | integer | No       | —           |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/prices?cursor=example" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Price page.                                              |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
+
+### Response body (200)
+
+| Field                   | Type            | Description                                                          |
+| ----------------------- | --------------- | -------------------------------------------------------------------- |
+| `items`                 | object[]        | —                                                                    |
+| `items[].id`            | string          | Format: `uuid`.                                                      |
+| `items[].productId`     | string          | Format: `uuid`.                                                      |
+| `items[].currency`      | string          | Pattern: `^[a-z]{3}$`.                                               |
+| `items[].unitAmount`    | integer         | —                                                                    |
+| `items[].mode`          | string          | One of: `one_time`, `subscription`.                                  |
+| `items[].interval`      | string or null  | One of: `day`, `week`, `month`, `year`, `null`.                      |
+| `items[].intervalCount` | integer or null | —                                                                    |
+| `items[].active`        | boolean         | —                                                                    |
+| `items[].metadata`      | object          | At most 20 application-defined string entries. Map of string values. |
+| `items[].createdAt`     | string          | Format: `date-time`.                                                 |
+| `nextCursor`            | string or null  | —                                                                    |
+
+## customerPayments.createPrice
+
+Create an immutable one-time or recurring price idempotently.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/payments/prices
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write`
+
+### Request body
+
+| Field           | Type    | Required | Description                                                          |
+| --------------- | ------- | -------- | -------------------------------------------------------------------- |
+| `productId`     | string  | Yes      | Format: `uuid`.                                                      |
+| `currency`      | string  | Yes      | Pattern: `^[A-Za-z]{3}$`.                                            |
+| `unitAmount`    | integer | Yes      | —                                                                    |
+| `mode`          | string  | Yes      | One of: `one_time`, `subscription`.                                  |
+| `interval`      | string  | No       | One of: `day`, `week`, `month`, `year`.                              |
+| `intervalCount` | integer | No       | —                                                                    |
+| `metadata`      | object  | No       | At most 20 application-defined string entries. Map of string values. |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/prices" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "productId": "example",
+  "currency": "example",
+  "unitAmount": 1,
+  "mode": "one_time"
+}'
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `201`  | Created price.                                           |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
+
+### Response body (201)
+
+| Field           | Type            | Description                                                          |
+| --------------- | --------------- | -------------------------------------------------------------------- |
+| `id`            | string          | Format: `uuid`.                                                      |
+| `productId`     | string          | Format: `uuid`.                                                      |
+| `currency`      | string          | Pattern: `^[a-z]{3}$`.                                               |
+| `unitAmount`    | integer         | —                                                                    |
+| `mode`          | string          | One of: `one_time`, `subscription`.                                  |
+| `interval`      | string or null  | One of: `day`, `week`, `month`, `year`, `null`.                      |
+| `intervalCount` | integer or null | —                                                                    |
+| `active`        | boolean         | —                                                                    |
+| `metadata`      | object          | At most 20 application-defined string entries. Map of string values. |
+| `createdAt`     | string          | Format: `date-time`.                                                 |
+
+## customerPayments.archivePrice
+
+Archive an immutable price. Existing subscriptions remain valid.
+
+```text
+DELETE /v1/orgs/{orgId}/projects/{projectId}/payments/prices/{priceId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `destructive` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/prices/$PRICE_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Archived price.                                          |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
+
+### Response body (200)
+
+| Field           | Type            | Description                                                          |
+| --------------- | --------------- | -------------------------------------------------------------------- |
+| `id`            | string          | Format: `uuid`.                                                      |
+| `productId`     | string          | Format: `uuid`.                                                      |
+| `currency`      | string          | Pattern: `^[a-z]{3}$`.                                               |
+| `unitAmount`    | integer         | —                                                                    |
+| `mode`          | string          | One of: `one_time`, `subscription`.                                  |
+| `interval`      | string or null  | One of: `day`, `week`, `month`, `year`, `null`.                      |
+| `intervalCount` | integer or null | —                                                                    |
+| `active`        | boolean         | —                                                                    |
+| `metadata`      | object          | At most 20 application-defined string entries. Map of string values. |
+| `createdAt`     | string          | Format: `date-time`.                                                 |
+
+## customerPayments.listCustomers
+
+List end-customer projections.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/payments/customers
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name     | Type    | Required | Description |
+| -------- | ------- | -------- | ----------- |
+| `cursor` | string  | No       | —           |
+| `limit`  | integer | No       | —           |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/customers?cursor=example" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Customer page.                                           |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
+
+### Response body (200)
+
+| Field                | Type           | Description                                                          |
+| -------------------- | -------------- | -------------------------------------------------------------------- |
+| `items`              | object[]       | —                                                                    |
+| `items[].id`         | string         | Format: `uuid`.                                                      |
+| `items[].email`      | string         | Format: `email`.                                                     |
+| `items[].name`       | string or null | —                                                                    |
+| `items[].externalId` | string or null | —                                                                    |
+| `items[].metadata`   | object         | At most 20 application-defined string entries. Map of string values. |
+| `items[].createdAt`  | string         | Format: `date-time`.                                                 |
+| `nextCursor`         | string or null | —                                                                    |
+
+## customerPayments.createCustomer
+
+Create an end customer idempotently.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/payments/customers
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write`
+
+### Request body
+
+| Field        | Type   | Required | Description                                                          |
+| ------------ | ------ | -------- | -------------------------------------------------------------------- |
+| `email`      | string | Yes      | Format: `email`.                                                     |
+| `name`       | string | No       | —                                                                    |
+| `externalId` | string | No       | —                                                                    |
+| `metadata`   | object | No       | At most 20 application-defined string entries. Map of string values. |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/customers" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "email": "dev@acme.com"
+}'
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `201`  | Created customer.                                        |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
+
+### Response body (201)
+
+| Field        | Type           | Description                                                          |
+| ------------ | -------------- | -------------------------------------------------------------------- |
+| `id`         | string         | Format: `uuid`.                                                      |
+| `email`      | string         | Format: `email`.                                                     |
+| `name`       | string or null | —                                                                    |
+| `externalId` | string or null | —                                                                    |
+| `metadata`   | object         | At most 20 application-defined string entries. Map of string values. |
+| `createdAt`  | string         | Format: `date-time`.                                                 |
+
+## customerPayments.runtimeCreateCustomer
+
+Create an end customer from the deployed server runtime scoped to exactly one project and environment.
+
+```text
+POST /v1/runtime/payments/customers
+```
+
+- **Auth:** Project app-service token (`Authorization: Bearer $APP_SERVICE_TOKEN`).
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write`
+
+### Request body
+
+| Field        | Type   | Required | Description                                                          |
+| ------------ | ------ | -------- | -------------------------------------------------------------------- |
+| `email`      | string | Yes      | Format: `email`.                                                     |
+| `name`       | string | No       | —                                                                    |
+| `externalId` | string | No       | —                                                                    |
+| `metadata`   | object | No       | At most 20 application-defined string entries. Map of string values. |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/runtime/payments/customers" \
+  -H "Authorization: Bearer $APP_SERVICE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "email": "dev@acme.com"
+}'
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `201`  | Created customer.                                        |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
+
+### Response body (201)
+
+| Field        | Type           | Description                                                          |
+| ------------ | -------------- | -------------------------------------------------------------------- |
+| `id`         | string         | Format: `uuid`.                                                      |
+| `email`      | string         | Format: `email`.                                                     |
+| `name`       | string or null | —                                                                    |
+| `externalId` | string or null | —                                                                    |
+| `metadata`   | object         | At most 20 application-defined string entries. Map of string values. |
+| `createdAt`  | string         | Format: `date-time`.                                                 |
+
+## customerPayments.listCheckouts
+
+List checkout sessions. Hosted URLs are not retained or returned.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/payments/checkouts
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name     | Type    | Required | Description |
+| -------- | ------- | -------- | ----------- |
+| `cursor` | string  | No       | —           |
+| `limit`  | integer | No       | —           |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/checkouts?cursor=example" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Checkout page.                                           |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
+
+### Response body (200)
+
+| Field                       | Type           | Description                                                              |
+| --------------------------- | -------------- | ------------------------------------------------------------------------ |
+| `items`                     | object[]       | —                                                                        |
+| `items[].id`                | string         | Format: `uuid`.                                                          |
+| `items[].priceId`           | string         | Format: `uuid`.                                                          |
+| `items[].customerId`        | string or null | Format: `uuid`.                                                          |
+| `items[].mode`              | string         | One of: `one_time`, `subscription`.                                      |
+| `items[].quantity`          | integer        | —                                                                        |
+| `items[].status`            | string         | One of: `open`, `complete`, `expired`.                                   |
+| `items[].url`               | string or null | Hosted checkout URL. Present only on the create response. Format: `uri`. |
+| `items[].clientReferenceId` | string or null | —                                                                        |
+| `items[].expiresAt`         | string         | Format: `date-time`.                                                     |
+| `items[].createdAt`         | string         | Format: `date-time`.                                                     |
+| `nextCursor`                | string or null | —                                                                        |
+
+## customerPayments.createCheckout
+
+Create a hosted checkout session idempotently.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/payments/checkouts
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field               | Type    | Required | Description                                                          |
+| ------------------- | ------- | -------- | -------------------------------------------------------------------- |
+| `priceId`           | string  | Yes      | Format: `uuid`.                                                      |
+| `quantity`          | integer | No       | —                                                                    |
+| `successUrl`        | string  | Yes      | Format: `uri`.                                                       |
+| `cancelUrl`         | string  | Yes      | Format: `uri`.                                                       |
+| `customerId`        | string  | No       | Format: `uuid`.                                                      |
+| `customerEmail`     | string  | No       | Format: `email`.                                                     |
+| `clientReferenceId` | string  | No       | —                                                                    |
+| `metadata`          | object  | No       | At most 20 application-defined string entries. Map of string values. |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/checkouts" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "priceId": "example",
+  "successUrl": "https://app.acme.com/callback",
+  "cancelUrl": "https://app.acme.com/callback"
+}'
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `201`  | Created checkout.                                        |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
+
+### Response body (201)
+
+| Field               | Type           | Description                                                              |
+| ------------------- | -------------- | ------------------------------------------------------------------------ |
+| `id`                | string         | Format: `uuid`.                                                          |
+| `priceId`           | string         | Format: `uuid`.                                                          |
+| `customerId`        | string or null | Format: `uuid`.                                                          |
+| `mode`              | string         | One of: `one_time`, `subscription`.                                      |
+| `quantity`          | integer        | —                                                                        |
+| `status`            | string         | One of: `open`, `complete`, `expired`.                                   |
+| `url`               | string or null | Hosted checkout URL. Present only on the create response. Format: `uri`. |
+| `clientReferenceId` | string or null | —                                                                        |
+| `expiresAt`         | string         | Format: `date-time`.                                                     |
+| `createdAt`         | string         | Format: `date-time`.                                                     |
+
+## customerPayments.runtimeCreateCheckout
+
+Create a hosted checkout from the deployed server runtime scoped to exactly one project and environment.
+
+```text
+POST /v1/runtime/payments/checkouts
+```
+
+- **Auth:** Project app-service token (`Authorization: Bearer $APP_SERVICE_TOKEN`).
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field               | Type    | Required | Description                                                          |
+| ------------------- | ------- | -------- | -------------------------------------------------------------------- |
+| `priceId`           | string  | Yes      | Format: `uuid`.                                                      |
+| `quantity`          | integer | No       | —                                                                    |
+| `successUrl`        | string  | Yes      | Format: `uri`.                                                       |
+| `cancelUrl`         | string  | Yes      | Format: `uri`.                                                       |
+| `customerId`        | string  | No       | Format: `uuid`.                                                      |
+| `customerEmail`     | string  | No       | Format: `email`.                                                     |
+| `clientReferenceId` | string  | No       | —                                                                    |
+| `metadata`          | object  | No       | At most 20 application-defined string entries. Map of string values. |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/runtime/payments/checkouts" \
+  -H "Authorization: Bearer $APP_SERVICE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "priceId": "example",
+  "successUrl": "https://app.acme.com/callback",
+  "cancelUrl": "https://app.acme.com/callback"
+}'
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `201`  | Created checkout.                                        |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
+
+### Response body (201)
+
+| Field               | Type           | Description                                                              |
+| ------------------- | -------------- | ------------------------------------------------------------------------ |
+| `id`                | string         | Format: `uuid`.                                                          |
+| `priceId`           | string         | Format: `uuid`.                                                          |
+| `customerId`        | string or null | Format: `uuid`.                                                          |
+| `mode`              | string         | One of: `one_time`, `subscription`.                                      |
+| `quantity`          | integer        | —                                                                        |
+| `status`            | string         | One of: `open`, `complete`, `expired`.                                   |
+| `url`               | string or null | Hosted checkout URL. Present only on the create response. Format: `uri`. |
+| `clientReferenceId` | string or null | —                                                                        |
+| `expiresAt`         | string         | Format: `date-time`.                                                     |
+| `createdAt`         | string         | Format: `date-time`.                                                     |
+
+## customerPayments.listSubscriptions
+
+List webhook-reconciled subscriptions.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/payments/subscriptions
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name     | Type    | Required | Description |
+| -------- | ------- | -------- | ----------- |
+| `cursor` | string  | No       | —           |
+| `limit`  | integer | No       | —           |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/subscriptions?cursor=example" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Subscription page.                                       |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
+
+### Response body (200)
+
+| Field                       | Type           | Description                                                                   |
+| --------------------------- | -------------- | ----------------------------------------------------------------------------- |
+| `items`                     | object[]       | —                                                                             |
+| `items[].id`                | string         | Format: `uuid`.                                                               |
+| `items[].customerId`        | string or null | Format: `uuid`.                                                               |
+| `items[].priceId`           | string or null | Format: `uuid`.                                                               |
+| `items[].status`            | string         | One of: `incomplete`, `trialing`, `active`, `past_due`, `canceled`, `unpaid`. |
+| `items[].cancelAtPeriodEnd` | boolean        | —                                                                             |
+| `items[].currentPeriodEnd`  | string or null | Format: `date-time`.                                                          |
+| `items[].createdAt`         | string         | Format: `date-time`.                                                          |
+| `items[].updatedAt`         | string         | Format: `date-time`.                                                          |
+| `nextCursor`                | string or null | —                                                                             |
+
+## customerPayments.cancelSubscription
+
+Cancel a subscription now or at the end of its current period.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/payments/subscriptions/{subscriptionId}/cancel
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field         | Type    | Required | Description |
+| ------------- | ------- | -------- | ----------- |
+| `atPeriodEnd` | boolean | Yes      | —           |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/subscriptions/$SUBSCRIPTION_ID/cancel" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "atPeriodEnd": true
+}'
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Updated subscription.                                    |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
+
+### Response body (200)
+
+| Field               | Type           | Description                                                                   |
+| ------------------- | -------------- | ----------------------------------------------------------------------------- |
+| `id`                | string         | Format: `uuid`.                                                               |
+| `customerId`        | string or null | Format: `uuid`.                                                               |
+| `priceId`           | string or null | Format: `uuid`.                                                               |
+| `status`            | string         | One of: `incomplete`, `trialing`, `active`, `past_due`, `canceled`, `unpaid`. |
+| `cancelAtPeriodEnd` | boolean        | —                                                                             |
+| `currentPeriodEnd`  | string or null | Format: `date-time`.                                                          |
+| `createdAt`         | string         | Format: `date-time`.                                                          |
+| `updatedAt`         | string         | Format: `date-time`.                                                          |
+
+## customerPayments.listEvents
+
+List bounded, deduplicated payment lifecycle events for audit and debugging.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/payments/events
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name     | Type    | Required | Description |
+| -------- | ------- | -------- | ----------- |
+| `cursor` | string  | No       | —           |
+| `limit`  | integer | No       | —           |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/payments/events?cursor=example" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| `200`  | Event page.                                              |
+| `402`  | Organization billing is not active.                      |
+| `404`  | Project or payment resource not found.                   |
+| `409`  | Duplicate idempotency key or conflicting resource state. |
+| `422`  | Invalid payment request.                                 |
+| `502`  | The payment processor rejected the request.              |
+| `503`  | The payment processor is temporarily unavailable.        |
+
+### Response body (200)
+
+| Field                      | Type           | Description                               |
+| -------------------------- | -------------- | ----------------------------------------- |
+| `items`                    | object[]       | —                                         |
+| `items[].id`               | string         | Format: `uuid`.                           |
+| `items[].type`             | string         | —                                         |
+| `items[].processingStatus` | string         | One of: `processed`, `ignored`, `failed`. |
+| `items[].occurredAt`       | string         | Format: `date-time`.                      |
+| `items[].receivedAt`       | string         | Format: `date-time`.                      |
+| `nextCursor`               | string or null | —                                         |

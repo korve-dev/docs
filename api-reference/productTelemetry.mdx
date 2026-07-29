@@ -1,0 +1,105 @@
+---
+title: "productTelemetry"
+description: "Privacy-bounded first-party product funnel events and organization-level aggregate evidence."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Privacy-bounded first-party product funnel events and organization-level aggregate evidence.
+
+## productTelemetry.track
+
+Accept a bounded batch of allowlisted funnel events. Raw network addresses, secrets, nested objects, and unbounded strings are never accepted or retained.
+
+```text
+POST /v1/telemetry/events
+```
+
+- **Auth:** None — public endpoint.
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field                     | Type     | Required | Description                                                                                                                                                                                                                                             |
+| ------------------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `events`                  | object[] | Yes      | —                                                                                                                                                                                                                                                       |
+| `events[].name`           | string   | Yes      | One of: `cli_installed`, `login_started`, `login_succeeded`, `login_failed`, `link_agent_files`, `init_planned`, `checkout_link_shown`, `billing_activated`, `first_deploy_ready`, `mcp_installed`, `agent_connected`, `guard_nudged`, `guard_briefed`. |
+| `events[].at`             | string   | Yes      | When the event occurred. Events outside the accepted clock window are rejected. Format: `date-time`.                                                                                                                                                    |
+| `events[].anonymousId`    | string   | No       | Optional installation-scoped pseudonym. The service stores only a one-way digest.                                                                                                                                                                       |
+| `events[].organizationId` | string   | No       | Optional post-auth correlation claim. Public claims are digested and never trusted for organization reporting. Format: `uuid`.                                                                                                                          |
+| `events[].properties`     | object   | No       | At most 20 scalar values. Property names and string values are bounded; nested data is rejected. Map of string or number or boolean or null values.                                                                                                     |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/telemetry/events" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "events": [
+    {
+      "name": "cli_installed",
+      "at": "2026-06-01T12:00:00Z"
+    }
+  ]
+}'
+```
+
+### Responses
+
+| Status | Description                                                   |
+| ------ | ------------------------------------------------------------- |
+| `202`  | The bounded event batch was accepted for first-party storage. |
+| `413`  | The encoded request exceeds 65,536 bytes.                     |
+| `422`  | The event batch is malformed or outside the privacy bounds.   |
+| `429`  | Too many event batches arrived from this network source.      |
+
+### Response body (202)
+
+| Field      | Type    | Description |
+| ---------- | ------- | ----------- |
+| `accepted` | integer | —           |
+
+## productTelemetry.getFunnel
+
+Return aggregate, server-verified onboarding funnel evidence for this organization. Anonymous and untrusted public correlation data is never returned.
+
+```text
+GET /v1/orgs/{orgId}/telemetry/funnel
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name    | Type   | Required | Description          |
+| ------- | ------ | -------- | -------------------- |
+| `since` | string | No       | Format: `date-time`. |
+| `until` | string | No       | Format: `date-time`. |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/telemetry/funnel?since=2026-06-01T12%3A00%3A00Z" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                                |
+| ------ | ---------------------------------------------------------- |
+| `200`  | Aggregate event counts and first/last evidence timestamps. |
+| `422`  | The requested window is invalid or exceeds 90 days.        |
+
+### Response body (200)
+
+| Field             | Type           | Description                                                                                                                                                                                                                                             |
+| ----------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `since`           | string         | Format: `date-time`.                                                                                                                                                                                                                                    |
+| `until`           | string         | Format: `date-time`.                                                                                                                                                                                                                                    |
+| `steps`           | object[]       | —                                                                                                                                                                                                                                                       |
+| `steps[].name`    | string         | One of: `cli_installed`, `login_started`, `login_succeeded`, `login_failed`, `link_agent_files`, `init_planned`, `checkout_link_shown`, `billing_activated`, `first_deploy_ready`, `mcp_installed`, `agent_connected`, `guard_nudged`, `guard_briefed`. |
+| `steps[].count`   | integer        | —                                                                                                                                                                                                                                                       |
+| `steps[].firstAt` | string or null | Format: `date-time`.                                                                                                                                                                                                                                    |
+| `steps[].lastAt`  | string or null | Format: `date-time`.                                                                                                                                                                                                                                    |

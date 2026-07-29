@@ -17,7 +17,14 @@
     "groups": [
       {
         "group": "Start",
-        "pages": ["introduction", "quickstart", "install-cli", "pricing", "troubleshooting"]
+        "pages": [
+          "introduction",
+          "quickstart",
+          "starters",
+          "install-cli",
+          "pricing",
+          "troubleshooting"
+        ]
       },
       {
         "group": "Core concepts",
@@ -25,7 +32,8 @@
           "concepts/projects-and-environments",
           "concepts/runtime-and-regions",
           "concepts/security-and-roles",
-          "concepts/billing-and-budgets"
+          "concepts/billing-and-budgets",
+          "concepts/product-telemetry"
         ]
       },
       {
@@ -34,6 +42,7 @@
           "agents/agent-onboarding",
           "agents/oauth",
           "agents/mcp-setup",
+          "agents/local-agent-setup",
           "agents/skills",
           "agents/safe-automation"
         ]
@@ -43,6 +52,7 @@
         "pages": [
           "sdk/runtime",
           "sdk/app-auth",
+          "primitives/app-auth",
           "primitives/deploys",
           "primitives/app-access",
           "primitives/project-operator",
@@ -61,6 +71,9 @@
           "primitives/backups",
           "primitives/database-branches",
           "primitives/storage",
+          "primitives/realtime",
+          "primitives/ai-gateway",
+          "primitives/customer-payments",
           "primitives/caches",
           "primitives/queues",
           "primitives/crons"
@@ -107,6 +120,10 @@
           "api-reference/alertPolicies",
           "api-reference/alertIncidents",
           "api-reference/appauth",
+          "api-reference/aiGateways",
+          "api-reference/customerPayments",
+          "api-reference/productTelemetry",
+          "api-reference/realtime",
           "api-reference/domains",
           "api-reference/databases",
           "api-reference/caches",

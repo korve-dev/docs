@@ -1000,14 +1000,17 @@
                       "type": "array",
                       "items": {
                         "type": "string",
-                        "enum": ["google"]
+                        "enum": ["google", "password", "magic_link"]
                       }
+                    },
+                    "passwordMinLength": {
+                      "type": "integer"
                     },
                     "accessTokenTtlSeconds": {
                       "type": "integer"
                     }
                   },
-                  "required": ["enabled", "providers", "accessTokenTtlSeconds"]
+                  "required": ["enabled", "providers", "accessTokenTtlSeconds", "passwordMinLength"]
                 }
               }
             }
@@ -1018,6 +1021,185 @@
         },
         "x-korve-risk": "read",
         "x-korve-project-scoped": true
+      }
+    },
+    "/v1/apps/{projectId}/auth/magic-link/verify": {
+      "post": {
+        "operationId": "appauth.completeMagicLink",
+        "summary": "Complete Magic Link",
+        "description": "Consume a single-use email link and return a new application session.",
+        "tags": ["appauth"],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project id (UUID) or globally unique project slug."
+          }
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "New app session.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "accessToken": {
+                      "type": "string",
+                      "description": "Short-lived opaque bearer token. Only a SHA-256 digest is stored by Korve."
+                    },
+                    "refreshToken": {
+                      "type": "string",
+                      "description": "One-time rotating token. Only a SHA-256 digest is stored by Korve."
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string",
+                          "format": "email"
+                        },
+                        "emailVerified": {
+                          "type": "boolean"
+                        },
+                        "name": {
+                          "type": ["string", "null"]
+                        },
+                        "image": {
+                          "type": ["string", "null"]
+                        },
+                        "disabledAt": {
+                          "type": ["string", "null"],
+                          "format": "date-time"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "lastSignInAt": {
+                          "type": ["string", "null"],
+                          "format": "date-time"
+                        },
+                        "lastActiveAt": {
+                          "type": ["string", "null"],
+                          "format": "date-time"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "email",
+                        "emailVerified",
+                        "name",
+                        "image",
+                        "disabledAt",
+                        "createdAt",
+                        "lastSignInAt",
+                        "lastActiveAt"
+                      ]
+                    }
+                  },
+                  "required": ["accessToken", "refreshToken", "expiresAt", "user"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The link is invalid, expired, or already consumed."
+          },
+          "429": {
+            "description": "Too many authentication attempts."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  }
+                },
+                "required": ["token"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/apps/{projectId}/auth/magic-link": {
+      "post": {
+        "operationId": "appauth.requestMagicLink",
+        "summary": "Request Magic Link",
+        "description": "Send a single-use passwordless sign-in link. The response never reveals whether an account existed.",
+        "tags": ["appauth"],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project id (UUID) or globally unique project slug."
+          }
+        ],
+        "security": [],
+        "responses": {
+          "202": {
+            "description": "The sign-in request was accepted."
+          },
+          "404": {
+            "description": "No such project or app-auth resource in this organization."
+          },
+          "422": {
+            "description": "Invalid configuration or request."
+          },
+          "429": {
+            "description": "Too many authentication attempts."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "redirectUrl": {
+                    "type": "string"
+                  }
+                },
+                "required": ["email", "redirectUrl"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
       }
     },
     "/v1/apps/{projectId}/auth/oauth/google/callback": {
@@ -1137,6 +1319,121 @@
                   }
                 },
                 "required": ["redirectUrl"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/apps/{projectId}/auth/password/reset/verify": {
+      "post": {
+        "operationId": "appauth.completePasswordReset",
+        "summary": "Complete Password Reset",
+        "description": "Consume a single-use reset token, replace the password hash, and revoke existing sessions.",
+        "tags": ["appauth"],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project id (UUID) or globally unique project slug."
+          }
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Password replaced and sessions revoked."
+          },
+          "401": {
+            "description": "The reset link is invalid, expired, or already consumed."
+          },
+          "422": {
+            "description": "The password does not satisfy project policy."
+          },
+          "429": {
+            "description": "Too many authentication attempts."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": ["token", "password"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/apps/{projectId}/auth/password/reset": {
+      "post": {
+        "operationId": "appauth.requestPasswordReset",
+        "summary": "Request Password Reset",
+        "description": "Send a single-use password reset link. The response never reveals whether an account existed.",
+        "tags": ["appauth"],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project id (UUID) or globally unique project slug."
+          }
+        ],
+        "security": [],
+        "responses": {
+          "202": {
+            "description": "The reset request was accepted."
+          },
+          "404": {
+            "description": "No such project or app-auth resource in this organization."
+          },
+          "422": {
+            "description": "Invalid configuration or request."
+          },
+          "429": {
+            "description": "Too many authentication attempts."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "redirectUrl": {
+                    "type": "string"
+                  }
+                },
+                "required": ["email", "redirectUrl"],
                 "additionalProperties": false
               }
             }
@@ -1361,6 +1658,131 @@
         "x-korve-project-scoped": true
       }
     },
+    "/v1/apps/{projectId}/auth/sign-in/password": {
+      "post": {
+        "operationId": "appauth.signInPassword",
+        "summary": "Sign In Password",
+        "description": "Sign in a verified application user with a password. Authentication failures use one enumeration-resistant response.",
+        "tags": ["appauth"],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project id (UUID) or globally unique project slug."
+          }
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "New app session.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "accessToken": {
+                      "type": "string",
+                      "description": "Short-lived opaque bearer token. Only a SHA-256 digest is stored by Korve."
+                    },
+                    "refreshToken": {
+                      "type": "string",
+                      "description": "One-time rotating token. Only a SHA-256 digest is stored by Korve."
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string",
+                          "format": "email"
+                        },
+                        "emailVerified": {
+                          "type": "boolean"
+                        },
+                        "name": {
+                          "type": ["string", "null"]
+                        },
+                        "image": {
+                          "type": ["string", "null"]
+                        },
+                        "disabledAt": {
+                          "type": ["string", "null"],
+                          "format": "date-time"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "lastSignInAt": {
+                          "type": ["string", "null"],
+                          "format": "date-time"
+                        },
+                        "lastActiveAt": {
+                          "type": ["string", "null"],
+                          "format": "date-time"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "email",
+                        "emailVerified",
+                        "name",
+                        "image",
+                        "disabledAt",
+                        "createdAt",
+                        "lastSignInAt",
+                        "lastActiveAt"
+                      ]
+                    }
+                  },
+                  "required": ["accessToken", "refreshToken", "expiresAt", "user"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The credentials are invalid or the email is not verified."
+          },
+          "429": {
+            "description": "Too many authentication attempts."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": ["email", "password"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/apps/{projectId}/auth/sign-out": {
       "post": {
         "operationId": "appauth.signOut",
@@ -1393,6 +1815,70 @@
         },
         "x-korve-risk": "write",
         "x-korve-project-scoped": true
+      }
+    },
+    "/v1/apps/{projectId}/auth/sign-up/password": {
+      "post": {
+        "operationId": "appauth.signUpPassword",
+        "summary": "Sign Up Password",
+        "description": "Register an email credential and send a single-use verification link. The response is intentionally identical when the email already exists.",
+        "tags": ["appauth"],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project id (UUID) or globally unique project slug."
+          }
+        ],
+        "security": [],
+        "responses": {
+          "202": {
+            "description": "The verification request was accepted."
+          },
+          "404": {
+            "description": "No such project or app-auth resource in this organization."
+          },
+          "422": {
+            "description": "Invalid configuration or request."
+          },
+          "429": {
+            "description": "Too many authentication attempts."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "redirectUrl": {
+                    "type": "string"
+                  }
+                },
+                "required": ["email", "password", "redirectUrl"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
       }
     },
     "/v1/apps/{projectId}/auth/token": {
@@ -2782,11 +3268,11 @@
                         "properties": {
                           "kind": {
                             "type": "string",
-                            "enum": ["user", "api_key", "agent_grant"]
+                            "enum": ["user", "api_key", "agent_grant", "app_service"]
                           },
                           "label": {
                             "type": ["string", "null"],
-                            "description": "The user's email or the API key's name, captured when the entry was written — entries outlive removed members and revoked keys. Null for agent grants."
+                            "description": "The user's email or the API key's name, captured when the entry was written — entries outlive removed members and revoked keys. Null for agent grants and deployed app-service capabilities."
                           }
                         },
                         "required": ["kind", "label"]
@@ -7803,6 +8289,908 @@
         }
       }
     },
+    "/v1/orgs/{orgId}/projects/{projectId}/ai-gateways/{gatewayId}/keys/{keyId}": {
+      "delete": {
+        "operationId": "aiGateways.keys.revoke",
+        "summary": "Revoke",
+        "description": "Permanently revoke a gateway key.",
+        "tags": ["aiGateways"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "gatewayId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "keyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Key revoked."
+          },
+          "404": {
+            "description": "No such key."
+          }
+        },
+        "x-korve-risk": "destructive",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "admin"
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/ai-gateways/{gatewayId}/keys": {
+      "get": {
+        "operationId": "aiGateways.keys.list",
+        "summary": "List",
+        "description": "List gateway key metadata. Secret values are never returned.",
+        "tags": ["aiGateways"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "gatewayId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gateway keys."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "admin"
+      },
+      "post": {
+        "operationId": "aiGateways.keys.create",
+        "summary": "Create",
+        "description": "Create a least-privilege gateway key. The secret is returned exactly once.",
+        "tags": ["aiGateways"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "gatewayId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Key metadata and one-time secret."
+          },
+          "404": {
+            "description": "No such gateway."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "admin",
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  }
+                },
+                "required": ["name"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/ai-gateways/{gatewayId}/models": {
+      "get": {
+        "operationId": "aiGateways.models",
+        "summary": "Models",
+        "description": "List provider-neutral models available through this gateway.",
+        "tags": ["aiGateways"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "gatewayId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Available models.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["korve/fast", "korve/balanced", "korve/reasoning"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/ai-gateways/{gatewayId}/usage": {
+      "get": {
+        "operationId": "aiGateways.usage",
+        "summary": "Usage",
+        "description": "Get token and spend usage for the current billing month.",
+        "tags": ["aiGateways"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "gatewayId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gateway usage and remaining budget."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/ai-gateways/{gatewayId}": {
+      "delete": {
+        "operationId": "aiGateways.delete",
+        "summary": "Delete",
+        "description": "Permanently delete an AI gateway and revoke every gateway key.",
+        "tags": ["aiGateways"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "gatewayId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "AI gateway deleted."
+          },
+          "404": {
+            "description": "No such gateway."
+          }
+        },
+        "x-korve-risk": "destructive",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "owner"
+      },
+      "get": {
+        "operationId": "aiGateways.get",
+        "summary": "Get",
+        "description": "Get AI gateway configuration.",
+        "tags": ["aiGateways"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "gatewayId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "AI gateway.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "environment": {
+                      "type": "string"
+                    },
+                    "allowedModels": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": ["korve/fast", "korve/balanced", "korve/reasoning"]
+                      }
+                    },
+                    "monthlyBudgetUsd": {
+                      "type": "number"
+                    },
+                    "timeoutMs": {
+                      "type": "integer"
+                    },
+                    "maxRetries": {
+                      "type": "integer"
+                    },
+                    "redactPrompts": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "environment",
+                    "allowedModels",
+                    "monthlyBudgetUsd",
+                    "timeoutMs",
+                    "maxRetries",
+                    "redactPrompts",
+                    "createdAt",
+                    "updatedAt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such gateway."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      },
+      "patch": {
+        "operationId": "aiGateways.update",
+        "summary": "Update",
+        "description": "Update model allowlists, budget, timeout, retry, and prompt-retention policy.",
+        "tags": ["aiGateways"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "gatewayId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Updated AI gateway.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "environment": {
+                      "type": "string"
+                    },
+                    "allowedModels": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": ["korve/fast", "korve/balanced", "korve/reasoning"]
+                      }
+                    },
+                    "monthlyBudgetUsd": {
+                      "type": "number"
+                    },
+                    "timeoutMs": {
+                      "type": "integer"
+                    },
+                    "maxRetries": {
+                      "type": "integer"
+                    },
+                    "redactPrompts": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "environment",
+                    "allowedModels",
+                    "monthlyBudgetUsd",
+                    "timeoutMs",
+                    "maxRetries",
+                    "redactPrompts",
+                    "createdAt",
+                    "updatedAt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such gateway."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "admin",
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9-]{1,61}$"
+                  },
+                  "allowedModels": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["korve/fast", "korve/balanced", "korve/reasoning"]
+                    },
+                    "minItems": 1,
+                    "maxItems": 3
+                  },
+                  "monthlyBudgetUsd": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 100000
+                  },
+                  "timeoutMs": {
+                    "type": "integer",
+                    "minimum": 1000,
+                    "maximum": 120000
+                  },
+                  "maxRetries": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 3
+                  },
+                  "redactPrompts": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/ai-gateways": {
+      "get": {
+        "operationId": "aiGateways.list",
+        "summary": "List",
+        "description": "List AI gateways in one project environment.",
+        "tags": ["aiGateways"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,38}$"
+            },
+            "description": "Environment slug to scope this operation to. Defaults to \"production\". An environment that does not exist on the project answers 404. Gateways are isolated to the addressed environment."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "AI gateways.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "environment": {
+                        "type": "string"
+                      },
+                      "allowedModels": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": ["korve/fast", "korve/balanced", "korve/reasoning"]
+                        }
+                      },
+                      "monthlyBudgetUsd": {
+                        "type": "number"
+                      },
+                      "timeoutMs": {
+                        "type": "integer"
+                      },
+                      "maxRetries": {
+                        "type": "integer"
+                      },
+                      "redactPrompts": {
+                        "type": "boolean"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name",
+                      "environment",
+                      "allowedModels",
+                      "monthlyBudgetUsd",
+                      "timeoutMs",
+                      "maxRetries",
+                      "redactPrompts",
+                      "createdAt",
+                      "updatedAt"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      },
+      "post": {
+        "operationId": "aiGateways.create",
+        "summary": "Create",
+        "description": "Create a budgeted AI gateway in one project environment.",
+        "tags": ["aiGateways"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,38}$"
+            },
+            "description": "Environment slug to scope this operation to. Defaults to \"production\". An environment that does not exist on the project answers 404. The gateway is created in the addressed environment."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "AI gateway created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "environment": {
+                      "type": "string"
+                    },
+                    "allowedModels": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": ["korve/fast", "korve/balanced", "korve/reasoning"]
+                      }
+                    },
+                    "monthlyBudgetUsd": {
+                      "type": "number"
+                    },
+                    "timeoutMs": {
+                      "type": "integer"
+                    },
+                    "maxRetries": {
+                      "type": "integer"
+                    },
+                    "redactPrompts": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "environment",
+                    "allowedModels",
+                    "monthlyBudgetUsd",
+                    "timeoutMs",
+                    "maxRetries",
+                    "redactPrompts",
+                    "createdAt",
+                    "updatedAt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The gateway name already exists."
+          },
+          "422": {
+            "description": "Invalid gateway configuration."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "admin",
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9-]{1,61}$"
+                  },
+                  "allowedModels": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["korve/fast", "korve/balanced", "korve/reasoning"]
+                    },
+                    "minItems": 1,
+                    "maxItems": 3
+                  },
+                  "monthlyBudgetUsd": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 100000
+                  },
+                  "timeoutMs": {
+                    "type": "integer",
+                    "minimum": 1000,
+                    "maximum": 120000
+                  },
+                  "maxRetries": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 3
+                  },
+                  "redactPrompts": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false,
+                "required": ["name", "allowedModels", "monthlyBudgetUsd"]
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/orgs/{orgId}/projects/{projectId}/alert-incidents/{incidentId}/acknowledge": {
       "post": {
         "operationId": "alertIncidents.acknowledge",
@@ -10097,7 +11485,7 @@
                         "properties": {
                           "provider": {
                             "type": "string",
-                            "enum": ["google"]
+                            "enum": ["google", "credential", "magic_link"]
                           },
                           "providerEmail": {
                             "type": "string",
@@ -10447,6 +11835,21 @@
                     "sessionMaxTtlSeconds": {
                       "type": "integer"
                     },
+                    "emailPasswordEnabled": {
+                      "type": "boolean"
+                    },
+                    "magicLinkEnabled": {
+                      "type": "boolean"
+                    },
+                    "passwordMinLength": {
+                      "type": "integer"
+                    },
+                    "magicLinkTtlSeconds": {
+                      "type": "integer"
+                    },
+                    "passwordResetTtlSeconds": {
+                      "type": "integer"
+                    },
                     "google": {
                       "type": "object",
                       "properties": {
@@ -10496,6 +11899,11 @@
                     "refreshTokenTtlSeconds",
                     "sessionIdleTtlSeconds",
                     "sessionMaxTtlSeconds",
+                    "emailPasswordEnabled",
+                    "magicLinkEnabled",
+                    "passwordMinLength",
+                    "magicLinkTtlSeconds",
+                    "passwordResetTtlSeconds",
                     "google",
                     "callbackUrl",
                     "createdAt",
@@ -10586,6 +11994,21 @@
                     "sessionMaxTtlSeconds": {
                       "type": "integer"
                     },
+                    "emailPasswordEnabled": {
+                      "type": "boolean"
+                    },
+                    "magicLinkEnabled": {
+                      "type": "boolean"
+                    },
+                    "passwordMinLength": {
+                      "type": "integer"
+                    },
+                    "magicLinkTtlSeconds": {
+                      "type": "integer"
+                    },
+                    "passwordResetTtlSeconds": {
+                      "type": "integer"
+                    },
                     "google": {
                       "type": "object",
                       "properties": {
@@ -10635,6 +12058,11 @@
                     "refreshTokenTtlSeconds",
                     "sessionIdleTtlSeconds",
                     "sessionMaxTtlSeconds",
+                    "emailPasswordEnabled",
+                    "magicLinkEnabled",
+                    "passwordMinLength",
+                    "magicLinkTtlSeconds",
+                    "passwordResetTtlSeconds",
                     "google",
                     "callbackUrl",
                     "createdAt",
@@ -10694,6 +12122,26 @@
                   "sessionMaxTtlSeconds": {
                     "type": "integer",
                     "description": "3600-2592000 seconds."
+                  },
+                  "emailPasswordEnabled": {
+                    "type": "boolean",
+                    "description": "Allow verified users to sign in with an application password."
+                  },
+                  "magicLinkEnabled": {
+                    "type": "boolean",
+                    "description": "Allow passwordless email sign-in and email verification links."
+                  },
+                  "passwordMinLength": {
+                    "type": "integer",
+                    "description": "10-64 characters."
+                  },
+                  "magicLinkTtlSeconds": {
+                    "type": "integer",
+                    "description": "300-3600 seconds."
+                  },
+                  "passwordResetTtlSeconds": {
+                    "type": "integer",
+                    "description": "300-3600 seconds."
                   }
                 },
                 "required": ["enabled", "allowedOrigins", "redirectUrls"],
@@ -25903,6 +27351,2205 @@
         }
       }
     },
+    "/v1/orgs/{orgId}/projects/{projectId}/payments/checkouts": {
+      "get": {
+        "operationId": "customerPayments.listCheckouts",
+        "summary": "List Checkouts",
+        "description": "List checkout sessions. Hosted URLs are not retained or returned.",
+        "tags": ["customerPayments"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "description": "Opaque cursor from the previous page."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "description": "Page size from 1 to 100. Defaults to 50."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Checkout page.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "priceId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "customerId": {
+                            "type": ["string", "null"],
+                            "format": "uuid"
+                          },
+                          "mode": {
+                            "type": "string",
+                            "enum": ["one_time", "subscription"]
+                          },
+                          "quantity": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 999
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": ["open", "complete", "expired"]
+                          },
+                          "url": {
+                            "type": ["string", "null"],
+                            "format": "uri",
+                            "description": "Hosted checkout URL. Present only on the create response."
+                          },
+                          "clientReferenceId": {
+                            "type": ["string", "null"]
+                          },
+                          "expiresAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "priceId",
+                          "customerId",
+                          "mode",
+                          "quantity",
+                          "status",
+                          "url",
+                          "clientReferenceId",
+                          "expiresAt",
+                          "createdAt"
+                        ]
+                      }
+                    },
+                    "nextCursor": {
+                      "type": ["string", "null"]
+                    }
+                  },
+                  "required": ["items", "nextCursor"]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "Project or payment resource not found."
+          },
+          "409": {
+            "description": "Duplicate idempotency key or conflicting resource state."
+          },
+          "422": {
+            "description": "Invalid payment request."
+          },
+          "502": {
+            "description": "The payment processor rejected the request."
+          },
+          "503": {
+            "description": "The payment processor is temporarily unavailable."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      },
+      "post": {
+        "operationId": "customerPayments.createCheckout",
+        "summary": "Create Checkout",
+        "description": "Create a hosted checkout session idempotently.",
+        "tags": ["customerPayments"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created checkout.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "priceId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "customerId": {
+                      "type": ["string", "null"],
+                      "format": "uuid"
+                    },
+                    "mode": {
+                      "type": "string",
+                      "enum": ["one_time", "subscription"]
+                    },
+                    "quantity": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 999
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["open", "complete", "expired"]
+                    },
+                    "url": {
+                      "type": ["string", "null"],
+                      "format": "uri",
+                      "description": "Hosted checkout URL. Present only on the create response."
+                    },
+                    "clientReferenceId": {
+                      "type": ["string", "null"]
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "priceId",
+                    "customerId",
+                    "mode",
+                    "quantity",
+                    "status",
+                    "url",
+                    "clientReferenceId",
+                    "expiresAt",
+                    "createdAt"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "Project or payment resource not found."
+          },
+          "409": {
+            "description": "Duplicate idempotency key or conflicting resource state."
+          },
+          "422": {
+            "description": "Invalid payment request."
+          },
+          "502": {
+            "description": "The payment processor rejected the request."
+          },
+          "503": {
+            "description": "The payment processor is temporarily unavailable."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "admin",
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "priceId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "quantity": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 999
+                  },
+                  "successUrl": {
+                    "type": "string",
+                    "format": "uri",
+                    "maxLength": 2048
+                  },
+                  "cancelUrl": {
+                    "type": "string",
+                    "format": "uri",
+                    "maxLength": 2048
+                  },
+                  "customerId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "customerEmail": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 320
+                  },
+                  "clientReferenceId": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "description": "At most 20 application-defined string entries.",
+                    "additionalProperties": {
+                      "type": "string",
+                      "maxLength": 500
+                    }
+                  }
+                },
+                "required": ["priceId", "successUrl", "cancelUrl"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/payments/customers": {
+      "get": {
+        "operationId": "customerPayments.listCustomers",
+        "summary": "List Customers",
+        "description": "List end-customer projections.",
+        "tags": ["customerPayments"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "description": "Opaque cursor from the previous page."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "description": "Page size from 1 to 100. Defaults to 50."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Customer page.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "email": {
+                            "type": "string",
+                            "format": "email"
+                          },
+                          "name": {
+                            "type": ["string", "null"]
+                          },
+                          "externalId": {
+                            "type": ["string", "null"]
+                          },
+                          "metadata": {
+                            "type": "object",
+                            "description": "At most 20 application-defined string entries.",
+                            "additionalProperties": {
+                              "type": "string",
+                              "maxLength": 500
+                            }
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        },
+                        "required": ["id", "email", "name", "externalId", "metadata", "createdAt"]
+                      }
+                    },
+                    "nextCursor": {
+                      "type": ["string", "null"]
+                    }
+                  },
+                  "required": ["items", "nextCursor"]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "Project or payment resource not found."
+          },
+          "409": {
+            "description": "Duplicate idempotency key or conflicting resource state."
+          },
+          "422": {
+            "description": "Invalid payment request."
+          },
+          "502": {
+            "description": "The payment processor rejected the request."
+          },
+          "503": {
+            "description": "The payment processor is temporarily unavailable."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      },
+      "post": {
+        "operationId": "customerPayments.createCustomer",
+        "summary": "Create Customer",
+        "description": "Create an end customer idempotently.",
+        "tags": ["customerPayments"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created customer.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "email": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "name": {
+                      "type": ["string", "null"]
+                    },
+                    "externalId": {
+                      "type": ["string", "null"]
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "description": "At most 20 application-defined string entries.",
+                      "additionalProperties": {
+                        "type": "string",
+                        "maxLength": 500
+                      }
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": ["id", "email", "name", "externalId", "metadata", "createdAt"]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "Project or payment resource not found."
+          },
+          "409": {
+            "description": "Duplicate idempotency key or conflicting resource state."
+          },
+          "422": {
+            "description": "Invalid payment request."
+          },
+          "502": {
+            "description": "The payment processor rejected the request."
+          },
+          "503": {
+            "description": "The payment processor is temporarily unavailable."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "admin",
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 320
+                  },
+                  "name": {
+                    "type": "string",
+                    "maxLength": 120
+                  },
+                  "externalId": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "description": "At most 20 application-defined string entries.",
+                    "additionalProperties": {
+                      "type": "string",
+                      "maxLength": 500
+                    }
+                  }
+                },
+                "required": ["email"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/payments/events": {
+      "get": {
+        "operationId": "customerPayments.listEvents",
+        "summary": "List Events",
+        "description": "List bounded, deduplicated payment lifecycle events for audit and debugging.",
+        "tags": ["customerPayments"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "description": "Opaque cursor from the previous page."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "description": "Page size from 1 to 100. Defaults to 50."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Event page.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "processingStatus": {
+                            "type": "string",
+                            "enum": ["processed", "ignored", "failed"]
+                          },
+                          "occurredAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "receivedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        },
+                        "required": ["id", "type", "processingStatus", "occurredAt", "receivedAt"]
+                      }
+                    },
+                    "nextCursor": {
+                      "type": ["string", "null"]
+                    }
+                  },
+                  "required": ["items", "nextCursor"]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "Project or payment resource not found."
+          },
+          "409": {
+            "description": "Duplicate idempotency key or conflicting resource state."
+          },
+          "422": {
+            "description": "Invalid payment request."
+          },
+          "502": {
+            "description": "The payment processor rejected the request."
+          },
+          "503": {
+            "description": "The payment processor is temporarily unavailable."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/payments/prices/{priceId}": {
+      "delete": {
+        "operationId": "customerPayments.archivePrice",
+        "summary": "Archive Price",
+        "description": "Archive an immutable price. Existing subscriptions remain valid.",
+        "tags": ["customerPayments"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "priceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archived price.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "productId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "currency": {
+                      "type": "string",
+                      "pattern": "^[a-z]{3}$"
+                    },
+                    "unitAmount": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "mode": {
+                      "type": "string",
+                      "enum": ["one_time", "subscription"]
+                    },
+                    "interval": {
+                      "type": ["string", "null"],
+                      "enum": ["day", "week", "month", "year", null]
+                    },
+                    "intervalCount": {
+                      "type": ["integer", "null"],
+                      "minimum": 1,
+                      "maximum": 365
+                    },
+                    "active": {
+                      "type": "boolean"
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "description": "At most 20 application-defined string entries.",
+                      "additionalProperties": {
+                        "type": "string",
+                        "maxLength": 500
+                      }
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "productId",
+                    "currency",
+                    "unitAmount",
+                    "mode",
+                    "interval",
+                    "intervalCount",
+                    "active",
+                    "metadata",
+                    "createdAt"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "Project or payment resource not found."
+          },
+          "409": {
+            "description": "Duplicate idempotency key or conflicting resource state."
+          },
+          "422": {
+            "description": "Invalid payment request."
+          },
+          "502": {
+            "description": "The payment processor rejected the request."
+          },
+          "503": {
+            "description": "The payment processor is temporarily unavailable."
+          }
+        },
+        "x-korve-risk": "destructive",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "admin"
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/payments/prices": {
+      "get": {
+        "operationId": "customerPayments.listPrices",
+        "summary": "List Prices",
+        "description": "List immutable prices and their active state.",
+        "tags": ["customerPayments"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "description": "Opaque cursor from the previous page."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "description": "Page size from 1 to 100. Defaults to 50."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Price page.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "productId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "currency": {
+                            "type": "string",
+                            "pattern": "^[a-z]{3}$"
+                          },
+                          "unitAmount": {
+                            "type": "integer",
+                            "minimum": 1
+                          },
+                          "mode": {
+                            "type": "string",
+                            "enum": ["one_time", "subscription"]
+                          },
+                          "interval": {
+                            "type": ["string", "null"],
+                            "enum": ["day", "week", "month", "year", null]
+                          },
+                          "intervalCount": {
+                            "type": ["integer", "null"],
+                            "minimum": 1,
+                            "maximum": 365
+                          },
+                          "active": {
+                            "type": "boolean"
+                          },
+                          "metadata": {
+                            "type": "object",
+                            "description": "At most 20 application-defined string entries.",
+                            "additionalProperties": {
+                              "type": "string",
+                              "maxLength": 500
+                            }
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "productId",
+                          "currency",
+                          "unitAmount",
+                          "mode",
+                          "interval",
+                          "intervalCount",
+                          "active",
+                          "metadata",
+                          "createdAt"
+                        ]
+                      }
+                    },
+                    "nextCursor": {
+                      "type": ["string", "null"]
+                    }
+                  },
+                  "required": ["items", "nextCursor"]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "Project or payment resource not found."
+          },
+          "409": {
+            "description": "Duplicate idempotency key or conflicting resource state."
+          },
+          "422": {
+            "description": "Invalid payment request."
+          },
+          "502": {
+            "description": "The payment processor rejected the request."
+          },
+          "503": {
+            "description": "The payment processor is temporarily unavailable."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      },
+      "post": {
+        "operationId": "customerPayments.createPrice",
+        "summary": "Create Price",
+        "description": "Create an immutable one-time or recurring price idempotently.",
+        "tags": ["customerPayments"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created price.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "productId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "currency": {
+                      "type": "string",
+                      "pattern": "^[a-z]{3}$"
+                    },
+                    "unitAmount": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "mode": {
+                      "type": "string",
+                      "enum": ["one_time", "subscription"]
+                    },
+                    "interval": {
+                      "type": ["string", "null"],
+                      "enum": ["day", "week", "month", "year", null]
+                    },
+                    "intervalCount": {
+                      "type": ["integer", "null"],
+                      "minimum": 1,
+                      "maximum": 365
+                    },
+                    "active": {
+                      "type": "boolean"
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "description": "At most 20 application-defined string entries.",
+                      "additionalProperties": {
+                        "type": "string",
+                        "maxLength": 500
+                      }
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "productId",
+                    "currency",
+                    "unitAmount",
+                    "mode",
+                    "interval",
+                    "intervalCount",
+                    "active",
+                    "metadata",
+                    "createdAt"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "Project or payment resource not found."
+          },
+          "409": {
+            "description": "Duplicate idempotency key or conflicting resource state."
+          },
+          "422": {
+            "description": "Invalid payment request."
+          },
+          "502": {
+            "description": "The payment processor rejected the request."
+          },
+          "503": {
+            "description": "The payment processor is temporarily unavailable."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "admin",
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "productId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z]{3}$"
+                  },
+                  "unitAmount": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "mode": {
+                    "type": "string",
+                    "enum": ["one_time", "subscription"]
+                  },
+                  "interval": {
+                    "type": "string",
+                    "enum": ["day", "week", "month", "year"]
+                  },
+                  "intervalCount": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 365
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "description": "At most 20 application-defined string entries.",
+                    "additionalProperties": {
+                      "type": "string",
+                      "maxLength": 500
+                    }
+                  }
+                },
+                "required": ["productId", "currency", "unitAmount", "mode"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/payments/products/{productId}": {
+      "patch": {
+        "operationId": "customerPayments.updateProduct",
+        "summary": "Update Product",
+        "description": "Update or archive a product idempotently.",
+        "tags": ["customerPayments"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Updated product.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": ["string", "null"]
+                    },
+                    "active": {
+                      "type": "boolean"
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "description": "At most 20 application-defined string entries.",
+                      "additionalProperties": {
+                        "type": "string",
+                        "maxLength": 500
+                      }
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "description",
+                    "active",
+                    "metadata",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "Project or payment resource not found."
+          },
+          "409": {
+            "description": "Duplicate idempotency key or conflicting resource state."
+          },
+          "422": {
+            "description": "Invalid payment request."
+          },
+          "502": {
+            "description": "The payment processor rejected the request."
+          },
+          "503": {
+            "description": "The payment processor is temporarily unavailable."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "admin",
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 1000
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "description": "At most 20 application-defined string entries.",
+                    "additionalProperties": {
+                      "type": "string",
+                      "maxLength": 500
+                    }
+                  },
+                  "active": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["name"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/payments/products": {
+      "get": {
+        "operationId": "customerPayments.listProducts",
+        "summary": "List Products",
+        "description": "List products in stable creation order.",
+        "tags": ["customerPayments"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "description": "Opaque cursor from the previous page."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "description": "Page size from 1 to 100. Defaults to 50."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product page.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": ["string", "null"]
+                          },
+                          "active": {
+                            "type": "boolean"
+                          },
+                          "metadata": {
+                            "type": "object",
+                            "description": "At most 20 application-defined string entries.",
+                            "additionalProperties": {
+                              "type": "string",
+                              "maxLength": 500
+                            }
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "description",
+                          "active",
+                          "metadata",
+                          "createdAt",
+                          "updatedAt"
+                        ]
+                      }
+                    },
+                    "nextCursor": {
+                      "type": ["string", "null"]
+                    }
+                  },
+                  "required": ["items", "nextCursor"]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "Project or payment resource not found."
+          },
+          "409": {
+            "description": "Duplicate idempotency key or conflicting resource state."
+          },
+          "422": {
+            "description": "Invalid payment request."
+          },
+          "502": {
+            "description": "The payment processor rejected the request."
+          },
+          "503": {
+            "description": "The payment processor is temporarily unavailable."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      },
+      "post": {
+        "operationId": "customerPayments.createProduct",
+        "summary": "Create Product",
+        "description": "Create a product idempotently.",
+        "tags": ["customerPayments"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created product.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": ["string", "null"]
+                    },
+                    "active": {
+                      "type": "boolean"
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "description": "At most 20 application-defined string entries.",
+                      "additionalProperties": {
+                        "type": "string",
+                        "maxLength": 500
+                      }
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "description",
+                    "active",
+                    "metadata",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "Project or payment resource not found."
+          },
+          "409": {
+            "description": "Duplicate idempotency key or conflicting resource state."
+          },
+          "422": {
+            "description": "Invalid payment request."
+          },
+          "502": {
+            "description": "The payment processor rejected the request."
+          },
+          "503": {
+            "description": "The payment processor is temporarily unavailable."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "admin",
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 1000
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "description": "At most 20 application-defined string entries.",
+                    "additionalProperties": {
+                      "type": "string",
+                      "maxLength": 500
+                    }
+                  }
+                },
+                "required": ["name"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/payments/subscriptions/{subscriptionId}/cancel": {
+      "post": {
+        "operationId": "customerPayments.cancelSubscription",
+        "summary": "Cancel Subscription",
+        "description": "Cancel a subscription now or at the end of its current period.",
+        "tags": ["customerPayments"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "subscriptionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Updated subscription.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "customerId": {
+                      "type": ["string", "null"],
+                      "format": "uuid"
+                    },
+                    "priceId": {
+                      "type": ["string", "null"],
+                      "format": "uuid"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["incomplete", "trialing", "active", "past_due", "canceled", "unpaid"]
+                    },
+                    "cancelAtPeriodEnd": {
+                      "type": "boolean"
+                    },
+                    "currentPeriodEnd": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "customerId",
+                    "priceId",
+                    "status",
+                    "cancelAtPeriodEnd",
+                    "currentPeriodEnd",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "Project or payment resource not found."
+          },
+          "409": {
+            "description": "Duplicate idempotency key or conflicting resource state."
+          },
+          "422": {
+            "description": "Invalid payment request."
+          },
+          "502": {
+            "description": "The payment processor rejected the request."
+          },
+          "503": {
+            "description": "The payment processor is temporarily unavailable."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "admin",
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "atPeriodEnd": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["atPeriodEnd"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/payments/subscriptions": {
+      "get": {
+        "operationId": "customerPayments.listSubscriptions",
+        "summary": "List Subscriptions",
+        "description": "List webhook-reconciled subscriptions.",
+        "tags": ["customerPayments"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "description": "Opaque cursor from the previous page."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "description": "Page size from 1 to 100. Defaults to 50."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscription page.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "customerId": {
+                            "type": ["string", "null"],
+                            "format": "uuid"
+                          },
+                          "priceId": {
+                            "type": ["string", "null"],
+                            "format": "uuid"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "incomplete",
+                              "trialing",
+                              "active",
+                              "past_due",
+                              "canceled",
+                              "unpaid"
+                            ]
+                          },
+                          "cancelAtPeriodEnd": {
+                            "type": "boolean"
+                          },
+                          "currentPeriodEnd": {
+                            "type": ["string", "null"],
+                            "format": "date-time"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "customerId",
+                          "priceId",
+                          "status",
+                          "cancelAtPeriodEnd",
+                          "currentPeriodEnd",
+                          "createdAt",
+                          "updatedAt"
+                        ]
+                      }
+                    },
+                    "nextCursor": {
+                      "type": ["string", "null"]
+                    }
+                  },
+                  "required": ["items", "nextCursor"]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "Project or payment resource not found."
+          },
+          "409": {
+            "description": "Duplicate idempotency key or conflicting resource state."
+          },
+          "422": {
+            "description": "Invalid payment request."
+          },
+          "502": {
+            "description": "The payment processor rejected the request."
+          },
+          "503": {
+            "description": "The payment processor is temporarily unavailable."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/payments": {
+      "delete": {
+        "operationId": "customerPayments.disconnect",
+        "summary": "Disconnect",
+        "description": "Revoke the local connection and permanently delete payment projections and audit events.",
+        "tags": ["customerPayments"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          }
+        ],
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payments disconnected."
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "Project or payment resource not found."
+          },
+          "409": {
+            "description": "Duplicate idempotency key or conflicting resource state."
+          },
+          "422": {
+            "description": "Invalid payment request."
+          },
+          "502": {
+            "description": "The payment processor rejected the request."
+          },
+          "503": {
+            "description": "The payment processor is temporarily unavailable."
+          }
+        },
+        "x-korve-risk": "destructive",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "owner"
+      },
+      "get": {
+        "operationId": "customerPayments.getConfig",
+        "summary": "Get Config",
+        "description": "Get payment readiness and webhook configuration without returning secrets.",
+        "tags": ["customerPayments"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment configuration.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": ["not_configured", "ready", "disabled"]
+                    },
+                    "credentialConfigured": {
+                      "type": "boolean"
+                    },
+                    "credentialHint": {
+                      "type": ["string", "null"]
+                    },
+                    "webhookUrl": {
+                      "type": ["string", "null"],
+                      "format": "uri"
+                    },
+                    "webhookSecretConfigured": {
+                      "type": "boolean"
+                    },
+                    "connectedAt": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "credentialConfigured",
+                    "credentialHint",
+                    "webhookUrl",
+                    "webhookSecretConfigured",
+                    "connectedAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "Project or payment resource not found."
+          },
+          "409": {
+            "description": "Duplicate idempotency key or conflicting resource state."
+          },
+          "422": {
+            "description": "Invalid payment request."
+          },
+          "502": {
+            "description": "The payment processor rejected the request."
+          },
+          "503": {
+            "description": "The payment processor is temporarily unavailable."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      },
+      "put": {
+        "operationId": "customerPayments.connect",
+        "summary": "Connect",
+        "description": "Connect a customer-owned payment account with write-only restricted credentials.",
+        "tags": ["customerPayments"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          }
+        ],
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Connected configuration.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": ["not_configured", "ready", "disabled"]
+                    },
+                    "credentialConfigured": {
+                      "type": "boolean"
+                    },
+                    "credentialHint": {
+                      "type": ["string", "null"]
+                    },
+                    "webhookUrl": {
+                      "type": ["string", "null"],
+                      "format": "uri"
+                    },
+                    "webhookSecretConfigured": {
+                      "type": "boolean"
+                    },
+                    "connectedAt": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "credentialConfigured",
+                    "credentialHint",
+                    "webhookUrl",
+                    "webhookSecretConfigured",
+                    "connectedAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "Project or payment resource not found."
+          },
+          "409": {
+            "description": "Duplicate idempotency key or conflicting resource state."
+          },
+          "422": {
+            "description": "Invalid payment request."
+          },
+          "502": {
+            "description": "The payment processor rejected the request."
+          },
+          "503": {
+            "description": "The payment processor is temporarily unavailable."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "owner",
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "secretKey": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 512
+                  },
+                  "webhookSecret": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 512
+                  }
+                },
+                "required": ["secretKey", "webhookSecret"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/orgs/{orgId}/projects/{projectId}/previews/{previewId}": {
       "delete": {
         "operationId": "previews.remove",
@@ -27484,6 +31131,870 @@
         }
       }
     },
+    "/v1/orgs/{orgId}/projects/{projectId}/realtime/channels/{channelId}/events": {
+      "post": {
+        "operationId": "realtime.publish",
+        "summary": "Publish",
+        "description": "Publish one JSON event of at most 65,536 encoded bytes. Live fan-out is at most once.",
+        "tags": ["realtime"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "channelId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Event accepted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "messageId": {
+                      "type": "string"
+                    },
+                    "sequence": {
+                      "type": "integer"
+                    },
+                    "acceptedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": ["messageId", "sequence", "acceptedAt"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such channel."
+          },
+          "409": {
+            "description": "Channel is paused or unavailable."
+          },
+          "413": {
+            "description": "Encoded event exceeds 65,536 bytes."
+          },
+          "429": {
+            "description": "Channel message-rate quota reached."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member",
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 65536,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "event": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+                  },
+                  "data": {
+                    "description": "JSON event payload."
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  }
+                },
+                "required": ["event", "data"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/realtime/channels/{channelId}/stats": {
+      "get": {
+        "operationId": "realtime.stats",
+        "summary": "Stats",
+        "description": "Get current connection, presence, message, delivery, and retained-event counters.",
+        "tags": ["realtime"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "channelId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Channel statistics.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sampledAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "connections": {
+                      "type": "integer"
+                    },
+                    "presenceMembers": {
+                      "type": "integer"
+                    },
+                    "published": {
+                      "type": "integer"
+                    },
+                    "delivered": {
+                      "type": "integer"
+                    },
+                    "rejected": {
+                      "type": "integer"
+                    },
+                    "retainedEvents": {
+                      "type": "integer"
+                    },
+                    "retainedBytes": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "sampledAt",
+                    "connections",
+                    "presenceMembers",
+                    "published",
+                    "delivered",
+                    "rejected",
+                    "retainedEvents",
+                    "retainedBytes"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such channel."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/realtime/channels/{channelId}": {
+      "delete": {
+        "operationId": "realtime.deleteChannel",
+        "summary": "Delete Channel",
+        "description": "Permanently close every connection and delete channel configuration, presence, and retained events.",
+        "tags": ["realtime"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "channelId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Channel deleted."
+          },
+          "404": {
+            "description": "No such channel."
+          }
+        },
+        "x-korve-risk": "destructive",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "owner"
+      },
+      "get": {
+        "operationId": "realtime.getChannel",
+        "summary": "Get Channel",
+        "description": "Get channel configuration without credentials.",
+        "tags": ["realtime"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "channelId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Channel configuration.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9-]{1,61}$"
+                    },
+                    "environment": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["ready", "paused", "failed"]
+                    },
+                    "region": {
+                      "type": "string",
+                      "enum": ["global"],
+                      "description": "Realtime channels are globally routed. The platform does not promise a storage jurisdiction."
+                    },
+                    "retentionSeconds": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 86400
+                    },
+                    "presenceEnabled": {
+                      "type": "boolean"
+                    },
+                    "maxConnections": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 10000
+                    },
+                    "maxMessagesPerSecond": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 2500
+                    },
+                    "deliveryGuarantee": {
+                      "type": "string",
+                      "enum": ["at-most-once-live"]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "environment",
+                    "status",
+                    "region",
+                    "retentionSeconds",
+                    "presenceEnabled",
+                    "maxConnections",
+                    "maxMessagesPerSecond",
+                    "deliveryGuarantee",
+                    "createdAt",
+                    "updatedAt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such channel."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      },
+      "patch": {
+        "operationId": "realtime.updateChannel",
+        "summary": "Update Channel",
+        "description": "Change retention, presence, quotas, or pause state. Reducing retention removes expired replay asynchronously.",
+        "tags": ["realtime"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "channelId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Updated channel.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9-]{1,61}$"
+                    },
+                    "environment": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["ready", "paused", "failed"]
+                    },
+                    "region": {
+                      "type": "string",
+                      "enum": ["global"],
+                      "description": "Realtime channels are globally routed. The platform does not promise a storage jurisdiction."
+                    },
+                    "retentionSeconds": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 86400
+                    },
+                    "presenceEnabled": {
+                      "type": "boolean"
+                    },
+                    "maxConnections": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 10000
+                    },
+                    "maxMessagesPerSecond": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 2500
+                    },
+                    "deliveryGuarantee": {
+                      "type": "string",
+                      "enum": ["at-most-once-live"]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "environment",
+                    "status",
+                    "region",
+                    "retentionSeconds",
+                    "presenceEnabled",
+                    "maxConnections",
+                    "maxMessagesPerSecond",
+                    "deliveryGuarantee",
+                    "createdAt",
+                    "updatedAt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such channel."
+          },
+          "422": {
+            "description": "Invalid channel configuration."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "admin",
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 16384,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "retentionSeconds": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 86400
+                  },
+                  "presenceEnabled": {
+                    "type": "boolean"
+                  },
+                  "maxConnections": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10000
+                  },
+                  "maxMessagesPerSecond": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 2500
+                  },
+                  "paused": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/realtime/channels": {
+      "get": {
+        "operationId": "realtime.listChannels",
+        "summary": "List Channels",
+        "description": "List realtime channels in one project environment.",
+        "tags": ["realtime"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,38}$"
+            },
+            "description": "Environment slug to scope this operation to. Defaults to \"production\". An environment that does not exist on the project answers 404. Channels are isolated to the addressed environment."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Channels ordered by name.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string",
+                        "pattern": "^[a-z][a-z0-9-]{1,61}$"
+                      },
+                      "environment": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": ["ready", "paused", "failed"]
+                      },
+                      "region": {
+                        "type": "string",
+                        "enum": ["global"],
+                        "description": "Realtime channels are globally routed. The platform does not promise a storage jurisdiction."
+                      },
+                      "retentionSeconds": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 86400
+                      },
+                      "presenceEnabled": {
+                        "type": "boolean"
+                      },
+                      "maxConnections": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 10000
+                      },
+                      "maxMessagesPerSecond": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 2500
+                      },
+                      "deliveryGuarantee": {
+                        "type": "string",
+                        "enum": ["at-most-once-live"]
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name",
+                      "environment",
+                      "status",
+                      "region",
+                      "retentionSeconds",
+                      "presenceEnabled",
+                      "maxConnections",
+                      "maxMessagesPerSecond",
+                      "deliveryGuarantee",
+                      "createdAt",
+                      "updatedAt"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such project or environment."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      },
+      "post": {
+        "operationId": "realtime.createChannel",
+        "summary": "Create Channel",
+        "description": "Create a globally routed channel. Retention is disabled by default; enabling it permits bounded ordered replay.",
+        "tags": ["realtime"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,38}$"
+            },
+            "description": "Environment slug to scope this operation to. Defaults to \"production\". An environment that does not exist on the project answers 404. The channel is created in this environment."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Channel ready.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9-]{1,61}$"
+                    },
+                    "environment": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["ready", "paused", "failed"]
+                    },
+                    "region": {
+                      "type": "string",
+                      "enum": ["global"],
+                      "description": "Realtime channels are globally routed. The platform does not promise a storage jurisdiction."
+                    },
+                    "retentionSeconds": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 86400
+                    },
+                    "presenceEnabled": {
+                      "type": "boolean"
+                    },
+                    "maxConnections": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 10000
+                    },
+                    "maxMessagesPerSecond": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 2500
+                    },
+                    "deliveryGuarantee": {
+                      "type": "string",
+                      "enum": ["at-most-once-live"]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "environment",
+                    "status",
+                    "region",
+                    "retentionSeconds",
+                    "presenceEnabled",
+                    "maxConnections",
+                    "maxMessagesPerSecond",
+                    "deliveryGuarantee",
+                    "createdAt",
+                    "updatedAt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The channel name already exists in this environment."
+          },
+          "422": {
+            "description": "Invalid channel configuration."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "admin",
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 16384,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9-]{1,61}$"
+                  },
+                  "region": {
+                    "type": "string",
+                    "enum": ["global"]
+                  },
+                  "retentionSeconds": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 86400
+                  },
+                  "presenceEnabled": {
+                    "type": "boolean"
+                  },
+                  "maxConnections": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10000
+                  },
+                  "maxMessagesPerSecond": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 2500
+                  }
+                },
+                "required": ["name"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/orgs/{orgId}/projects/{projectId}/repo-access": {
       "get": {
         "operationId": "projects.checkRepoAccess",
@@ -28854,6 +33365,123 @@
         "x-korve-required-role": "member"
       }
     },
+    "/v1/orgs/{orgId}/telemetry/funnel": {
+      "get": {
+        "operationId": "productTelemetry.getFunnel",
+        "summary": "Get Funnel",
+        "description": "Return aggregate, server-verified onboarding funnel evidence for this organization. Anonymous and untrusted public correlation data is never returned.",
+        "tags": ["productTelemetry"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Window start (RFC 3339). Defaults to 30 days before until."
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Exclusive window end (RFC 3339). Defaults to now."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Aggregate event counts and first/last evidence timestamps.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["since", "until", "steps"],
+                  "properties": {
+                    "since": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "until": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "steps": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": ["name", "count", "firstAt", "lastAt"],
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "enum": [
+                              "cli_installed",
+                              "login_started",
+                              "login_succeeded",
+                              "login_failed",
+                              "link_agent_files",
+                              "init_planned",
+                              "checkout_link_shown",
+                              "billing_activated",
+                              "first_deploy_ready",
+                              "mcp_installed",
+                              "agent_connected",
+                              "guard_nudged",
+                              "guard_briefed"
+                            ]
+                          },
+                          "count": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "firstAt": {
+                            "type": ["string", "null"],
+                            "format": "date-time"
+                          },
+                          "lastAt": {
+                            "type": ["string", "null"],
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The requested window is invalid or exceeds 90 days."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": false,
+        "x-korve-required-role": "admin"
+      }
+    },
     "/v1/orgs/{orgId}/usage": {
       "get": {
         "operationId": "usage.orgGet",
@@ -29987,6 +34615,367 @@
         "x-korve-project-scoped": false
       }
     },
+    "/v1/runtime/ai/{gatewayName}/chat/completions": {
+      "post": {
+        "operationId": "aiGateways.runtimeChatCompletions",
+        "summary": "Runtime Chat Completions",
+        "description": "Run an OpenAI-compatible chat completion from a deployed server runtime using its injected project-and-environment capability.",
+        "tags": ["aiGateways"],
+        "parameters": [
+          {
+            "name": "gatewayName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "appService": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OpenAI-compatible JSON or text/event-stream response."
+          },
+          "403": {
+            "description": "The requested model is not allowed."
+          },
+          "404": {
+            "description": "No such gateway in the runtime environment."
+          },
+          "429": {
+            "description": "The monthly gateway budget is exhausted."
+          },
+          "503": {
+            "description": "Model inference is temporarily unavailable."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "enum": ["korve/fast", "korve/balanced", "korve/reasoning"]
+                  },
+                  "messages": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 256,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "role": {
+                          "type": "string",
+                          "enum": ["system", "user", "assistant", "tool"]
+                        },
+                        "content": {
+                          "type": "string",
+                          "maxLength": 262144
+                        }
+                      },
+                      "required": ["role", "content"],
+                      "additionalProperties": false
+                    }
+                  },
+                  "stream": {
+                    "type": "boolean"
+                  },
+                  "max_tokens": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 65536
+                  },
+                  "temperature": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 2
+                  }
+                },
+                "required": ["model", "messages"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/runtime/payments/checkouts": {
+      "post": {
+        "operationId": "customerPayments.runtimeCreateCheckout",
+        "summary": "Runtime Create Checkout",
+        "description": "Create a hosted checkout from the deployed server runtime scoped to exactly one project and environment.",
+        "tags": ["customerPayments"],
+        "parameters": [],
+        "security": [
+          {
+            "appService": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created checkout.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "priceId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "customerId": {
+                      "type": ["string", "null"],
+                      "format": "uuid"
+                    },
+                    "mode": {
+                      "type": "string",
+                      "enum": ["one_time", "subscription"]
+                    },
+                    "quantity": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 999
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["open", "complete", "expired"]
+                    },
+                    "url": {
+                      "type": ["string", "null"],
+                      "format": "uri",
+                      "description": "Hosted checkout URL. Present only on the create response."
+                    },
+                    "clientReferenceId": {
+                      "type": ["string", "null"]
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "priceId",
+                    "customerId",
+                    "mode",
+                    "quantity",
+                    "status",
+                    "url",
+                    "clientReferenceId",
+                    "expiresAt",
+                    "createdAt"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "Project or payment resource not found."
+          },
+          "409": {
+            "description": "Duplicate idempotency key or conflicting resource state."
+          },
+          "422": {
+            "description": "Invalid payment request."
+          },
+          "502": {
+            "description": "The payment processor rejected the request."
+          },
+          "503": {
+            "description": "The payment processor is temporarily unavailable."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "priceId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "quantity": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 999
+                  },
+                  "successUrl": {
+                    "type": "string",
+                    "format": "uri",
+                    "maxLength": 2048
+                  },
+                  "cancelUrl": {
+                    "type": "string",
+                    "format": "uri",
+                    "maxLength": 2048
+                  },
+                  "customerId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "customerEmail": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 320
+                  },
+                  "clientReferenceId": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "description": "At most 20 application-defined string entries.",
+                    "additionalProperties": {
+                      "type": "string",
+                      "maxLength": 500
+                    }
+                  }
+                },
+                "required": ["priceId", "successUrl", "cancelUrl"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/runtime/payments/customers": {
+      "post": {
+        "operationId": "customerPayments.runtimeCreateCustomer",
+        "summary": "Runtime Create Customer",
+        "description": "Create an end customer from the deployed server runtime scoped to exactly one project and environment.",
+        "tags": ["customerPayments"],
+        "parameters": [],
+        "security": [
+          {
+            "appService": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created customer.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "email": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "name": {
+                      "type": ["string", "null"]
+                    },
+                    "externalId": {
+                      "type": ["string", "null"]
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "description": "At most 20 application-defined string entries.",
+                      "additionalProperties": {
+                        "type": "string",
+                        "maxLength": 500
+                      }
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": ["id", "email", "name", "externalId", "metadata", "createdAt"]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "Project or payment resource not found."
+          },
+          "409": {
+            "description": "Duplicate idempotency key or conflicting resource state."
+          },
+          "422": {
+            "description": "Invalid payment request."
+          },
+          "502": {
+            "description": "The payment processor rejected the request."
+          },
+          "503": {
+            "description": "The payment processor is temporarily unavailable."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 320
+                  },
+                  "name": {
+                    "type": "string",
+                    "maxLength": 120
+                  },
+                  "externalId": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "description": "At most 20 application-defined string entries.",
+                    "additionalProperties": {
+                      "type": "string",
+                      "maxLength": 500
+                    }
+                  }
+                },
+                "required": ["email"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/runtime/queues/{queueName}/messages/batch": {
       "post": {
         "operationId": "queues.runtimeSendBatch",
@@ -30192,6 +35181,386 @@
         }
       }
     },
+    "/v1/runtime/realtime/{channelName}/events": {
+      "post": {
+        "operationId": "realtime.runtimePublish",
+        "summary": "Runtime Publish",
+        "description": "Publish one bounded event from a deployed server using its project-and-environment-scoped runtime token.",
+        "tags": ["realtime"],
+        "parameters": [
+          {
+            "name": "channelName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "appService": []
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Event accepted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "messageId": {
+                      "type": "string"
+                    },
+                    "sequence": {
+                      "type": "integer"
+                    },
+                    "acceptedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": ["messageId", "sequence", "acceptedAt"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Runtime token invalid or outside this environment."
+          },
+          "404": {
+            "description": "No such channel in the runtime environment."
+          },
+          "409": {
+            "description": "Channel is paused or unavailable."
+          },
+          "413": {
+            "description": "Encoded event exceeds 65,536 bytes."
+          },
+          "429": {
+            "description": "Channel message-rate quota reached."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 65536,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "event": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+                  },
+                  "data": {
+                    "description": "JSON event payload."
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  }
+                },
+                "required": ["event", "data"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/runtime/realtime/{channelName}/tokens": {
+      "post": {
+        "operationId": "realtime.runtimeIssueToken",
+        "summary": "Runtime Issue Token",
+        "description": "Issue a short-lived subscribe/publish capability from a deployed server. The runtime token fixes the project and environment; the returned capability fixes one channel, subject, permissions, and replay limit.",
+        "tags": ["realtime"],
+        "parameters": [
+          {
+            "name": "channelName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "appService": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Short-lived channel capability.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "description": "Short-lived channel capability. Keep it out of logs and exchange it only over TLS."
+                    },
+                    "websocketUrl": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": ["token", "websocketUrl", "expiresAt"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Runtime token invalid or outside this environment."
+          },
+          "404": {
+            "description": "No such channel in the runtime environment."
+          },
+          "409": {
+            "description": "Channel is paused or unavailable."
+          },
+          "422": {
+            "description": "Invalid capability request."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 16384,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "subject": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  },
+                  "permissions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["subscribe", "publish", "presence"]
+                    },
+                    "minItems": 1,
+                    "maxItems": 3
+                  },
+                  "ttlSeconds": {
+                    "type": "integer",
+                    "minimum": 30,
+                    "maximum": 3600
+                  },
+                  "replayLimit": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  }
+                },
+                "required": ["subject", "permissions"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/runtime/storage/downloads": {
+      "post": {
+        "operationId": "storage.runtimeGetDownload",
+        "summary": "Runtime Get Download",
+        "description": "Create a short-lived signed download URL from deployed server code. The injected runtime capability fixes the project and environment; keys resolve only inside that scope or an optional project-visible bucket.",
+        "tags": ["storage"],
+        "parameters": [
+          {
+            "name": "bucket",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{1,61}$"
+            },
+            "description": "Bucket name to address (see buckets.list). The bucket must belong to this organization and be either an organization-level shared bucket or scoped to this project — any other name answers 404. Omitted, the operation addresses the project's original per-environment storage scope, exactly as before buckets existed; that legacy scope is separate from every named bucket, including the project's default bucket. The runtime capability still fixes the project and environment. With a bucket, the key resolves only in a project-visible bucket namespace."
+          }
+        ],
+        "security": [
+          {
+            "appService": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Short-lived signed download.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": ["url", "expiresAt"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Runtime capability is absent, invalid, expired, or lacks storage download access."
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "No such project-visible bucket."
+          },
+          "422": {
+            "description": "Missing or invalid key."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Scope-relative object key."
+                  }
+                },
+                "required": ["key"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/runtime/storage/uploads": {
+      "post": {
+        "operationId": "storage.runtimeCreateUpload",
+        "summary": "Runtime Create Upload",
+        "description": "Create a short-lived signed upload URL from deployed server code. The injected runtime capability fixes the project and environment; an optional visible bucket may narrow the destination but can never address another project or organization.",
+        "tags": ["storage"],
+        "parameters": [
+          {
+            "name": "bucket",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{1,61}$"
+            },
+            "description": "Bucket name to address (see buckets.list). The bucket must belong to this organization and be either an organization-level shared bucket or scoped to this project — any other name answers 404. Omitted, the operation addresses the project's original per-environment storage scope, exactly as before buckets existed; that legacy scope is separate from every named bucket, including the project's default bucket. The runtime capability still fixes the project and environment. With a bucket, the object lands only in a project-visible bucket namespace."
+          }
+        ],
+        "security": [
+          {
+            "appService": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Short-lived signed upload. PUT the bytes with the returned headers before expiry.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "description": "Scope-relative object key."
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "method": {
+                      "type": "string",
+                      "enum": ["PUT"]
+                    },
+                    "headers": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": ["key", "url", "method", "headers", "expiresAt"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Runtime capability is absent, invalid, expired, or lacks storage upload access."
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "No such project-visible bucket."
+          },
+          "422": {
+            "description": "Invalid filename, content type, or byte length."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "filename": {
+                    "type": "string"
+                  },
+                  "contentType": {
+                    "type": "string"
+                  },
+                  "byteLength": {
+                    "type": "integer",
+                    "description": "Exact size of the upload in bytes."
+                  }
+                },
+                "required": ["filename", "contentType", "byteLength"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/spec": {
       "get": {
         "operationId": "system.spec",
@@ -30207,6 +35576,131 @@
         },
         "x-korve-risk": "read",
         "x-korve-project-scoped": false
+      }
+    },
+    "/v1/telemetry/events": {
+      "post": {
+        "operationId": "productTelemetry.track",
+        "summary": "Track",
+        "description": "Accept a bounded batch of allowlisted funnel events. Raw network addresses, secrets, nested objects, and unbounded strings are never accepted or retained.",
+        "tags": ["productTelemetry"],
+        "parameters": [],
+        "security": [],
+        "responses": {
+          "202": {
+            "description": "The bounded event batch was accepted for first-party storage.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["accepted"],
+                  "properties": {
+                    "accepted": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 20
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The encoded request exceeds 65,536 bytes."
+          },
+          "422": {
+            "description": "The event batch is malformed or outside the privacy bounds."
+          },
+          "429": {
+            "description": "Too many event batches arrived from this network source."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": false,
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 65536,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["events"],
+                "properties": {
+                  "events": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 20,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": ["name", "at"],
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "enum": [
+                            "cli_installed",
+                            "login_started",
+                            "login_succeeded",
+                            "login_failed",
+                            "link_agent_files",
+                            "init_planned",
+                            "checkout_link_shown",
+                            "billing_activated",
+                            "first_deploy_ready",
+                            "mcp_installed",
+                            "agent_connected",
+                            "guard_nudged",
+                            "guard_briefed"
+                          ]
+                        },
+                        "at": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "When the event occurred. Events outside the accepted clock window are rejected."
+                        },
+                        "anonymousId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80,
+                          "description": "Optional installation-scoped pseudonym. The service stores only a one-way digest."
+                        },
+                        "organizationId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "Optional post-auth correlation claim. Public claims are digested and never trusted for organization reporting."
+                        },
+                        "properties": {
+                          "type": "object",
+                          "maxProperties": 20,
+                          "additionalProperties": {
+                            "oneOf": [
+                              {
+                                "type": "string",
+                                "maxLength": 80
+                              },
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "description": "At most 20 scalar values. Property names and string values are bounded; nested data is rejected."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   },

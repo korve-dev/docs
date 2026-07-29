@@ -199,3 +199,114 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/stora
 | ------ | ------------------------------------------------------------- |
 | `200`  | Object deleted (idempotent).                                  |
 | `404`  | No such project, environment, or bucket in this organization. |
+
+## storage.runtimeCreateUpload
+
+Create a short-lived signed upload URL from deployed server code. The injected runtime capability fixes the project and environment; an optional visible bucket may narrow the destination but can never address another project or organization.
+
+```text
+POST /v1/runtime/storage/uploads
+```
+
+- **Auth:** Project app-service token (`Authorization: Bearer $APP_SERVICE_TOKEN`).
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Query parameters
+
+| Name     | Type   | Required | Description                        |
+| -------- | ------ | -------- | ---------------------------------- |
+| `bucket` | string | No       | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+
+### Request body
+
+| Field         | Type    | Required | Description                        |
+| ------------- | ------- | -------- | ---------------------------------- |
+| `filename`    | string  | Yes      | —                                  |
+| `contentType` | string  | Yes      | —                                  |
+| `byteLength`  | integer | Yes      | Exact size of the upload in bytes. |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/runtime/storage/uploads?bucket=example" \
+  -H "Authorization: Bearer $APP_SERVICE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "filename": "report.pdf",
+  "contentType": "application/pdf",
+  "byteLength": 24576
+}'
+```
+
+### Responses
+
+| Status | Description                                                                       |
+| ------ | --------------------------------------------------------------------------------- |
+| `201`  | Short-lived signed upload. PUT the bytes with the returned headers before expiry. |
+| `401`  | Runtime capability is absent, invalid, expired, or lacks storage upload access.   |
+| `402`  | Organization billing is not active.                                               |
+| `404`  | No such project-visible bucket.                                                   |
+| `422`  | Invalid filename, content type, or byte length.                                   |
+
+### Response body (201)
+
+| Field       | Type   | Description                |
+| ----------- | ------ | -------------------------- |
+| `key`       | string | Scope-relative object key. |
+| `url`       | string | —                          |
+| `method`    | string | One of: `PUT`.             |
+| `headers`   | object | Map of string values.      |
+| `expiresAt` | string | Format: `date-time`.       |
+
+## storage.runtimeGetDownload
+
+Create a short-lived signed download URL from deployed server code. The injected runtime capability fixes the project and environment; keys resolve only inside that scope or an optional project-visible bucket.
+
+```text
+POST /v1/runtime/storage/downloads
+```
+
+- **Auth:** Project app-service token (`Authorization: Bearer $APP_SERVICE_TOKEN`).
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Query parameters
+
+| Name     | Type   | Required | Description                        |
+| -------- | ------ | -------- | ---------------------------------- |
+| `bucket` | string | No       | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+
+### Request body
+
+| Field | Type   | Required | Description                |
+| ----- | ------ | -------- | -------------------------- |
+| `key` | string | Yes      | Scope-relative object key. |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/runtime/storage/downloads?bucket=example" \
+  -H "Authorization: Bearer $APP_SERVICE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "key": "uploads/report.pdf"
+}'
+```
+
+### Responses
+
+| Status | Description                                                                       |
+| ------ | --------------------------------------------------------------------------------- |
+| `200`  | Short-lived signed download.                                                      |
+| `401`  | Runtime capability is absent, invalid, expired, or lacks storage download access. |
+| `402`  | Organization billing is not active.                                               |
+| `404`  | No such project-visible bucket.                                                   |
+| `422`  | Missing or invalid key.                                                           |
+
+### Response body (200)
+
+| Field       | Type   | Description          |
+| ----------- | ------ | -------------------- |
+| `url`       | string | —                    |
+| `expiresAt` | string | Format: `date-time`. |

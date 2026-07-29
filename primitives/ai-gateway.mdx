@@ -1,0 +1,73 @@
+---
+title: "AI Gateway"
+description: "Provider-neutral model routing with hard budgets, allowlists, retries, and redacted audit events."
+---
+
+AI Gateway gives deployed server code one OpenAI-compatible chat-completions endpoint. Applications
+select stable Korve model aliases while the platform owns routing, retries, usage accounting, and
+credential isolation.
+
+## Declare a gateway
+
+```toml
+[[projects.aiGateways]]
+name = "primary-ai"
+environment = "production"
+allowedModels = ["korve/fast", "korve/balanced"]
+monthlyBudgetUsd = 25
+timeoutMs = 30000
+maxRetries = 1
+redactPrompts = true
+```
+
+The supported aliases are `korve/fast`, `korve/balanced`, and `korve/reasoning`. A gateway must
+allow at least one alias. Monthly budgets range from $1 to $100,000, timeouts from 1–120 seconds,
+and automatic retries from 0–3.
+
+```bash
+korve manifest plan -f korve.toml
+korve manifest apply -f korve.toml
+```
+
+## Complete from a deployed server
+
+```ts
+import { createKorve } from "@korve-dev/sdk";
+
+const result = await createKorve().ai("primary-ai").complete({
+  model: "korve/fast",
+  messages: [{ role: "user", content: "Summarize this support ticket." }],
+  maxTokens: 600,
+});
+```
+
+Korve injects the project-and-environment runtime capability. Never copy it, or a gateway key, into
+a browser bundle. A direct server client can call:
+
+```text
+POST /v1/runtime/ai/primary-ai/chat/completions
+Authorization: Bearer $KORVE_RUNTIME_TOKEN
+Content-Type: application/json
+```
+
+The body supports `model`, `messages`, `stream`, `max_tokens`, and `temperature`. Streaming uses
+`text/event-stream`. Requests can contain at most 256 messages and 1,048,576 encoded bytes.
+
+## Security, privacy, and spend
+
+- Requests for models outside the gateway allowlist fail before inference.
+- The hard monthly gateway budget stops new requests with `429` when exhausted.
+- Prompt bodies are excluded from audit events by default. With `redactPrompts = false`, audit
+  storage still retains only a redacted, bounded preview—not a complete prompt.
+- Gateway key secrets are shown once; listings return metadata only. Revoke a key immediately if
+  its one-time value may have escaped.
+- Errors are provider-neutral and never include upstream response bodies, identifiers, or
+  credentials.
+- Deleting a gateway permanently revokes all of its gateway keys.
+
+Gateway creation, configuration changes, key creation, and inference require active billing.
+Inference is metered against the public `ai.gateway.inference` rate-card entry and the gateway's own
+hard budget. Inspect current-month tokens, spend, and remaining budget with
+`aiGateways.usage`.
+
+See the complete [AI Gateway API](/api-reference/aiGateways).

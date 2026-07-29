@@ -1,0 +1,439 @@
+---
+title: "aiGateways"
+description: "OpenAI-compatible model routing with provider-neutral models, tenant budgets, retries, redacted audit events, and unified usage."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+OpenAI-compatible model routing with provider-neutral models, tenant budgets, retries, redacted audit events, and unified usage.
+
+## aiGateways.list
+
+List AI gateways in one project environment.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/ai-gateways
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-gateways?environment=example" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description  |
+| ------ | ------------ |
+| `200`  | AI gateways. |
+
+### Response body (200)
+
+An array of objects with these fields:
+
+| Field              | Type     | Description          |
+| ------------------ | -------- | -------------------- |
+| `id`               | string   | —                    |
+| `name`             | string   | —                    |
+| `environment`      | string   | —                    |
+| `allowedModels`    | string[] | —                    |
+| `monthlyBudgetUsd` | number   | —                    |
+| `timeoutMs`        | integer  | —                    |
+| `maxRetries`       | integer  | —                    |
+| `redactPrompts`    | boolean  | —                    |
+| `createdAt`        | string   | Format: `date-time`. |
+| `updatedAt`        | string   | Format: `date-time`. |
+
+## aiGateways.create
+
+Create a budgeted AI gateway in one project environment.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/ai-gateways
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write`
+
+### Query parameters
+
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+
+### Request body
+
+| Field              | Type     | Required | Description                        |
+| ------------------ | -------- | -------- | ---------------------------------- |
+| `name`             | string   | Yes      | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `allowedModels`    | string[] | Yes      | —                                  |
+| `monthlyBudgetUsd` | number   | Yes      | —                                  |
+| `timeoutMs`        | integer  | No       | —                                  |
+| `maxRetries`       | integer  | No       | —                                  |
+| `redactPrompts`    | boolean  | No       | —                                  |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-gateways?environment=example" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "example",
+  "allowedModels": [
+    "korve/fast"
+  ],
+  "monthlyBudgetUsd": 1
+}'
+```
+
+### Responses
+
+| Status | Description                      |
+| ------ | -------------------------------- |
+| `201`  | AI gateway created.              |
+| `409`  | The gateway name already exists. |
+| `422`  | Invalid gateway configuration.   |
+
+### Response body (201)
+
+| Field              | Type     | Description          |
+| ------------------ | -------- | -------------------- |
+| `id`               | string   | —                    |
+| `name`             | string   | —                    |
+| `environment`      | string   | —                    |
+| `allowedModels`    | string[] | —                    |
+| `monthlyBudgetUsd` | number   | —                    |
+| `timeoutMs`        | integer  | —                    |
+| `maxRetries`       | integer  | —                    |
+| `redactPrompts`    | boolean  | —                    |
+| `createdAt`        | string   | Format: `date-time`. |
+| `updatedAt`        | string   | Format: `date-time`. |
+
+## aiGateways.get
+
+Get AI gateway configuration.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/ai-gateways/{gatewayId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-gateways/$GATEWAY_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description      |
+| ------ | ---------------- |
+| `200`  | AI gateway.      |
+| `404`  | No such gateway. |
+
+### Response body (200)
+
+| Field              | Type     | Description          |
+| ------------------ | -------- | -------------------- |
+| `id`               | string   | —                    |
+| `name`             | string   | —                    |
+| `environment`      | string   | —                    |
+| `allowedModels`    | string[] | —                    |
+| `monthlyBudgetUsd` | number   | —                    |
+| `timeoutMs`        | integer  | —                    |
+| `maxRetries`       | integer  | —                    |
+| `redactPrompts`    | boolean  | —                    |
+| `createdAt`        | string   | Format: `date-time`. |
+| `updatedAt`        | string   | Format: `date-time`. |
+
+## aiGateways.update
+
+Update model allowlists, budget, timeout, retry, and prompt-retention policy.
+
+```text
+PATCH /v1/orgs/{orgId}/projects/{projectId}/ai-gateways/{gatewayId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write`
+
+### Request body
+
+| Field              | Type     | Required | Description                        |
+| ------------------ | -------- | -------- | ---------------------------------- |
+| `name`             | string   | No       | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `allowedModels`    | string[] | No       | —                                  |
+| `monthlyBudgetUsd` | number   | No       | —                                  |
+| `timeoutMs`        | integer  | No       | —                                  |
+| `maxRetries`       | integer  | No       | —                                  |
+| `redactPrompts`    | boolean  | No       | —                                  |
+
+### Example
+
+```bash
+curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-gateways/$GATEWAY_ID" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### Responses
+
+| Status | Description         |
+| ------ | ------------------- |
+| `200`  | Updated AI gateway. |
+| `404`  | No such gateway.    |
+
+### Response body (200)
+
+| Field              | Type     | Description          |
+| ------------------ | -------- | -------------------- |
+| `id`               | string   | —                    |
+| `name`             | string   | —                    |
+| `environment`      | string   | —                    |
+| `allowedModels`    | string[] | —                    |
+| `monthlyBudgetUsd` | number   | —                    |
+| `timeoutMs`        | integer  | —                    |
+| `maxRetries`       | integer  | —                    |
+| `redactPrompts`    | boolean  | —                    |
+| `createdAt`        | string   | Format: `date-time`. |
+| `updatedAt`        | string   | Format: `date-time`. |
+
+## aiGateways.delete
+
+Permanently delete an AI gateway and revoke every gateway key.
+
+```text
+DELETE /v1/orgs/{orgId}/projects/{projectId}/ai-gateways/{gatewayId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `owner`
+- **Risk:** `destructive` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-gateways/$GATEWAY_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description         |
+| ------ | ------------------- |
+| `200`  | AI gateway deleted. |
+| `404`  | No such gateway.    |
+
+## aiGateways.models
+
+List provider-neutral models available through this gateway.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/ai-gateways/{gatewayId}/models
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-gateways/$GATEWAY_ID/models" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description       |
+| ------ | ----------------- |
+| `200`  | Available models. |
+
+### Response body (200)
+
+One of: `korve/fast`, `korve/balanced`, `korve/reasoning`.
+
+## aiGateways.keys.list
+
+List gateway key metadata. Secret values are never returned.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/ai-gateways/{gatewayId}/keys
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `read` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-gateways/$GATEWAY_ID/keys" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description   |
+| ------ | ------------- |
+| `200`  | Gateway keys. |
+
+## aiGateways.keys.create
+
+Create a least-privilege gateway key. The secret is returned exactly once.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/ai-gateways/{gatewayId}/keys
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field  | Type   | Required | Description |
+| ------ | ------ | -------- | ----------- |
+| `name` | string | Yes      | —           |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-gateways/$GATEWAY_ID/keys" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "Storefront"
+}'
+```
+
+### Responses
+
+| Status | Description                       |
+| ------ | --------------------------------- |
+| `201`  | Key metadata and one-time secret. |
+| `404`  | No such gateway.                  |
+
+## aiGateways.keys.revoke
+
+Permanently revoke a gateway key.
+
+```text
+DELETE /v1/orgs/{orgId}/projects/{projectId}/ai-gateways/{gatewayId}/keys/{keyId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Risk:** `destructive` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-gateways/$GATEWAY_ID/keys/$KEY_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description  |
+| ------ | ------------ |
+| `200`  | Key revoked. |
+| `404`  | No such key. |
+
+## aiGateways.usage
+
+Get token and spend usage for the current billing month.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/ai-gateways/{gatewayId}/usage
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-gateways/$GATEWAY_ID/usage" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                         |
+| ------ | ----------------------------------- |
+| `200`  | Gateway usage and remaining budget. |
+
+## aiGateways.runtimeChatCompletions
+
+Run an OpenAI-compatible chat completion from a deployed server runtime using its injected project-and-environment capability.
+
+```text
+POST /v1/runtime/ai/{gatewayName}/chat/completions
+```
+
+- **Auth:** Project app-service token (`Authorization: Bearer $APP_SERVICE_TOKEN`).
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write`
+
+### Request body
+
+| Field                | Type     | Required | Description                                                |
+| -------------------- | -------- | -------- | ---------------------------------------------------------- |
+| `model`              | string   | Yes      | One of: `korve/fast`, `korve/balanced`, `korve/reasoning`. |
+| `messages`           | object[] | Yes      | —                                                          |
+| `messages[].role`    | string   | Yes      | One of: `system`, `user`, `assistant`, `tool`.             |
+| `messages[].content` | string   | Yes      | —                                                          |
+| `stream`             | boolean  | No       | —                                                          |
+| `max_tokens`         | integer  | No       | —                                                          |
+| `temperature`        | number   | No       | —                                                          |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/runtime/ai/$GATEWAY_NAME/chat/completions" \
+  -H "Authorization: Bearer $APP_SERVICE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "korve/fast",
+  "messages": [
+    {
+      "role": "system",
+      "content": "example"
+    }
+  ]
+}'
+```
+
+### Responses
+
+| Status | Description                                           |
+| ------ | ----------------------------------------------------- |
+| `200`  | OpenAI-compatible JSON or text/event-stream response. |
+| `403`  | The requested model is not allowed.                   |
+| `404`  | No such gateway in the runtime environment.           |
+| `429`  | The monthly gateway budget is exhausted.              |
+| `503`  | Model inference is temporarily unavailable.           |

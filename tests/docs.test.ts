@@ -75,7 +75,14 @@ describe("Korve public docs", () => {
   it("publishes the complete agent-cloud workflow guides", () => {
     for (const page of [
       "agents/oauth",
+      "agents/local-agent-setup",
+      "starters",
+      "concepts/product-telemetry",
+      "primitives/app-auth",
       "primitives/app-access",
+      "primitives/realtime",
+      "primitives/ai-gateway",
+      "primitives/customer-payments",
       "primitives/project-operator",
       "primitives/project-maintenance",
     ]) {
@@ -125,8 +132,62 @@ describe("Korve public docs", () => {
       false,
     );
     expect(operations.some((operation) => operation.operationId === "projects.list")).toBe(true);
+    for (const operationId of [
+      "aiGateways.list",
+      "appauth.signInPassword",
+      "customerPayments.getConfig",
+      "productTelemetry.getFunnel",
+      "realtime.listChannels",
+      "storage.runtimeCreateUpload",
+    ]) {
+      expect(
+        operations.some((operation) => operation.operationId === operationId),
+        operationId,
+      ).toBe(true);
+    }
     expect(operations.flatMap((operation) => operation.tags ?? [])).not.toContain(
       "telemetryInternal",
     );
+  });
+
+  it("publishes every new menu resource through the API navigation", () => {
+    for (const resource of [
+      "aiGateways",
+      "appauth",
+      "customerPayments",
+      "productTelemetry",
+      "realtime",
+      "storage",
+    ]) {
+      expect(published.has(`api-reference/${resource}`), resource).toBe(true);
+    }
+  });
+
+  it("does not claim the unreleased TypeScript packages are anonymously installable", () => {
+    for (const page of ["sdk/runtime", "sdk/app-auth", "primitives/app-auth"]) {
+      const source = fs.readFileSync(path.join(root, `${page}.mdx`), "utf8");
+      expect(source, page).toContain("not yet available from");
+      expect(source, page).toMatch(/public\s+npm\s+registry/);
+      expect(source, page).not.toMatch(/(?:npm|bun|pnpm|yarn)\s+(?:install|add)\s+@korve-dev\//);
+    }
+
+    const payments = fs.readFileSync(
+      path.join(root, "primitives/customer-payments.mdx"),
+      "utf8",
+    );
+    expect(payments).toMatch(/not yet available from the\s+public npm registry/);
+  });
+
+  it("gives agents security and delivery constraints for every new runtime surface", () => {
+    const llms = fs.readFileSync(path.join(root, "llms.txt"), "utf8");
+    for (const phrase of [
+      "Realtime live delivery is at most once",
+      "runtime token",
+      "AI gateway key",
+      "customer-payment credential",
+      "not yet published to npm",
+    ]) {
+      expect(llms).toContain(phrase);
+    }
   });
 });

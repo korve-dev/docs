@@ -45,13 +45,13 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/audit?since=2026-06-01T12%3A00%3A00Z
 
 An array of objects with these fields:
 
-| Field         | Type           | Description                                                                                                                                            |
-| ------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `occurredAt`  | string         | Format: `date-time`.                                                                                                                                   |
-| `operation`   | string         | The operation performed, e.g. "deploys.create".                                                                                                        |
-| `actor`       | object         | Who performed the operation.                                                                                                                           |
-| `actor.kind`  | string         | One of: `user`, `api_key`, `agent_grant`.                                                                                                              |
-| `actor.label` | string or null | The user's email or the API key's name, captured when the entry was written — entries outlive removed members and revoked keys. Null for agent grants. |
-| `project`     | string or null | Slug of the project the operation addressed, resolved when listing; null when no project was addressed or the project no longer exists.                |
-| `status`      | integer        | HTTP status the operation answered — failed writes are recorded too.                                                                                   |
-| `detail`      | string or null | Request context such as a hostname, slug, or key name. Never contains secrets or environment-variable values.                                          |
+| Field         | Type           | Description                                                                                                                                                                                  |
+| ------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `occurredAt`  | string         | Format: `date-time`.                                                                                                                                                                         |
+| `operation`   | string         | The operation performed, e.g. "deploys.create".                                                                                                                                              |
+| `actor`       | object         | Who performed the operation.                                                                                                                                                                 |
+| `actor.kind`  | string         | One of: `user`, `api_key`, `agent_grant`, `app_service`.                                                                                                                                     |
+| `actor.label` | string or null | The user's email or the API key's name, captured when the entry was written — entries outlive removed members and revoked keys. Null for agent grants and deployed app-service capabilities. |
+| `project`     | string or null | Slug of the project the operation addressed, resolved when listing; null when no project was addressed or the project no longer exists.                                                      |
+| `status`      | integer        | HTTP status the operation answered — failed writes are recorded too.                                                                                                                         |
+| `detail`      | string or null | Request context such as a hostname, slug, or key name. Never contains secrets or environment-variable values.                                                                                |

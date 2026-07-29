@@ -1,0 +1,46 @@
+---
+title: "Onboarding telemetry"
+description: "Privacy-bounded first-party evidence for the repository-to-live onboarding funnel."
+---
+
+Korve records a closed set of onboarding events to understand whether the repository-to-live
+workflow is working. This product telemetry is separate from customer application logs and runtime
+metrics.
+
+The CLI and installer can send only an allowlisted event name, event time, a random installation
+pseudonym, and at most 20 short scalar properties. They never send command arguments, environment
+values, repository contents, secrets, URLs, nested objects, or error text.
+
+Disable client events at any time:
+
+```bash
+export KORVE_TELEMETRY=0
+# The standard privacy signal is supported too:
+export DO_NOT_TRACK=1
+```
+
+## Trusted funnel evidence
+
+Anonymous client events are advisory and cannot claim that an organization completed a step.
+Billing activation, first-ready deployment, and first agent connection are recorded by the control
+plane with trusted organization scope.
+
+Organization admins can query server-verified aggregates:
+
+```bash
+korve telemetry funnel
+korve telemetry funnel --since 2026-07-01T00:00:00Z --json
+```
+
+The same `productTelemetry.getFunnel` operation is available through REST, OpenAPI, and MCP. Query
+windows cannot exceed 90 days. Results contain counts plus first/last evidence timestamps, not
+individual users or raw events.
+
+## Ingestion limits
+
+Public ingestion is best effort: 1–20 events and at most 65,536 bytes per request. Event timestamps,
+property counts, keys, and string lengths are bounded; nested values are rejected. Network
+rate-limiting uses a one-way fingerprint, and raw network addresses and public correlation claims
+are not retained or trusted for organization reporting.
+
+See the [Product telemetry API](/api-reference/productTelemetry).

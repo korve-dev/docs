@@ -1,17 +1,35 @@
 ---
 title: "Runtime SDK"
-description: "Publish queue messages, consume signed deliveries, and connect to managed caches."
+description: "Use project-scoped queues, storage, realtime, AI, payments, and managed caches from deployed servers."
 ---
 
 `@korve-dev/sdk` is server-only. Korve injects a project-and-environment-scoped runtime token and
 delivery secret; never substitute an organization API key or bundle the SDK into browser code.
+
+<Warning>
+`@korve-dev/sdk` is release-ready in the repository but is not yet available from the public npm
+registry. Do not add it as an npm dependency until anonymous registry installation succeeds. The
+examples currently use the checked-out workspace package.
+</Warning>
 
 ```ts
 import { ack, createKorve, retry } from "@korve-dev/sdk";
 
 const korve = createKorve();
 const emails = korve.queue<{ userId: string }>("emails");
+const media = korve.storage("media");
 await emails.send({ userId: "u_123" }, { idempotencyKey: "welcome:u_123" });
+
+const upload = await media.createUpload({
+  filename: "avatar.png",
+  contentType: "image/png",
+  byteLength: bytes.byteLength,
+});
+await fetch(upload.url, {
+  method: upload.method,
+  headers: upload.headers,
+  body: bytes,
+});
 
 export const POST = korve.handler<{ userId: string }>(async (message) => {
   await persistWelcomeEmailOnce(message.id, message.body.userId);
@@ -24,4 +42,19 @@ the timestamp and signature, but your application owns business-level deduplicat
 accepts up to 100 messages in one atomic request. `korve.cache("sessions")` returns the injected TLS
 connection string for a ready cache.
 
-See [Queues](/primitives/queues) and [Caches](/primitives/caches).
+The same client exposes:
+
+| Surface | Runtime authority |
+| --- | --- |
+| `storage(bucket?)` | Mint short-lived upload/download grants; no list or delete |
+| `realtime(name)` | Publish events and mint short-lived channel capabilities |
+| `ai(name)` | Call allowlisted model aliases through the gateway budget |
+| `payments` | Create end-customers and hosted checkout sessions |
+
+The runtime token fixes project and environment server-side; method arguments cannot override that
+scope. Signed URLs, cache connection strings, and realtime capabilities are secrets. Never persist
+or log them.
+
+See [Queues](/primitives/queues), [Storage](/primitives/storage),
+[Realtime](/primitives/realtime), [AI Gateway](/primitives/ai-gateway),
+[Customer payments](/primitives/customer-payments), and [Caches](/primitives/caches).

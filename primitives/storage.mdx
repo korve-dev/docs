@@ -51,6 +51,32 @@ const upload = await korve.request({
 
 Full contracts in the [Storage API](/api-reference/storage).
 
+## From a deployed server
+
+`@korve-dev/sdk` uses the injected runtime capability to mint the same short-lived upload and
+download grants without an organization key:
+
+```ts
+import { createKorve } from "@korve-dev/sdk";
+
+const media = createKorve().storage("media");
+const upload = await media.createUpload({
+  filename: "avatar.png",
+  contentType: "image/png",
+  byteLength: bytes.byteLength,
+});
+await fetch(upload.url, {
+  method: upload.method,
+  headers: upload.headers,
+  body: bytes,
+});
+```
+
+The platform fixes project and environment server-side. A named bucket must already be visible to
+that project, and its object keys receive a private project/environment prefix. Runtime code cannot
+list or delete objects. Grants expire after ten minutes; treat the bearer and signed URL as secrets
+and never persist or log them.
+
 ## Deleting objects
 
 Deletes are idempotent. Over the raw API the key travels as a single
@@ -66,5 +92,6 @@ The CLI handles encoding; MCP code should URL-encode the key path segment.
 
 Listing and downloading need `member`; creating uploads requires active
 billing; deleting requires `admin`. Storage meters `storage.objects` per
-GB-month plus `network.egress` per GB — see the
-[rate card](/primitives/budgets-and-usage#the-rate-card).
+GB-month. Direct signed-download bytes are not yet exposed as a separate customer
+usage line. Read the current public amounts and available meters from `billing.get`;
+see [budgets and usage](/primitives/budgets-and-usage).

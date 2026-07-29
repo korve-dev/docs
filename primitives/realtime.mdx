@@ -1,0 +1,80 @@
+---
+title: "Realtime"
+description: "Environment-isolated WebSocket channels with bounded replay and ephemeral presence."
+---
+
+Realtime channels let a deployed server publish JSON events and mint short-lived browser
+capabilities without exposing an organization key or runtime token. Channels are isolated by
+project and environment and are globally routed.
+
+## Declare a channel
+
+```toml
+[[projects.realtime]]
+name = "updates"
+environment = "production"
+region = "global"
+retentionSeconds = 3600
+presenceEnabled = true
+maxConnections = 500
+maxMessagesPerSecond = 100
+```
+
+Review the change before applying it:
+
+```bash
+korve manifest plan -f korve.toml
+korve manifest apply -f korve.toml
+```
+
+Retention is off when `retentionSeconds` is `0` and is bounded to 24 hours when enabled. Presence
+is ephemeral. A channel can allow 1–10,000 simultaneous connections and 1–2,500 published messages
+per second.
+
+## Use it from a deployed server
+
+```ts
+import { createKorve } from "@korve-dev/sdk";
+
+const updates = createKorve().realtime("updates");
+const capability = await updates.token({
+  subject: appUser.id,
+  permissions: ["subscribe", "presence"],
+  ttlSeconds: 300,
+  replayLimit: 25,
+});
+
+await updates.publish(
+  "task.updated",
+  { taskId: "task_123", status: "complete" },
+  { idempotencyKey: "task_123:complete" },
+);
+```
+
+Return only the short-lived `capability` to the browser. The capability fixes the channel, subject,
+permissions, expiry, and replay limit; it cannot escape the deployment's project or environment.
+Treat it as a secret and never put the injected runtime token in browser code.
+
+## Delivery and limits
+
+- Live delivery is **at most once**. A disconnected or slow subscriber can miss an event.
+- Retained replay is ordered by channel sequence, but is not a durable job queue. Use
+  [queues](/primitives/queues) when every job must eventually run.
+- One event is limited to 65,536 encoded bytes. Event names are limited to 128 characters.
+- Capabilities last 30–3,600 seconds and can request at most 100 replay events.
+- Pausing rejects new publication and capabilities. Deleting a channel permanently closes
+  connections and removes presence and retained events.
+- Global routing does not promise a storage jurisdiction. Do not use retained events for data that
+  requires a specific residency guarantee.
+
+## Access and billing
+
+Members can inspect channels, statistics, and publish through the operator API. Admins create,
+update, and pause channels. Only owners can delete them. Creation, updates, publication, and runtime
+capabilities require active organization billing.
+
+Usage is metered as published-plus-delivered messages, connection minutes, and retained payload.
+The current amounts and included quantities are returned by `billing.get`; see
+[budgets and usage](/primitives/budgets-and-usage).
+
+See the complete [Realtime API](/api-reference/realtime).

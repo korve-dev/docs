@@ -1,0 +1,46 @@
+---
+title: "Executable starters"
+description: "Runnable reference applications with manifests, security boundaries, tests, and deploy instructions."
+---
+
+Korve's starters are source directories in the public repository—not opaque one-click templates.
+Inspect and copy the code, change the organization slug, review the manifest plan, and deploy it
+from your own repository.
+
+## Full-stack SaaS
+
+[Browse source](https://github.com/korve-dev/korve/tree/main/examples/full-stack-saas)
+
+A runnable Bun application with App Auth, tenant-scoped Postgres rows, object storage, a recovery
+policy, and a strict browser/server credential boundary. It demonstrates one-time database
+credentials and explicit environment configuration.
+
+## Agent-operated internal tool
+
+[Browse source](https://github.com/korve-dev/korve/tree/main/examples/agent-operated-internal-tool)
+
+An organization-only application with a stable deployment identifier, exact health evidence, daily
+maintenance analysis, and approval-gated operator actions. No organization credential is embedded
+in the application.
+
+## Queue and cron worker
+
+[Browse source](https://github.com/korve-dev/korve/tree/main/examples/queue-cron-worker)
+
+A signed push consumer with durable replay protection, stable idempotency, retries, dead-letter
+handling, and a timezone-aware cron that publishes into the work queue.
+
+## Safe workflow
+
+```bash
+bun install
+bun test
+korve manifest plan -f korve.toml
+korve manifest apply -f korve.toml
+korve deploy .
+```
+
+Read each starter's README before applying its manifest. Optional resources are provisioned only
+when declared; ordinary deployment does not silently create a database, cache, queue, or storage
+bucket. Database connection strings and other shown-once values belong in Korve environment
+variables, never in a manifest or repository.

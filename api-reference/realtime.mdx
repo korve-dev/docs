@@ -1,0 +1,445 @@
+---
+title: "realtime"
+description: "Environment-isolated realtime channels with WebSocket broadcast, bounded replay, and ephemeral presence. Live delivery is at most once; retained replay is ordered by channel sequence."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Environment-isolated realtime channels with WebSocket broadcast, bounded replay, and ephemeral presence. Live delivery is at most once; retained replay is ordered by channel sequence.
+
+## realtime.listChannels
+
+List realtime channels in one project environment.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/realtime/channels
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/realtime/channels?environment=example" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                     |
+| ------ | ------------------------------- |
+| `200`  | Channels ordered by name.       |
+| `404`  | No such project or environment. |
+
+### Response body (200)
+
+An array of objects with these fields:
+
+| Field                  | Type    | Description                                                                                                    |
+| ---------------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
+| `id`                   | string  | —                                                                                                              |
+| `name`                 | string  | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                             |
+| `environment`          | string  | —                                                                                                              |
+| `status`               | string  | One of: `ready`, `paused`, `failed`.                                                                           |
+| `region`               | string  | Realtime channels are globally routed. The platform does not promise a storage jurisdiction. One of: `global`. |
+| `retentionSeconds`     | integer | —                                                                                                              |
+| `presenceEnabled`      | boolean | —                                                                                                              |
+| `maxConnections`       | integer | —                                                                                                              |
+| `maxMessagesPerSecond` | integer | —                                                                                                              |
+| `deliveryGuarantee`    | string  | One of: `at-most-once-live`.                                                                                   |
+| `createdAt`            | string  | Format: `date-time`.                                                                                           |
+| `updatedAt`            | string  | Format: `date-time`.                                                                                           |
+
+## realtime.createChannel
+
+Create a globally routed channel. Retention is disabled by default; enabling it permits bounded ordered replay.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/realtime/channels
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write`
+
+### Query parameters
+
+| Name          | Type   | Required | Description                        |
+| ------------- | ------ | -------- | ---------------------------------- |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+
+### Request body
+
+| Field                  | Type    | Required | Description                        |
+| ---------------------- | ------- | -------- | ---------------------------------- |
+| `name`                 | string  | Yes      | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `region`               | string  | No       | One of: `global`.                  |
+| `retentionSeconds`     | integer | No       | —                                  |
+| `presenceEnabled`      | boolean | No       | —                                  |
+| `maxConnections`       | integer | No       | —                                  |
+| `maxMessagesPerSecond` | integer | No       | —                                  |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/realtime/channels?environment=example" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "example"
+}'
+```
+
+### Responses
+
+| Status | Description                                          |
+| ------ | ---------------------------------------------------- |
+| `201`  | Channel ready.                                       |
+| `409`  | The channel name already exists in this environment. |
+| `422`  | Invalid channel configuration.                       |
+
+### Response body (201)
+
+| Field                  | Type    | Description                                                                                                    |
+| ---------------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
+| `id`                   | string  | —                                                                                                              |
+| `name`                 | string  | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                             |
+| `environment`          | string  | —                                                                                                              |
+| `status`               | string  | One of: `ready`, `paused`, `failed`.                                                                           |
+| `region`               | string  | Realtime channels are globally routed. The platform does not promise a storage jurisdiction. One of: `global`. |
+| `retentionSeconds`     | integer | —                                                                                                              |
+| `presenceEnabled`      | boolean | —                                                                                                              |
+| `maxConnections`       | integer | —                                                                                                              |
+| `maxMessagesPerSecond` | integer | —                                                                                                              |
+| `deliveryGuarantee`    | string  | One of: `at-most-once-live`.                                                                                   |
+| `createdAt`            | string  | Format: `date-time`.                                                                                           |
+| `updatedAt`            | string  | Format: `date-time`.                                                                                           |
+
+## realtime.getChannel
+
+Get channel configuration without credentials.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/realtime/channels/{channelId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/realtime/channels/$CHANNEL_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description            |
+| ------ | ---------------------- |
+| `200`  | Channel configuration. |
+| `404`  | No such channel.       |
+
+### Response body (200)
+
+| Field                  | Type    | Description                                                                                                    |
+| ---------------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
+| `id`                   | string  | —                                                                                                              |
+| `name`                 | string  | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                             |
+| `environment`          | string  | —                                                                                                              |
+| `status`               | string  | One of: `ready`, `paused`, `failed`.                                                                           |
+| `region`               | string  | Realtime channels are globally routed. The platform does not promise a storage jurisdiction. One of: `global`. |
+| `retentionSeconds`     | integer | —                                                                                                              |
+| `presenceEnabled`      | boolean | —                                                                                                              |
+| `maxConnections`       | integer | —                                                                                                              |
+| `maxMessagesPerSecond` | integer | —                                                                                                              |
+| `deliveryGuarantee`    | string  | One of: `at-most-once-live`.                                                                                   |
+| `createdAt`            | string  | Format: `date-time`.                                                                                           |
+| `updatedAt`            | string  | Format: `date-time`.                                                                                           |
+
+## realtime.updateChannel
+
+Change retention, presence, quotas, or pause state. Reducing retention removes expired replay asynchronously.
+
+```text
+PATCH /v1/orgs/{orgId}/projects/{projectId}/realtime/channels/{channelId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write`
+
+### Request body
+
+| Field                  | Type    | Required | Description |
+| ---------------------- | ------- | -------- | ----------- |
+| `retentionSeconds`     | integer | No       | —           |
+| `presenceEnabled`      | boolean | No       | —           |
+| `maxConnections`       | integer | No       | —           |
+| `maxMessagesPerSecond` | integer | No       | —           |
+| `paused`               | boolean | No       | —           |
+
+### Example
+
+```bash
+curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/realtime/channels/$CHANNEL_ID" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### Responses
+
+| Status | Description                    |
+| ------ | ------------------------------ |
+| `200`  | Updated channel.               |
+| `404`  | No such channel.               |
+| `422`  | Invalid channel configuration. |
+
+### Response body (200)
+
+| Field                  | Type    | Description                                                                                                    |
+| ---------------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
+| `id`                   | string  | —                                                                                                              |
+| `name`                 | string  | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                             |
+| `environment`          | string  | —                                                                                                              |
+| `status`               | string  | One of: `ready`, `paused`, `failed`.                                                                           |
+| `region`               | string  | Realtime channels are globally routed. The platform does not promise a storage jurisdiction. One of: `global`. |
+| `retentionSeconds`     | integer | —                                                                                                              |
+| `presenceEnabled`      | boolean | —                                                                                                              |
+| `maxConnections`       | integer | —                                                                                                              |
+| `maxMessagesPerSecond` | integer | —                                                                                                              |
+| `deliveryGuarantee`    | string  | One of: `at-most-once-live`.                                                                                   |
+| `createdAt`            | string  | Format: `date-time`.                                                                                           |
+| `updatedAt`            | string  | Format: `date-time`.                                                                                           |
+
+## realtime.deleteChannel
+
+Permanently close every connection and delete channel configuration, presence, and retained events.
+
+```text
+DELETE /v1/orgs/{orgId}/projects/{projectId}/realtime/channels/{channelId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `owner`
+- **Risk:** `destructive` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/realtime/channels/$CHANNEL_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description      |
+| ------ | ---------------- |
+| `200`  | Channel deleted. |
+| `404`  | No such channel. |
+
+## realtime.publish
+
+Publish one JSON event of at most 65,536 encoded bytes. Live fan-out is at most once.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/realtime/channels/{channelId}/events
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write`
+
+### Request body
+
+| Field            | Type   | Required | Description                            |
+| ---------------- | ------ | -------- | -------------------------------------- |
+| `event`          | string | Yes      | Pattern: `^[A-Za-z][A-Za-z0-9._:-]*$`. |
+| `data`           | object | Yes      | JSON event payload.                    |
+| `idempotencyKey` | string | No       | —                                      |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/realtime/channels/$CHANNEL_ID/events" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "event": "example",
+  "data": {}
+}'
+```
+
+### Responses
+
+| Status | Description                         |
+| ------ | ----------------------------------- |
+| `202`  | Event accepted.                     |
+| `404`  | No such channel.                    |
+| `409`  | Channel is paused or unavailable.   |
+| `413`  | Encoded event exceeds 65,536 bytes. |
+| `429`  | Channel message-rate quota reached. |
+
+### Response body (202)
+
+| Field        | Type    | Description          |
+| ------------ | ------- | -------------------- |
+| `messageId`  | string  | —                    |
+| `sequence`   | integer | —                    |
+| `acceptedAt` | string  | Format: `date-time`. |
+
+## realtime.stats
+
+Get current connection, presence, message, delivery, and retained-event counters.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/realtime/channels/{channelId}/stats
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/realtime/channels/$CHANNEL_ID/stats" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description         |
+| ------ | ------------------- |
+| `200`  | Channel statistics. |
+| `404`  | No such channel.    |
+
+### Response body (200)
+
+| Field             | Type    | Description          |
+| ----------------- | ------- | -------------------- |
+| `sampledAt`       | string  | Format: `date-time`. |
+| `connections`     | integer | —                    |
+| `presenceMembers` | integer | —                    |
+| `published`       | integer | —                    |
+| `delivered`       | integer | —                    |
+| `rejected`        | integer | —                    |
+| `retainedEvents`  | integer | —                    |
+| `retainedBytes`   | integer | —                    |
+
+## realtime.runtimeIssueToken
+
+Issue a short-lived subscribe/publish capability from a deployed server. The runtime token fixes the project and environment; the returned capability fixes one channel, subject, permissions, and replay limit.
+
+```text
+POST /v1/runtime/realtime/{channelName}/tokens
+```
+
+- **Auth:** Project app-service token (`Authorization: Bearer $APP_SERVICE_TOKEN`).
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field         | Type     | Required | Description |
+| ------------- | -------- | -------- | ----------- |
+| `subject`     | string   | Yes      | —           |
+| `permissions` | string[] | Yes      | —           |
+| `ttlSeconds`  | integer  | No       | —           |
+| `replayLimit` | integer  | No       | —           |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/runtime/realtime/$CHANNEL_NAME/tokens" \
+  -H "Authorization: Bearer $APP_SERVICE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "subject": "example",
+  "permissions": [
+    "subscribe"
+  ]
+}'
+```
+
+### Responses
+
+| Status | Description                                        |
+| ------ | -------------------------------------------------- |
+| `201`  | Short-lived channel capability.                    |
+| `401`  | Runtime token invalid or outside this environment. |
+| `404`  | No such channel in the runtime environment.        |
+| `409`  | Channel is paused or unavailable.                  |
+| `422`  | Invalid capability request.                        |
+
+### Response body (201)
+
+| Field          | Type   | Description                                                                        |
+| -------------- | ------ | ---------------------------------------------------------------------------------- |
+| `token`        | string | Short-lived channel capability. Keep it out of logs and exchange it only over TLS. |
+| `websocketUrl` | string | Format: `uri`.                                                                     |
+| `expiresAt`    | string | Format: `date-time`.                                                               |
+
+## realtime.runtimePublish
+
+Publish one bounded event from a deployed server using its project-and-environment-scoped runtime token.
+
+```text
+POST /v1/runtime/realtime/{channelName}/events
+```
+
+- **Auth:** Project app-service token (`Authorization: Bearer $APP_SERVICE_TOKEN`).
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write`
+
+### Request body
+
+| Field            | Type   | Required | Description                            |
+| ---------------- | ------ | -------- | -------------------------------------- |
+| `event`          | string | Yes      | Pattern: `^[A-Za-z][A-Za-z0-9._:-]*$`. |
+| `data`           | object | Yes      | JSON event payload.                    |
+| `idempotencyKey` | string | No       | —                                      |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/runtime/realtime/$CHANNEL_NAME/events" \
+  -H "Authorization: Bearer $APP_SERVICE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "event": "example",
+  "data": {}
+}'
+```
+
+### Responses
+
+| Status | Description                                        |
+| ------ | -------------------------------------------------- |
+| `202`  | Event accepted.                                    |
+| `401`  | Runtime token invalid or outside this environment. |
+| `404`  | No such channel in the runtime environment.        |
+| `409`  | Channel is paused or unavailable.                  |
+| `413`  | Encoded event exceeds 65,536 bytes.                |
+| `429`  | Channel message-rate quota reached.                |
+
+### Response body (202)
+
+| Field        | Type    | Description          |
+| ------------ | ------- | -------------------- |
+| `messageId`  | string  | —                    |
+| `sequence`   | integer | —                    |
+| `acceptedAt` | string  | Format: `date-time`. |
