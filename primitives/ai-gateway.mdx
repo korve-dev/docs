@@ -34,11 +34,13 @@ korve manifest apply -f korve.toml
 ```ts
 import { createKorve } from "@korve-dev/sdk";
 
-const result = await createKorve().ai("primary-ai").complete({
-  model: "korve/fast",
-  messages: [{ role: "user", content: "Summarize this support ticket." }],
-  maxTokens: 600,
-});
+const result = await createKorve()
+  .ai("primary-ai")
+  .complete({
+    model: "korve/fast",
+    messages: [{ role: "user", content: "Summarize this support ticket." }],
+    maxTokens: 600,
+  });
 ```
 
 Korve injects the project-and-environment runtime capability. Never copy it, or a gateway key, into

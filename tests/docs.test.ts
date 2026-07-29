@@ -171,10 +171,7 @@ describe("Korve public docs", () => {
       expect(source, page).not.toMatch(/(?:npm|bun|pnpm|yarn)\s+(?:install|add)\s+@korve-dev\//);
     }
 
-    const payments = fs.readFileSync(
-      path.join(root, "primitives/customer-payments.mdx"),
-      "utf8",
-    );
+    const payments = fs.readFileSync(path.join(root, "primitives/customer-payments.mdx"), "utf8");
     expect(payments).toMatch(/not yet available from the\s+public npm registry/);
   });
 
