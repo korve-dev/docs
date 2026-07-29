@@ -23950,6 +23950,13 @@
                         "enum": ["shared", "performance"]
                       }
                     },
+                    "privateImageRegistries": {
+                      "type": "array",
+                      "description": "Registry hosts accepted for write-only private-image credentials. Wildcards describe supported customer-owned registry hostnames.",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
                     "limits": {
                       "type": "object",
                       "properties": {
@@ -24024,6 +24031,7 @@
                     "regions",
                     "architectures",
                     "cpuKinds",
+                    "privateImageRegistries",
                     "limits",
                     "runtime"
                   ],
@@ -24555,6 +24563,9 @@
               }
             }
           },
+          "402": {
+            "description": "The project hard-stop budget cannot reserve this execution."
+          },
           "404": {
             "description": "No such project."
           },
@@ -24641,7 +24652,7 @@
                         "type": "string",
                         "minLength": 1,
                         "maxLength": 253,
-                        "description": "Registry hostname and optional port. It must match the registry in image."
+                        "description": "Supported registry hostname advertised by executions.availability. It must match the registry in image; Docker Hub aliases are normalized."
                       },
                       "username": {
                         "type": "string",

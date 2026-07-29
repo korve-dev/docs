@@ -35,7 +35,7 @@ POST /v1/orgs/{orgId}/projects/{projectId}/executions
 | `runtime.nestedContainers`      | boolean  | No       | —                                                                                                                                                 |
 | `env`                           | object   | No       | Write-only environment variables supplied only to this execution. Map of string values.                                                           |
 | `imagePullCredentials`          | object   | No       | Write-only credentials used to import this execution's private OCI image. The password may be a registry token or password and is never returned. |
-| `imagePullCredentials.registry` | string   | Yes      | Registry hostname and optional port. It must match the registry in image.                                                                         |
+| `imagePullCredentials.registry` | string   | Yes      | Supported registry hostname advertised by executions.availability. It must match the registry in image; Docker Hub aliases are normalized.        |
 | `imagePullCredentials.username` | string   | Yes      | —                                                                                                                                                 |
 | `imagePullCredentials.password` | string   | Yes      | —                                                                                                                                                 |
 | `timeoutSeconds`                | integer  | No       | —                                                                                                                                                 |
@@ -60,6 +60,7 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/executi
 | Status | Description                                                                |
 | ------ | -------------------------------------------------------------------------- |
 | `202`  | Execution accepted and starting.                                           |
+| `402`  | The project hard-stop budget cannot reserve this execution.                |
 | `404`  | No such project.                                                           |
 | `409`  | Project execution concurrency limit reached.                               |
 | `422`  | Invalid image, command, region, resources, runtime capability, or timeout. |
@@ -174,31 +175,32 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/executions/avai
 
 ### Response body (200)
 
-| Field                                  | Type     | Description |
-| -------------------------------------- | -------- | ----------- |
-| `ready`                                | boolean  | —           |
-| `regions`                              | object[] | —           |
-| `regions[].id`                         | string   | —           |
-| `regions[].name`                       | string   | —           |
-| `regions[].city`                       | string   | —           |
-| `regions[].country`                    | string   | —           |
-| `regions[].continent`                  | string   | —           |
-| `architectures`                        | string[] | —           |
-| `cpuKinds`                             | string[] | —           |
-| `limits`                               | object   | —           |
-| `limits.cpus`                          | object   | —           |
-| `limits.cpus.min`                      | integer  | —           |
-| `limits.cpus.max`                      | integer  | —           |
-| `limits.memoryMb`                      | object   | —           |
-| `limits.memoryMb.min`                  | integer  | —           |
-| `limits.memoryMb.max`                  | integer  | —           |
-| `limits.timeoutSeconds`                | object   | —           |
-| `limits.timeoutSeconds.min`            | integer  | —           |
-| `limits.timeoutSeconds.max`            | integer  | —           |
-| `limits.maxActiveExecutionsPerProject` | integer  | —           |
-| `limits.maxEnvVariables`               | integer  | —           |
-| `runtime`                              | object   | —           |
-| `runtime.nestedContainers`             | boolean  | —           |
+| Field                                  | Type     | Description                                                                                                                       |
+| -------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `ready`                                | boolean  | —                                                                                                                                 |
+| `regions`                              | object[] | —                                                                                                                                 |
+| `regions[].id`                         | string   | —                                                                                                                                 |
+| `regions[].name`                       | string   | —                                                                                                                                 |
+| `regions[].city`                       | string   | —                                                                                                                                 |
+| `regions[].country`                    | string   | —                                                                                                                                 |
+| `regions[].continent`                  | string   | —                                                                                                                                 |
+| `architectures`                        | string[] | —                                                                                                                                 |
+| `cpuKinds`                             | string[] | —                                                                                                                                 |
+| `privateImageRegistries`               | string[] | Registry hosts accepted for write-only private-image credentials. Wildcards describe supported customer-owned registry hostnames. |
+| `limits`                               | object   | —                                                                                                                                 |
+| `limits.cpus`                          | object   | —                                                                                                                                 |
+| `limits.cpus.min`                      | integer  | —                                                                                                                                 |
+| `limits.cpus.max`                      | integer  | —                                                                                                                                 |
+| `limits.memoryMb`                      | object   | —                                                                                                                                 |
+| `limits.memoryMb.min`                  | integer  | —                                                                                                                                 |
+| `limits.memoryMb.max`                  | integer  | —                                                                                                                                 |
+| `limits.timeoutSeconds`                | object   | —                                                                                                                                 |
+| `limits.timeoutSeconds.min`            | integer  | —                                                                                                                                 |
+| `limits.timeoutSeconds.max`            | integer  | —                                                                                                                                 |
+| `limits.maxActiveExecutionsPerProject` | integer  | —                                                                                                                                 |
+| `limits.maxEnvVariables`               | integer  | —                                                                                                                                 |
+| `runtime`                              | object   | —                                                                                                                                 |
+| `runtime.nestedContainers`             | boolean  | —                                                                                                                                 |
 
 ## executions.resolve
 
