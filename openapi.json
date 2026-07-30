@@ -224,7 +224,7 @@
                   },
                   "state": {
                     "type": "string",
-                    "minLength": 32,
+                    "minLength": 20,
                     "maxLength": 256
                   },
                   "codeChallenge": {
@@ -21732,6 +21732,1353 @@
                   }
                 },
                 "required": ["name"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/executions/{executionId}/cancel": {
+      "post": {
+        "operationId": "executions.cancel",
+        "summary": "Cancel",
+        "description": "Force-stop a non-terminal execution and clean up its infrastructure.",
+        "tags": ["executions"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "executionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Execution cancelled, or already terminal.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "starting",
+                        "running",
+                        "succeeded",
+                        "failed",
+                        "cancelled",
+                        "timed_out"
+                      ]
+                    },
+                    "image": {
+                      "type": "string"
+                    },
+                    "command": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "region": {
+                      "type": "string"
+                    },
+                    "resources": {
+                      "type": "object",
+                      "properties": {
+                        "cpuKind": {
+                          "type": "string",
+                          "enum": ["shared", "performance"]
+                        },
+                        "cpus": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 8
+                        },
+                        "memoryMb": {
+                          "type": "integer",
+                          "minimum": 256,
+                          "maximum": 32768
+                        }
+                      },
+                      "required": ["cpuKind", "cpus", "memoryMb"],
+                      "additionalProperties": false
+                    },
+                    "runtime": {
+                      "type": "object",
+                      "properties": {
+                        "nestedContainers": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": ["nestedContainers"],
+                      "additionalProperties": false
+                    },
+                    "timeoutSeconds": {
+                      "type": "integer"
+                    },
+                    "exitCode": {
+                      "type": ["integer", "null"]
+                    },
+                    "errorCode": {
+                      "type": ["string", "null"]
+                    },
+                    "cleanupStatus": {
+                      "type": "string",
+                      "enum": ["pending", "confirmed", "attention_required"]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "startedAt": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    },
+                    "finishedAt": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "status",
+                    "image",
+                    "command",
+                    "region",
+                    "resources",
+                    "runtime",
+                    "timeoutSeconds",
+                    "exitCode",
+                    "errorCode",
+                    "cleanupStatus",
+                    "createdAt",
+                    "startedAt",
+                    "finishedAt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such execution."
+          },
+          "409": {
+            "description": "Execution lifecycle changed concurrently."
+          }
+        },
+        "x-korve-risk": "dangerous",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/executions/{executionId}/logs": {
+      "get": {
+        "operationId": "executions.logs",
+        "summary": "Logs",
+        "description": "Read bounded execution logs after platform lifecycle chatter is removed.",
+        "tags": ["executions"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "executionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Inclusive RFC 3339 lower bound."
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Inclusive RFC 3339 upper bound."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500
+            },
+            "description": "Maximum entries, newest entries winning."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Execution log entries ordered oldest first.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "entries": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "timestamp": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "level": {
+                            "type": "string",
+                            "enum": ["debug", "info", "warn", "error"]
+                          },
+                          "message": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["timestamp", "level", "message"],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": ["entries"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such execution."
+          },
+          "422": {
+            "description": "Invalid log window or limit."
+          },
+          "503": {
+            "description": "Execution logs are temporarily unavailable."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/executions/{executionId}/metrics": {
+      "get": {
+        "operationId": "executions.metrics",
+        "summary": "Metrics",
+        "description": "Read execution duration and available resource observations. Unsupported observations are null.",
+        "tags": ["executions"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "executionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Execution resource observations.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "wallTimeMs": {
+                      "type": ["integer", "null"]
+                    },
+                    "cpuSeconds": {
+                      "type": ["number", "null"]
+                    },
+                    "memoryPeakMb": {
+                      "type": ["number", "null"]
+                    },
+                    "startedAt": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    },
+                    "finishedAt": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "wallTimeMs",
+                    "cpuSeconds",
+                    "memoryPeakMb",
+                    "startedAt",
+                    "finishedAt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such execution."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/executions/{executionId}": {
+      "get": {
+        "operationId": "executions.get",
+        "summary": "Get",
+        "description": "Get current execution state and exit information.",
+        "tags": ["executions"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "executionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current execution state.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "starting",
+                        "running",
+                        "succeeded",
+                        "failed",
+                        "cancelled",
+                        "timed_out"
+                      ]
+                    },
+                    "image": {
+                      "type": "string"
+                    },
+                    "command": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "region": {
+                      "type": "string"
+                    },
+                    "resources": {
+                      "type": "object",
+                      "properties": {
+                        "cpuKind": {
+                          "type": "string",
+                          "enum": ["shared", "performance"]
+                        },
+                        "cpus": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 8
+                        },
+                        "memoryMb": {
+                          "type": "integer",
+                          "minimum": 256,
+                          "maximum": 32768
+                        }
+                      },
+                      "required": ["cpuKind", "cpus", "memoryMb"],
+                      "additionalProperties": false
+                    },
+                    "runtime": {
+                      "type": "object",
+                      "properties": {
+                        "nestedContainers": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": ["nestedContainers"],
+                      "additionalProperties": false
+                    },
+                    "timeoutSeconds": {
+                      "type": "integer"
+                    },
+                    "exitCode": {
+                      "type": ["integer", "null"]
+                    },
+                    "errorCode": {
+                      "type": ["string", "null"]
+                    },
+                    "cleanupStatus": {
+                      "type": "string",
+                      "enum": ["pending", "confirmed", "attention_required"]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "startedAt": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    },
+                    "finishedAt": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "status",
+                    "image",
+                    "command",
+                    "region",
+                    "resources",
+                    "runtime",
+                    "timeoutSeconds",
+                    "exitCode",
+                    "errorCode",
+                    "cleanupStatus",
+                    "createdAt",
+                    "startedAt",
+                    "finishedAt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such execution."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/executions/availability": {
+      "get": {
+        "operationId": "executions.availability",
+        "summary": "Availability",
+        "description": "Read provider-neutral scheduling readiness, accepted regions, architectures, and resource limits.",
+        "tags": ["executions"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current execution scheduling envelope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ready": {
+                      "type": "boolean"
+                    },
+                    "regions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "city": {
+                            "type": "string"
+                          },
+                          "country": {
+                            "type": "string"
+                          },
+                          "continent": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["id", "name", "city", "country", "continent"],
+                        "additionalProperties": false
+                      }
+                    },
+                    "architectures": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": ["x86_64"]
+                      }
+                    },
+                    "cpuKinds": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": ["shared", "performance"]
+                      }
+                    },
+                    "limits": {
+                      "type": "object",
+                      "properties": {
+                        "cpus": {
+                          "type": "object",
+                          "properties": {
+                            "min": {
+                              "type": "integer"
+                            },
+                            "max": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": ["min", "max"],
+                          "additionalProperties": false
+                        },
+                        "memoryMb": {
+                          "type": "object",
+                          "properties": {
+                            "min": {
+                              "type": "integer"
+                            },
+                            "max": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": ["min", "max"],
+                          "additionalProperties": false
+                        },
+                        "timeoutSeconds": {
+                          "type": "object",
+                          "properties": {
+                            "min": {
+                              "type": "integer"
+                            },
+                            "max": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": ["min", "max"],
+                          "additionalProperties": false
+                        },
+                        "maxActiveExecutionsPerProject": {
+                          "type": "integer"
+                        },
+                        "maxEnvVariables": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "cpus",
+                        "memoryMb",
+                        "timeoutSeconds",
+                        "maxActiveExecutionsPerProject",
+                        "maxEnvVariables"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "runtime": {
+                      "type": "object",
+                      "properties": {
+                        "nestedContainers": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": ["nestedContainers"],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "ready",
+                    "regions",
+                    "architectures",
+                    "cpuKinds",
+                    "limits",
+                    "runtime"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such project."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/executions/resolve": {
+      "get": {
+        "operationId": "executions.resolve",
+        "summary": "Resolve",
+        "description": "Resolve this principal's completed create request by its Idempotency-Key after an ambiguous client failure.",
+        "tags": ["executions"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "idempotencyKey",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]+$"
+            },
+            "description": "The exact key sent with executions.create."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The execution created by that request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "starting",
+                        "running",
+                        "succeeded",
+                        "failed",
+                        "cancelled",
+                        "timed_out"
+                      ]
+                    },
+                    "image": {
+                      "type": "string"
+                    },
+                    "command": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "region": {
+                      "type": "string"
+                    },
+                    "resources": {
+                      "type": "object",
+                      "properties": {
+                        "cpuKind": {
+                          "type": "string",
+                          "enum": ["shared", "performance"]
+                        },
+                        "cpus": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 8
+                        },
+                        "memoryMb": {
+                          "type": "integer",
+                          "minimum": 256,
+                          "maximum": 32768
+                        }
+                      },
+                      "required": ["cpuKind", "cpus", "memoryMb"],
+                      "additionalProperties": false
+                    },
+                    "runtime": {
+                      "type": "object",
+                      "properties": {
+                        "nestedContainers": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": ["nestedContainers"],
+                      "additionalProperties": false
+                    },
+                    "timeoutSeconds": {
+                      "type": "integer"
+                    },
+                    "exitCode": {
+                      "type": ["integer", "null"]
+                    },
+                    "errorCode": {
+                      "type": ["string", "null"]
+                    },
+                    "cleanupStatus": {
+                      "type": "string",
+                      "enum": ["pending", "confirmed", "attention_required"]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "startedAt": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    },
+                    "finishedAt": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "status",
+                    "image",
+                    "command",
+                    "region",
+                    "resources",
+                    "runtime",
+                    "timeoutSeconds",
+                    "exitCode",
+                    "errorCode",
+                    "cleanupStatus",
+                    "createdAt",
+                    "startedAt",
+                    "finishedAt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "The create request is still in progress; retry resolution shortly.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "state": {
+                      "type": "string",
+                      "enum": ["pending"]
+                    }
+                  },
+                  "required": ["state"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No matching request exists, or the completed or failed request created no execution."
+          },
+          "422": {
+            "description": "Invalid idempotency key."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/executions": {
+      "get": {
+        "operationId": "executions.list",
+        "summary": "List",
+        "description": "List executions in newest-first order.",
+        "tags": ["executions"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["starting", "running", "succeeded", "failed", "cancelled", "timed_out"]
+            },
+            "description": "Filter by lifecycle status."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            },
+            "description": "Maximum executions to return."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Executions ordered newest first.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "starting",
+                          "running",
+                          "succeeded",
+                          "failed",
+                          "cancelled",
+                          "timed_out"
+                        ]
+                      },
+                      "image": {
+                        "type": "string"
+                      },
+                      "command": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "region": {
+                        "type": "string"
+                      },
+                      "resources": {
+                        "type": "object",
+                        "properties": {
+                          "cpuKind": {
+                            "type": "string",
+                            "enum": ["shared", "performance"]
+                          },
+                          "cpus": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 8
+                          },
+                          "memoryMb": {
+                            "type": "integer",
+                            "minimum": 256,
+                            "maximum": 32768
+                          }
+                        },
+                        "required": ["cpuKind", "cpus", "memoryMb"],
+                        "additionalProperties": false
+                      },
+                      "runtime": {
+                        "type": "object",
+                        "properties": {
+                          "nestedContainers": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": ["nestedContainers"],
+                        "additionalProperties": false
+                      },
+                      "timeoutSeconds": {
+                        "type": "integer"
+                      },
+                      "exitCode": {
+                        "type": ["integer", "null"]
+                      },
+                      "errorCode": {
+                        "type": ["string", "null"]
+                      },
+                      "cleanupStatus": {
+                        "type": "string",
+                        "enum": ["pending", "confirmed", "attention_required"]
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "startedAt": {
+                        "type": ["string", "null"],
+                        "format": "date-time"
+                      },
+                      "finishedAt": {
+                        "type": ["string", "null"],
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "status",
+                      "image",
+                      "command",
+                      "region",
+                      "resources",
+                      "runtime",
+                      "timeoutSeconds",
+                      "exitCode",
+                      "errorCode",
+                      "cleanupStatus",
+                      "createdAt",
+                      "startedAt",
+                      "finishedAt"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such project."
+          },
+          "422": {
+            "description": "Invalid lifecycle status or limit."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      },
+      "post": {
+        "operationId": "executions.create",
+        "summary": "Create",
+        "description": "Start an isolated one-shot container execution. Environment values are write-only and never returned.",
+        "tags": ["executions"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Execution accepted and starting.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "starting",
+                        "running",
+                        "succeeded",
+                        "failed",
+                        "cancelled",
+                        "timed_out"
+                      ]
+                    },
+                    "image": {
+                      "type": "string"
+                    },
+                    "command": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "region": {
+                      "type": "string"
+                    },
+                    "resources": {
+                      "type": "object",
+                      "properties": {
+                        "cpuKind": {
+                          "type": "string",
+                          "enum": ["shared", "performance"]
+                        },
+                        "cpus": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 8
+                        },
+                        "memoryMb": {
+                          "type": "integer",
+                          "minimum": 256,
+                          "maximum": 32768
+                        }
+                      },
+                      "required": ["cpuKind", "cpus", "memoryMb"],
+                      "additionalProperties": false
+                    },
+                    "runtime": {
+                      "type": "object",
+                      "properties": {
+                        "nestedContainers": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": ["nestedContainers"],
+                      "additionalProperties": false
+                    },
+                    "timeoutSeconds": {
+                      "type": "integer"
+                    },
+                    "exitCode": {
+                      "type": ["integer", "null"]
+                    },
+                    "errorCode": {
+                      "type": ["string", "null"]
+                    },
+                    "cleanupStatus": {
+                      "type": "string",
+                      "enum": ["pending", "confirmed", "attention_required"]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "startedAt": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    },
+                    "finishedAt": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "status",
+                    "image",
+                    "command",
+                    "region",
+                    "resources",
+                    "runtime",
+                    "timeoutSeconds",
+                    "exitCode",
+                    "errorCode",
+                    "cleanupStatus",
+                    "createdAt",
+                    "startedAt",
+                    "finishedAt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such project."
+          },
+          "409": {
+            "description": "Project execution concurrency limit reached."
+          },
+          "422": {
+            "description": "Invalid image, command, region, resources, runtime capability, or timeout."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member",
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 256000,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "command": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 4096
+                    },
+                    "minItems": 1,
+                    "maxItems": 128
+                  },
+                  "region": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "resources": {
+                    "type": "object",
+                    "properties": {
+                      "cpuKind": {
+                        "type": "string",
+                        "enum": ["shared", "performance"]
+                      },
+                      "cpus": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 8
+                      },
+                      "memoryMb": {
+                        "type": "integer",
+                        "minimum": 256,
+                        "maximum": 32768
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "runtime": {
+                    "type": "object",
+                    "properties": {
+                      "nestedContainers": {
+                        "type": "boolean"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "env": {
+                    "type": "object",
+                    "description": "Write-only environment variables supplied only to this execution.",
+                    "additionalProperties": {
+                      "type": "string",
+                      "maxLength": 32768
+                    }
+                  },
+                  "imagePullCredentials": {
+                    "type": "object",
+                    "description": "Write-only credentials used to import this execution's private OCI image. The password may be a registry token or password and is never returned.",
+                    "properties": {
+                      "registry": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 253,
+                        "description": "Registry hostname and optional port. It must match the registry in image."
+                      },
+                      "username": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 512
+                      },
+                      "password": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 16384
+                      }
+                    },
+                    "required": ["registry", "username", "password"],
+                    "additionalProperties": false
+                  },
+                  "timeoutSeconds": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 86400
+                  }
+                },
+                "required": ["image", "command", "region"],
+                "additionalProperties": false
               }
             }
           }

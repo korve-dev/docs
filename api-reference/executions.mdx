@@ -1,0 +1,438 @@
+---
+title: "Executions"
+description: "Isolated, one-shot container executions with bounded resources, lifecycle observation, logs, cancellation, and automatic cleanup."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Isolated, one-shot container executions with bounded resources, lifecycle observation, logs, cancellation, and automatic cleanup.
+
+## executions.create
+
+Start an isolated one-shot container execution. Environment values are write-only and never returned.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/executions
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write`
+
+### Request body
+
+| Field                           | Type     | Required | Description                                                                                                                                       |
+| ------------------------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `image`                         | string   | Yes      | —                                                                                                                                                 |
+| `command`                       | string[] | Yes      | —                                                                                                                                                 |
+| `region`                        | string   | Yes      | —                                                                                                                                                 |
+| `resources`                     | object   | No       | —                                                                                                                                                 |
+| `resources.cpuKind`             | string   | No       | One of: `shared`, `performance`.                                                                                                                  |
+| `resources.cpus`                | integer  | No       | —                                                                                                                                                 |
+| `resources.memoryMb`            | integer  | No       | —                                                                                                                                                 |
+| `runtime`                       | object   | No       | —                                                                                                                                                 |
+| `runtime.nestedContainers`      | boolean  | No       | —                                                                                                                                                 |
+| `env`                           | object   | No       | Write-only environment variables supplied only to this execution. Map of string values.                                                           |
+| `imagePullCredentials`          | object   | No       | Write-only credentials used to import this execution's private OCI image. The password may be a registry token or password and is never returned. |
+| `imagePullCredentials.registry` | string   | Yes      | Registry hostname and optional port. It must match the registry in image.                                                                         |
+| `imagePullCredentials.username` | string   | Yes      | —                                                                                                                                                 |
+| `imagePullCredentials.password` | string   | Yes      | —                                                                                                                                                 |
+| `timeoutSeconds`                | integer  | No       | —                                                                                                                                                 |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/executions" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "image": "registry.example.com/acme/job:latest",
+  "command": [
+    "example"
+  ],
+  "region": "iad"
+}'
+```
+
+### Responses
+
+| Status | Description                                                                |
+| ------ | -------------------------------------------------------------------------- |
+| `202`  | Execution accepted and starting.                                           |
+| `404`  | No such project.                                                           |
+| `409`  | Project execution concurrency limit reached.                               |
+| `422`  | Invalid image, command, region, resources, runtime capability, or timeout. |
+
+### Response body (202)
+
+| Field                      | Type            | Description                                                                     |
+| -------------------------- | --------------- | ------------------------------------------------------------------------------- |
+| `id`                       | string          | —                                                                               |
+| `status`                   | string          | One of: `starting`, `running`, `succeeded`, `failed`, `cancelled`, `timed_out`. |
+| `image`                    | string          | —                                                                               |
+| `command`                  | string[]        | —                                                                               |
+| `region`                   | string          | —                                                                               |
+| `resources`                | object          | —                                                                               |
+| `resources.cpuKind`        | string          | One of: `shared`, `performance`.                                                |
+| `resources.cpus`           | integer         | —                                                                               |
+| `resources.memoryMb`       | integer         | —                                                                               |
+| `runtime`                  | object          | —                                                                               |
+| `runtime.nestedContainers` | boolean         | —                                                                               |
+| `timeoutSeconds`           | integer         | —                                                                               |
+| `exitCode`                 | integer or null | —                                                                               |
+| `errorCode`                | string or null  | —                                                                               |
+| `cleanupStatus`            | string          | One of: `pending`, `confirmed`, `attention_required`.                           |
+| `createdAt`                | string          | Format: `date-time`.                                                            |
+| `startedAt`                | string or null  | Format: `date-time`.                                                            |
+| `finishedAt`               | string or null  | Format: `date-time`.                                                            |
+
+## executions.list
+
+List executions in newest-first order.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/executions
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name     | Type    | Required | Description                                                                     |
+| -------- | ------- | -------- | ------------------------------------------------------------------------------- |
+| `status` | string  | No       | One of: `starting`, `running`, `succeeded`, `failed`, `cancelled`, `timed_out`. |
+| `limit`  | integer | No       | —                                                                               |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/executions?status=starting" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                        |
+| ------ | ---------------------------------- |
+| `200`  | Executions ordered newest first.   |
+| `404`  | No such project.                   |
+| `422`  | Invalid lifecycle status or limit. |
+
+### Response body (200)
+
+An array of objects with these fields:
+
+| Field                      | Type            | Description                                                                     |
+| -------------------------- | --------------- | ------------------------------------------------------------------------------- |
+| `id`                       | string          | —                                                                               |
+| `status`                   | string          | One of: `starting`, `running`, `succeeded`, `failed`, `cancelled`, `timed_out`. |
+| `image`                    | string          | —                                                                               |
+| `command`                  | string[]        | —                                                                               |
+| `region`                   | string          | —                                                                               |
+| `resources`                | object          | —                                                                               |
+| `resources.cpuKind`        | string          | One of: `shared`, `performance`.                                                |
+| `resources.cpus`           | integer         | —                                                                               |
+| `resources.memoryMb`       | integer         | —                                                                               |
+| `runtime`                  | object          | —                                                                               |
+| `runtime.nestedContainers` | boolean         | —                                                                               |
+| `timeoutSeconds`           | integer         | —                                                                               |
+| `exitCode`                 | integer or null | —                                                                               |
+| `errorCode`                | string or null  | —                                                                               |
+| `cleanupStatus`            | string          | One of: `pending`, `confirmed`, `attention_required`.                           |
+| `createdAt`                | string          | Format: `date-time`.                                                            |
+| `startedAt`                | string or null  | Format: `date-time`.                                                            |
+| `finishedAt`               | string or null  | Format: `date-time`.                                                            |
+
+## executions.availability
+
+Read provider-neutral scheduling readiness, accepted regions, architectures, and resource limits.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/executions/availability
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/executions/availability" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                            |
+| ------ | -------------------------------------- |
+| `200`  | Current execution scheduling envelope. |
+| `404`  | No such project.                       |
+
+### Response body (200)
+
+| Field                                  | Type     | Description |
+| -------------------------------------- | -------- | ----------- |
+| `ready`                                | boolean  | —           |
+| `regions`                              | object[] | —           |
+| `regions[].id`                         | string   | —           |
+| `regions[].name`                       | string   | —           |
+| `regions[].city`                       | string   | —           |
+| `regions[].country`                    | string   | —           |
+| `regions[].continent`                  | string   | —           |
+| `architectures`                        | string[] | —           |
+| `cpuKinds`                             | string[] | —           |
+| `limits`                               | object   | —           |
+| `limits.cpus`                          | object   | —           |
+| `limits.cpus.min`                      | integer  | —           |
+| `limits.cpus.max`                      | integer  | —           |
+| `limits.memoryMb`                      | object   | —           |
+| `limits.memoryMb.min`                  | integer  | —           |
+| `limits.memoryMb.max`                  | integer  | —           |
+| `limits.timeoutSeconds`                | object   | —           |
+| `limits.timeoutSeconds.min`            | integer  | —           |
+| `limits.timeoutSeconds.max`            | integer  | —           |
+| `limits.maxActiveExecutionsPerProject` | integer  | —           |
+| `limits.maxEnvVariables`               | integer  | —           |
+| `runtime`                              | object   | —           |
+| `runtime.nestedContainers`             | boolean  | —           |
+
+## executions.resolve
+
+Resolve this principal's completed create request by its Idempotency-Key after an ambiguous client failure.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/executions/resolve
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name             | Type   | Required | Description                    |
+| ---------------- | ------ | -------- | ------------------------------ |
+| `idempotencyKey` | string | Yes      | Pattern: `^[A-Za-z0-9._:-]+$`. |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/executions/resolve?idempotencyKey=example" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                                                          |
+| ------ | ------------------------------------------------------------------------------------ |
+| `200`  | The execution created by that request.                                               |
+| `202`  | The create request is still in progress; retry resolution shortly.                   |
+| `404`  | No matching request exists, or the completed or failed request created no execution. |
+| `422`  | Invalid idempotency key.                                                             |
+
+### Response body (200)
+
+| Field                      | Type            | Description                                                                     |
+| -------------------------- | --------------- | ------------------------------------------------------------------------------- |
+| `id`                       | string          | —                                                                               |
+| `status`                   | string          | One of: `starting`, `running`, `succeeded`, `failed`, `cancelled`, `timed_out`. |
+| `image`                    | string          | —                                                                               |
+| `command`                  | string[]        | —                                                                               |
+| `region`                   | string          | —                                                                               |
+| `resources`                | object          | —                                                                               |
+| `resources.cpuKind`        | string          | One of: `shared`, `performance`.                                                |
+| `resources.cpus`           | integer         | —                                                                               |
+| `resources.memoryMb`       | integer         | —                                                                               |
+| `runtime`                  | object          | —                                                                               |
+| `runtime.nestedContainers` | boolean         | —                                                                               |
+| `timeoutSeconds`           | integer         | —                                                                               |
+| `exitCode`                 | integer or null | —                                                                               |
+| `errorCode`                | string or null  | —                                                                               |
+| `cleanupStatus`            | string          | One of: `pending`, `confirmed`, `attention_required`.                           |
+| `createdAt`                | string          | Format: `date-time`.                                                            |
+| `startedAt`                | string or null  | Format: `date-time`.                                                            |
+| `finishedAt`               | string or null  | Format: `date-time`.                                                            |
+
+## executions.get
+
+Get current execution state and exit information.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/executions/{executionId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/executions/$EXECUTION_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description              |
+| ------ | ------------------------ |
+| `200`  | Current execution state. |
+| `404`  | No such execution.       |
+
+### Response body (200)
+
+| Field                      | Type            | Description                                                                     |
+| -------------------------- | --------------- | ------------------------------------------------------------------------------- |
+| `id`                       | string          | —                                                                               |
+| `status`                   | string          | One of: `starting`, `running`, `succeeded`, `failed`, `cancelled`, `timed_out`. |
+| `image`                    | string          | —                                                                               |
+| `command`                  | string[]        | —                                                                               |
+| `region`                   | string          | —                                                                               |
+| `resources`                | object          | —                                                                               |
+| `resources.cpuKind`        | string          | One of: `shared`, `performance`.                                                |
+| `resources.cpus`           | integer         | —                                                                               |
+| `resources.memoryMb`       | integer         | —                                                                               |
+| `runtime`                  | object          | —                                                                               |
+| `runtime.nestedContainers` | boolean         | —                                                                               |
+| `timeoutSeconds`           | integer         | —                                                                               |
+| `exitCode`                 | integer or null | —                                                                               |
+| `errorCode`                | string or null  | —                                                                               |
+| `cleanupStatus`            | string          | One of: `pending`, `confirmed`, `attention_required`.                           |
+| `createdAt`                | string          | Format: `date-time`.                                                            |
+| `startedAt`                | string or null  | Format: `date-time`.                                                            |
+| `finishedAt`               | string or null  | Format: `date-time`.                                                            |
+
+## executions.cancel
+
+Force-stop a non-terminal execution and clean up its infrastructure.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/executions/{executionId}/cancel
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `dangerous` · sensitive (elevated blast radius)
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/executions/$EXECUTION_ID/cancel" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                               |
+| ------ | ----------------------------------------- |
+| `200`  | Execution cancelled, or already terminal. |
+| `404`  | No such execution.                        |
+| `409`  | Execution lifecycle changed concurrently. |
+
+### Response body (200)
+
+| Field                      | Type            | Description                                                                     |
+| -------------------------- | --------------- | ------------------------------------------------------------------------------- |
+| `id`                       | string          | —                                                                               |
+| `status`                   | string          | One of: `starting`, `running`, `succeeded`, `failed`, `cancelled`, `timed_out`. |
+| `image`                    | string          | —                                                                               |
+| `command`                  | string[]        | —                                                                               |
+| `region`                   | string          | —                                                                               |
+| `resources`                | object          | —                                                                               |
+| `resources.cpuKind`        | string          | One of: `shared`, `performance`.                                                |
+| `resources.cpus`           | integer         | —                                                                               |
+| `resources.memoryMb`       | integer         | —                                                                               |
+| `runtime`                  | object          | —                                                                               |
+| `runtime.nestedContainers` | boolean         | —                                                                               |
+| `timeoutSeconds`           | integer         | —                                                                               |
+| `exitCode`                 | integer or null | —                                                                               |
+| `errorCode`                | string or null  | —                                                                               |
+| `cleanupStatus`            | string          | One of: `pending`, `confirmed`, `attention_required`.                           |
+| `createdAt`                | string          | Format: `date-time`.                                                            |
+| `startedAt`                | string or null  | Format: `date-time`.                                                            |
+| `finishedAt`               | string or null  | Format: `date-time`.                                                            |
+
+## executions.logs
+
+Read bounded execution logs after platform lifecycle chatter is removed.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/executions/{executionId}/logs
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name    | Type    | Required | Description          |
+| ------- | ------- | -------- | -------------------- |
+| `since` | string  | No       | Format: `date-time`. |
+| `until` | string  | No       | Format: `date-time`. |
+| `limit` | integer | No       | —                    |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/executions/$EXECUTION_ID/logs?since=2026-06-01T12%3A00%3A00Z" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                                 |
+| ------ | ------------------------------------------- |
+| `200`  | Execution log entries ordered oldest first. |
+| `404`  | No such execution.                          |
+| `422`  | Invalid log window or limit.                |
+| `503`  | Execution logs are temporarily unavailable. |
+
+### Response body (200)
+
+| Field                 | Type     | Description                               |
+| --------------------- | -------- | ----------------------------------------- |
+| `entries`             | object[] | —                                         |
+| `entries[].timestamp` | string   | Format: `date-time`.                      |
+| `entries[].level`     | string   | One of: `debug`, `info`, `warn`, `error`. |
+| `entries[].message`   | string   | —                                         |
+
+## executions.metrics
+
+Read execution duration and available resource observations. Unsupported observations are null.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/executions/{executionId}/metrics
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/executions/$EXECUTION_ID/metrics" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                      |
+| ------ | -------------------------------- |
+| `200`  | Execution resource observations. |
+| `404`  | No such execution.               |
+
+### Response body (200)
+
+| Field          | Type            | Description          |
+| -------------- | --------------- | -------------------- |
+| `wallTimeMs`   | integer or null | —                    |
+| `cpuSeconds`   | number or null  | —                    |
+| `memoryPeakMb` | number or null  | —                    |
+| `startedAt`    | string or null  | Format: `date-time`. |
+| `finishedAt`   | string or null  | Format: `date-time`. |
