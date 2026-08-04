@@ -16,8 +16,10 @@ Use an organization-scoped key with the least role the agent needs. MCP clients 
 protected-resource and authorization-server discovery, dynamic public-client registration,
 authorization code with S256 PKCE, and rotating refresh tokens can instead request a grant bound
 to audience `mcp` and exact operation scopes; see
-[Agent OAuth](/agents/oauth). Never reuse a CLI-audience token. `search` works without a credential;
-`execute` requires one.
+[Agent OAuth](/agents/oauth). Never reuse a CLI-audience token. The MCP transport authenticates
+before initialization, so every client connection needs an MCP-audience credential. Once connected,
+`search` only reads the bundled public contract and makes no API request; `execute` additionally
+enforces the credential's exact operation scopes.
 
 ## Search the contract
 
