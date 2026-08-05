@@ -34736,7 +34736,7 @@
                     },
                     "region": {
                       "type": "string",
-                      "description": "Where the app runs: a compute region id for always-on apps, \"global\" for scale-to-zero apps (they run on the global edge). Immutable after creation. The catalog lives at regions.list."
+                      "description": "Where the app runs: a compute region id for always-on apps, \"global\" for scale-to-zero apps (they run on the global edge). Always-on projects can change regions with projects.update; the catalog lives at regions.list."
                     },
                     "gitRepo": {
                       "type": ["string", "null"],
@@ -34851,7 +34851,7 @@
       "patch": {
         "operationId": "projects.update",
         "summary": "Update",
-        "description": "Update project settings: rename it, connect or disconnect a repository, or change the production branch. Renaming never changes the slug or the public URL.",
+        "description": "Update project settings: rename it, connect or disconnect a repository, or change the production branch or compute region. Renaming never changes the slug or the public URL. Region changes apply to the next deployment for always-on projects.",
         "tags": ["projects"],
         "parameters": [
           {
@@ -34905,7 +34905,7 @@
                     },
                     "region": {
                       "type": "string",
-                      "description": "Where the app runs: a compute region id for always-on apps, \"global\" for scale-to-zero apps (they run on the global edge). Immutable after creation. The catalog lives at regions.list."
+                      "description": "Where the app runs: a compute region id for always-on apps, \"global\" for scale-to-zero apps (they run on the global edge). Always-on projects can change regions with projects.update; the catalog lives at regions.list."
                     },
                     "gitRepo": {
                       "type": ["string", "null"],
@@ -34942,7 +34942,7 @@
             "description": "No such project in this organization."
           },
           "422": {
-            "description": "Invalid name, gitRepo, gitRef, or repository access — or no fields to update."
+            "description": "Invalid name, gitRepo, gitRef, region, or repository access — or no fields to update."
           },
           "502": {
             "description": "Repository access could not be verified — try again."
@@ -34971,6 +34971,10 @@
                   "gitRef": {
                     "type": "string",
                     "description": "Production branch for push-to-deploy, 1-100 characters."
+                  },
+                  "region": {
+                    "type": "string",
+                    "description": "Compute region id for an always-on project (see regions.list). Scale-to-zero projects run globally and cannot set a region."
                   }
                 }
               }
@@ -35030,7 +35034,7 @@
                       },
                       "region": {
                         "type": "string",
-                        "description": "Where the app runs: a compute region id for always-on apps, \"global\" for scale-to-zero apps (they run on the global edge). Immutable after creation. The catalog lives at regions.list."
+                        "description": "Where the app runs: a compute region id for always-on apps, \"global\" for scale-to-zero apps (they run on the global edge). Always-on projects can change regions with projects.update; the catalog lives at regions.list."
                       },
                       "gitRepo": {
                         "type": ["string", "null"],
@@ -35117,7 +35121,7 @@
                     },
                     "region": {
                       "type": "string",
-                      "description": "Where the app runs: a compute region id for always-on apps, \"global\" for scale-to-zero apps (they run on the global edge). Immutable after creation. The catalog lives at regions.list."
+                      "description": "Where the app runs: a compute region id for always-on apps, \"global\" for scale-to-zero apps (they run on the global edge). Always-on projects can change regions with projects.update; the catalog lives at regions.list."
                     },
                     "gitRepo": {
                       "type": ["string", "null"],
@@ -35188,7 +35192,7 @@
                   },
                   "region": {
                     "type": "string",
-                    "description": "Compute region id for always-on apps (see regions.list); defaults to the platform default region. Scale-to-zero apps run on the global edge and must not pick a region. Immutable after creation."
+                    "description": "Compute region id for always-on apps (see regions.list); defaults to the platform default region. Scale-to-zero apps run on the global edge and must not pick a region."
                   },
                   "gitRepo": {
                     "type": "string",
