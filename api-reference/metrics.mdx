@@ -28,27 +28,27 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/metrics/catalog" \
 
 ### Responses
 
-| Status | Description                              |
-| ------ | ---------------------------------------- |
-| `200`  | Provider-neutral public metrics catalog. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Provider-neutral public metrics catalog. |
 
 ### Response body (200)
 
-| Field                             | Type     | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| --------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `retention`                       | object   | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `retention.rawDays`               | integer  | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `retention.hourlyMonths`          | integer  | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `metrics`                         | object[] | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `metrics[].name`                  | string   | One of: `cpu.percent`, `memory.used_bytes`, `memory.limit_bytes`, `disk.used_bytes`, `disk.limit_bytes`, `disk.read_iops`, `disk.write_iops`, `network.receive_bytes`, `network.transmit_bytes`, `runtime.restarts`, `runtime.uptime_seconds`, `http.requests`, `http.errors`, `database.connections`, `database.pool_waiting`, `database.queries_per_second`, `database.query_latency_avg_ms`, `database.query_latency_p50_ms`, `database.query_latency_p90_ms`, `database.query_latency_p95_ms`, `database.query_latency_p99_ms`, `queue.backlog_messages`, `queue.oldest_message_age_seconds`, `cron.failures`. |
-| `metrics[].label`                 | string   | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `metrics[].description`           | string   | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `metrics[].unit`                  | string   | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `metrics[].category`              | string   | One of: `compute`, `memory`, `storage`, `network`, `http`, `database`, `queue`, `cron`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| `metrics[].scopes`                | string[] | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `metrics[].defaultAggregation`    | string   | One of: `avg`, `min`, `max`, `sum`, `p50`, `p95`, `p99`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| `metrics[].supportedAggregations` | string[] | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `metrics[].groupBy`               | string[] | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `retention` | object | — |
+| `retention.rawDays` | integer | — |
+| `retention.hourlyMonths` | integer | — |
+| `metrics` | object[] | — |
+| `metrics[].name` | string | One of: `cpu.percent`, `memory.used_bytes`, `memory.limit_bytes`, `disk.used_bytes`, `disk.limit_bytes`, `disk.read_iops`, `disk.write_iops`, `network.receive_bytes`, `network.transmit_bytes`, `runtime.restarts`, `runtime.uptime_seconds`, `http.requests`, `http.errors`, `database.connections`, `database.pool_waiting`, `database.queries_per_second`, `database.query_latency_avg_ms`, `database.query_latency_p50_ms`, `database.query_latency_p90_ms`, `database.query_latency_p95_ms`, `database.query_latency_p99_ms`, `queue.backlog_messages`, `queue.oldest_message_age_seconds`, `cron.failures`. |
+| `metrics[].label` | string | — |
+| `metrics[].description` | string | — |
+| `metrics[].unit` | string | — |
+| `metrics[].category` | string | One of: `compute`, `memory`, `storage`, `network`, `http`, `database`, `queue`, `cron`. |
+| `metrics[].scopes` | string[] | — |
+| `metrics[].defaultAggregation` | string | One of: `avg`, `min`, `max`, `sum`, `p50`, `p95`, `p99`. |
+| `metrics[].supportedAggregations` | string[] | — |
+| `metrics[].groupBy` | string[] | — |
 
 ## metrics.queryProject
 
@@ -64,20 +64,20 @@ POST /v1/orgs/{orgId}/projects/{projectId}/metrics/query
 
 ### Query parameters
 
-| Name          | Type   | Required | Description                        |
-| ------------- | ------ | -------- | ---------------------------------- |
-| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Request body
 
-| Field         | Type     | Required | Description                                                                                 |
-| ------------- | -------- | -------- | ------------------------------------------------------------------------------------------- |
-| `names`       | string[] | Yes      | One to 10 metric names.                                                                     |
-| `from`        | string   | Yes      | Format: `date-time`.                                                                        |
-| `until`       | string   | Yes      | Format: `date-time`.                                                                        |
-| `stepSeconds` | integer  | No       | Bucket width. Raw one-minute data is retained for 30 days; hourly aggregates for 13 months. |
-| `aggregation` | string   | No       | One of: `avg`, `min`, `max`, `sum`, `p50`, `p95`, `p99`.                                    |
-| `groupBy`     | string[] | No       | —                                                                                           |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `names` | string[] | Yes | One to 10 metric names. |
+| `from` | string | Yes | Format: `date-time`. |
+| `until` | string | Yes | Format: `date-time`. |
+| `stepSeconds` | integer | No | Bucket width. Raw one-minute data is retained for 30 days; hourly aggregates for 13 months. |
+| `aggregation` | string | No | One of: `avg`, `min`, `max`, `sum`, `p50`, `p95`, `p99`. |
+| `groupBy` | string[] | No | — |
 
 ### Example
 
@@ -96,27 +96,27 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/metrics
 
 ### Responses
 
-| Status | Description                                                  |
-| ------ | ------------------------------------------------------------ |
-| `200`  | Metric series in ascending timestamp order.                  |
-| `404`  | No such project or environment.                              |
-| `422`  | Invalid metric, time window, step, aggregation, or grouping. |
-| `429`  | Metrics query limit reached.                                 |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Metric series in ascending timestamp order. |
+| `404` | No such project or environment. |
+| `422` | Invalid metric, time window, step, aggregation, or grouping. |
+| `429` | Metrics query limit reached. |
 
 ### Response body (200)
 
-| Field                         | Type           | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| ----------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `from`                        | string         | Format: `date-time`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `until`                       | string         | Format: `date-time`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `stepSeconds`                 | integer        | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `series`                      | object[]       | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `series[].name`               | string         | One of: `cpu.percent`, `memory.used_bytes`, `memory.limit_bytes`, `disk.used_bytes`, `disk.limit_bytes`, `disk.read_iops`, `disk.write_iops`, `network.receive_bytes`, `network.transmit_bytes`, `runtime.restarts`, `runtime.uptime_seconds`, `http.requests`, `http.errors`, `database.connections`, `database.pool_waiting`, `database.queries_per_second`, `database.query_latency_avg_ms`, `database.query_latency_p50_ms`, `database.query_latency_p90_ms`, `database.query_latency_p95_ms`, `database.query_latency_p99_ms`, `queue.backlog_messages`, `queue.oldest_message_age_seconds`, `cron.failures`. |
-| `series[].unit`               | string         | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `series[].labels`             | object         | Map of string values.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `series[].points`             | object[]       | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `series[].points[].timestamp` | string         | Format: `date-time`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `series[].points[].value`     | number or null | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `from` | string | Format: `date-time`. |
+| `until` | string | Format: `date-time`. |
+| `stepSeconds` | integer | — |
+| `series` | object[] | — |
+| `series[].name` | string | One of: `cpu.percent`, `memory.used_bytes`, `memory.limit_bytes`, `disk.used_bytes`, `disk.limit_bytes`, `disk.read_iops`, `disk.write_iops`, `network.receive_bytes`, `network.transmit_bytes`, `runtime.restarts`, `runtime.uptime_seconds`, `http.requests`, `http.errors`, `database.connections`, `database.pool_waiting`, `database.queries_per_second`, `database.query_latency_avg_ms`, `database.query_latency_p50_ms`, `database.query_latency_p90_ms`, `database.query_latency_p95_ms`, `database.query_latency_p99_ms`, `queue.backlog_messages`, `queue.oldest_message_age_seconds`, `cron.failures`. |
+| `series[].unit` | string | — |
+| `series[].labels` | object | Map of string values. |
+| `series[].points` | object[] | — |
+| `series[].points[].timestamp` | string | Format: `date-time`. |
+| `series[].points[].value` | number or null | — |
 
 ## metrics.queryDatabase
 
@@ -132,14 +132,14 @@ POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/metrics/query
 
 ### Request body
 
-| Field         | Type     | Required | Description                                                                                 |
-| ------------- | -------- | -------- | ------------------------------------------------------------------------------------------- |
-| `names`       | string[] | Yes      | One to 10 metric names.                                                                     |
-| `from`        | string   | Yes      | Format: `date-time`.                                                                        |
-| `until`       | string   | Yes      | Format: `date-time`.                                                                        |
-| `stepSeconds` | integer  | No       | Bucket width. Raw one-minute data is retained for 30 days; hourly aggregates for 13 months. |
-| `aggregation` | string   | No       | One of: `avg`, `min`, `max`, `sum`, `p50`, `p95`, `p99`.                                    |
-| `groupBy`     | string[] | No       | —                                                                                           |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `names` | string[] | Yes | One to 10 metric names. |
+| `from` | string | Yes | Format: `date-time`. |
+| `until` | string | Yes | Format: `date-time`. |
+| `stepSeconds` | integer | No | Bucket width. Raw one-minute data is retained for 30 days; hourly aggregates for 13 months. |
+| `aggregation` | string | No | One of: `avg`, `min`, `max`, `sum`, `p50`, `p95`, `p99`. |
+| `groupBy` | string[] | No | — |
 
 ### Example
 
@@ -158,24 +158,24 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databas
 
 ### Responses
 
-| Status | Description                                                           |
-| ------ | --------------------------------------------------------------------- |
-| `200`  | Database metric series in ascending timestamp order.                  |
-| `404`  | No such database in this project.                                     |
-| `422`  | Invalid database metric, time window, step, aggregation, or grouping. |
-| `429`  | Metrics query limit reached.                                          |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Database metric series in ascending timestamp order. |
+| `404` | No such database in this project. |
+| `422` | Invalid database metric, time window, step, aggregation, or grouping. |
+| `429` | Metrics query limit reached. |
 
 ### Response body (200)
 
-| Field                         | Type           | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| ----------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `from`                        | string         | Format: `date-time`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `until`                       | string         | Format: `date-time`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `stepSeconds`                 | integer        | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `series`                      | object[]       | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `series[].name`               | string         | One of: `cpu.percent`, `memory.used_bytes`, `memory.limit_bytes`, `disk.used_bytes`, `disk.limit_bytes`, `disk.read_iops`, `disk.write_iops`, `network.receive_bytes`, `network.transmit_bytes`, `runtime.restarts`, `runtime.uptime_seconds`, `http.requests`, `http.errors`, `database.connections`, `database.pool_waiting`, `database.queries_per_second`, `database.query_latency_avg_ms`, `database.query_latency_p50_ms`, `database.query_latency_p90_ms`, `database.query_latency_p95_ms`, `database.query_latency_p99_ms`, `queue.backlog_messages`, `queue.oldest_message_age_seconds`, `cron.failures`. |
-| `series[].unit`               | string         | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `series[].labels`             | object         | Map of string values.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `series[].points`             | object[]       | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `series[].points[].timestamp` | string         | Format: `date-time`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `series[].points[].value`     | number or null | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `from` | string | Format: `date-time`. |
+| `until` | string | Format: `date-time`. |
+| `stepSeconds` | integer | — |
+| `series` | object[] | — |
+| `series[].name` | string | One of: `cpu.percent`, `memory.used_bytes`, `memory.limit_bytes`, `disk.used_bytes`, `disk.limit_bytes`, `disk.read_iops`, `disk.write_iops`, `network.receive_bytes`, `network.transmit_bytes`, `runtime.restarts`, `runtime.uptime_seconds`, `http.requests`, `http.errors`, `database.connections`, `database.pool_waiting`, `database.queries_per_second`, `database.query_latency_avg_ms`, `database.query_latency_p50_ms`, `database.query_latency_p90_ms`, `database.query_latency_p95_ms`, `database.query_latency_p99_ms`, `queue.backlog_messages`, `queue.oldest_message_age_seconds`, `cron.failures`. |
+| `series[].unit` | string | — |
+| `series[].labels` | object | Map of string values. |
+| `series[].points` | object[] | — |
+| `series[].points[].timestamp` | string | Format: `date-time`. |
+| `series[].points[].value` | number or null | — |

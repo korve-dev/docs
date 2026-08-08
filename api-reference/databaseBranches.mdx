@@ -28,35 +28,35 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATA
 
 ### Responses
 
-| Status | Description                       |
-| ------ | --------------------------------- |
-| `200`  | Database branches.                |
-| `404`  | No such database in this project. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Database branches. |
+| `404` | No such database in this project. |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field                      | Type           | Description                                                                                                                   |
-| -------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `id`                       | string         | —                                                                                                                             |
-| `sourceDatabaseId`         | string         | —                                                                                                                             |
-| `databaseId`               | string or null | —                                                                                                                             |
-| `name`                     | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                            |
-| `environment`              | string         | Pattern: `^[a-z][a-z0-9-]{0,38}$`.                                                                                            |
-| `source`                   | object         | —                                                                                                                             |
-| `source.kind`              | string         | One of: `current`, `backup`, `point_in_time`.                                                                                 |
-| `source.backupId`          | string         | —                                                                                                                             |
-| `source.pointInTime`       | string         | Format: `date-time`.                                                                                                          |
-| `status`                   | string         | One of: `queued`, `hydrating`, `ready`, `failed`, `expired`, `promoted`.                                                      |
-| `progressPercent`          | integer        | —                                                                                                                             |
-| `hydrationMode`            | string         | Launch implementation hydrates a full independent copy; it is not copy-on-write. One of: `full_copy`.                         |
-| `hydrationProgressPercent` | integer        | —                                                                                                                             |
-| `connectionReady`          | boolean        | True only when the independent database safely accepts customer connections.                                                  |
-| `fullyHydrated`            | boolean        | True only after every data block is copied and verified. Full-copy branches never report connectionReady before this is true. |
-| `deleteOnPreviewClose`     | boolean        | —                                                                                                                             |
-| `expiresAt`                | string or null | Defaults to seven days; null disables automatic expiry. Format: `date-time`.                                                  |
-| `createdAt`                | string         | Format: `date-time`.                                                                                                          |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `sourceDatabaseId` | string | — |
+| `databaseId` | string or null | — |
+| `name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `environment` | string | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `source` | object | — |
+| `source.kind` | string | One of: `current`, `backup`, `point_in_time`. |
+| `source.backupId` | string | — |
+| `source.pointInTime` | string | Format: `date-time`. |
+| `status` | string | One of: `queued`, `hydrating`, `ready`, `failed`, `expired`, `promoted`. |
+| `progressPercent` | integer | — |
+| `hydrationMode` | string | Launch implementation hydrates a full independent copy; it is not copy-on-write. One of: `full_copy`. |
+| `hydrationProgressPercent` | integer | — |
+| `connectionReady` | boolean | True only when the independent database safely accepts customer connections. |
+| `fullyHydrated` | boolean | True only after every data block is copied and verified. Full-copy branches never report connectionReady before this is true. |
+| `deleteOnPreviewClose` | boolean | — |
+| `expiresAt` | string or null | Defaults to seven days; null disables automatic expiry. Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
 
 ## databaseBranches.create
 
@@ -73,19 +73,19 @@ POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/branches
 
 ### Request body
 
-| Field                  | Type            | Required | Description                                   |
-| ---------------------- | --------------- | -------- | --------------------------------------------- |
-| `name`                 | string          | Yes      | Pattern: `^[a-z][a-z0-9-]{1,61}$`.            |
-| `environment`          | string          | Yes      | Pattern: `^[a-z][a-z0-9-]{0,38}$`.            |
-| `region`               | string          | Yes      | —                                             |
-| `sku`                  | string          | Yes      | —                                             |
-| `source`               | object          | Yes      | —                                             |
-| `source.kind`          | string          | Yes      | One of: `current`, `backup`, `point_in_time`. |
-| `source.backupId`      | string          | No       | —                                             |
-| `source.pointInTime`   | string          | No       | Format: `date-time`.                          |
-| `expiresInDays`        | integer or null | No       | Defaults to seven days; null disables expiry. |
-| `deleteOnPreviewClose` | boolean         | No       | —                                             |
-| `previewId`            | string or null  | No       | —                                             |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `name` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `environment` | string | Yes | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `region` | string | Yes | — |
+| `sku` | string | Yes | — |
+| `source` | object | Yes | — |
+| `source.kind` | string | Yes | One of: `current`, `backup`, `point_in_time`. |
+| `source.backupId` | string | No | — |
+| `source.pointInTime` | string | No | Format: `date-time`. |
+| `expiresInDays` | integer or null | No | Defaults to seven days; null disables expiry. |
+| `deleteOnPreviewClose` | boolean | No | — |
+| `previewId` | string or null | No | — |
 
 ### Example
 
@@ -106,35 +106,35 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databas
 
 ### Responses
 
-| Status | Description                                                                         |
-| ------ | ----------------------------------------------------------------------------------- |
-| `202`  | Branch hydration queued.                                                            |
-| `404`  | No such source, environment, preview, region, or SKU.                               |
-| `409`  | The branch database name already exists.                                            |
-| `422`  | Timestamp is outside the recovery window or preview data policy forbids the source. |
+| Status | Description |
+| ------ | ----------- |
+| `202` | Branch hydration queued. |
+| `404` | No such source, environment, preview, region, or SKU. |
+| `409` | The branch database name already exists. |
+| `422` | Timestamp is outside the recovery window or preview data policy forbids the source. |
 
 ### Response body (202)
 
-| Field                      | Type           | Description                                                                                                                   |
-| -------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `id`                       | string         | —                                                                                                                             |
-| `sourceDatabaseId`         | string         | —                                                                                                                             |
-| `databaseId`               | string or null | —                                                                                                                             |
-| `name`                     | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                            |
-| `environment`              | string         | Pattern: `^[a-z][a-z0-9-]{0,38}$`.                                                                                            |
-| `source`                   | object         | —                                                                                                                             |
-| `source.kind`              | string         | One of: `current`, `backup`, `point_in_time`.                                                                                 |
-| `source.backupId`          | string         | —                                                                                                                             |
-| `source.pointInTime`       | string         | Format: `date-time`.                                                                                                          |
-| `status`                   | string         | One of: `queued`, `hydrating`, `ready`, `failed`, `expired`, `promoted`.                                                      |
-| `progressPercent`          | integer        | —                                                                                                                             |
-| `hydrationMode`            | string         | Launch implementation hydrates a full independent copy; it is not copy-on-write. One of: `full_copy`.                         |
-| `hydrationProgressPercent` | integer        | —                                                                                                                             |
-| `connectionReady`          | boolean        | True only when the independent database safely accepts customer connections.                                                  |
-| `fullyHydrated`            | boolean        | True only after every data block is copied and verified. Full-copy branches never report connectionReady before this is true. |
-| `deleteOnPreviewClose`     | boolean        | —                                                                                                                             |
-| `expiresAt`                | string or null | Defaults to seven days; null disables automatic expiry. Format: `date-time`.                                                  |
-| `createdAt`                | string         | Format: `date-time`.                                                                                                          |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `sourceDatabaseId` | string | — |
+| `databaseId` | string or null | — |
+| `name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `environment` | string | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `source` | object | — |
+| `source.kind` | string | One of: `current`, `backup`, `point_in_time`. |
+| `source.backupId` | string | — |
+| `source.pointInTime` | string | Format: `date-time`. |
+| `status` | string | One of: `queued`, `hydrating`, `ready`, `failed`, `expired`, `promoted`. |
+| `progressPercent` | integer | — |
+| `hydrationMode` | string | Launch implementation hydrates a full independent copy; it is not copy-on-write. One of: `full_copy`. |
+| `hydrationProgressPercent` | integer | — |
+| `connectionReady` | boolean | True only when the independent database safely accepts customer connections. |
+| `fullyHydrated` | boolean | True only after every data block is copied and verified. Full-copy branches never report connectionReady before this is true. |
+| `deleteOnPreviewClose` | boolean | — |
+| `expiresAt` | string or null | Defaults to seven days; null disables automatic expiry. Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
 
 ## databaseBranches.get
 
@@ -157,33 +157,33 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATA
 
 ### Responses
 
-| Status | Description                       |
-| ------ | --------------------------------- |
-| `200`  | Database branch.                  |
-| `404`  | No such branch for this database. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Database branch. |
+| `404` | No such branch for this database. |
 
 ### Response body (200)
 
-| Field                      | Type           | Description                                                                                                                   |
-| -------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `id`                       | string         | —                                                                                                                             |
-| `sourceDatabaseId`         | string         | —                                                                                                                             |
-| `databaseId`               | string or null | —                                                                                                                             |
-| `name`                     | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                            |
-| `environment`              | string         | Pattern: `^[a-z][a-z0-9-]{0,38}$`.                                                                                            |
-| `source`                   | object         | —                                                                                                                             |
-| `source.kind`              | string         | One of: `current`, `backup`, `point_in_time`.                                                                                 |
-| `source.backupId`          | string         | —                                                                                                                             |
-| `source.pointInTime`       | string         | Format: `date-time`.                                                                                                          |
-| `status`                   | string         | One of: `queued`, `hydrating`, `ready`, `failed`, `expired`, `promoted`.                                                      |
-| `progressPercent`          | integer        | —                                                                                                                             |
-| `hydrationMode`            | string         | Launch implementation hydrates a full independent copy; it is not copy-on-write. One of: `full_copy`.                         |
-| `hydrationProgressPercent` | integer        | —                                                                                                                             |
-| `connectionReady`          | boolean        | True only when the independent database safely accepts customer connections.                                                  |
-| `fullyHydrated`            | boolean        | True only after every data block is copied and verified. Full-copy branches never report connectionReady before this is true. |
-| `deleteOnPreviewClose`     | boolean        | —                                                                                                                             |
-| `expiresAt`                | string or null | Defaults to seven days; null disables automatic expiry. Format: `date-time`.                                                  |
-| `createdAt`                | string         | Format: `date-time`.                                                                                                          |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `sourceDatabaseId` | string | — |
+| `databaseId` | string or null | — |
+| `name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `environment` | string | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `source` | object | — |
+| `source.kind` | string | One of: `current`, `backup`, `point_in_time`. |
+| `source.backupId` | string | — |
+| `source.pointInTime` | string | Format: `date-time`. |
+| `status` | string | One of: `queued`, `hydrating`, `ready`, `failed`, `expired`, `promoted`. |
+| `progressPercent` | integer | — |
+| `hydrationMode` | string | Launch implementation hydrates a full independent copy; it is not copy-on-write. One of: `full_copy`. |
+| `hydrationProgressPercent` | integer | — |
+| `connectionReady` | boolean | True only when the independent database safely accepts customer connections. |
+| `fullyHydrated` | boolean | True only after every data block is copied and verified. Full-copy branches never report connectionReady before this is true. |
+| `deleteOnPreviewClose` | boolean | — |
+| `expiresAt` | string or null | Defaults to seven days; null disables automatic expiry. Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
 
 ## databaseBranches.update
 
@@ -200,10 +200,10 @@ PATCH /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/branches/{bra
 
 ### Request body
 
-| Field                  | Type            | Required | Description |
-| ---------------------- | --------------- | -------- | ----------- |
-| `expiresInDays`        | integer or null | No       | —           |
-| `deleteOnPreviewClose` | boolean         | No       | —           |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `expiresInDays` | integer or null | No | — |
+| `deleteOnPreviewClose` | boolean | No | — |
 
 ### Example
 
@@ -216,34 +216,34 @@ curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databa
 
 ### Responses
 
-| Status | Description                       |
-| ------ | --------------------------------- |
-| `200`  | Updated database branch.          |
-| `404`  | No such branch for this database. |
-| `422`  | Invalid expiry.                   |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Updated database branch. |
+| `404` | No such branch for this database. |
+| `422` | Invalid expiry. |
 
 ### Response body (200)
 
-| Field                      | Type           | Description                                                                                                                   |
-| -------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `id`                       | string         | —                                                                                                                             |
-| `sourceDatabaseId`         | string         | —                                                                                                                             |
-| `databaseId`               | string or null | —                                                                                                                             |
-| `name`                     | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                            |
-| `environment`              | string         | Pattern: `^[a-z][a-z0-9-]{0,38}$`.                                                                                            |
-| `source`                   | object         | —                                                                                                                             |
-| `source.kind`              | string         | One of: `current`, `backup`, `point_in_time`.                                                                                 |
-| `source.backupId`          | string         | —                                                                                                                             |
-| `source.pointInTime`       | string         | Format: `date-time`.                                                                                                          |
-| `status`                   | string         | One of: `queued`, `hydrating`, `ready`, `failed`, `expired`, `promoted`.                                                      |
-| `progressPercent`          | integer        | —                                                                                                                             |
-| `hydrationMode`            | string         | Launch implementation hydrates a full independent copy; it is not copy-on-write. One of: `full_copy`.                         |
-| `hydrationProgressPercent` | integer        | —                                                                                                                             |
-| `connectionReady`          | boolean        | True only when the independent database safely accepts customer connections.                                                  |
-| `fullyHydrated`            | boolean        | True only after every data block is copied and verified. Full-copy branches never report connectionReady before this is true. |
-| `deleteOnPreviewClose`     | boolean        | —                                                                                                                             |
-| `expiresAt`                | string or null | Defaults to seven days; null disables automatic expiry. Format: `date-time`.                                                  |
-| `createdAt`                | string         | Format: `date-time`.                                                                                                          |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `sourceDatabaseId` | string | — |
+| `databaseId` | string or null | — |
+| `name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `environment` | string | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `source` | object | — |
+| `source.kind` | string | One of: `current`, `backup`, `point_in_time`. |
+| `source.backupId` | string | — |
+| `source.pointInTime` | string | Format: `date-time`. |
+| `status` | string | One of: `queued`, `hydrating`, `ready`, `failed`, `expired`, `promoted`. |
+| `progressPercent` | integer | — |
+| `hydrationMode` | string | Launch implementation hydrates a full independent copy; it is not copy-on-write. One of: `full_copy`. |
+| `hydrationProgressPercent` | integer | — |
+| `connectionReady` | boolean | True only when the independent database safely accepts customer connections. |
+| `fullyHydrated` | boolean | True only after every data block is copied and verified. Full-copy branches never report connectionReady before this is true. |
+| `deleteOnPreviewClose` | boolean | — |
+| `expiresAt` | string or null | Defaults to seven days; null disables automatic expiry. Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
 
 ## databaseBranches.delete
 
@@ -266,10 +266,10 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/datab
 
 ### Responses
 
-| Status | Description                       |
-| ------ | --------------------------------- |
-| `200`  | Branch deleted.                   |
-| `404`  | No such branch for this database. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Branch deleted. |
+| `404` | No such branch for this database. |
 
 ## databaseBranches.previewPromotion
 
@@ -285,9 +285,9 @@ POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/branches/{bran
 
 ### Request body
 
-| Field         | Type   | Required | Description |
-| ------------- | ------ | -------- | ----------- |
-| `bindingName` | string | Yes      | —           |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `bindingName` | string | Yes | — |
 
 ### Example
 
@@ -302,28 +302,28 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databas
 
 ### Responses
 
-| Status | Description                            |
-| ------ | -------------------------------------- |
-| `200`  | Exact promotion plan and confirmation. |
-| `404`  | No ready branch or binding.            |
-| `409`  | The binding target already changed.    |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Exact promotion plan and confirmation. |
+| `404` | No ready branch or binding. |
+| `409` | The binding target already changed. |
 
 ### Response body (200)
 
-| Field                              | Type    | Description          |
-| ---------------------------------- | ------- | -------------------- |
-| `bindingName`                      | string  | —                    |
-| `currentDatabaseId`                | string  | —                    |
-| `targetDatabaseId`                 | string  | —                    |
-| `bindingVersion`                   | integer | —                    |
-| `impact`                           | object  | —                    |
-| `impact.sourceRemainsAvailable`    | boolean | One of: `true`.      |
-| `impact.automaticDataMerge`        | boolean | One of: `false`.     |
-| `impact.connectionRestartRequired` | boolean | —                    |
-| `rollbackWindowSeconds`            | integer | —                    |
-| `planHash`                         | string  | —                    |
-| `confirmationToken`                | string  | —                    |
-| `expiresAt`                        | string  | Format: `date-time`. |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `bindingName` | string | — |
+| `currentDatabaseId` | string | — |
+| `targetDatabaseId` | string | — |
+| `bindingVersion` | integer | — |
+| `impact` | object | — |
+| `impact.sourceRemainsAvailable` | boolean | One of: `true`. |
+| `impact.automaticDataMerge` | boolean | One of: `false`. |
+| `impact.connectionRestartRequired` | boolean | — |
+| `rollbackWindowSeconds` | integer | — |
+| `planHash` | string | — |
+| `confirmationToken` | string | — |
+| `expiresAt` | string | Format: `date-time`. |
 
 ## databaseBranches.promote
 
@@ -339,11 +339,11 @@ POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/branches/{bran
 
 ### Request body
 
-| Field               | Type    | Required | Description                                                                      |
-| ------------------- | ------- | -------- | -------------------------------------------------------------------------------- |
-| `confirmed`         | boolean | Yes      | Explicit confirmation from the owner-facing confirmation dialog. One of: `true`. |
-| `confirmationToken` | string  | Yes      | Short-lived token bound to this exact action and target.                         |
-| `bindingName`       | string  | Yes      | —                                                                                |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `confirmed` | boolean | Yes | Explicit confirmation from the owner-facing confirmation dialog. One of: `true`. |
+| `confirmationToken` | string | Yes | Short-lived token bound to this exact action and target. |
+| `bindingName` | string | Yes | — |
 
 ### Example
 
@@ -360,35 +360,35 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databas
 
 ### Responses
 
-| Status | Description                                    |
-| ------ | ---------------------------------------------- |
-| `200`  | Branch binding promoted.                       |
-| `404`  | No ready branch or binding.                    |
-| `409`  | Binding changed after confirmation was issued. |
-| `422`  | Confirmation is invalid or expired.            |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Branch binding promoted. |
+| `404` | No ready branch or binding. |
+| `409` | Binding changed after confirmation was issued. |
+| `422` | Confirmation is invalid or expired. |
 
 ### Response body (200)
 
-| Field                      | Type           | Description                                                                                                                   |
-| -------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `id`                       | string         | —                                                                                                                             |
-| `sourceDatabaseId`         | string         | —                                                                                                                             |
-| `databaseId`               | string or null | —                                                                                                                             |
-| `name`                     | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                            |
-| `environment`              | string         | Pattern: `^[a-z][a-z0-9-]{0,38}$`.                                                                                            |
-| `source`                   | object         | —                                                                                                                             |
-| `source.kind`              | string         | One of: `current`, `backup`, `point_in_time`.                                                                                 |
-| `source.backupId`          | string         | —                                                                                                                             |
-| `source.pointInTime`       | string         | Format: `date-time`.                                                                                                          |
-| `status`                   | string         | One of: `queued`, `hydrating`, `ready`, `failed`, `expired`, `promoted`.                                                      |
-| `progressPercent`          | integer        | —                                                                                                                             |
-| `hydrationMode`            | string         | Launch implementation hydrates a full independent copy; it is not copy-on-write. One of: `full_copy`.                         |
-| `hydrationProgressPercent` | integer        | —                                                                                                                             |
-| `connectionReady`          | boolean        | True only when the independent database safely accepts customer connections.                                                  |
-| `fullyHydrated`            | boolean        | True only after every data block is copied and verified. Full-copy branches never report connectionReady before this is true. |
-| `deleteOnPreviewClose`     | boolean        | —                                                                                                                             |
-| `expiresAt`                | string or null | Defaults to seven days; null disables automatic expiry. Format: `date-time`.                                                  |
-| `createdAt`                | string         | Format: `date-time`.                                                                                                          |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `sourceDatabaseId` | string | — |
+| `databaseId` | string or null | — |
+| `name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `environment` | string | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `source` | object | — |
+| `source.kind` | string | One of: `current`, `backup`, `point_in_time`. |
+| `source.backupId` | string | — |
+| `source.pointInTime` | string | Format: `date-time`. |
+| `status` | string | One of: `queued`, `hydrating`, `ready`, `failed`, `expired`, `promoted`. |
+| `progressPercent` | integer | — |
+| `hydrationMode` | string | Launch implementation hydrates a full independent copy; it is not copy-on-write. One of: `full_copy`. |
+| `hydrationProgressPercent` | integer | — |
+| `connectionReady` | boolean | True only when the independent database safely accepts customer connections. |
+| `fullyHydrated` | boolean | True only after every data block is copied and verified. Full-copy branches never report connectionReady before this is true. |
+| `deleteOnPreviewClose` | boolean | — |
+| `expiresAt` | string or null | Defaults to seven days; null disables automatic expiry. Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
 
 ## databaseBranches.getPreviewPolicy
 
@@ -411,21 +411,21 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/database-branch
 
 ### Responses
 
-| Status | Description                           |
-| ------ | ------------------------------------- |
-| `200`  | Preview database branch policy.       |
-| `404`  | No such project in this organization. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Preview database branch policy. |
+| `404` | No such project in this organization. |
 
 ### Response body (200)
 
-| Field                  | Type           | Description                        |
-| ---------------------- | -------------- | ---------------------------------- |
-| `enabled`              | boolean        | —                                  |
-| `sourceEnvironment`    | string         | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
-| `sourceDatabaseId`     | string or null | —                                  |
-| `allowProductionData`  | boolean        | —                                  |
-| `expiresInDays`        | integer        | —                                  |
-| `deleteOnPreviewClose` | boolean        | —                                  |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `enabled` | boolean | — |
+| `sourceEnvironment` | string | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `sourceDatabaseId` | string or null | — |
+| `allowProductionData` | boolean | — |
+| `expiresInDays` | integer | — |
+| `deleteOnPreviewClose` | boolean | — |
 
 ## databaseBranches.updatePreviewPolicy
 
@@ -442,14 +442,14 @@ PUT /v1/orgs/{orgId}/projects/{projectId}/database-branch-policy
 
 ### Request body
 
-| Field                  | Type           | Required | Description                        |
-| ---------------------- | -------------- | -------- | ---------------------------------- |
-| `enabled`              | boolean        | Yes      | —                                  |
-| `sourceEnvironment`    | string         | Yes      | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
-| `sourceDatabaseId`     | string or null | Yes      | —                                  |
-| `allowProductionData`  | boolean        | Yes      | —                                  |
-| `expiresInDays`        | integer        | No       | —                                  |
-| `deleteOnPreviewClose` | boolean        | No       | —                                  |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `enabled` | boolean | Yes | — |
+| `sourceEnvironment` | string | Yes | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `sourceDatabaseId` | string or null | Yes | — |
+| `allowProductionData` | boolean | Yes | — |
+| `expiresInDays` | integer | No | — |
+| `deleteOnPreviewClose` | boolean | No | — |
 
 ### Example
 
@@ -467,8 +467,8 @@ curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/database
 
 ### Responses
 
-| Status | Description                                                                                         |
-| ------ | --------------------------------------------------------------------------------------------------- |
-| `200`  | Preview database branch policy updated.                                                             |
-| `404`  | No such project, environment, or database.                                                          |
-| `422`  | Source database is outside the selected environment, or production data was not explicitly allowed. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Preview database branch policy updated. |
+| `404` | No such project, environment, or database. |
+| `422` | Source database is outside the selected environment, or production data was not explicitly allowed. |

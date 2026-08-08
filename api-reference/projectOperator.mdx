@@ -28,54 +28,54 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/operator/thread
 
 ### Responses
 
-| Status | Description               |
-| ------ | ------------------------- |
-| `200`  | Project operator threads. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Project operator threads. |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field                           | Type           | Description                                                                 |
-| ------------------------------- | -------------- | --------------------------------------------------------------------------- |
-| `id`                            | string         | Format: `uuid`.                                                             |
-| `projectId`                     | string         | Format: `uuid`.                                                             |
-| `title`                         | string         | —                                                                           |
-| `deploymentId`                  | string or null | Format: `uuid`.                                                             |
-| `createdAt`                     | string         | Format: `date-time`.                                                        |
-| `updatedAt`                     | string         | Format: `date-time`.                                                        |
-| `runs`                          | object[]       | —                                                                           |
-| `runs[].id`                     | string         | Format: `uuid`.                                                             |
-| `runs[].threadId`               | string         | Format: `uuid`.                                                             |
-| `runs[].status`                 | string         | One of: `queued`, `running`, `waiting_for_approval`, `succeeded`, `failed`. |
-| `runs[].input`                  | string         | —                                                                           |
-| `runs[].output`                 | string or null | —                                                                           |
-| `runs[].error`                  | string or null | —                                                                           |
-| `runs[].startedAt`              | string or null | Format: `date-time`.                                                        |
-| `runs[].finishedAt`             | string or null | Format: `date-time`.                                                        |
-| `runs[].createdAt`              | string         | Format: `date-time`.                                                        |
-| `runs[].actions`                | object[]       | —                                                                           |
-| `runs[].actions[].id`           | string         | Format: `uuid`.                                                             |
-| `runs[].actions[].runId`        | string         | Format: `uuid`.                                                             |
-| `runs[].actions[].operationId`  | string         | —                                                                           |
-| `runs[].actions[].risk`         | string         | One of: `write`, `dangerous`, `destructive`.                                |
-| `runs[].actions[].status`       | string         | One of: `pending`, `rejected`, `running`, `succeeded`, `failed`.            |
-| `runs[].actions[].version`      | integer        | —                                                                           |
-| `runs[].actions[].preview`      | object         | —                                                                           |
-| `runs[].actions[].result`       | object         | —                                                                           |
-| `runs[].actions[].error`        | string or null | —                                                                           |
-| `runs[].actions[].decidedAt`    | string or null | Format: `date-time`.                                                        |
-| `runs[].actions[].executedAt`   | string or null | Format: `date-time`.                                                        |
-| `runs[].actions[].createdAt`    | string         | Format: `date-time`.                                                        |
-| `runs[].evidence`               | object[]       | —                                                                           |
-| `runs[].evidence[].id`          | string         | Format: `uuid`.                                                             |
-| `runs[].evidence[].runId`       | string         | Format: `uuid`.                                                             |
-| `runs[].evidence[].actionId`    | string or null | Format: `uuid`.                                                             |
-| `runs[].evidence[].kind`        | string         | One of: `observation`, `verification`, `rollback`.                          |
-| `runs[].evidence[].operationId` | string or null | —                                                                           |
-| `runs[].evidence[].summary`     | string         | —                                                                           |
-| `runs[].evidence[].data`        | object         | —                                                                           |
-| `runs[].evidence[].createdAt`   | string         | Format: `date-time`.                                                        |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | Format: `uuid`. |
+| `projectId` | string | Format: `uuid`. |
+| `title` | string | — |
+| `deploymentId` | string or null | Format: `uuid`. |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
+| `runs` | object[] | — |
+| `runs[].id` | string | Format: `uuid`. |
+| `runs[].threadId` | string | Format: `uuid`. |
+| `runs[].status` | string | One of: `queued`, `running`, `waiting_for_approval`, `succeeded`, `failed`. |
+| `runs[].input` | string | — |
+| `runs[].output` | string or null | — |
+| `runs[].error` | string or null | — |
+| `runs[].startedAt` | string or null | Format: `date-time`. |
+| `runs[].finishedAt` | string or null | Format: `date-time`. |
+| `runs[].createdAt` | string | Format: `date-time`. |
+| `runs[].actions` | object[] | — |
+| `runs[].actions[].id` | string | Format: `uuid`. |
+| `runs[].actions[].runId` | string | Format: `uuid`. |
+| `runs[].actions[].operationId` | string | — |
+| `runs[].actions[].risk` | string | One of: `write`, `dangerous`, `destructive`. |
+| `runs[].actions[].status` | string | One of: `pending`, `rejected`, `running`, `succeeded`, `failed`. |
+| `runs[].actions[].version` | integer | — |
+| `runs[].actions[].preview` | object | — |
+| `runs[].actions[].result` | object | — |
+| `runs[].actions[].error` | string or null | — |
+| `runs[].actions[].decidedAt` | string or null | Format: `date-time`. |
+| `runs[].actions[].executedAt` | string or null | Format: `date-time`. |
+| `runs[].actions[].createdAt` | string | Format: `date-time`. |
+| `runs[].evidence` | object[] | — |
+| `runs[].evidence[].id` | string | Format: `uuid`. |
+| `runs[].evidence[].runId` | string | Format: `uuid`. |
+| `runs[].evidence[].actionId` | string or null | Format: `uuid`. |
+| `runs[].evidence[].kind` | string | One of: `observation`, `verification`, `rollback`. |
+| `runs[].evidence[].operationId` | string or null | — |
+| `runs[].evidence[].summary` | string | — |
+| `runs[].evidence[].data` | object | — |
+| `runs[].evidence[].createdAt` | string | Format: `date-time`. |
 
 ## projectOperator.createThread
 
@@ -91,10 +91,10 @@ POST /v1/orgs/{orgId}/projects/{projectId}/operator/threads
 
 ### Request body
 
-| Field          | Type   | Required | Description     |
-| -------------- | ------ | -------- | --------------- |
-| `title`        | string | Yes      | —               |
-| `deploymentId` | string | No       | Format: `uuid`. |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `title` | string | Yes | — |
+| `deploymentId` | string | No | Format: `uuid`. |
 
 ### Example
 
@@ -109,53 +109,53 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/operato
 
 ### Responses
 
-| Status | Description                         |
-| ------ | ----------------------------------- |
-| `201`  | Created thread.                     |
-| `404`  | No such project or seed deployment. |
+| Status | Description |
+| ------ | ----------- |
+| `201` | Created thread. |
+| `404` | No such project or seed deployment. |
 
 ### Response body (201)
 
-| Field                           | Type           | Description                                                                 |
-| ------------------------------- | -------------- | --------------------------------------------------------------------------- |
-| `id`                            | string         | Format: `uuid`.                                                             |
-| `projectId`                     | string         | Format: `uuid`.                                                             |
-| `title`                         | string         | —                                                                           |
-| `deploymentId`                  | string or null | Format: `uuid`.                                                             |
-| `createdAt`                     | string         | Format: `date-time`.                                                        |
-| `updatedAt`                     | string         | Format: `date-time`.                                                        |
-| `runs`                          | object[]       | —                                                                           |
-| `runs[].id`                     | string         | Format: `uuid`.                                                             |
-| `runs[].threadId`               | string         | Format: `uuid`.                                                             |
-| `runs[].status`                 | string         | One of: `queued`, `running`, `waiting_for_approval`, `succeeded`, `failed`. |
-| `runs[].input`                  | string         | —                                                                           |
-| `runs[].output`                 | string or null | —                                                                           |
-| `runs[].error`                  | string or null | —                                                                           |
-| `runs[].startedAt`              | string or null | Format: `date-time`.                                                        |
-| `runs[].finishedAt`             | string or null | Format: `date-time`.                                                        |
-| `runs[].createdAt`              | string         | Format: `date-time`.                                                        |
-| `runs[].actions`                | object[]       | —                                                                           |
-| `runs[].actions[].id`           | string         | Format: `uuid`.                                                             |
-| `runs[].actions[].runId`        | string         | Format: `uuid`.                                                             |
-| `runs[].actions[].operationId`  | string         | —                                                                           |
-| `runs[].actions[].risk`         | string         | One of: `write`, `dangerous`, `destructive`.                                |
-| `runs[].actions[].status`       | string         | One of: `pending`, `rejected`, `running`, `succeeded`, `failed`.            |
-| `runs[].actions[].version`      | integer        | —                                                                           |
-| `runs[].actions[].preview`      | object         | —                                                                           |
-| `runs[].actions[].result`       | object         | —                                                                           |
-| `runs[].actions[].error`        | string or null | —                                                                           |
-| `runs[].actions[].decidedAt`    | string or null | Format: `date-time`.                                                        |
-| `runs[].actions[].executedAt`   | string or null | Format: `date-time`.                                                        |
-| `runs[].actions[].createdAt`    | string         | Format: `date-time`.                                                        |
-| `runs[].evidence`               | object[]       | —                                                                           |
-| `runs[].evidence[].id`          | string         | Format: `uuid`.                                                             |
-| `runs[].evidence[].runId`       | string         | Format: `uuid`.                                                             |
-| `runs[].evidence[].actionId`    | string or null | Format: `uuid`.                                                             |
-| `runs[].evidence[].kind`        | string         | One of: `observation`, `verification`, `rollback`.                          |
-| `runs[].evidence[].operationId` | string or null | —                                                                           |
-| `runs[].evidence[].summary`     | string         | —                                                                           |
-| `runs[].evidence[].data`        | object         | —                                                                           |
-| `runs[].evidence[].createdAt`   | string         | Format: `date-time`.                                                        |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | Format: `uuid`. |
+| `projectId` | string | Format: `uuid`. |
+| `title` | string | — |
+| `deploymentId` | string or null | Format: `uuid`. |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
+| `runs` | object[] | — |
+| `runs[].id` | string | Format: `uuid`. |
+| `runs[].threadId` | string | Format: `uuid`. |
+| `runs[].status` | string | One of: `queued`, `running`, `waiting_for_approval`, `succeeded`, `failed`. |
+| `runs[].input` | string | — |
+| `runs[].output` | string or null | — |
+| `runs[].error` | string or null | — |
+| `runs[].startedAt` | string or null | Format: `date-time`. |
+| `runs[].finishedAt` | string or null | Format: `date-time`. |
+| `runs[].createdAt` | string | Format: `date-time`. |
+| `runs[].actions` | object[] | — |
+| `runs[].actions[].id` | string | Format: `uuid`. |
+| `runs[].actions[].runId` | string | Format: `uuid`. |
+| `runs[].actions[].operationId` | string | — |
+| `runs[].actions[].risk` | string | One of: `write`, `dangerous`, `destructive`. |
+| `runs[].actions[].status` | string | One of: `pending`, `rejected`, `running`, `succeeded`, `failed`. |
+| `runs[].actions[].version` | integer | — |
+| `runs[].actions[].preview` | object | — |
+| `runs[].actions[].result` | object | — |
+| `runs[].actions[].error` | string or null | — |
+| `runs[].actions[].decidedAt` | string or null | Format: `date-time`. |
+| `runs[].actions[].executedAt` | string or null | Format: `date-time`. |
+| `runs[].actions[].createdAt` | string | Format: `date-time`. |
+| `runs[].evidence` | object[] | — |
+| `runs[].evidence[].id` | string | Format: `uuid`. |
+| `runs[].evidence[].runId` | string | Format: `uuid`. |
+| `runs[].evidence[].actionId` | string or null | Format: `uuid`. |
+| `runs[].evidence[].kind` | string | One of: `observation`, `verification`, `rollback`. |
+| `runs[].evidence[].operationId` | string or null | — |
+| `runs[].evidence[].summary` | string | — |
+| `runs[].evidence[].data` | object | — |
+| `runs[].evidence[].createdAt` | string | Format: `date-time`. |
 
 ## projectOperator.getThread
 
@@ -178,53 +178,53 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/operator/thread
 
 ### Responses
 
-| Status | Description                     |
-| ------ | ------------------------------- |
-| `200`  | Operator thread.                |
-| `404`  | No such thread in this project. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Operator thread. |
+| `404` | No such thread in this project. |
 
 ### Response body (200)
 
-| Field                           | Type           | Description                                                                 |
-| ------------------------------- | -------------- | --------------------------------------------------------------------------- |
-| `id`                            | string         | Format: `uuid`.                                                             |
-| `projectId`                     | string         | Format: `uuid`.                                                             |
-| `title`                         | string         | —                                                                           |
-| `deploymentId`                  | string or null | Format: `uuid`.                                                             |
-| `createdAt`                     | string         | Format: `date-time`.                                                        |
-| `updatedAt`                     | string         | Format: `date-time`.                                                        |
-| `runs`                          | object[]       | —                                                                           |
-| `runs[].id`                     | string         | Format: `uuid`.                                                             |
-| `runs[].threadId`               | string         | Format: `uuid`.                                                             |
-| `runs[].status`                 | string         | One of: `queued`, `running`, `waiting_for_approval`, `succeeded`, `failed`. |
-| `runs[].input`                  | string         | —                                                                           |
-| `runs[].output`                 | string or null | —                                                                           |
-| `runs[].error`                  | string or null | —                                                                           |
-| `runs[].startedAt`              | string or null | Format: `date-time`.                                                        |
-| `runs[].finishedAt`             | string or null | Format: `date-time`.                                                        |
-| `runs[].createdAt`              | string         | Format: `date-time`.                                                        |
-| `runs[].actions`                | object[]       | —                                                                           |
-| `runs[].actions[].id`           | string         | Format: `uuid`.                                                             |
-| `runs[].actions[].runId`        | string         | Format: `uuid`.                                                             |
-| `runs[].actions[].operationId`  | string         | —                                                                           |
-| `runs[].actions[].risk`         | string         | One of: `write`, `dangerous`, `destructive`.                                |
-| `runs[].actions[].status`       | string         | One of: `pending`, `rejected`, `running`, `succeeded`, `failed`.            |
-| `runs[].actions[].version`      | integer        | —                                                                           |
-| `runs[].actions[].preview`      | object         | —                                                                           |
-| `runs[].actions[].result`       | object         | —                                                                           |
-| `runs[].actions[].error`        | string or null | —                                                                           |
-| `runs[].actions[].decidedAt`    | string or null | Format: `date-time`.                                                        |
-| `runs[].actions[].executedAt`   | string or null | Format: `date-time`.                                                        |
-| `runs[].actions[].createdAt`    | string         | Format: `date-time`.                                                        |
-| `runs[].evidence`               | object[]       | —                                                                           |
-| `runs[].evidence[].id`          | string         | Format: `uuid`.                                                             |
-| `runs[].evidence[].runId`       | string         | Format: `uuid`.                                                             |
-| `runs[].evidence[].actionId`    | string or null | Format: `uuid`.                                                             |
-| `runs[].evidence[].kind`        | string         | One of: `observation`, `verification`, `rollback`.                          |
-| `runs[].evidence[].operationId` | string or null | —                                                                           |
-| `runs[].evidence[].summary`     | string         | —                                                                           |
-| `runs[].evidence[].data`        | object         | —                                                                           |
-| `runs[].evidence[].createdAt`   | string         | Format: `date-time`.                                                        |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | Format: `uuid`. |
+| `projectId` | string | Format: `uuid`. |
+| `title` | string | — |
+| `deploymentId` | string or null | Format: `uuid`. |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
+| `runs` | object[] | — |
+| `runs[].id` | string | Format: `uuid`. |
+| `runs[].threadId` | string | Format: `uuid`. |
+| `runs[].status` | string | One of: `queued`, `running`, `waiting_for_approval`, `succeeded`, `failed`. |
+| `runs[].input` | string | — |
+| `runs[].output` | string or null | — |
+| `runs[].error` | string or null | — |
+| `runs[].startedAt` | string or null | Format: `date-time`. |
+| `runs[].finishedAt` | string or null | Format: `date-time`. |
+| `runs[].createdAt` | string | Format: `date-time`. |
+| `runs[].actions` | object[] | — |
+| `runs[].actions[].id` | string | Format: `uuid`. |
+| `runs[].actions[].runId` | string | Format: `uuid`. |
+| `runs[].actions[].operationId` | string | — |
+| `runs[].actions[].risk` | string | One of: `write`, `dangerous`, `destructive`. |
+| `runs[].actions[].status` | string | One of: `pending`, `rejected`, `running`, `succeeded`, `failed`. |
+| `runs[].actions[].version` | integer | — |
+| `runs[].actions[].preview` | object | — |
+| `runs[].actions[].result` | object | — |
+| `runs[].actions[].error` | string or null | — |
+| `runs[].actions[].decidedAt` | string or null | Format: `date-time`. |
+| `runs[].actions[].executedAt` | string or null | Format: `date-time`. |
+| `runs[].actions[].createdAt` | string | Format: `date-time`. |
+| `runs[].evidence` | object[] | — |
+| `runs[].evidence[].id` | string | Format: `uuid`. |
+| `runs[].evidence[].runId` | string | Format: `uuid`. |
+| `runs[].evidence[].actionId` | string or null | Format: `uuid`. |
+| `runs[].evidence[].kind` | string | One of: `observation`, `verification`, `rollback`. |
+| `runs[].evidence[].operationId` | string or null | — |
+| `runs[].evidence[].summary` | string | — |
+| `runs[].evidence[].data` | object | — |
+| `runs[].evidence[].createdAt` | string | Format: `date-time`. |
 
 ## projectOperator.createRun
 
@@ -241,9 +241,9 @@ POST /v1/orgs/{orgId}/projects/{projectId}/operator/threads/{threadId}/runs
 
 ### Request body
 
-| Field     | Type   | Required | Description |
-| --------- | ------ | -------- | ----------- |
-| `message` | string | Yes      | —           |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `message` | string | Yes | — |
 
 ### Example
 
@@ -258,48 +258,48 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/operato
 
 ### Responses
 
-| Status | Description                                              |
-| ------ | -------------------------------------------------------- |
-| `201`  | Persisted run.                                           |
-| `404`  | No such thread in this project.                          |
-| `422`  | Invalid follow-up.                                       |
-| `502`  | The configured model runtime could not complete the run. |
+| Status | Description |
+| ------ | ----------- |
+| `201` | Persisted run. |
+| `404` | No such thread in this project. |
+| `422` | Invalid follow-up. |
+| `502` | The configured model runtime could not complete the run. |
 
 ### Response body (201)
 
-| Field                    | Type           | Description                                                                 |
-| ------------------------ | -------------- | --------------------------------------------------------------------------- |
-| `id`                     | string         | Format: `uuid`.                                                             |
-| `threadId`               | string         | Format: `uuid`.                                                             |
-| `status`                 | string         | One of: `queued`, `running`, `waiting_for_approval`, `succeeded`, `failed`. |
-| `input`                  | string         | —                                                                           |
-| `output`                 | string or null | —                                                                           |
-| `error`                  | string or null | —                                                                           |
-| `startedAt`              | string or null | Format: `date-time`.                                                        |
-| `finishedAt`             | string or null | Format: `date-time`.                                                        |
-| `createdAt`              | string         | Format: `date-time`.                                                        |
-| `actions`                | object[]       | —                                                                           |
-| `actions[].id`           | string         | Format: `uuid`.                                                             |
-| `actions[].runId`        | string         | Format: `uuid`.                                                             |
-| `actions[].operationId`  | string         | —                                                                           |
-| `actions[].risk`         | string         | One of: `write`, `dangerous`, `destructive`.                                |
-| `actions[].status`       | string         | One of: `pending`, `rejected`, `running`, `succeeded`, `failed`.            |
-| `actions[].version`      | integer        | —                                                                           |
-| `actions[].preview`      | object         | —                                                                           |
-| `actions[].result`       | object         | —                                                                           |
-| `actions[].error`        | string or null | —                                                                           |
-| `actions[].decidedAt`    | string or null | Format: `date-time`.                                                        |
-| `actions[].executedAt`   | string or null | Format: `date-time`.                                                        |
-| `actions[].createdAt`    | string         | Format: `date-time`.                                                        |
-| `evidence`               | object[]       | —                                                                           |
-| `evidence[].id`          | string         | Format: `uuid`.                                                             |
-| `evidence[].runId`       | string         | Format: `uuid`.                                                             |
-| `evidence[].actionId`    | string or null | Format: `uuid`.                                                             |
-| `evidence[].kind`        | string         | One of: `observation`, `verification`, `rollback`.                          |
-| `evidence[].operationId` | string or null | —                                                                           |
-| `evidence[].summary`     | string         | —                                                                           |
-| `evidence[].data`        | object         | —                                                                           |
-| `evidence[].createdAt`   | string         | Format: `date-time`.                                                        |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | Format: `uuid`. |
+| `threadId` | string | Format: `uuid`. |
+| `status` | string | One of: `queued`, `running`, `waiting_for_approval`, `succeeded`, `failed`. |
+| `input` | string | — |
+| `output` | string or null | — |
+| `error` | string or null | — |
+| `startedAt` | string or null | Format: `date-time`. |
+| `finishedAt` | string or null | Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
+| `actions` | object[] | — |
+| `actions[].id` | string | Format: `uuid`. |
+| `actions[].runId` | string | Format: `uuid`. |
+| `actions[].operationId` | string | — |
+| `actions[].risk` | string | One of: `write`, `dangerous`, `destructive`. |
+| `actions[].status` | string | One of: `pending`, `rejected`, `running`, `succeeded`, `failed`. |
+| `actions[].version` | integer | — |
+| `actions[].preview` | object | — |
+| `actions[].result` | object | — |
+| `actions[].error` | string or null | — |
+| `actions[].decidedAt` | string or null | Format: `date-time`. |
+| `actions[].executedAt` | string or null | Format: `date-time`. |
+| `actions[].createdAt` | string | Format: `date-time`. |
+| `evidence` | object[] | — |
+| `evidence[].id` | string | Format: `uuid`. |
+| `evidence[].runId` | string | Format: `uuid`. |
+| `evidence[].actionId` | string or null | Format: `uuid`. |
+| `evidence[].kind` | string | One of: `observation`, `verification`, `rollback`. |
+| `evidence[].operationId` | string or null | — |
+| `evidence[].summary` | string | — |
+| `evidence[].data` | object | — |
+| `evidence[].createdAt` | string | Format: `date-time`. |
 
 ## projectOperator.getRun
 
@@ -322,46 +322,46 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/operator/thread
 
 ### Responses
 
-| Status | Description                 |
-| ------ | --------------------------- |
-| `200`  | Operator run.               |
-| `404`  | No such run in this thread. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Operator run. |
+| `404` | No such run in this thread. |
 
 ### Response body (200)
 
-| Field                    | Type           | Description                                                                 |
-| ------------------------ | -------------- | --------------------------------------------------------------------------- |
-| `id`                     | string         | Format: `uuid`.                                                             |
-| `threadId`               | string         | Format: `uuid`.                                                             |
-| `status`                 | string         | One of: `queued`, `running`, `waiting_for_approval`, `succeeded`, `failed`. |
-| `input`                  | string         | —                                                                           |
-| `output`                 | string or null | —                                                                           |
-| `error`                  | string or null | —                                                                           |
-| `startedAt`              | string or null | Format: `date-time`.                                                        |
-| `finishedAt`             | string or null | Format: `date-time`.                                                        |
-| `createdAt`              | string         | Format: `date-time`.                                                        |
-| `actions`                | object[]       | —                                                                           |
-| `actions[].id`           | string         | Format: `uuid`.                                                             |
-| `actions[].runId`        | string         | Format: `uuid`.                                                             |
-| `actions[].operationId`  | string         | —                                                                           |
-| `actions[].risk`         | string         | One of: `write`, `dangerous`, `destructive`.                                |
-| `actions[].status`       | string         | One of: `pending`, `rejected`, `running`, `succeeded`, `failed`.            |
-| `actions[].version`      | integer        | —                                                                           |
-| `actions[].preview`      | object         | —                                                                           |
-| `actions[].result`       | object         | —                                                                           |
-| `actions[].error`        | string or null | —                                                                           |
-| `actions[].decidedAt`    | string or null | Format: `date-time`.                                                        |
-| `actions[].executedAt`   | string or null | Format: `date-time`.                                                        |
-| `actions[].createdAt`    | string         | Format: `date-time`.                                                        |
-| `evidence`               | object[]       | —                                                                           |
-| `evidence[].id`          | string         | Format: `uuid`.                                                             |
-| `evidence[].runId`       | string         | Format: `uuid`.                                                             |
-| `evidence[].actionId`    | string or null | Format: `uuid`.                                                             |
-| `evidence[].kind`        | string         | One of: `observation`, `verification`, `rollback`.                          |
-| `evidence[].operationId` | string or null | —                                                                           |
-| `evidence[].summary`     | string         | —                                                                           |
-| `evidence[].data`        | object         | —                                                                           |
-| `evidence[].createdAt`   | string         | Format: `date-time`.                                                        |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | Format: `uuid`. |
+| `threadId` | string | Format: `uuid`. |
+| `status` | string | One of: `queued`, `running`, `waiting_for_approval`, `succeeded`, `failed`. |
+| `input` | string | — |
+| `output` | string or null | — |
+| `error` | string or null | — |
+| `startedAt` | string or null | Format: `date-time`. |
+| `finishedAt` | string or null | Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
+| `actions` | object[] | — |
+| `actions[].id` | string | Format: `uuid`. |
+| `actions[].runId` | string | Format: `uuid`. |
+| `actions[].operationId` | string | — |
+| `actions[].risk` | string | One of: `write`, `dangerous`, `destructive`. |
+| `actions[].status` | string | One of: `pending`, `rejected`, `running`, `succeeded`, `failed`. |
+| `actions[].version` | integer | — |
+| `actions[].preview` | object | — |
+| `actions[].result` | object | — |
+| `actions[].error` | string or null | — |
+| `actions[].decidedAt` | string or null | Format: `date-time`. |
+| `actions[].executedAt` | string or null | Format: `date-time`. |
+| `actions[].createdAt` | string | Format: `date-time`. |
+| `evidence` | object[] | — |
+| `evidence[].id` | string | Format: `uuid`. |
+| `evidence[].runId` | string | Format: `uuid`. |
+| `evidence[].actionId` | string or null | Format: `uuid`. |
+| `evidence[].kind` | string | One of: `observation`, `verification`, `rollback`. |
+| `evidence[].operationId` | string or null | — |
+| `evidence[].summary` | string | — |
+| `evidence[].data` | object | — |
+| `evidence[].createdAt` | string | Format: `date-time`. |
 
 ## projectOperator.listEvents
 
@@ -377,10 +377,10 @@ GET /v1/orgs/{orgId}/projects/{projectId}/operator/threads/{threadId}/events
 
 ### Query parameters
 
-| Name    | Type    | Required | Description |
-| ------- | ------- | -------- | ----------- |
-| `after` | integer | No       | —           |
-| `limit` | integer | No       | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `after` | integer | No | — |
+| `limit` | integer | No | — |
 
 ### Example
 
@@ -391,22 +391,22 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/operator/thread
 
 ### Responses
 
-| Status | Description                                 |
-| ------ | ------------------------------------------- |
-| `200`  | Ordered durable events and the next cursor. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Ordered durable events and the next cursor. |
 
 ### Response body (200)
 
-| Field                | Type           | Description                                                                                                     |
-| -------------------- | -------------- | --------------------------------------------------------------------------------------------------------------- |
-| `events`             | object[]       | —                                                                                                               |
-| `events[].cursor`    | integer        | —                                                                                                               |
-| `events[].id`        | string         | Format: `uuid`.                                                                                                 |
-| `events[].runId`     | string or null | Format: `uuid`.                                                                                                 |
-| `events[].kind`      | string         | One of: `run_started`, `status`, `text_delta`, `tool_result`, `action_required`, `run_completed`, `run_failed`. |
-| `events[].payload`   | object         | —                                                                                                               |
-| `events[].createdAt` | string         | Format: `date-time`.                                                                                            |
-| `nextCursor`         | integer        | —                                                                                                               |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `events` | object[] | — |
+| `events[].cursor` | integer | — |
+| `events[].id` | string | Format: `uuid`. |
+| `events[].runId` | string or null | Format: `uuid`. |
+| `events[].kind` | string | One of: `run_started`, `status`, `text_delta`, `tool_result`, `action_required`, `run_completed`, `run_failed`. |
+| `events[].payload` | object | — |
+| `events[].createdAt` | string | Format: `date-time`. |
+| `nextCursor` | integer | — |
 
 ## projectOperator.decideAction
 
@@ -423,10 +423,10 @@ POST /v1/orgs/{orgId}/projects/{projectId}/operator/threads/{threadId}/actions/{
 
 ### Request body
 
-| Field           | Type    | Required | Description                  |
-| --------------- | ------- | -------- | ---------------------------- |
-| `decision`      | string  | Yes      | One of: `approve`, `reject`. |
-| `actionVersion` | integer | Yes      | —                            |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `decision` | string | Yes | One of: `approve`, `reject`. |
+| `actionVersion` | integer | Yes | — |
 
 ### Example
 
@@ -442,45 +442,45 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/operato
 
 ### Responses
 
-| Status | Description                                        |
-| ------ | -------------------------------------------------- |
-| `200`  | Updated run with audited result.                   |
-| `403`  | Current role cannot execute the target operation.  |
-| `404`  | No such action in this project thread.             |
-| `409`  | Action was already decided or its version changed. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Updated run with audited result. |
+| `403` | Current role cannot execute the target operation. |
+| `404` | No such action in this project thread. |
+| `409` | Action was already decided or its version changed. |
 
 ### Response body (200)
 
-| Field                    | Type           | Description                                                                 |
-| ------------------------ | -------------- | --------------------------------------------------------------------------- |
-| `id`                     | string         | Format: `uuid`.                                                             |
-| `threadId`               | string         | Format: `uuid`.                                                             |
-| `status`                 | string         | One of: `queued`, `running`, `waiting_for_approval`, `succeeded`, `failed`. |
-| `input`                  | string         | —                                                                           |
-| `output`                 | string or null | —                                                                           |
-| `error`                  | string or null | —                                                                           |
-| `startedAt`              | string or null | Format: `date-time`.                                                        |
-| `finishedAt`             | string or null | Format: `date-time`.                                                        |
-| `createdAt`              | string         | Format: `date-time`.                                                        |
-| `actions`                | object[]       | —                                                                           |
-| `actions[].id`           | string         | Format: `uuid`.                                                             |
-| `actions[].runId`        | string         | Format: `uuid`.                                                             |
-| `actions[].operationId`  | string         | —                                                                           |
-| `actions[].risk`         | string         | One of: `write`, `dangerous`, `destructive`.                                |
-| `actions[].status`       | string         | One of: `pending`, `rejected`, `running`, `succeeded`, `failed`.            |
-| `actions[].version`      | integer        | —                                                                           |
-| `actions[].preview`      | object         | —                                                                           |
-| `actions[].result`       | object         | —                                                                           |
-| `actions[].error`        | string or null | —                                                                           |
-| `actions[].decidedAt`    | string or null | Format: `date-time`.                                                        |
-| `actions[].executedAt`   | string or null | Format: `date-time`.                                                        |
-| `actions[].createdAt`    | string         | Format: `date-time`.                                                        |
-| `evidence`               | object[]       | —                                                                           |
-| `evidence[].id`          | string         | Format: `uuid`.                                                             |
-| `evidence[].runId`       | string         | Format: `uuid`.                                                             |
-| `evidence[].actionId`    | string or null | Format: `uuid`.                                                             |
-| `evidence[].kind`        | string         | One of: `observation`, `verification`, `rollback`.                          |
-| `evidence[].operationId` | string or null | —                                                                           |
-| `evidence[].summary`     | string         | —                                                                           |
-| `evidence[].data`        | object         | —                                                                           |
-| `evidence[].createdAt`   | string         | Format: `date-time`.                                                        |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | Format: `uuid`. |
+| `threadId` | string | Format: `uuid`. |
+| `status` | string | One of: `queued`, `running`, `waiting_for_approval`, `succeeded`, `failed`. |
+| `input` | string | — |
+| `output` | string or null | — |
+| `error` | string or null | — |
+| `startedAt` | string or null | Format: `date-time`. |
+| `finishedAt` | string or null | Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
+| `actions` | object[] | — |
+| `actions[].id` | string | Format: `uuid`. |
+| `actions[].runId` | string | Format: `uuid`. |
+| `actions[].operationId` | string | — |
+| `actions[].risk` | string | One of: `write`, `dangerous`, `destructive`. |
+| `actions[].status` | string | One of: `pending`, `rejected`, `running`, `succeeded`, `failed`. |
+| `actions[].version` | integer | — |
+| `actions[].preview` | object | — |
+| `actions[].result` | object | — |
+| `actions[].error` | string or null | — |
+| `actions[].decidedAt` | string or null | Format: `date-time`. |
+| `actions[].executedAt` | string or null | Format: `date-time`. |
+| `actions[].createdAt` | string | Format: `date-time`. |
+| `evidence` | object[] | — |
+| `evidence[].id` | string | Format: `uuid`. |
+| `evidence[].runId` | string | Format: `uuid`. |
+| `evidence[].actionId` | string or null | Format: `uuid`. |
+| `evidence[].kind` | string | One of: `observation`, `verification`, `rollback`. |
+| `evidence[].operationId` | string or null | — |
+| `evidence[].summary` | string | — |
+| `evidence[].data` | object | — |
+| `evidence[].createdAt` | string | Format: `date-time`. |

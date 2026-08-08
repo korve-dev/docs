@@ -21,11 +21,11 @@ GET /v1/orgs/{orgId}/projects/{projectId}/usage
 
 ### Query parameters
 
-| Name          | Type   | Required | Description          |
-| ------------- | ------ | -------- | -------------------- |
-| `since`       | string | No       | Format: `date-time`. |
-| `until`       | string | No       | Format: `date-time`. |
-| `granularity` | string | No       | One of: `day`.       |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `since` | string | No | Format: `date-time`. |
+| `until` | string | No | Format: `date-time`. |
+| `granularity` | string | No | One of: `day`. |
 
 ### Example
 
@@ -36,40 +36,40 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/usage?since=202
 
 ### Responses
 
-| Status | Description                                                          |
-| ------ | -------------------------------------------------------------------- |
-| `200`  | Aggregated meters at rate-card prices.                               |
-| `404`  | No such project in this organization.                                |
-| `422`  | Invalid since/until timestamp, empty window, or invalid granularity. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Aggregated meters at rate-card prices. |
+| `404` | No such project in this organization. |
+| `422` | Invalid since/until timestamp, empty window, or invalid granularity. |
 
 ### Response body (200)
 
-| Field                           | Type           | Description                                                                                                       |
-| ------------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `meters`                        | object[]       | —                                                                                                                 |
-| `meters[].meterId`              | string         | —                                                                                                                 |
-| `meters[].quantity`             | number         | —                                                                                                                 |
-| `meters[].costUsd`              | number         | —                                                                                                                 |
-| `resources`                     | object[]       | Usage grouped by named app, database, cache, queue, cron, deployment, or storage resource.                        |
-| `resources[].resourceType`      | string         | One of: `app`, `database`, `cache`, `queue`, `cron`, `deployment`, `storage`, `other`.                            |
-| `resources[].resourceId`        | string or null | Customer-visible Korve resource id, or null for a product-wide category.                                          |
-| `resources[].name`              | string         | —                                                                                                                 |
-| `resources[].environment`       | object or null | —                                                                                                                 |
-| `resources[].environment.id`    | string         | —                                                                                                                 |
-| `resources[].environment.name`  | string         | —                                                                                                                 |
-| `resources[].environment.slug`  | string         | Pattern: `^[a-z][a-z0-9-]{0,38}$`.                                                                                |
-| `resources[].meters`            | object[]       | —                                                                                                                 |
-| `resources[].meters[].meterId`  | string         | —                                                                                                                 |
-| `resources[].meters[].quantity` | number         | —                                                                                                                 |
-| `resources[].meters[].costUsd`  | number         | —                                                                                                                 |
-| `resources[].totalUsd`          | number         | —                                                                                                                 |
-| `totalUsd`                      | number         | —                                                                                                                 |
-| `days`                          | object[]       | Present with granularity=day: cost per UTC calendar day, ascending. Days in the window without usage are omitted. |
-| `days[].date`                   | string         | UTC calendar day, "YYYY-MM-DD".                                                                                   |
-| `days[].totalUsd`               | number         | —                                                                                                                 |
-| `days[].meters`                 | object[]       | That day's cost per meter, ascending by meter id.                                                                 |
-| `days[].meters[].meterId`       | string         | —                                                                                                                 |
-| `days[].meters[].costUsd`       | number         | —                                                                                                                 |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `meters` | object[] | — |
+| `meters[].meterId` | string | — |
+| `meters[].quantity` | number | — |
+| `meters[].costUsd` | number | — |
+| `resources` | object[] | Usage grouped by named app, database, cache, queue, cron, deployment, or storage resource. |
+| `resources[].resourceType` | string | One of: `app`, `database`, `cache`, `queue`, `cron`, `deployment`, `storage`, `other`. |
+| `resources[].resourceId` | string or null | Customer-visible Korve resource id, or null for a product-wide category. |
+| `resources[].name` | string | — |
+| `resources[].environment` | object or null | — |
+| `resources[].environment.id` | string | — |
+| `resources[].environment.name` | string | — |
+| `resources[].environment.slug` | string | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `resources[].meters` | object[] | — |
+| `resources[].meters[].meterId` | string | — |
+| `resources[].meters[].quantity` | number | — |
+| `resources[].meters[].costUsd` | number | — |
+| `resources[].totalUsd` | number | — |
+| `totalUsd` | number | — |
+| `days` | object[] | Present with granularity=day: cost per UTC calendar day, ascending. Days in the window without usage are omitted. |
+| `days[].date` | string | UTC calendar day, "YYYY-MM-DD". |
+| `days[].totalUsd` | number | — |
+| `days[].meters` | object[] | That day's cost per meter, ascending by meter id. |
+| `days[].meters[].meterId` | string | — |
+| `days[].meters[].costUsd` | number | — |
 
 ## usage.orgGet
 
@@ -85,10 +85,10 @@ GET /v1/orgs/{orgId}/usage
 
 ### Query parameters
 
-| Name    | Type   | Required | Description          |
-| ------- | ------ | -------- | -------------------- |
-| `since` | string | No       | Format: `date-time`. |
-| `until` | string | No       | Format: `date-time`. |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `since` | string | No | Format: `date-time`. |
+| `until` | string | No | Format: `date-time`. |
 
 ### Example
 
@@ -99,52 +99,52 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/usage?since=2026-06-01T12%3A00%3A00Z
 
 ### Responses
 
-| Status | Description                                                    |
-| ------ | -------------------------------------------------------------- |
-| `200`  | Organization total with project and named resource breakdowns. |
-| `422`  | Invalid since/until timestamp or empty window.                 |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Organization total with project and named resource breakdowns. |
+| `422` | Invalid since/until timestamp or empty window. |
 
 ### Response body (200)
 
-| Field                                      | Type           | Description                                                                                |
-| ------------------------------------------ | -------------- | ------------------------------------------------------------------------------------------ |
-| `meters`                                   | object[]       | —                                                                                          |
-| `meters[].meterId`                         | string         | —                                                                                          |
-| `meters[].quantity`                        | number         | —                                                                                          |
-| `meters[].costUsd`                         | number         | —                                                                                          |
-| `resources`                                | object[]       | Usage grouped by named app, database, cache, queue, cron, deployment, or storage resource. |
-| `resources[].resourceType`                 | string         | One of: `app`, `database`, `cache`, `queue`, `cron`, `deployment`, `storage`, `other`.     |
-| `resources[].resourceId`                   | string or null | Customer-visible Korve resource id, or null for a product-wide category.                   |
-| `resources[].name`                         | string         | —                                                                                          |
-| `resources[].environment`                  | object or null | —                                                                                          |
-| `resources[].environment.id`               | string         | —                                                                                          |
-| `resources[].environment.name`             | string         | —                                                                                          |
-| `resources[].environment.slug`             | string         | Pattern: `^[a-z][a-z0-9-]{0,38}$`.                                                         |
-| `resources[].meters`                       | object[]       | —                                                                                          |
-| `resources[].meters[].meterId`             | string         | —                                                                                          |
-| `resources[].meters[].quantity`            | number         | —                                                                                          |
-| `resources[].meters[].costUsd`             | number         | —                                                                                          |
-| `resources[].totalUsd`                     | number         | —                                                                                          |
-| `totalUsd`                                 | number         | —                                                                                          |
-| `projects`                                 | object[]       | —                                                                                          |
-| `projects[].projectId`                     | string         | —                                                                                          |
-| `projects[].projectName`                   | string         | —                                                                                          |
-| `projects[].projectSlug`                   | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                         |
-| `projects[].meters`                        | object[]       | —                                                                                          |
-| `projects[].meters[].meterId`              | string         | —                                                                                          |
-| `projects[].meters[].quantity`             | number         | —                                                                                          |
-| `projects[].meters[].costUsd`              | number         | —                                                                                          |
-| `projects[].resources`                     | object[]       | Usage grouped by named app, database, cache, queue, cron, deployment, or storage resource. |
-| `projects[].resources[].resourceType`      | string         | One of: `app`, `database`, `cache`, `queue`, `cron`, `deployment`, `storage`, `other`.     |
-| `projects[].resources[].resourceId`        | string or null | Customer-visible Korve resource id, or null for a product-wide category.                   |
-| `projects[].resources[].name`              | string         | —                                                                                          |
-| `projects[].resources[].environment`       | object or null | —                                                                                          |
-| `projects[].resources[].environment.id`    | string         | —                                                                                          |
-| `projects[].resources[].environment.name`  | string         | —                                                                                          |
-| `projects[].resources[].environment.slug`  | string         | Pattern: `^[a-z][a-z0-9-]{0,38}$`.                                                         |
-| `projects[].resources[].meters`            | object[]       | —                                                                                          |
-| `projects[].resources[].meters[].meterId`  | string         | —                                                                                          |
-| `projects[].resources[].meters[].quantity` | number         | —                                                                                          |
-| `projects[].resources[].meters[].costUsd`  | number         | —                                                                                          |
-| `projects[].resources[].totalUsd`          | number         | —                                                                                          |
-| `projects[].totalUsd`                      | number         | —                                                                                          |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `meters` | object[] | — |
+| `meters[].meterId` | string | — |
+| `meters[].quantity` | number | — |
+| `meters[].costUsd` | number | — |
+| `resources` | object[] | Usage grouped by named app, database, cache, queue, cron, deployment, or storage resource. |
+| `resources[].resourceType` | string | One of: `app`, `database`, `cache`, `queue`, `cron`, `deployment`, `storage`, `other`. |
+| `resources[].resourceId` | string or null | Customer-visible Korve resource id, or null for a product-wide category. |
+| `resources[].name` | string | — |
+| `resources[].environment` | object or null | — |
+| `resources[].environment.id` | string | — |
+| `resources[].environment.name` | string | — |
+| `resources[].environment.slug` | string | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `resources[].meters` | object[] | — |
+| `resources[].meters[].meterId` | string | — |
+| `resources[].meters[].quantity` | number | — |
+| `resources[].meters[].costUsd` | number | — |
+| `resources[].totalUsd` | number | — |
+| `totalUsd` | number | — |
+| `projects` | object[] | — |
+| `projects[].projectId` | string | — |
+| `projects[].projectName` | string | — |
+| `projects[].projectSlug` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].meters` | object[] | — |
+| `projects[].meters[].meterId` | string | — |
+| `projects[].meters[].quantity` | number | — |
+| `projects[].meters[].costUsd` | number | — |
+| `projects[].resources` | object[] | Usage grouped by named app, database, cache, queue, cron, deployment, or storage resource. |
+| `projects[].resources[].resourceType` | string | One of: `app`, `database`, `cache`, `queue`, `cron`, `deployment`, `storage`, `other`. |
+| `projects[].resources[].resourceId` | string or null | Customer-visible Korve resource id, or null for a product-wide category. |
+| `projects[].resources[].name` | string | — |
+| `projects[].resources[].environment` | object or null | — |
+| `projects[].resources[].environment.id` | string | — |
+| `projects[].resources[].environment.name` | string | — |
+| `projects[].resources[].environment.slug` | string | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `projects[].resources[].meters` | object[] | — |
+| `projects[].resources[].meters[].meterId` | string | — |
+| `projects[].resources[].meters[].quantity` | number | — |
+| `projects[].resources[].meters[].costUsd` | number | — |
+| `projects[].resources[].totalUsd` | number | — |
+| `projects[].totalUsd` | number | — |
