@@ -23485,12 +23485,12 @@
                         "cpus": {
                           "type": "integer",
                           "minimum": 1,
-                          "maximum": 8
+                          "maximum": 16
                         },
                         "memoryMb": {
                           "type": "integer",
                           "minimum": 256,
-                          "maximum": 32768
+                          "maximum": 65536
                         }
                       },
                       "required": ["cpuKind", "cpus", "memoryMb"],
@@ -23864,12 +23864,12 @@
                         "cpus": {
                           "type": "integer",
                           "minimum": 1,
-                          "maximum": 8
+                          "maximum": 16
                         },
                         "memoryMb": {
                           "type": "integer",
                           "minimum": 256,
-                          "maximum": 32768
+                          "maximum": 65536
                         }
                       },
                       "required": ["cpuKind", "cpus", "memoryMb"],
@@ -24075,7 +24075,7 @@
                           "additionalProperties": false
                         },
                         "maxActiveExecutionsPerProject": {
-                          "type": "integer"
+                          "type": ["integer", "null"]
                         },
                         "maxEnvVariables": {
                           "type": "integer"
@@ -24214,12 +24214,12 @@
                         "cpus": {
                           "type": "integer",
                           "minimum": 1,
-                          "maximum": 8
+                          "maximum": 16
                         },
                         "memoryMb": {
                           "type": "integer",
                           "minimum": 256,
-                          "maximum": 32768
+                          "maximum": 65536
                         }
                       },
                       "required": ["cpuKind", "cpus", "memoryMb"],
@@ -24413,12 +24413,12 @@
                           "cpus": {
                             "type": "integer",
                             "minimum": 1,
-                            "maximum": 8
+                            "maximum": 16
                           },
                           "memoryMb": {
                             "type": "integer",
                             "minimum": 256,
-                            "maximum": 32768
+                            "maximum": 65536
                           }
                         },
                         "required": ["cpuKind", "cpus", "memoryMb"],
@@ -24570,12 +24570,12 @@
                         "cpus": {
                           "type": "integer",
                           "minimum": 1,
-                          "maximum": 8
+                          "maximum": 16
                         },
                         "memoryMb": {
                           "type": "integer",
                           "minimum": 256,
-                          "maximum": 32768
+                          "maximum": 65536
                         }
                       },
                       "required": ["cpuKind", "cpus", "memoryMb"],
@@ -24644,9 +24644,6 @@
           "404": {
             "description": "No such project."
           },
-          "409": {
-            "description": "Project execution concurrency limit reached."
-          },
           "422": {
             "description": "Invalid image, command, region, resources, runtime capability, or timeout."
           }
@@ -24692,12 +24689,12 @@
                       "cpus": {
                         "type": "integer",
                         "minimum": 1,
-                        "maximum": 8
+                        "maximum": 16
                       },
                       "memoryMb": {
                         "type": "integer",
                         "minimum": 256,
-                        "maximum": 32768
+                        "maximum": 65536
                       }
                     },
                     "additionalProperties": false

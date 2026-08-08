@@ -62,7 +62,6 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/executi
 | `202`  | Execution accepted and starting.                                           |
 | `402`  | The project hard-stop budget cannot reserve this execution.                |
 | `404`  | No such project.                                                           |
-| `409`  | Project execution concurrency limit reached.                               |
 | `422`  | Invalid image, command, region, resources, runtime capability, or timeout. |
 
 ### Response body (202)
@@ -175,32 +174,32 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/executions/avai
 
 ### Response body (200)
 
-| Field                                  | Type     | Description                                                                                                                       |
-| -------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `ready`                                | boolean  | —                                                                                                                                 |
-| `regions`                              | object[] | —                                                                                                                                 |
-| `regions[].id`                         | string   | —                                                                                                                                 |
-| `regions[].name`                       | string   | —                                                                                                                                 |
-| `regions[].city`                       | string   | —                                                                                                                                 |
-| `regions[].country`                    | string   | —                                                                                                                                 |
-| `regions[].continent`                  | string   | —                                                                                                                                 |
-| `architectures`                        | string[] | —                                                                                                                                 |
-| `cpuKinds`                             | string[] | —                                                                                                                                 |
-| `privateImageRegistries`               | string[] | Registry hosts accepted for write-only private-image credentials. Wildcards describe supported customer-owned registry hostnames. |
-| `limits`                               | object   | —                                                                                                                                 |
-| `limits.cpus`                          | object   | —                                                                                                                                 |
-| `limits.cpus.min`                      | integer  | —                                                                                                                                 |
-| `limits.cpus.max`                      | integer  | —                                                                                                                                 |
-| `limits.memoryMb`                      | object   | —                                                                                                                                 |
-| `limits.memoryMb.min`                  | integer  | —                                                                                                                                 |
-| `limits.memoryMb.max`                  | integer  | —                                                                                                                                 |
-| `limits.timeoutSeconds`                | object   | —                                                                                                                                 |
-| `limits.timeoutSeconds.min`            | integer  | —                                                                                                                                 |
-| `limits.timeoutSeconds.max`            | integer  | —                                                                                                                                 |
-| `limits.maxActiveExecutionsPerProject` | integer  | —                                                                                                                                 |
-| `limits.maxEnvVariables`               | integer  | —                                                                                                                                 |
-| `runtime`                              | object   | —                                                                                                                                 |
-| `runtime.nestedContainers`             | boolean  | —                                                                                                                                 |
+| Field                                  | Type            | Description                                                                                                                       |
+| -------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `ready`                                | boolean         | —                                                                                                                                 |
+| `regions`                              | object[]        | —                                                                                                                                 |
+| `regions[].id`                         | string          | —                                                                                                                                 |
+| `regions[].name`                       | string          | —                                                                                                                                 |
+| `regions[].city`                       | string          | —                                                                                                                                 |
+| `regions[].country`                    | string          | —                                                                                                                                 |
+| `regions[].continent`                  | string          | —                                                                                                                                 |
+| `architectures`                        | string[]        | —                                                                                                                                 |
+| `cpuKinds`                             | string[]        | —                                                                                                                                 |
+| `privateImageRegistries`               | string[]        | Registry hosts accepted for write-only private-image credentials. Wildcards describe supported customer-owned registry hostnames. |
+| `limits`                               | object          | —                                                                                                                                 |
+| `limits.cpus`                          | object          | —                                                                                                                                 |
+| `limits.cpus.min`                      | integer         | —                                                                                                                                 |
+| `limits.cpus.max`                      | integer         | —                                                                                                                                 |
+| `limits.memoryMb`                      | object          | —                                                                                                                                 |
+| `limits.memoryMb.min`                  | integer         | —                                                                                                                                 |
+| `limits.memoryMb.max`                  | integer         | —                                                                                                                                 |
+| `limits.timeoutSeconds`                | object          | —                                                                                                                                 |
+| `limits.timeoutSeconds.min`            | integer         | —                                                                                                                                 |
+| `limits.timeoutSeconds.max`            | integer         | —                                                                                                                                 |
+| `limits.maxActiveExecutionsPerProject` | integer or null | —                                                                                                                                 |
+| `limits.maxEnvVariables`               | integer         | —                                                                                                                                 |
+| `runtime`                              | object          | —                                                                                                                                 |
+| `runtime.nestedContainers`             | boolean         | —                                                                                                                                 |
 
 ## executions.resolve
 
