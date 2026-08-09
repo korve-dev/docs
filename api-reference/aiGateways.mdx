@@ -34,26 +34,34 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-gateways?env
 
 ### Responses
 
-| Status | Description  |
-| ------ | ------------ |
-| `200`  | AI gateways. |
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| `200`  | AI gateways with batched current-month usage. |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field              | Type     | Description          |
-| ------------------ | -------- | -------------------- |
-| `id`               | string   | —                    |
-| `name`             | string   | —                    |
-| `environment`      | string   | —                    |
-| `allowedModels`    | string[] | —                    |
-| `monthlyBudgetUsd` | number   | —                    |
-| `timeoutMs`        | integer  | —                    |
-| `maxRetries`       | integer  | —                    |
-| `redactPrompts`    | boolean  | —                    |
-| `createdAt`        | string   | Format: `date-time`. |
-| `updatedAt`        | string   | Format: `date-time`. |
+| Field                | Type     | Description          |
+| -------------------- | -------- | -------------------- |
+| `id`                 | string   | —                    |
+| `name`               | string   | —                    |
+| `environment`        | string   | —                    |
+| `allowedModels`      | string[] | —                    |
+| `monthlyBudgetUsd`   | number   | —                    |
+| `timeoutMs`          | integer  | —                    |
+| `maxRetries`         | integer  | —                    |
+| `redactPrompts`      | boolean  | —                    |
+| `createdAt`          | string   | Format: `date-time`. |
+| `updatedAt`          | string   | Format: `date-time`. |
+| `usage`              | object   | —                    |
+| `usage.month`        | string   | Format: `date-time`. |
+| `usage.requests`     | integer  | —                    |
+| `usage.inputTokens`  | integer  | —                    |
+| `usage.outputTokens` | integer  | —                    |
+| `usage.spentUsd`     | number   | —                    |
+| `usage.budgetUsd`    | number   | —                    |
+| `usage.remainingUsd` | number   | —                    |
 
 ## aiGateways.create
 

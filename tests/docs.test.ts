@@ -115,6 +115,17 @@ describe("Korve public docs", () => {
     expect(leaks).toEqual([]);
   });
 
+  it("does not advertise source links that anonymous readers cannot open", () => {
+    const sources = [
+      fs.readFileSync(path.join(root, "starters.mdx"), "utf8"),
+      fs.readFileSync(path.join(root, "agents/skills.mdx"), "utf8"),
+    ].join("\n");
+
+    expect(sources).not.toContain("github.com/korve-dev/korve");
+    expect(sources).not.toContain("public repository");
+    expect(sources).toContain("https://korve.dev/skills/manifest.json");
+  });
+
   it("ships the generated public OpenAPI contract without internal routes", () => {
     const openapiPath = path.join(root, "openapi.json");
     expect(fs.existsSync(openapiPath)).toBe(true);
