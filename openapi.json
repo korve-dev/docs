@@ -14151,11 +14151,15 @@
                     },
                     "responseBody": {
                       "type": ["object", "array", "string", "number", "boolean", "null"],
-                      "description": "Bounded target response body retained for inspection as parsed JSON, sanitized text, or null when unavailable. Secret-like JSON fields are redacted and provider-specific infrastructure terms are normalized."
+                      "description": "Bounded target response body retained for inspection as parsed JSON, sanitized text, or null when unavailable. Secret-like values are redacted."
                     },
                     "responseBodyTruncated": {
                       "type": "boolean",
-                      "description": "Whether the retained response body exceeded the 32,768-byte limit or could not be read completely."
+                      "description": "Whether the retained response body exceeded the 32,768-byte limit."
+                    },
+                    "responseBodyUnavailable": {
+                      "type": "boolean",
+                      "description": "Whether the target response body could not be retained for inspection."
                     },
                     "responseContentType": {
                       "type": ["string", "null"],
@@ -14205,6 +14209,7 @@
                     "error",
                     "responseBody",
                     "responseBodyTruncated",
+                    "responseBodyUnavailable",
                     "responseContentType",
                     "attempts"
                   ],
