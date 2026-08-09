@@ -4867,10 +4867,15 @@
                                   "cron",
                                   "database",
                                   "cache",
+                                  "realtime",
+                                  "ai-gateway",
                                   "backup",
                                   "preview-database",
                                   "alert",
-                                  "access"
+                                  "access",
+                                  "auth",
+                                  "maintenance",
+                                  "customer-payments"
                                 ]
                               },
                               "project": {
@@ -5221,6 +5226,196 @@
                             "additionalProperties": false
                           }
                         },
+                        "caches": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9-]{1,61}$"
+                              },
+                              "environment": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9-]{0,38}$"
+                              },
+                              "sku": {
+                                "type": "string",
+                                "enum": ["cache-n1", "cache-s1", "cache-s2"]
+                              },
+                              "region": {
+                                "type": "string"
+                              },
+                              "persistence": {
+                                "type": "string",
+                                "enum": ["none", "aof"]
+                              },
+                              "evictionPolicy": {
+                                "type": "string",
+                                "enum": ["allkeys-lru", "allkeys-lfu", "volatile-lru", "noeviction"]
+                              }
+                            },
+                            "required": ["name", "region"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "realtime": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9-]{1,61}$"
+                              },
+                              "environment": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9-]{0,38}$"
+                              },
+                              "region": {
+                                "type": "string",
+                                "enum": ["global"]
+                              },
+                              "retentionSeconds": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 86400
+                              },
+                              "presenceEnabled": {
+                                "type": "boolean"
+                              },
+                              "maxConnections": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 10000
+                              },
+                              "maxMessagesPerSecond": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 2500
+                              },
+                              "paused": {
+                                "type": "boolean"
+                              }
+                            },
+                            "required": ["name"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "aiGateways": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9-]{1,61}$"
+                              },
+                              "environment": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9-]{0,38}$"
+                              },
+                              "allowedModels": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "enum": ["korve/fast", "korve/balanced", "korve/reasoning"]
+                                },
+                                "minItems": 1,
+                                "maxItems": 3,
+                                "uniqueItems": true
+                              },
+                              "monthlyBudgetUsd": {
+                                "type": "number",
+                                "minimum": 1,
+                                "maximum": 100000
+                              },
+                              "timeoutMs": {
+                                "type": "integer",
+                                "minimum": 1000,
+                                "maximum": 120000
+                              },
+                              "maxRetries": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 3
+                              },
+                              "redactPrompts": {
+                                "type": "boolean"
+                              }
+                            },
+                            "required": ["name", "allowedModels", "monthlyBudgetUsd"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "customerPayments": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "environment": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9-]{0,38}$"
+                              },
+                              "secretKey": {
+                                "oneOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["********"]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "pattern": "^rk_(?:test|live)_[A-Za-z0-9]{16,}$"
+                                  }
+                                ]
+                              },
+                              "webhookSecret": {
+                                "oneOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["********"]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "pattern": "^whsec_[A-Za-z0-9_-]{24,}$"
+                                  }
+                                ]
+                              },
+                              "credentialScopes": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "enum": [
+                                    "customers:write",
+                                    "products:write",
+                                    "prices:write",
+                                    "checkout_sessions:write",
+                                    "subscriptions:write"
+                                  ]
+                                },
+                                "minItems": 5,
+                                "maxItems": 5,
+                                "uniqueItems": true
+                              },
+                              "allowedRedirectOrigins": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "format": "uri"
+                                },
+                                "minItems": 1,
+                                "maxItems": 25
+                              }
+                            },
+                            "required": [
+                              "secretKey",
+                              "webhookSecret",
+                              "credentialScopes",
+                              "allowedRedirectOrigins"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
                         "databaseBranch": {
                           "type": "object",
                           "properties": {
@@ -5420,6 +5615,135 @@
                           },
                           "required": ["mode"],
                           "additionalProperties": false
+                        },
+                        "auth": {
+                          "type": "object",
+                          "properties": {
+                            "enabled": {
+                              "type": "boolean"
+                            },
+                            "allowedOrigins": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "format": "uri"
+                              },
+                              "maxItems": 20
+                            },
+                            "redirectUrls": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "format": "uri"
+                              },
+                              "maxItems": 50
+                            },
+                            "emailPassword": {
+                              "type": "boolean"
+                            },
+                            "magicLink": {
+                              "type": "boolean"
+                            },
+                            "passwordMinLength": {
+                              "type": "integer",
+                              "minimum": 10,
+                              "maximum": 64
+                            },
+                            "accessTokenTtlSeconds": {
+                              "type": "integer",
+                              "minimum": 300,
+                              "maximum": 3600
+                            },
+                            "refreshTokenTtlSeconds": {
+                              "type": "integer",
+                              "minimum": 3600,
+                              "maximum": 2592000
+                            },
+                            "sessionIdleTtlSeconds": {
+                              "type": "integer",
+                              "minimum": 900,
+                              "maximum": 604800
+                            },
+                            "sessionMaxTtlSeconds": {
+                              "type": "integer",
+                              "minimum": 3600,
+                              "maximum": 2592000
+                            },
+                            "magicLinkTtlSeconds": {
+                              "type": "integer",
+                              "minimum": 300,
+                              "maximum": 3600
+                            },
+                            "passwordResetTtlSeconds": {
+                              "type": "integer",
+                              "minimum": 300,
+                              "maximum": 3600
+                            }
+                          },
+                          "required": ["enabled"],
+                          "additionalProperties": false
+                        },
+                        "maintenance": {
+                          "type": "object",
+                          "description": "Continuous evidence-backed project maintenance policy.",
+                          "properties": {
+                            "enabled": {
+                              "type": "boolean"
+                            },
+                            "schedule": {
+                              "type": "string",
+                              "enum": ["hourly", "daily", "weekly"]
+                            },
+                            "categories": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "enum": ["reliability"]
+                              },
+                              "minItems": 1,
+                              "maxItems": 1,
+                              "uniqueItems": true
+                            },
+                            "environments": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9-]{0,38}$"
+                              },
+                              "minItems": 1,
+                              "maxItems": 25,
+                              "uniqueItems": true
+                            },
+                            "autoRemediation": {
+                              "type": "object",
+                              "properties": {
+                                "enabled": {
+                                  "type": "boolean"
+                                },
+                                "maximumRisk": {
+                                  "type": "string",
+                                  "enum": ["read", "write"]
+                                },
+                                "allowedOperationIds": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "enum": ["deploys.create"]
+                                  },
+                                  "maxItems": 100,
+                                  "uniqueItems": true
+                                },
+                                "maxActionsPerRun": {
+                                  "type": "integer",
+                                  "minimum": 1,
+                                  "maximum": 25
+                                }
+                              },
+                              "additionalProperties": false
+                            }
+                          },
+                          "required": ["enabled"],
+                          "additionalProperties": false
                         }
                       },
                       "required": ["name", "slug", "runtimeClass"],
@@ -5493,10 +5817,15 @@
                               "cron",
                               "database",
                               "cache",
+                              "realtime",
+                              "ai-gateway",
                               "backup",
                               "preview-database",
                               "alert",
-                              "access"
+                              "access",
+                              "auth",
+                              "maintenance",
+                              "customer-payments"
                             ]
                           },
                           "project": {
@@ -5843,6 +6172,196 @@
                             "additionalProperties": false
                           }
                         },
+                        "caches": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9-]{1,61}$"
+                              },
+                              "environment": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9-]{0,38}$"
+                              },
+                              "sku": {
+                                "type": "string",
+                                "enum": ["cache-n1", "cache-s1", "cache-s2"]
+                              },
+                              "region": {
+                                "type": "string"
+                              },
+                              "persistence": {
+                                "type": "string",
+                                "enum": ["none", "aof"]
+                              },
+                              "evictionPolicy": {
+                                "type": "string",
+                                "enum": ["allkeys-lru", "allkeys-lfu", "volatile-lru", "noeviction"]
+                              }
+                            },
+                            "required": ["name", "region"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "realtime": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9-]{1,61}$"
+                              },
+                              "environment": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9-]{0,38}$"
+                              },
+                              "region": {
+                                "type": "string",
+                                "enum": ["global"]
+                              },
+                              "retentionSeconds": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 86400
+                              },
+                              "presenceEnabled": {
+                                "type": "boolean"
+                              },
+                              "maxConnections": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 10000
+                              },
+                              "maxMessagesPerSecond": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 2500
+                              },
+                              "paused": {
+                                "type": "boolean"
+                              }
+                            },
+                            "required": ["name"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "aiGateways": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9-]{1,61}$"
+                              },
+                              "environment": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9-]{0,38}$"
+                              },
+                              "allowedModels": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "enum": ["korve/fast", "korve/balanced", "korve/reasoning"]
+                                },
+                                "minItems": 1,
+                                "maxItems": 3,
+                                "uniqueItems": true
+                              },
+                              "monthlyBudgetUsd": {
+                                "type": "number",
+                                "minimum": 1,
+                                "maximum": 100000
+                              },
+                              "timeoutMs": {
+                                "type": "integer",
+                                "minimum": 1000,
+                                "maximum": 120000
+                              },
+                              "maxRetries": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 3
+                              },
+                              "redactPrompts": {
+                                "type": "boolean"
+                              }
+                            },
+                            "required": ["name", "allowedModels", "monthlyBudgetUsd"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "customerPayments": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "environment": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9-]{0,38}$"
+                              },
+                              "secretKey": {
+                                "oneOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["********"]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "pattern": "^rk_(?:test|live)_[A-Za-z0-9]{16,}$"
+                                  }
+                                ]
+                              },
+                              "webhookSecret": {
+                                "oneOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["********"]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "pattern": "^whsec_[A-Za-z0-9_-]{24,}$"
+                                  }
+                                ]
+                              },
+                              "credentialScopes": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "enum": [
+                                    "customers:write",
+                                    "products:write",
+                                    "prices:write",
+                                    "checkout_sessions:write",
+                                    "subscriptions:write"
+                                  ]
+                                },
+                                "minItems": 5,
+                                "maxItems": 5,
+                                "uniqueItems": true
+                              },
+                              "allowedRedirectOrigins": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "format": "uri"
+                                },
+                                "minItems": 1,
+                                "maxItems": 25
+                              }
+                            },
+                            "required": [
+                              "secretKey",
+                              "webhookSecret",
+                              "credentialScopes",
+                              "allowedRedirectOrigins"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
                         "databaseBranch": {
                           "type": "object",
                           "properties": {
@@ -6041,6 +6560,135 @@
                             }
                           },
                           "required": ["mode"],
+                          "additionalProperties": false
+                        },
+                        "auth": {
+                          "type": "object",
+                          "properties": {
+                            "enabled": {
+                              "type": "boolean"
+                            },
+                            "allowedOrigins": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "format": "uri"
+                              },
+                              "maxItems": 20
+                            },
+                            "redirectUrls": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "format": "uri"
+                              },
+                              "maxItems": 50
+                            },
+                            "emailPassword": {
+                              "type": "boolean"
+                            },
+                            "magicLink": {
+                              "type": "boolean"
+                            },
+                            "passwordMinLength": {
+                              "type": "integer",
+                              "minimum": 10,
+                              "maximum": 64
+                            },
+                            "accessTokenTtlSeconds": {
+                              "type": "integer",
+                              "minimum": 300,
+                              "maximum": 3600
+                            },
+                            "refreshTokenTtlSeconds": {
+                              "type": "integer",
+                              "minimum": 3600,
+                              "maximum": 2592000
+                            },
+                            "sessionIdleTtlSeconds": {
+                              "type": "integer",
+                              "minimum": 900,
+                              "maximum": 604800
+                            },
+                            "sessionMaxTtlSeconds": {
+                              "type": "integer",
+                              "minimum": 3600,
+                              "maximum": 2592000
+                            },
+                            "magicLinkTtlSeconds": {
+                              "type": "integer",
+                              "minimum": 300,
+                              "maximum": 3600
+                            },
+                            "passwordResetTtlSeconds": {
+                              "type": "integer",
+                              "minimum": 300,
+                              "maximum": 3600
+                            }
+                          },
+                          "required": ["enabled"],
+                          "additionalProperties": false
+                        },
+                        "maintenance": {
+                          "type": "object",
+                          "description": "Continuous evidence-backed project maintenance policy.",
+                          "properties": {
+                            "enabled": {
+                              "type": "boolean"
+                            },
+                            "schedule": {
+                              "type": "string",
+                              "enum": ["hourly", "daily", "weekly"]
+                            },
+                            "categories": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "enum": ["reliability"]
+                              },
+                              "minItems": 1,
+                              "maxItems": 1,
+                              "uniqueItems": true
+                            },
+                            "environments": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9-]{0,38}$"
+                              },
+                              "minItems": 1,
+                              "maxItems": 25,
+                              "uniqueItems": true
+                            },
+                            "autoRemediation": {
+                              "type": "object",
+                              "properties": {
+                                "enabled": {
+                                  "type": "boolean"
+                                },
+                                "maximumRisk": {
+                                  "type": "string",
+                                  "enum": ["read", "write"]
+                                },
+                                "allowedOperationIds": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "enum": ["deploys.create"]
+                                  },
+                                  "maxItems": 100,
+                                  "uniqueItems": true
+                                },
+                                "maxActionsPerRun": {
+                                  "type": "integer",
+                                  "minimum": 1,
+                                  "maximum": 25
+                                }
+                              },
+                              "additionalProperties": false
+                            }
+                          },
+                          "required": ["enabled"],
                           "additionalProperties": false
                         }
                       },
@@ -6397,6 +7045,201 @@
                               "additionalProperties": false
                             }
                           },
+                          "caches": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "type": "string",
+                                  "pattern": "^[a-z][a-z0-9-]{1,61}$"
+                                },
+                                "environment": {
+                                  "type": "string",
+                                  "pattern": "^[a-z][a-z0-9-]{0,38}$"
+                                },
+                                "sku": {
+                                  "type": "string",
+                                  "enum": ["cache-n1", "cache-s1", "cache-s2"]
+                                },
+                                "region": {
+                                  "type": "string"
+                                },
+                                "persistence": {
+                                  "type": "string",
+                                  "enum": ["none", "aof"]
+                                },
+                                "evictionPolicy": {
+                                  "type": "string",
+                                  "enum": [
+                                    "allkeys-lru",
+                                    "allkeys-lfu",
+                                    "volatile-lru",
+                                    "noeviction"
+                                  ]
+                                }
+                              },
+                              "required": ["name", "region"],
+                              "additionalProperties": false
+                            }
+                          },
+                          "realtime": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "type": "string",
+                                  "pattern": "^[a-z][a-z0-9-]{1,61}$"
+                                },
+                                "environment": {
+                                  "type": "string",
+                                  "pattern": "^[a-z][a-z0-9-]{0,38}$"
+                                },
+                                "region": {
+                                  "type": "string",
+                                  "enum": ["global"]
+                                },
+                                "retentionSeconds": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 86400
+                                },
+                                "presenceEnabled": {
+                                  "type": "boolean"
+                                },
+                                "maxConnections": {
+                                  "type": "integer",
+                                  "minimum": 1,
+                                  "maximum": 10000
+                                },
+                                "maxMessagesPerSecond": {
+                                  "type": "integer",
+                                  "minimum": 1,
+                                  "maximum": 2500
+                                },
+                                "paused": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "required": ["name"],
+                              "additionalProperties": false
+                            }
+                          },
+                          "aiGateways": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "type": "string",
+                                  "pattern": "^[a-z][a-z0-9-]{1,61}$"
+                                },
+                                "environment": {
+                                  "type": "string",
+                                  "pattern": "^[a-z][a-z0-9-]{0,38}$"
+                                },
+                                "allowedModels": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "enum": ["korve/fast", "korve/balanced", "korve/reasoning"]
+                                  },
+                                  "minItems": 1,
+                                  "maxItems": 3,
+                                  "uniqueItems": true
+                                },
+                                "monthlyBudgetUsd": {
+                                  "type": "number",
+                                  "minimum": 1,
+                                  "maximum": 100000
+                                },
+                                "timeoutMs": {
+                                  "type": "integer",
+                                  "minimum": 1000,
+                                  "maximum": 120000
+                                },
+                                "maxRetries": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 3
+                                },
+                                "redactPrompts": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "required": ["name", "allowedModels", "monthlyBudgetUsd"],
+                              "additionalProperties": false
+                            }
+                          },
+                          "customerPayments": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "environment": {
+                                  "type": "string",
+                                  "pattern": "^[a-z][a-z0-9-]{0,38}$"
+                                },
+                                "secretKey": {
+                                  "oneOf": [
+                                    {
+                                      "type": "string",
+                                      "enum": ["********"]
+                                    },
+                                    {
+                                      "type": "string",
+                                      "pattern": "^rk_(?:test|live)_[A-Za-z0-9]{16,}$"
+                                    }
+                                  ]
+                                },
+                                "webhookSecret": {
+                                  "oneOf": [
+                                    {
+                                      "type": "string",
+                                      "enum": ["********"]
+                                    },
+                                    {
+                                      "type": "string",
+                                      "pattern": "^whsec_[A-Za-z0-9_-]{24,}$"
+                                    }
+                                  ]
+                                },
+                                "credentialScopes": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "enum": [
+                                      "customers:write",
+                                      "products:write",
+                                      "prices:write",
+                                      "checkout_sessions:write",
+                                      "subscriptions:write"
+                                    ]
+                                  },
+                                  "minItems": 5,
+                                  "maxItems": 5,
+                                  "uniqueItems": true
+                                },
+                                "allowedRedirectOrigins": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "format": "uri"
+                                  },
+                                  "minItems": 1,
+                                  "maxItems": 25
+                                }
+                              },
+                              "required": [
+                                "secretKey",
+                                "webhookSecret",
+                                "credentialScopes",
+                                "allowedRedirectOrigins"
+                              ],
+                              "additionalProperties": false
+                            }
+                          },
                           "databaseBranch": {
                             "type": "object",
                             "properties": {
@@ -6600,6 +7443,135 @@
                               }
                             },
                             "required": ["mode"],
+                            "additionalProperties": false
+                          },
+                          "auth": {
+                            "type": "object",
+                            "properties": {
+                              "enabled": {
+                                "type": "boolean"
+                              },
+                              "allowedOrigins": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "format": "uri"
+                                },
+                                "maxItems": 20
+                              },
+                              "redirectUrls": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "format": "uri"
+                                },
+                                "maxItems": 50
+                              },
+                              "emailPassword": {
+                                "type": "boolean"
+                              },
+                              "magicLink": {
+                                "type": "boolean"
+                              },
+                              "passwordMinLength": {
+                                "type": "integer",
+                                "minimum": 10,
+                                "maximum": 64
+                              },
+                              "accessTokenTtlSeconds": {
+                                "type": "integer",
+                                "minimum": 300,
+                                "maximum": 3600
+                              },
+                              "refreshTokenTtlSeconds": {
+                                "type": "integer",
+                                "minimum": 3600,
+                                "maximum": 2592000
+                              },
+                              "sessionIdleTtlSeconds": {
+                                "type": "integer",
+                                "minimum": 900,
+                                "maximum": 604800
+                              },
+                              "sessionMaxTtlSeconds": {
+                                "type": "integer",
+                                "minimum": 3600,
+                                "maximum": 2592000
+                              },
+                              "magicLinkTtlSeconds": {
+                                "type": "integer",
+                                "minimum": 300,
+                                "maximum": 3600
+                              },
+                              "passwordResetTtlSeconds": {
+                                "type": "integer",
+                                "minimum": 300,
+                                "maximum": 3600
+                              }
+                            },
+                            "required": ["enabled"],
+                            "additionalProperties": false
+                          },
+                          "maintenance": {
+                            "type": "object",
+                            "description": "Continuous evidence-backed project maintenance policy.",
+                            "properties": {
+                              "enabled": {
+                                "type": "boolean"
+                              },
+                              "schedule": {
+                                "type": "string",
+                                "enum": ["hourly", "daily", "weekly"]
+                              },
+                              "categories": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "enum": ["reliability"]
+                                },
+                                "minItems": 1,
+                                "maxItems": 1,
+                                "uniqueItems": true
+                              },
+                              "environments": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "pattern": "^[a-z][a-z0-9-]{0,38}$"
+                                },
+                                "minItems": 1,
+                                "maxItems": 25,
+                                "uniqueItems": true
+                              },
+                              "autoRemediation": {
+                                "type": "object",
+                                "properties": {
+                                  "enabled": {
+                                    "type": "boolean"
+                                  },
+                                  "maximumRisk": {
+                                    "type": "string",
+                                    "enum": ["read", "write"]
+                                  },
+                                  "allowedOperationIds": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string",
+                                      "enum": ["deploys.create"]
+                                    },
+                                    "maxItems": 100,
+                                    "uniqueItems": true
+                                  },
+                                  "maxActionsPerRun": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 25
+                                  }
+                                },
+                                "additionalProperties": false
+                              }
+                            },
+                            "required": ["enabled"],
                             "additionalProperties": false
                           }
                         },
@@ -9122,7 +10094,7 @@
         ],
         "responses": {
           "200": {
-            "description": "AI gateways.",
+            "description": "AI gateways with batched current-month usage.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9165,6 +10137,49 @@
                       "updatedAt": {
                         "type": "string",
                         "format": "date-time"
+                      },
+                      "usage": {
+                        "type": "object",
+                        "properties": {
+                          "month": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "requests": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "inputTokens": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "outputTokens": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "spentUsd": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "budgetUsd": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "remainingUsd": {
+                            "type": "number",
+                            "minimum": 0
+                          }
+                        },
+                        "required": [
+                          "month",
+                          "requests",
+                          "inputTokens",
+                          "outputTokens",
+                          "spentUsd",
+                          "budgetUsd",
+                          "remainingUsd"
+                        ],
+                        "additionalProperties": false
                       }
                     },
                     "required": [
@@ -9177,7 +10192,8 @@
                       "maxRetries",
                       "redactPrompts",
                       "createdAt",
-                      "updatedAt"
+                      "updatedAt",
+                      "usage"
                     ],
                     "additionalProperties": false
                   }
@@ -20354,6 +21370,16 @@
                   "cursor": {
                     "type": "string",
                     "description": "Opaque cursor from the previous page."
+                  },
+                  "columns": {
+                    "type": "array",
+                    "description": "Columns to return. The server verifies every identifier.",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "maxItems": 100,
+                    "uniqueItems": true
                   },
                   "sort": {
                     "type": "object",

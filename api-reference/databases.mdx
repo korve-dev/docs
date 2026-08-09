@@ -297,6 +297,7 @@ POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/rows
 | `relation`           | string                                                    | Yes      | —                                                                        |
 | `limit`              | integer                                                   | No       | Page size from 1 to 100. Defaults to 50.                                 |
 | `cursor`             | string                                                    | No       | Opaque cursor from the previous page.                                    |
+| `columns`            | string[]                                                  | No       | Columns to return. The server verifies every identifier.                 |
 | `sort`               | object                                                    | No       | —                                                                        |
 | `sort.column`        | string                                                    | Yes      | —                                                                        |
 | `sort.direction`     | string                                                    | Yes      | One of: `asc`, `desc`.                                                   |
