@@ -14138,7 +14138,7 @@
                     "durationMs": {
                       "type": ["integer", "null"],
                       "minimum": 0,
-                      "description": "Elapsed execution time when the run has completed."
+                      "description": "Elapsed execution time in milliseconds, or null when the run is queued, running, or skipped."
                     },
                     "attemptCount": {
                       "type": "integer"
@@ -14150,11 +14150,12 @@
                       "type": ["string", "null"]
                     },
                     "responseBody": {
-                      "description": "Bounded target response body retained for inspection. Secret-like JSON fields are redacted and provider-specific infrastructure terms are normalized."
+                      "type": ["object", "array", "string", "number", "boolean", "null"],
+                      "description": "Bounded target response body retained for inspection as parsed JSON, sanitized text, or null when unavailable. Secret-like JSON fields are redacted and provider-specific infrastructure terms are normalized."
                     },
                     "responseBodyTruncated": {
                       "type": "boolean",
-                      "description": "Whether the retained response body was cut at the 32,768-byte limit."
+                      "description": "Whether the retained response body exceeded the 32,768-byte limit or could not be read completely."
                     },
                     "responseContentType": {
                       "type": ["string", "null"],
@@ -14330,7 +14331,7 @@
                           "durationMs": {
                             "type": ["integer", "null"],
                             "minimum": 0,
-                            "description": "Elapsed execution time when the run has completed."
+                            "description": "Elapsed execution time in milliseconds, or null when the run is queued, running, or skipped."
                           },
                           "attemptCount": {
                             "type": "integer"
@@ -14452,7 +14453,7 @@
                     "durationMs": {
                       "type": ["integer", "null"],
                       "minimum": 0,
-                      "description": "Elapsed execution time when the run has completed."
+                      "description": "Elapsed execution time in milliseconds, or null when the run is queued, running, or skipped."
                     },
                     "attemptCount": {
                       "type": "integer"
