@@ -14103,7 +14103,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Cron run.",
+            "description": "Cron run inspection.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14135,6 +14135,11 @@
                       "type": ["string", "null"],
                       "format": "date-time"
                     },
+                    "durationMs": {
+                      "type": ["integer", "null"],
+                      "minimum": 0,
+                      "description": "Elapsed execution time in milliseconds, or null when the run is queued, running, or skipped."
+                    },
                     "attemptCount": {
                       "type": "integer"
                     },
@@ -14143,6 +14148,47 @@
                     },
                     "error": {
                       "type": ["string", "null"]
+                    },
+                    "responseBody": {
+                      "type": ["object", "array", "string", "number", "boolean", "null"],
+                      "description": "Bounded target response body retained for inspection as parsed JSON, sanitized text, or null when unavailable. Secret-like JSON fields are redacted and provider-specific infrastructure terms are normalized."
+                    },
+                    "responseBodyTruncated": {
+                      "type": "boolean",
+                      "description": "Whether the retained response body exceeded the 32,768-byte limit or could not be read completely."
+                    },
+                    "responseContentType": {
+                      "type": ["string", "null"],
+                      "description": "Target response content type when one was supplied."
+                    },
+                    "attempts": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "attempt": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": ["queued", "running", "succeeded", "failed", "skipped"]
+                          },
+                          "responseStatus": {
+                            "type": ["integer", "null"]
+                          },
+                          "error": {
+                            "type": ["string", "null"]
+                          },
+                          "recordedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        },
+                        "required": ["attempt", "status", "responseStatus", "error", "recordedAt"],
+                        "additionalProperties": false
+                      },
+                      "description": "Append-only run transitions in recorded order."
                     }
                   },
                   "required": [
@@ -14153,10 +14199,16 @@
                     "scheduledFor",
                     "startedAt",
                     "completedAt",
+                    "durationMs",
                     "attemptCount",
                     "responseStatus",
-                    "error"
-                  ]
+                    "error",
+                    "responseBody",
+                    "responseBodyTruncated",
+                    "responseContentType",
+                    "attempts"
+                  ],
+                  "additionalProperties": false
                 }
               }
             }
@@ -14276,6 +14328,11 @@
                             "type": ["string", "null"],
                             "format": "date-time"
                           },
+                          "durationMs": {
+                            "type": ["integer", "null"],
+                            "minimum": 0,
+                            "description": "Elapsed execution time in milliseconds, or null when the run is queued, running, or skipped."
+                          },
                           "attemptCount": {
                             "type": "integer"
                           },
@@ -14294,6 +14351,7 @@
                           "scheduledFor",
                           "startedAt",
                           "completedAt",
+                          "durationMs",
                           "attemptCount",
                           "responseStatus",
                           "error"
@@ -14392,6 +14450,11 @@
                       "type": ["string", "null"],
                       "format": "date-time"
                     },
+                    "durationMs": {
+                      "type": ["integer", "null"],
+                      "minimum": 0,
+                      "description": "Elapsed execution time in milliseconds, or null when the run is queued, running, or skipped."
+                    },
                     "attemptCount": {
                       "type": "integer"
                     },
@@ -14410,6 +14473,7 @@
                     "scheduledFor",
                     "startedAt",
                     "completedAt",
+                    "durationMs",
                     "attemptCount",
                     "responseStatus",
                     "error"

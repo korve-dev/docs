@@ -353,18 +353,19 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/crons/$
 
 ### Response body (202)
 
-| Field            | Type            | Description                                                    |
-| ---------------- | --------------- | -------------------------------------------------------------- |
-| `id`             | string          | —                                                              |
-| `cronId`         | string          | —                                                              |
-| `source`         | string          | One of: `scheduled`, `manual`.                                 |
-| `status`         | string          | One of: `queued`, `running`, `succeeded`, `failed`, `skipped`. |
-| `scheduledFor`   | string          | Format: `date-time`.                                           |
-| `startedAt`      | string or null  | Format: `date-time`.                                           |
-| `completedAt`    | string or null  | Format: `date-time`.                                           |
-| `attemptCount`   | integer         | —                                                              |
-| `responseStatus` | integer or null | —                                                              |
-| `error`          | string or null  | —                                                              |
+| Field            | Type            | Description                                                                                  |
+| ---------------- | --------------- | -------------------------------------------------------------------------------------------- |
+| `id`             | string          | —                                                                                            |
+| `cronId`         | string          | —                                                                                            |
+| `source`         | string          | One of: `scheduled`, `manual`.                                                               |
+| `status`         | string          | One of: `queued`, `running`, `succeeded`, `failed`, `skipped`.                               |
+| `scheduledFor`   | string          | Format: `date-time`.                                                                         |
+| `startedAt`      | string or null  | Format: `date-time`.                                                                         |
+| `completedAt`    | string or null  | Format: `date-time`.                                                                         |
+| `durationMs`     | integer or null | Elapsed execution time in milliseconds, or null when the run is queued, running, or skipped. |
+| `attemptCount`   | integer         | —                                                                                            |
+| `responseStatus` | integer or null | —                                                                                            |
+| `error`          | string or null  | —                                                                                            |
 
 ## crons.listRuns
 
@@ -402,20 +403,21 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/crons/$CRON_ID/
 
 ### Response body (200)
 
-| Field                    | Type            | Description                                                    |
-| ------------------------ | --------------- | -------------------------------------------------------------- |
-| `items`                  | object[]        | —                                                              |
-| `items[].id`             | string          | —                                                              |
-| `items[].cronId`         | string          | —                                                              |
-| `items[].source`         | string          | One of: `scheduled`, `manual`.                                 |
-| `items[].status`         | string          | One of: `queued`, `running`, `succeeded`, `failed`, `skipped`. |
-| `items[].scheduledFor`   | string          | Format: `date-time`.                                           |
-| `items[].startedAt`      | string or null  | Format: `date-time`.                                           |
-| `items[].completedAt`    | string or null  | Format: `date-time`.                                           |
-| `items[].attemptCount`   | integer         | —                                                              |
-| `items[].responseStatus` | integer or null | —                                                              |
-| `items[].error`          | string or null  | —                                                              |
-| `nextCursor`             | string or null  | —                                                              |
+| Field                    | Type            | Description                                                                                  |
+| ------------------------ | --------------- | -------------------------------------------------------------------------------------------- |
+| `items`                  | object[]        | —                                                                                            |
+| `items[].id`             | string          | —                                                                                            |
+| `items[].cronId`         | string          | —                                                                                            |
+| `items[].source`         | string          | One of: `scheduled`, `manual`.                                                               |
+| `items[].status`         | string          | One of: `queued`, `running`, `succeeded`, `failed`, `skipped`.                               |
+| `items[].scheduledFor`   | string          | Format: `date-time`.                                                                         |
+| `items[].startedAt`      | string or null  | Format: `date-time`.                                                                         |
+| `items[].completedAt`    | string or null  | Format: `date-time`.                                                                         |
+| `items[].durationMs`     | integer or null | Elapsed execution time in milliseconds, or null when the run is queued, running, or skipped. |
+| `items[].attemptCount`   | integer         | —                                                                                            |
+| `items[].responseStatus` | integer or null | —                                                                                            |
+| `items[].error`          | string or null  | —                                                                                            |
+| `nextCursor`             | string or null  | —                                                                                            |
 
 ## crons.getRun
 
@@ -440,20 +442,30 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/crons/$CRON_ID/
 
 | Status | Description                       |
 | ------ | --------------------------------- |
-| `200`  | Cron run.                         |
+| `200`  | Cron run inspection.              |
 | `404`  | No such cron run in this project. |
 
 ### Response body (200)
 
-| Field            | Type            | Description                                                    |
-| ---------------- | --------------- | -------------------------------------------------------------- |
-| `id`             | string          | —                                                              |
-| `cronId`         | string          | —                                                              |
-| `source`         | string          | One of: `scheduled`, `manual`.                                 |
-| `status`         | string          | One of: `queued`, `running`, `succeeded`, `failed`, `skipped`. |
-| `scheduledFor`   | string          | Format: `date-time`.                                           |
-| `startedAt`      | string or null  | Format: `date-time`.                                           |
-| `completedAt`    | string or null  | Format: `date-time`.                                           |
-| `attemptCount`   | integer         | —                                                              |
-| `responseStatus` | integer or null | —                                                              |
-| `error`          | string or null  | —                                                              |
+| Field                       | Type                                                   | Description                                                                                                                                                                                                    |
+| --------------------------- | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                        | string                                                 | —                                                                                                                                                                                                              |
+| `cronId`                    | string                                                 | —                                                                                                                                                                                                              |
+| `source`                    | string                                                 | One of: `scheduled`, `manual`.                                                                                                                                                                                 |
+| `status`                    | string                                                 | One of: `queued`, `running`, `succeeded`, `failed`, `skipped`.                                                                                                                                                 |
+| `scheduledFor`              | string                                                 | Format: `date-time`.                                                                                                                                                                                           |
+| `startedAt`                 | string or null                                         | Format: `date-time`.                                                                                                                                                                                           |
+| `completedAt`               | string or null                                         | Format: `date-time`.                                                                                                                                                                                           |
+| `durationMs`                | integer or null                                        | Elapsed execution time in milliseconds, or null when the run is queued, running, or skipped.                                                                                                                   |
+| `attemptCount`              | integer                                                | —                                                                                                                                                                                                              |
+| `responseStatus`            | integer or null                                        | —                                                                                                                                                                                                              |
+| `error`                     | string or null                                         | —                                                                                                                                                                                                              |
+| `responseBody`              | object or array or string or number or boolean or null | Bounded target response body retained for inspection as parsed JSON, sanitized text, or null when unavailable. Secret-like JSON fields are redacted and provider-specific infrastructure terms are normalized. |
+| `responseBodyTruncated`     | boolean                                                | Whether the retained response body exceeded the 32,768-byte limit or could not be read completely.                                                                                                             |
+| `responseContentType`       | string or null                                         | Target response content type when one was supplied.                                                                                                                                                            |
+| `attempts`                  | object[]                                               | Append-only run transitions in recorded order.                                                                                                                                                                 |
+| `attempts[].attempt`        | integer                                                | —                                                                                                                                                                                                              |
+| `attempts[].status`         | string                                                 | One of: `queued`, `running`, `succeeded`, `failed`, `skipped`.                                                                                                                                                 |
+| `attempts[].responseStatus` | integer or null                                        | —                                                                                                                                                                                                              |
+| `attempts[].error`          | string or null                                         | —                                                                                                                                                                                                              |
+| `attempts[].recordedAt`     | string                                                 | Format: `date-time`.                                                                                                                                                                                           |
