@@ -35469,6 +35469,511 @@
         "x-korve-required-role": "member"
       }
     },
+    "/v1/orgs/{orgId}/projects/{projectId}/speed-insights/query": {
+      "post": {
+        "operationId": "speedInsights.query",
+        "summary": "Query",
+        "description": "Query bounded real-user performance percentiles, experience scores, time buckets, and route summaries.",
+        "tags": ["speedInsights"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bounded Speed Insights report.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "from": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "until": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "retentionDays": {
+                      "type": "integer",
+                      "enum": [30]
+                    },
+                    "summary": {
+                      "type": "object",
+                      "properties": {
+                        "score": {
+                          "type": ["number", "null"],
+                          "minimum": 0,
+                          "maximum": 100
+                        },
+                        "samples": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "vitals": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "metric": {
+                                "type": "string",
+                                "enum": ["CLS", "FCP", "INP", "LCP", "TTFB"]
+                              },
+                              "unit": {
+                                "type": "string",
+                                "enum": ["milliseconds", "score"]
+                              },
+                              "rating": {
+                                "type": ["string", "null"],
+                                "enum": ["good", "needs-improvement", "poor", null]
+                              },
+                              "samples": {
+                                "type": "integer",
+                                "minimum": 0
+                              },
+                              "p75": {
+                                "type": ["number", "null"]
+                              },
+                              "p90": {
+                                "type": ["number", "null"]
+                              },
+                              "p95": {
+                                "type": ["number", "null"]
+                              },
+                              "p99": {
+                                "type": ["number", "null"]
+                              }
+                            },
+                            "required": [
+                              "metric",
+                              "unit",
+                              "rating",
+                              "samples",
+                              "p75",
+                              "p90",
+                              "p95",
+                              "p99"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "maxItems": 5
+                        }
+                      },
+                      "required": ["score", "samples", "vitals"],
+                      "additionalProperties": false
+                    },
+                    "series": {
+                      "type": "array",
+                      "maxItems": 720,
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "bucket": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "score": {
+                            "type": ["number", "null"],
+                            "minimum": 0,
+                            "maximum": 100
+                          },
+                          "samples": {
+                            "type": "integer",
+                            "minimum": 0
+                          }
+                        },
+                        "required": ["bucket", "score", "samples"],
+                        "additionalProperties": false
+                      }
+                    },
+                    "routes": {
+                      "type": "array",
+                      "maxItems": 50,
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "route": {
+                            "type": "string"
+                          },
+                          "score": {
+                            "type": ["number", "null"],
+                            "minimum": 0,
+                            "maximum": 100
+                          },
+                          "samples": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "vitals": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "metric": {
+                                  "type": "string",
+                                  "enum": ["CLS", "FCP", "INP", "LCP", "TTFB"]
+                                },
+                                "unit": {
+                                  "type": "string",
+                                  "enum": ["milliseconds", "score"]
+                                },
+                                "rating": {
+                                  "type": ["string", "null"],
+                                  "enum": ["good", "needs-improvement", "poor", null]
+                                },
+                                "samples": {
+                                  "type": "integer",
+                                  "minimum": 0
+                                },
+                                "p75": {
+                                  "type": ["number", "null"]
+                                },
+                                "p90": {
+                                  "type": ["number", "null"]
+                                },
+                                "p95": {
+                                  "type": ["number", "null"]
+                                },
+                                "p99": {
+                                  "type": ["number", "null"]
+                                }
+                              },
+                              "required": [
+                                "metric",
+                                "unit",
+                                "rating",
+                                "samples",
+                                "p75",
+                                "p90",
+                                "p95",
+                                "p99"
+                              ],
+                              "additionalProperties": false
+                            },
+                            "maxItems": 5
+                          }
+                        },
+                        "required": ["route", "score", "samples", "vitals"],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": ["from", "until", "retentionDays", "summary", "series", "routes"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such project or environment."
+          },
+          "422": {
+            "description": "Invalid time window, filter, or granularity."
+          },
+          "503": {
+            "description": "Speed Insights data is temporarily unavailable."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member",
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 8192,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "until": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "environment": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9-]{0,38}$"
+                  },
+                  "device": {
+                    "type": "string",
+                    "enum": ["all", "desktop", "mobile"]
+                  },
+                  "route": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256,
+                    "pattern": "^/[^?#]*$"
+                  },
+                  "granularity": {
+                    "type": "string",
+                    "enum": ["hour", "day"]
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/speed-insights": {
+      "get": {
+        "operationId": "speedInsights.get",
+        "summary": "Get",
+        "description": "Get the project's Speed Insights configuration and browser intake endpoint.",
+        "tags": ["speedInsights"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Speed Insights configuration.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "projectRef": {
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9-]{1,61}$",
+                      "description": "Public project reference used by the browser SDK."
+                    },
+                    "endpoint": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "sampleRate": {
+                      "type": "number",
+                      "minimum": 0.01,
+                      "maximum": 1,
+                      "description": "Batch retention rate applied before telemetry storage and billing."
+                    },
+                    "allowedOrigins": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 255
+                      },
+                      "maxItems": 20,
+                      "uniqueItems": true
+                    },
+                    "retentionDays": {
+                      "type": "integer",
+                      "enum": [30]
+                    }
+                  },
+                  "required": [
+                    "enabled",
+                    "projectRef",
+                    "endpoint",
+                    "sampleRate",
+                    "allowedOrigins",
+                    "retentionDays"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such project."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      },
+      "put": {
+        "operationId": "speedInsights.update",
+        "summary": "Update",
+        "description": "Enable or disable real-user measurements and set sampling and extra allowed origins.",
+        "tags": ["speedInsights"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Updated Speed Insights configuration.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "projectRef": {
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9-]{1,61}$",
+                      "description": "Public project reference used by the browser SDK."
+                    },
+                    "endpoint": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "sampleRate": {
+                      "type": "number",
+                      "minimum": 0.01,
+                      "maximum": 1,
+                      "description": "Batch retention rate applied before telemetry storage and billing."
+                    },
+                    "allowedOrigins": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 255
+                      },
+                      "maxItems": 20,
+                      "uniqueItems": true
+                    },
+                    "retentionDays": {
+                      "type": "integer",
+                      "enum": [30]
+                    }
+                  },
+                  "required": [
+                    "enabled",
+                    "projectRef",
+                    "endpoint",
+                    "sampleRate",
+                    "allowedOrigins",
+                    "retentionDays"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such project."
+          },
+          "422": {
+            "description": "Invalid Speed Insights configuration."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "admin",
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 8192,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "sampleRate": {
+                    "type": "number",
+                    "minimum": 0.01,
+                    "maximum": 1,
+                    "description": "Batch retention rate applied before telemetry storage and billing."
+                  },
+                  "allowedOrigins": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uri",
+                      "maxLength": 255
+                    },
+                    "maxItems": 20,
+                    "uniqueItems": true,
+                    "description": "Extra HTTPS origins allowed to submit measurements. The managed project origin and verified domains are allowed automatically."
+                  }
+                },
+                "required": ["enabled"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/orgs/{orgId}/projects/{projectId}/storage/downloads": {
       "post": {
         "operationId": "storage.getDownload",
@@ -39058,6 +39563,170 @@
         },
         "x-korve-risk": "read",
         "x-korve-project-scoped": false
+      }
+    },
+    "/v1/speed-insights/collect/{projectRef}": {
+      "post": {
+        "operationId": "speedInsights.collect",
+        "summary": "Collect",
+        "description": "Accept one bounded batch of normalized browser performance measurements from an allowed project origin.",
+        "tags": ["speedInsights"],
+        "parameters": [
+          {
+            "name": "projectRef",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{1,61}$"
+            },
+            "description": "Globally unique public project slug."
+          }
+        ],
+        "security": [],
+        "responses": {
+          "202": {
+            "description": "Measurement batch accepted, deduplicated, or sampled out before storage and billing.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "accepted": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 20
+                    },
+                    "duplicate": {
+                      "type": "boolean"
+                    },
+                    "sampledOut": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": ["accepted", "duplicate"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Speed Insights is disabled or the request origin is not allowed."
+          },
+          "404": {
+            "description": "No such project."
+          },
+          "413": {
+            "description": "Encoded request exceeds 32,768 bytes."
+          },
+          "422": {
+            "description": "The measurement batch is invalid."
+          },
+          "429": {
+            "description": "The browser intake limit was reached."
+          },
+          "503": {
+            "description": "Speed Insights intake is temporarily unavailable."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": false,
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 32768,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "schemaVersion": {
+                    "type": "integer",
+                    "enum": [1]
+                  },
+                  "batchId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64,
+                    "pattern": "^[A-Za-z0-9_-]+$"
+                  },
+                  "environment": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9-]{0,38}$",
+                    "description": "Project environment. Defaults to production in the browser SDK."
+                  },
+                  "sdkVersion": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 32
+                  },
+                  "events": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 20,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "eventId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 64,
+                          "pattern": "^[A-Za-z0-9_-]+$"
+                        },
+                        "metric": {
+                          "type": "string",
+                          "enum": ["CLS", "FCP", "INP", "LCP", "TTFB"]
+                        },
+                        "value": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 600000
+                        },
+                        "timestamp": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "route": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 256,
+                          "pattern": "^/[^?#]*$",
+                          "description": "A normalized route only. Browser SDKs remove query strings, fragments, and common dynamic identifiers before upload."
+                        },
+                        "device": {
+                          "type": "string",
+                          "enum": ["desktop", "mobile"]
+                        },
+                        "navigationType": {
+                          "type": "string",
+                          "enum": [
+                            "navigate",
+                            "reload",
+                            "back-forward",
+                            "prerender",
+                            "restore",
+                            "other"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "eventId",
+                        "metric",
+                        "value",
+                        "timestamp",
+                        "route",
+                        "device",
+                        "navigationType"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": ["schemaVersion", "batchId", "environment", "sdkVersion", "events"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
       }
     },
     "/v1/telemetry/events": {
