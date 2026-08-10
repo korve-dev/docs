@@ -7,15 +7,15 @@ Run `korve <command> --help` for the installed version's complete flags. Add glo
 machine-readable output. Project commands accept `--project <slug|id>` and otherwise use
 `KORVE_PROJECT` or `.korve.toml`.
 
-| Area                   | Commands                                                                                          |
-| ---------------------- | ------------------------------------------------------------------------------------------------- |
-| Session and bootstrap  | `login`, `logout`, `whoami`, `init`, `link`, `health`, `spec`, `regions`, `completions`           |
-| Organization           | `orgs`, `billing`, `webhooks`, `api-keys`                                                         |
-| Application            | `projects`, `environments`, `deploy`, `deploys`, `previews`, `env`, `domains`, `access`           |
-| Data                   | `databases`, `branches`, `backups`, `storage`, `buckets`, `caches`                                |
-| Work                   | `queues`, `crons`                                                                                 |
-| Operations             | `operator`, `maintenance`, `logs`, `analytics`, `metrics`, `alerts`, `advisor`, `budget`, `usage` |
-| Infrastructure as code | `manifest export`, `manifest plan`, `manifest apply`                                              |
+| Area                   | Commands                                                                                                            |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Session and bootstrap  | `login`, `logout`, `whoami`, `init`, `link`, `health`, `spec`, `regions`, `completions`                             |
+| Organization           | `orgs`, `billing`, `webhooks`, `api-keys`                                                                           |
+| Application            | `projects`, `environments`, `deploy`, `deploys`, `previews`, `env`, `domains`, `access`                             |
+| Data                   | `databases`, `branches`, `backups`, `storage`, `buckets`, `caches`                                                  |
+| Work                   | `queues`, `crons`                                                                                                   |
+| Operations             | `operator`, `maintenance`, `logs`, `analytics`, `metrics`, `speed-insights`, `alerts`, `advisor`, `budget`, `usage` |
+| Infrastructure as code | `manifest export`, `manifest plan`, `manifest apply`                                                                |
 
 ## Common flows
 
@@ -27,6 +27,7 @@ korve init
 korve deploys list
 korve logs --level error --limit 100
 korve analytics
+korve speed-insights query --device mobile --granularity day
 
 # declare and reconcile an organization
 korve manifest export -o korve.toml

@@ -1,0 +1,252 @@
+---
+title: "speedInsights"
+description: "Privacy-first real-user performance measurements for loading speed, responsiveness, and visual stability. Raw measurements are retained for 30 days."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Privacy-first real-user performance measurements for loading speed, responsiveness, and visual stability. Raw measurements are retained for 30 days.
+
+## speedInsights.get
+
+Get the project's Speed Insights configuration and browser intake endpoint.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/speed-insights
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/speed-insights" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                   |
+| ------ | ----------------------------- |
+| `200`  | Speed Insights configuration. |
+| `404`  | No such project.              |
+
+### Response body (200)
+
+| Field            | Type     | Description                                                                          |
+| ---------------- | -------- | ------------------------------------------------------------------------------------ |
+| `enabled`        | boolean  | —                                                                                    |
+| `projectRef`     | string   | Public project reference used by the browser SDK. Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `endpoint`       | string   | Format: `uri`.                                                                       |
+| `sampleRate`     | number   | Batch retention rate applied before telemetry storage and billing.                   |
+| `allowedOrigins` | string[] | —                                                                                    |
+| `retentionDays`  | integer  | One of: `30`.                                                                        |
+
+## speedInsights.update
+
+Enable or disable real-user measurements and set sampling and extra allowed origins.
+
+```text
+PUT /v1/orgs/{orgId}/projects/{projectId}/speed-insights
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write`
+
+### Request body
+
+| Field            | Type     | Required | Description                                                                                                                    |
+| ---------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `enabled`        | boolean  | Yes      | —                                                                                                                              |
+| `sampleRate`     | number   | No       | Batch retention rate applied before telemetry storage and billing.                                                             |
+| `allowedOrigins` | string[] | No       | Extra HTTPS origins allowed to submit measurements. The managed project origin and verified domains are allowed automatically. |
+
+### Example
+
+```bash
+curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/speed-insights" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "enabled": true
+}'
+```
+
+### Responses
+
+| Status | Description                           |
+| ------ | ------------------------------------- |
+| `200`  | Updated Speed Insights configuration. |
+| `404`  | No such project.                      |
+| `422`  | Invalid Speed Insights configuration. |
+
+### Response body (200)
+
+| Field            | Type     | Description                                                                          |
+| ---------------- | -------- | ------------------------------------------------------------------------------------ |
+| `enabled`        | boolean  | —                                                                                    |
+| `projectRef`     | string   | Public project reference used by the browser SDK. Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `endpoint`       | string   | Format: `uri`.                                                                       |
+| `sampleRate`     | number   | Batch retention rate applied before telemetry storage and billing.                   |
+| `allowedOrigins` | string[] | —                                                                                    |
+| `retentionDays`  | integer  | One of: `30`.                                                                        |
+
+## speedInsights.query
+
+Query bounded real-user performance percentiles, experience scores, time buckets, and route summaries.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/speed-insights/query
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Request body
+
+| Field         | Type   | Required | Description                         |
+| ------------- | ------ | -------- | ----------------------------------- |
+| `from`        | string | No       | Format: `date-time`.                |
+| `until`       | string | No       | Format: `date-time`.                |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`.  |
+| `device`      | string | No       | One of: `all`, `desktop`, `mobile`. |
+| `route`       | string | No       | Pattern: `^/[^?#]*$`.               |
+| `granularity` | string | No       | One of: `hour`, `day`.              |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/speed-insights/query" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### Responses
+
+| Status | Description                                     |
+| ------ | ----------------------------------------------- |
+| `200`  | Bounded Speed Insights report.                  |
+| `404`  | No such project or environment.                 |
+| `422`  | Invalid time window, filter, or granularity.    |
+| `503`  | Speed Insights data is temporarily unavailable. |
+
+### Response body (200)
+
+| Field                       | Type           | Description                                          |
+| --------------------------- | -------------- | ---------------------------------------------------- |
+| `from`                      | string         | Format: `date-time`.                                 |
+| `until`                     | string         | Format: `date-time`.                                 |
+| `retentionDays`             | integer        | One of: `30`.                                        |
+| `summary`                   | object         | —                                                    |
+| `summary.score`             | number or null | —                                                    |
+| `summary.samples`           | integer        | —                                                    |
+| `summary.vitals`            | object[]       | —                                                    |
+| `summary.vitals[].metric`   | string         | One of: `CLS`, `FCP`, `INP`, `LCP`, `TTFB`.          |
+| `summary.vitals[].unit`     | string         | One of: `milliseconds`, `score`.                     |
+| `summary.vitals[].rating`   | string or null | One of: `good`, `needs-improvement`, `poor`, `null`. |
+| `summary.vitals[].samples`  | integer        | —                                                    |
+| `summary.vitals[].p75`      | number or null | —                                                    |
+| `summary.vitals[].p90`      | number or null | —                                                    |
+| `summary.vitals[].p95`      | number or null | —                                                    |
+| `summary.vitals[].p99`      | number or null | —                                                    |
+| `series`                    | object[]       | —                                                    |
+| `series[].bucket`           | string         | Format: `date-time`.                                 |
+| `series[].score`            | number or null | —                                                    |
+| `series[].samples`          | integer        | —                                                    |
+| `routes`                    | object[]       | —                                                    |
+| `routes[].route`            | string         | —                                                    |
+| `routes[].score`            | number or null | —                                                    |
+| `routes[].samples`          | integer        | —                                                    |
+| `routes[].vitals`           | object[]       | —                                                    |
+| `routes[].vitals[].metric`  | string         | One of: `CLS`, `FCP`, `INP`, `LCP`, `TTFB`.          |
+| `routes[].vitals[].unit`    | string         | One of: `milliseconds`, `score`.                     |
+| `routes[].vitals[].rating`  | string or null | One of: `good`, `needs-improvement`, `poor`, `null`. |
+| `routes[].vitals[].samples` | integer        | —                                                    |
+| `routes[].vitals[].p75`     | number or null | —                                                    |
+| `routes[].vitals[].p90`     | number or null | —                                                    |
+| `routes[].vitals[].p95`     | number or null | —                                                    |
+| `routes[].vitals[].p99`     | number or null | —                                                    |
+
+## speedInsights.collect
+
+Accept one bounded batch of normalized browser performance measurements from an allowed project origin.
+
+```text
+POST /v1/speed-insights/collect/{projectRef}
+```
+
+- **Auth:** None — public endpoint.
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Path parameters
+
+| Name         | Type   | Required | Description                        |
+| ------------ | ------ | -------- | ---------------------------------- |
+| `projectRef` | string | Yes      | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+
+### Request body
+
+| Field                     | Type     | Required | Description                                                                                                                                |
+| ------------------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `schemaVersion`           | integer  | Yes      | One of: `1`.                                                                                                                               |
+| `batchId`                 | string   | Yes      | Pattern: `^[A-Za-z0-9_-]+$`.                                                                                                               |
+| `environment`             | string   | Yes      | Project environment. Defaults to production in the browser SDK. Pattern: `^[a-z][a-z0-9-]{0,38}$`.                                         |
+| `sdkVersion`              | string   | Yes      | —                                                                                                                                          |
+| `events`                  | object[] | Yes      | —                                                                                                                                          |
+| `events[].eventId`        | string   | Yes      | Pattern: `^[A-Za-z0-9_-]+$`.                                                                                                               |
+| `events[].metric`         | string   | Yes      | One of: `CLS`, `FCP`, `INP`, `LCP`, `TTFB`.                                                                                                |
+| `events[].value`          | number   | Yes      | —                                                                                                                                          |
+| `events[].timestamp`      | string   | Yes      | Format: `date-time`.                                                                                                                       |
+| `events[].route`          | string   | Yes      | A normalized route only. Browser SDKs remove query strings, fragments, and common dynamic identifiers before upload. Pattern: `^/[^?#]*$`. |
+| `events[].device`         | string   | Yes      | One of: `desktop`, `mobile`.                                                                                                               |
+| `events[].navigationType` | string   | Yes      | One of: `navigate`, `reload`, `back-forward`, `prerender`, `restore`, `other`.                                                             |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/speed-insights/collect/$PROJECT_REF" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "schemaVersion": 1,
+  "batchId": "example",
+  "environment": "example",
+  "sdkVersion": "example",
+  "events": [
+    {
+      "eventId": "example",
+      "metric": "CLS",
+      "value": 0,
+      "timestamp": "2026-06-01T12:00:00Z",
+      "route": "/health",
+      "device": "desktop",
+      "navigationType": "navigate"
+    }
+  ]
+}'
+```
+
+### Responses
+
+| Status | Description                                                                          |
+| ------ | ------------------------------------------------------------------------------------ |
+| `202`  | Measurement batch accepted, deduplicated, or sampled out before storage and billing. |
+| `403`  | Speed Insights is disabled or the request origin is not allowed.                     |
+| `404`  | No such project.                                                                     |
+| `413`  | Encoded request exceeds 32,768 bytes.                                                |
+| `422`  | The measurement batch is invalid.                                                    |
+| `429`  | The browser intake limit was reached.                                                |
+| `503`  | Speed Insights intake is temporarily unavailable.                                    |
+
+### Response body (202)
+
+| Field        | Type    | Description |
+| ------------ | ------- | ----------- |
+| `accepted`   | integer | —           |
+| `duplicate`  | boolean | —           |
+| `sampledOut` | boolean | —           |

@@ -1,0 +1,100 @@
+---
+title: "Speed Insights"
+description: "Measure real-user page speed, responsiveness, and visual stability with private route data."
+---
+
+Speed Insights measures CLS, FCP, INP, LCP, and TTFB in your users' browsers. The dashboard shows
+P75, P90, P95, and P99 values by device, environment, time, and normalized route.
+
+## Enable collection
+
+Add a collection policy to `korve.yaml`:
+
+```yaml
+version: 1
+organization: acme
+projects:
+  - name: Storefront
+    slug: storefront
+    runtimeClass: scale-to-zero
+    speedInsights:
+      enabled: true
+      sampleRate: 1
+      allowedOrigins:
+        - https://www.example.com
+```
+
+Korve always allows the managed project origin and active custom domains. Use `allowedOrigins` only
+for other exact HTTPS origins. Apply the manifest as usual:
+
+```bash
+korve manifest plan
+korve manifest apply
+```
+
+You can also manage the policy from the CLI:
+
+```bash
+korve speed-insights show --project storefront
+korve speed-insights set --state enabled --sample-rate 0.5 \
+  --origin https://www.example.com --project storefront
+```
+
+## Install the browser SDK
+
+```bash
+npm install @korve-dev/speed-insights
+```
+
+Mount one component near the root of a React application:
+
+```tsx
+import { SpeedInsights } from "@korve-dev/speed-insights/react";
+
+export function App() {
+  return <SpeedInsights project="storefront" />;
+}
+```
+
+Plain browser applications can use the injector:
+
+```ts
+import { injectSpeedInsights } from "@korve-dev/speed-insights";
+
+const stop = injectSpeedInsights({
+  project: "storefront",
+  beforeSend(event) {
+    return event.route.startsWith("/admin") ? null : event;
+  },
+});
+```
+
+Call `stop()` when the application unmounts. Do not start more than one collector for a page load.
+
+## Privacy and limits
+
+The SDK removes query strings and fragments before the `beforeSend` hook runs. It replaces common
+numeric, UUID, email-like, and long token route segments with `[param]`. It does not send cookies,
+user identifiers, IP fields, full URLs, referrers, browser fingerprints, DOM selectors, or session
+replay data.
+
+Each intake batch has a limit of 20 points and 32,768 bytes. Raw points expire after 30 days. Query
+windows cannot exceed 30 days. A duplicate batch ID is stored and billed once.
+
+Accepted batches enter a durable telemetry queue. The SDK retries the same batch ID and payload
+after a temporary transport failure.
+
+The saved `sampleRate` applies before storage and billing. The optional SDK `sampleRate` applies in
+the browser and reduces uploads further. If both values are below 1, their rates multiply.
+
+The first 100,000 data points for an organization each month are included. Each additional 100,000
+points costs $0.30. There is no project fee. Lower `sampleRate` to reduce collection volume.
+
+## Query from the CLI
+
+```bash
+korve speed-insights query --device mobile --granularity day --project storefront
+```
+
+The REST API and MCP surface expose `speedInsights.get`, `speedInsights.update`, and
+`speedInsights.query`. Browser intake is SDK-only and is not an MCP operation.
