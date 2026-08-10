@@ -9996,6 +9996,9 @@
           },
           "404": {
             "description": "No such gateway."
+          },
+          "422": {
+            "description": "Invalid gateway configuration."
           }
         },
         "x-korve-risk": "write",
@@ -10020,7 +10023,8 @@
                       "enum": ["korve/fast", "korve/balanced", "korve/reasoning"]
                     },
                     "minItems": 1,
-                    "maxItems": 3
+                    "maxItems": 3,
+                    "uniqueItems": true
                   },
                   "monthlyBudgetUsd": {
                     "type": "number",
@@ -10041,7 +10045,8 @@
                     "type": "boolean"
                   }
                 },
-                "additionalProperties": false
+                "additionalProperties": false,
+                "minProperties": 1
               }
             }
           }
@@ -10340,7 +10345,8 @@
                       "enum": ["korve/fast", "korve/balanced", "korve/reasoning"]
                     },
                     "minItems": 1,
-                    "maxItems": 3
+                    "maxItems": 3,
+                    "uniqueItems": true
                   },
                   "monthlyBudgetUsd": {
                     "type": "number",
