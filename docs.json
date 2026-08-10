@@ -52,6 +52,7 @@
         "pages": [
           "sdk/runtime",
           "sdk/app-auth",
+          "sdk/analytics",
           "primitives/app-auth",
           "primitives/deploys",
           "primitives/app-access",

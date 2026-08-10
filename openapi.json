@@ -11811,7 +11811,7 @@
       "get": {
         "operationId": "analytics.get",
         "summary": "Get",
-        "description": "Request, error, and CPU-time analytics for the project's deployed app, bucketed by hour (default) or UTC day. The window defaults to the last 24 hours. Scale-to-zero apps report CPU-time percentiles; always-on apps answer requests and errors with null CPU fields — the platform edge does not observe CPU time.",
+        "description": "Web visitors, page views, bounce rate, custom events, live visitors, and top traffic dimensions, plus request, error, and CPU-time analytics. Collection starts only after the application initializes the browser SDK. Visitor identifiers are site-scoped and reset daily. SDK collection does not store IP addresses, cookies, query strings, fragments, or full referrer URLs. The window defaults to 24 hours.",
         "tags": ["analytics"],
         "parameters": [
           {
@@ -11871,6 +11871,106 @@
               "pattern": "^[a-z][a-z0-9-]{0,38}$"
             },
             "description": "Environment slug to scope this operation to. Defaults to \"production\". An environment that does not exist on the project answers 404. Analytics are per app: production answers for the project's app, custom environments for their own."
+          },
+          {
+            "name": "path",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            },
+            "description": "Only include rows whose path value exactly matches this value. Filters combine with AND."
+          },
+          {
+            "name": "hostname",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 253
+            },
+            "description": "Only include rows whose hostname value exactly matches this value. Filters combine with AND."
+          },
+          {
+            "name": "referrer",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 253
+            },
+            "description": "Only include rows whose referrer value exactly matches this value. Filters combine with AND."
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 7,
+              "pattern": "^(?:[A-Z]{2}|Unknown)$"
+            },
+            "description": "Only include rows whose country value exactly matches this value. Filters combine with AND."
+          },
+          {
+            "name": "device",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32
+            },
+            "description": "Only include rows whose device value exactly matches this value. Filters combine with AND."
+          },
+          {
+            "name": "browser",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "description": "Only include rows whose browser value exactly matches this value. Filters combine with AND."
+          },
+          {
+            "name": "os",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "description": "Only include rows whose os value exactly matches this value. Filters combine with AND."
+          },
+          {
+            "name": "event",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "description": "Only include rows whose event value exactly matches this value. Filters combine with AND."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20
+            },
+            "description": "Maximum rows per breakdown panel. Defaults to 10; maximum 20."
           }
         ],
         "security": [
@@ -11937,9 +12037,284 @@
                     "note": {
                       "type": "string",
                       "description": "Present when there is context worth surfacing — for example the environment has no runtime yet."
+                    },
+                    "web": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "description": "Cookie-free web engagement data. Daily site-scoped visitor identifiers are not linkable across days or sites. Metrics can be estimated at very high volume.",
+                      "properties": {
+                        "series": {
+                          "type": "array",
+                          "description": "Ascending UTC buckets; empty buckets are omitted.",
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                              "bucket": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "Start of the UTC bucket."
+                              },
+                              "visitors": {
+                                "type": "number",
+                                "description": "Daily site-scoped visitor identifiers seen in this bucket."
+                              },
+                              "pageViews": {
+                                "type": "number"
+                              },
+                              "customEvents": {
+                                "type": "number"
+                              }
+                            },
+                            "required": ["bucket", "visitors", "pageViews", "customEvents"]
+                          }
+                        },
+                        "totals": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "visitors": {
+                              "type": "number"
+                            },
+                            "pageViews": {
+                              "type": "number"
+                            },
+                            "bounces": {
+                              "type": "number",
+                              "description": "Daily visitors that produced exactly one page view."
+                            },
+                            "bounceRate": {
+                              "type": "number",
+                              "description": "bounces / visitors; 0 when no visitor was seen."
+                            },
+                            "viewsPerVisitor": {
+                              "type": "number",
+                              "description": "pageViews / visitors; 0 when no visitor was seen."
+                            },
+                            "customEvents": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "visitors",
+                            "pageViews",
+                            "bounces",
+                            "bounceRate",
+                            "viewsPerVisitor",
+                            "customEvents"
+                          ]
+                        },
+                        "activeVisitors": {
+                          "type": "number",
+                          "description": "Daily visitor identifiers seen during the last five minutes."
+                        },
+                        "breakdowns": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "pages": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "value": {
+                                    "type": "string"
+                                  },
+                                  "visitors": {
+                                    "type": "number"
+                                  },
+                                  "pageViews": {
+                                    "type": "number"
+                                  },
+                                  "customEvents": {
+                                    "type": "number"
+                                  }
+                                },
+                                "required": ["value", "visitors", "pageViews", "customEvents"]
+                              }
+                            },
+                            "hostnames": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "value": {
+                                    "type": "string"
+                                  },
+                                  "visitors": {
+                                    "type": "number"
+                                  },
+                                  "pageViews": {
+                                    "type": "number"
+                                  },
+                                  "customEvents": {
+                                    "type": "number"
+                                  }
+                                },
+                                "required": ["value", "visitors", "pageViews", "customEvents"]
+                              }
+                            },
+                            "referrers": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "value": {
+                                    "type": "string"
+                                  },
+                                  "visitors": {
+                                    "type": "number"
+                                  },
+                                  "pageViews": {
+                                    "type": "number"
+                                  },
+                                  "customEvents": {
+                                    "type": "number"
+                                  }
+                                },
+                                "required": ["value", "visitors", "pageViews", "customEvents"]
+                              }
+                            },
+                            "countries": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "value": {
+                                    "type": "string"
+                                  },
+                                  "visitors": {
+                                    "type": "number"
+                                  },
+                                  "pageViews": {
+                                    "type": "number"
+                                  },
+                                  "customEvents": {
+                                    "type": "number"
+                                  }
+                                },
+                                "required": ["value", "visitors", "pageViews", "customEvents"]
+                              }
+                            },
+                            "devices": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "value": {
+                                    "type": "string"
+                                  },
+                                  "visitors": {
+                                    "type": "number"
+                                  },
+                                  "pageViews": {
+                                    "type": "number"
+                                  },
+                                  "customEvents": {
+                                    "type": "number"
+                                  }
+                                },
+                                "required": ["value", "visitors", "pageViews", "customEvents"]
+                              }
+                            },
+                            "browsers": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "value": {
+                                    "type": "string"
+                                  },
+                                  "visitors": {
+                                    "type": "number"
+                                  },
+                                  "pageViews": {
+                                    "type": "number"
+                                  },
+                                  "customEvents": {
+                                    "type": "number"
+                                  }
+                                },
+                                "required": ["value", "visitors", "pageViews", "customEvents"]
+                              }
+                            },
+                            "operatingSystems": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "value": {
+                                    "type": "string"
+                                  },
+                                  "visitors": {
+                                    "type": "number"
+                                  },
+                                  "pageViews": {
+                                    "type": "number"
+                                  },
+                                  "customEvents": {
+                                    "type": "number"
+                                  }
+                                },
+                                "required": ["value", "visitors", "pageViews", "customEvents"]
+                              }
+                            },
+                            "events": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "value": {
+                                    "type": "string"
+                                  },
+                                  "visitors": {
+                                    "type": "number"
+                                  },
+                                  "pageViews": {
+                                    "type": "number"
+                                  },
+                                  "customEvents": {
+                                    "type": "number"
+                                  }
+                                },
+                                "required": ["value", "visitors", "pageViews", "customEvents"]
+                              }
+                            }
+                          },
+                          "required": [
+                            "pages",
+                            "hostnames",
+                            "referrers",
+                            "countries",
+                            "devices",
+                            "browsers",
+                            "operatingSystems",
+                            "events"
+                          ]
+                        },
+                        "retentionDays": {
+                          "type": "integer",
+                          "enum": [90]
+                        }
+                      },
+                      "required": [
+                        "series",
+                        "totals",
+                        "activeVisitors",
+                        "breakdowns",
+                        "retentionDays"
+                      ]
                     }
                   },
-                  "required": ["series", "totals"]
+                  "required": ["series", "totals", "web"]
                 }
               }
             }
@@ -11948,7 +12323,10 @@
             "description": "No such project or environment in this organization."
           },
           "422": {
-            "description": "Invalid since, until, or granularity."
+            "description": "Invalid time, granularity, filter, or limit. The maximum window is 90 days."
+          },
+          "502": {
+            "description": "Analytics are unavailable — try again."
           }
         },
         "x-korve-risk": "read",

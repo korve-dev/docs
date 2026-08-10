@@ -1,15 +1,15 @@
 ---
 title: "analytics"
-description: "Traffic analytics for the project's deployed app: requests, errors, and CPU-time percentiles over time, in UTC buckets."
+description: "Privacy-safe web engagement and runtime traffic analytics for a deployed app."
 ---
 
 {/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
 
-Traffic analytics for the project's deployed app: requests, errors, and CPU-time percentiles over time, in UTC buckets.
+Privacy-safe web engagement and runtime traffic analytics for a deployed app.
 
 ## analytics.get
 
-Request, error, and CPU-time analytics for the project's deployed app, bucketed by hour (default) or UTC day. The window defaults to the last 24 hours. Scale-to-zero apps report CPU-time percentiles; always-on apps answer requests and errors with null CPU fields — the platform edge does not observe CPU time.
+Web visitors, page views, bounce rate, custom events, live visitors, and top traffic dimensions, plus request, error, and CPU-time analytics. Collection starts only after the application initializes the browser SDK. Visitor identifiers are site-scoped and reset daily. SDK collection does not store IP addresses, cookies, query strings, fragments, or full referrer URLs. The window defaults to 24 hours.
 
 ```text
 GET /v1/orgs/{orgId}/projects/{projectId}/analytics
@@ -21,12 +21,21 @@ GET /v1/orgs/{orgId}/projects/{projectId}/analytics
 
 ### Query parameters
 
-| Name          | Type   | Required | Description                        |
-| ------------- | ------ | -------- | ---------------------------------- |
-| `since`       | string | No       | Format: `date-time`.               |
-| `until`       | string | No       | Format: `date-time`.               |
-| `granularity` | string | No       | One of: `hour`, `day`.             |
-| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name          | Type    | Required | Description                         |
+| ------------- | ------- | -------- | ----------------------------------- |
+| `since`       | string  | No       | Format: `date-time`.                |
+| `until`       | string  | No       | Format: `date-time`.                |
+| `granularity` | string  | No       | One of: `hour`, `day`.              |
+| `environment` | string  | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`.  |
+| `path`        | string  | No       | —                                   |
+| `hostname`    | string  | No       | —                                   |
+| `referrer`    | string  | No       | —                                   |
+| `country`     | string  | No       | Pattern: `^(?:[A-Z]{2}\|Unknown)$`. |
+| `device`      | string  | No       | —                                   |
+| `browser`     | string  | No       | —                                   |
+| `os`          | string  | No       | —                                   |
+| `event`       | string  | No       | —                                   |
+| `limit`       | integer | No       | —                                   |
 
 ### Example
 
@@ -37,24 +46,81 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/analytics?since
 
 ### Responses
 
-| Status | Description                                          |
-| ------ | ---------------------------------------------------- |
-| `200`  | Bucketed traffic series with window totals.          |
-| `404`  | No such project or environment in this organization. |
-| `422`  | Invalid since, until, or granularity.                |
+| Status | Description                                                                 |
+| ------ | --------------------------------------------------------------------------- |
+| `200`  | Bucketed traffic series with window totals.                                 |
+| `404`  | No such project or environment in this organization.                        |
+| `422`  | Invalid time, granularity, filter, or limit. The maximum window is 90 days. |
+| `502`  | Analytics are unavailable — try again.                                      |
 
 ### Response body (200)
 
-| Field               | Type           | Description                                                                                                                                                |
-| ------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `series`            | object[]       | Ascending by bucket. Buckets the window saw no traffic for are omitted.                                                                                    |
-| `series[].bucket`   | string         | Start of the bucket (UTC). Format: `date-time`.                                                                                                            |
-| `series[].requests` | number         | —                                                                                                                                                          |
-| `series[].errors`   | number         | —                                                                                                                                                          |
-| `series[].cpuP50Us` | number or null | Median CPU time per request in microseconds — execution time, not wall-clock latency. Null when the bucket reports none; always-on apps never do.          |
-| `series[].cpuP99Us` | number or null | 99th-percentile CPU time per request in microseconds — execution time, not wall-clock latency. Null when the bucket reports none; always-on apps never do. |
-| `totals`            | object         | —                                                                                                                                                          |
-| `totals.requests`   | number         | —                                                                                                                                                          |
-| `totals.errors`     | number         | —                                                                                                                                                          |
-| `totals.errorRate`  | number         | errors / requests across the window; 0 when the window saw no requests.                                                                                    |
-| `note`              | string         | Present when there is context worth surfacing — for example the environment has no runtime yet.                                                            |
+| Field                                            | Type           | Description                                                                                                                                                 |
+| ------------------------------------------------ | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `series`                                         | object[]       | Ascending by bucket. Buckets the window saw no traffic for are omitted.                                                                                     |
+| `series[].bucket`                                | string         | Start of the bucket (UTC). Format: `date-time`.                                                                                                             |
+| `series[].requests`                              | number         | —                                                                                                                                                           |
+| `series[].errors`                                | number         | —                                                                                                                                                           |
+| `series[].cpuP50Us`                              | number or null | Median CPU time per request in microseconds — execution time, not wall-clock latency. Null when the bucket reports none; always-on apps never do.           |
+| `series[].cpuP99Us`                              | number or null | 99th-percentile CPU time per request in microseconds — execution time, not wall-clock latency. Null when the bucket reports none; always-on apps never do.  |
+| `totals`                                         | object         | —                                                                                                                                                           |
+| `totals.requests`                                | number         | —                                                                                                                                                           |
+| `totals.errors`                                  | number         | —                                                                                                                                                           |
+| `totals.errorRate`                               | number         | errors / requests across the window; 0 when the window saw no requests.                                                                                     |
+| `note`                                           | string         | Present when there is context worth surfacing — for example the environment has no runtime yet.                                                             |
+| `web`                                            | object         | Cookie-free web engagement data. Daily site-scoped visitor identifiers are not linkable across days or sites. Metrics can be estimated at very high volume. |
+| `web.series`                                     | object[]       | Ascending UTC buckets; empty buckets are omitted.                                                                                                           |
+| `web.series[].bucket`                            | string         | Start of the UTC bucket. Format: `date-time`.                                                                                                               |
+| `web.series[].visitors`                          | number         | Daily site-scoped visitor identifiers seen in this bucket.                                                                                                  |
+| `web.series[].pageViews`                         | number         | —                                                                                                                                                           |
+| `web.series[].customEvents`                      | number         | —                                                                                                                                                           |
+| `web.totals`                                     | object         | —                                                                                                                                                           |
+| `web.totals.visitors`                            | number         | —                                                                                                                                                           |
+| `web.totals.pageViews`                           | number         | —                                                                                                                                                           |
+| `web.totals.bounces`                             | number         | Daily visitors that produced exactly one page view.                                                                                                         |
+| `web.totals.bounceRate`                          | number         | bounces / visitors; 0 when no visitor was seen.                                                                                                             |
+| `web.totals.viewsPerVisitor`                     | number         | pageViews / visitors; 0 when no visitor was seen.                                                                                                           |
+| `web.totals.customEvents`                        | number         | —                                                                                                                                                           |
+| `web.activeVisitors`                             | number         | Daily visitor identifiers seen during the last five minutes.                                                                                                |
+| `web.breakdowns`                                 | object         | —                                                                                                                                                           |
+| `web.breakdowns.pages`                           | object[]       | —                                                                                                                                                           |
+| `web.breakdowns.pages[].value`                   | string         | —                                                                                                                                                           |
+| `web.breakdowns.pages[].visitors`                | number         | —                                                                                                                                                           |
+| `web.breakdowns.pages[].pageViews`               | number         | —                                                                                                                                                           |
+| `web.breakdowns.pages[].customEvents`            | number         | —                                                                                                                                                           |
+| `web.breakdowns.hostnames`                       | object[]       | —                                                                                                                                                           |
+| `web.breakdowns.hostnames[].value`               | string         | —                                                                                                                                                           |
+| `web.breakdowns.hostnames[].visitors`            | number         | —                                                                                                                                                           |
+| `web.breakdowns.hostnames[].pageViews`           | number         | —                                                                                                                                                           |
+| `web.breakdowns.hostnames[].customEvents`        | number         | —                                                                                                                                                           |
+| `web.breakdowns.referrers`                       | object[]       | —                                                                                                                                                           |
+| `web.breakdowns.referrers[].value`               | string         | —                                                                                                                                                           |
+| `web.breakdowns.referrers[].visitors`            | number         | —                                                                                                                                                           |
+| `web.breakdowns.referrers[].pageViews`           | number         | —                                                                                                                                                           |
+| `web.breakdowns.referrers[].customEvents`        | number         | —                                                                                                                                                           |
+| `web.breakdowns.countries`                       | object[]       | —                                                                                                                                                           |
+| `web.breakdowns.countries[].value`               | string         | —                                                                                                                                                           |
+| `web.breakdowns.countries[].visitors`            | number         | —                                                                                                                                                           |
+| `web.breakdowns.countries[].pageViews`           | number         | —                                                                                                                                                           |
+| `web.breakdowns.countries[].customEvents`        | number         | —                                                                                                                                                           |
+| `web.breakdowns.devices`                         | object[]       | —                                                                                                                                                           |
+| `web.breakdowns.devices[].value`                 | string         | —                                                                                                                                                           |
+| `web.breakdowns.devices[].visitors`              | number         | —                                                                                                                                                           |
+| `web.breakdowns.devices[].pageViews`             | number         | —                                                                                                                                                           |
+| `web.breakdowns.devices[].customEvents`          | number         | —                                                                                                                                                           |
+| `web.breakdowns.browsers`                        | object[]       | —                                                                                                                                                           |
+| `web.breakdowns.browsers[].value`                | string         | —                                                                                                                                                           |
+| `web.breakdowns.browsers[].visitors`             | number         | —                                                                                                                                                           |
+| `web.breakdowns.browsers[].pageViews`            | number         | —                                                                                                                                                           |
+| `web.breakdowns.browsers[].customEvents`         | number         | —                                                                                                                                                           |
+| `web.breakdowns.operatingSystems`                | object[]       | —                                                                                                                                                           |
+| `web.breakdowns.operatingSystems[].value`        | string         | —                                                                                                                                                           |
+| `web.breakdowns.operatingSystems[].visitors`     | number         | —                                                                                                                                                           |
+| `web.breakdowns.operatingSystems[].pageViews`    | number         | —                                                                                                                                                           |
+| `web.breakdowns.operatingSystems[].customEvents` | number         | —                                                                                                                                                           |
+| `web.breakdowns.events`                          | object[]       | —                                                                                                                                                           |
+| `web.breakdowns.events[].value`                  | string         | —                                                                                                                                                           |
+| `web.breakdowns.events[].visitors`               | number         | —                                                                                                                                                           |
+| `web.breakdowns.events[].pageViews`              | number         | —                                                                                                                                                           |
+| `web.breakdowns.events[].customEvents`           | number         | —                                                                                                                                                           |
+| `web.retentionDays`                              | integer        | One of: `90`.                                                                                                                                               |
