@@ -14153,6 +14153,10 @@
                       "type": ["object", "array", "string", "number", "boolean", "null"],
                       "description": "Bounded target response body retained for inspection as parsed JSON, sanitized text, or null when unavailable. Secret-like values are redacted."
                     },
+                    "responseBodyIsJson": {
+                      "type": "boolean",
+                      "description": "Whether the retained response body was complete, valid JSON before it was sanitized."
+                    },
                     "responseBodyTruncated": {
                       "type": "boolean",
                       "description": "Whether the retained response body exceeded the 32,768-byte limit."
@@ -14208,6 +14212,7 @@
                     "responseStatus",
                     "error",
                     "responseBody",
+                    "responseBodyIsJson",
                     "responseBodyTruncated",
                     "responseBodyUnavailable",
                     "responseContentType",
