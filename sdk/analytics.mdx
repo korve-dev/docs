@@ -1,0 +1,38 @@
+---
+title: "Web Analytics SDK"
+description: "Add privacy-safe page-view and custom-event collection to an app deployed on Korve."
+---
+
+Web analytics is opt-in. Korve does not collect a page view until application code initializes the
+browser SDK.
+
+<Warning>
+  `@korve-dev/analytics` is release-ready in the repository but is not yet available from the public
+  npm registry. Do not add it as an npm dependency until anonymous registry installation succeeds.
+</Warning>
+
+```ts
+import { createAnalytics } from "@korve-dev/analytics";
+
+const analytics = createAnalytics();
+analytics.track("signup_completed", {
+  plan: "pro",
+  seats: 3,
+});
+```
+
+The explicit `createAnalytics()` call sends the initial page view and follows History API and
+`popstate` navigation. Use `createAnalytics({ trackPageViews: false })` when a framework integration
+will call `analytics.pageview()` itself.
+
+The SDK sends bounded JSON to a same-origin Korve collection API. It needs no API key and stores no
+cookie. It removes query strings and fragments from paths and sends only the origin of the document
+referrer. It stops collection when Do Not Track or Global Privacy Control is enabled. Known bots
+are removed at the edge.
+
+Event names can contain letters, numbers, `_`, `.`, `:`, or `-` and can be up to 64 characters.
+Each event can include up to 16 scalar properties. Do not send personal data, secrets, or payment
+data in paths, event names, or properties.
+
+Read the report in the dashboard, with `korve analytics`, through `analytics.get` in the public API,
+or through the same operation in MCP Code Mode.
