@@ -1000,7 +1000,7 @@
                       "type": "array",
                       "items": {
                         "type": "string",
-                        "enum": ["google", "password", "magic_link"]
+                        "enum": ["google", "github", "password", "magic_link"]
                       }
                     },
                     "passwordMinLength": {
@@ -1195,6 +1195,130 @@
                   }
                 },
                 "required": ["email", "redirectUrl"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/apps/{projectId}/auth/oauth/github/callback": {
+      "get": {
+        "operationId": "appauth.githubCallback",
+        "summary": "Github Callback",
+        "description": "Validate the provider-bound one-time OAuth state and GitHub response, then redirect with a short-lived exchange code.",
+        "tags": ["appauth"],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project id (UUID) or globally unique project slug."
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "error",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [],
+        "responses": {
+          "302": {
+            "description": "Exact configured application redirect."
+          },
+          "400": {
+            "description": "Invalid, expired, consumed, or failed OAuth attempt."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true
+      }
+    },
+    "/v1/apps/{projectId}/auth/oauth/github/start": {
+      "post": {
+        "operationId": "appauth.startGithub",
+        "summary": "Start Github",
+        "description": "Create a single-use provider-bound state and PKCE challenge for an exact allowed redirect URL.",
+        "tags": ["appauth"],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project id (UUID) or globally unique project slug."
+          }
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Authorization URL and browser state value.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "authorizationUrl": {
+                      "type": "string"
+                    },
+                    "state": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["authorizationUrl", "state"]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such project or app-auth resource in this organization."
+          },
+          "422": {
+            "description": "Invalid configuration or request."
+          },
+          "429": {
+            "description": "Too many sign-in attempts."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "redirectUrl": {
+                    "type": "string"
+                  }
+                },
+                "required": ["redirectUrl"],
                 "additionalProperties": false
               }
             }
@@ -12462,6 +12586,208 @@
         "x-korve-required-role": "admin"
       }
     },
+    "/v1/orgs/{orgId}/projects/{projectId}/auth/providers/github/rotate": {
+      "post": {
+        "operationId": "appauth.rotateGithubSecret",
+        "summary": "Rotate Github Secret",
+        "description": "Replace the encrypted GitHub OAuth secret and increment its rotation version.",
+        "tags": ["appauth"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          }
+        ],
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Provider status without its secret.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "clientId": {
+                      "type": ["string", "null"]
+                    },
+                    "secretConfigured": {
+                      "type": "boolean"
+                    },
+                    "secretVersion": {
+                      "type": ["integer", "null"]
+                    },
+                    "rotatedAt": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "enabled",
+                    "clientId",
+                    "secretConfigured",
+                    "secretVersion",
+                    "rotatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such project or app-auth resource in this organization."
+          },
+          "422": {
+            "description": "Invalid configuration or request."
+          }
+        },
+        "x-korve-risk": "dangerous",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "owner",
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "clientSecret": {
+                    "type": "string",
+                    "description": "Write-only OAuth client secret."
+                  }
+                },
+                "required": ["clientSecret"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/auth/providers/github": {
+      "put": {
+        "operationId": "appauth.setGithubProvider",
+        "summary": "Set Github Provider",
+        "description": "Configure GitHub OAuth with the customer's client id and a secret encrypted at ingestion.",
+        "tags": ["appauth"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          }
+        ],
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Provider status without its secret.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "clientId": {
+                      "type": ["string", "null"]
+                    },
+                    "secretConfigured": {
+                      "type": "boolean"
+                    },
+                    "secretVersion": {
+                      "type": ["integer", "null"]
+                    },
+                    "rotatedAt": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "enabled",
+                    "clientId",
+                    "secretConfigured",
+                    "secretVersion",
+                    "rotatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such project or app-auth resource in this organization."
+          },
+          "422": {
+            "description": "Invalid configuration or request."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "owner",
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "clientId": {
+                    "type": "string"
+                  },
+                  "clientSecret": {
+                    "type": "string",
+                    "description": "Write-only OAuth client secret."
+                  },
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["clientId", "clientSecret", "enabled"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/orgs/{orgId}/projects/{projectId}/auth/providers/google/rotate": {
       "post": {
         "operationId": "appauth.rotateGoogleSecret",
@@ -13047,7 +13373,7 @@
                         "properties": {
                           "provider": {
                             "type": "string",
-                            "enum": ["google", "credential", "magic_link"]
+                            "enum": ["google", "github", "credential", "magic_link"]
                           },
                           "providerEmail": {
                             "type": "string",
@@ -13440,9 +13766,41 @@
                         "rotatedAt"
                       ]
                     },
+                    "github": {
+                      "type": "object",
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "clientId": {
+                          "type": ["string", "null"]
+                        },
+                        "secretConfigured": {
+                          "type": "boolean"
+                        },
+                        "secretVersion": {
+                          "type": ["integer", "null"]
+                        },
+                        "rotatedAt": {
+                          "type": ["string", "null"],
+                          "format": "date-time"
+                        }
+                      },
+                      "required": [
+                        "enabled",
+                        "clientId",
+                        "secretConfigured",
+                        "secretVersion",
+                        "rotatedAt"
+                      ]
+                    },
                     "callbackUrl": {
                       "type": "string",
                       "description": "Exact Google OAuth callback URL to register for this project."
+                    },
+                    "githubCallbackUrl": {
+                      "type": "string",
+                      "description": "Exact GitHub OAuth callback URL to register for this project."
                     },
                     "createdAt": {
                       "type": "string",
@@ -13467,7 +13825,9 @@
                     "magicLinkTtlSeconds",
                     "passwordResetTtlSeconds",
                     "google",
+                    "github",
                     "callbackUrl",
+                    "githubCallbackUrl",
                     "createdAt",
                     "updatedAt"
                   ]
@@ -13599,9 +13959,41 @@
                         "rotatedAt"
                       ]
                     },
+                    "github": {
+                      "type": "object",
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "clientId": {
+                          "type": ["string", "null"]
+                        },
+                        "secretConfigured": {
+                          "type": "boolean"
+                        },
+                        "secretVersion": {
+                          "type": ["integer", "null"]
+                        },
+                        "rotatedAt": {
+                          "type": ["string", "null"],
+                          "format": "date-time"
+                        }
+                      },
+                      "required": [
+                        "enabled",
+                        "clientId",
+                        "secretConfigured",
+                        "secretVersion",
+                        "rotatedAt"
+                      ]
+                    },
                     "callbackUrl": {
                       "type": "string",
                       "description": "Exact Google OAuth callback URL to register for this project."
+                    },
+                    "githubCallbackUrl": {
+                      "type": "string",
+                      "description": "Exact GitHub OAuth callback URL to register for this project."
                     },
                     "createdAt": {
                       "type": "string",
@@ -13626,7 +14018,9 @@
                     "magicLinkTtlSeconds",
                     "passwordResetTtlSeconds",
                     "google",
+                    "github",
                     "callbackUrl",
+                    "githubCallbackUrl",
                     "createdAt",
                     "updatedAt"
                   ]
