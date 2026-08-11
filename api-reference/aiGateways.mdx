@@ -202,15 +202,18 @@ PATCH /v1/orgs/{orgId}/projects/{projectId}/ai-gateways/{gatewayId}
 curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-gateways/$GATEWAY_ID" \
   -H "Authorization: Bearer korve_..." \
   -H "Content-Type: application/json" \
-  -d '{}'
+  -d '{
+  "name": "example"
+}'
 ```
 
 ### Responses
 
-| Status | Description         |
-| ------ | ------------------- |
-| `200`  | Updated AI gateway. |
-| `404`  | No such gateway.    |
+| Status | Description                    |
+| ------ | ------------------------------ |
+| `200`  | Updated AI gateway.            |
+| `404`  | No such gateway.               |
+| `422`  | Invalid gateway configuration. |
 
 ### Response body (200)
 
