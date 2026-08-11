@@ -56,7 +56,14 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth" \
 | `google.secretConfigured` | boolean         | —                                                                                       |
 | `google.secretVersion`    | integer or null | —                                                                                       |
 | `google.rotatedAt`        | string or null  | Format: `date-time`.                                                                    |
+| `github`                  | object          | —                                                                                       |
+| `github.enabled`          | boolean         | —                                                                                       |
+| `github.clientId`         | string or null  | —                                                                                       |
+| `github.secretConfigured` | boolean         | —                                                                                       |
+| `github.secretVersion`    | integer or null | —                                                                                       |
+| `github.rotatedAt`        | string or null  | Format: `date-time`.                                                                    |
 | `callbackUrl`             | string          | Exact Google OAuth callback URL to register for this project.                           |
+| `githubCallbackUrl`       | string          | Exact GitHub OAuth callback URL to register for this project.                           |
 | `createdAt`               | string          | Format: `date-time`.                                                                    |
 | `updatedAt`               | string          | Format: `date-time`.                                                                    |
 
@@ -136,7 +143,14 @@ curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth" \
 | `google.secretConfigured` | boolean         | —                                                                                       |
 | `google.secretVersion`    | integer or null | —                                                                                       |
 | `google.rotatedAt`        | string or null  | Format: `date-time`.                                                                    |
+| `github`                  | object          | —                                                                                       |
+| `github.enabled`          | boolean         | —                                                                                       |
+| `github.clientId`         | string or null  | —                                                                                       |
+| `github.secretConfigured` | boolean         | —                                                                                       |
+| `github.secretVersion`    | integer or null | —                                                                                       |
+| `github.rotatedAt`        | string or null  | Format: `date-time`.                                                                    |
 | `callbackUrl`             | string          | Exact Google OAuth callback URL to register for this project.                           |
+| `githubCallbackUrl`       | string          | Exact GitHub OAuth callback URL to register for this project.                           |
 | `createdAt`               | string          | Format: `date-time`.                                                                    |
 | `updatedAt`               | string          | Format: `date-time`.                                                                    |
 
@@ -265,6 +279,104 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth/pr
 | `secretVersion`    | integer or null | —                    |
 | `rotatedAt`        | string or null  | Format: `date-time`. |
 
+## appauth.setGithubProvider
+
+Configure GitHub OAuth with the customer's client id and a secret encrypted at ingestion.
+
+```text
+PUT /v1/orgs/{orgId}/projects/{projectId}/auth/providers/github
+```
+
+- **Auth:** Dashboard session only — organization API keys are rejected.
+- **Minimum role:** `owner`
+- **Risk:** `write` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field          | Type    | Required | Description                     |
+| -------------- | ------- | -------- | ------------------------------- |
+| `clientId`     | string  | Yes      | —                               |
+| `clientSecret` | string  | Yes      | Write-only OAuth client secret. |
+| `enabled`      | boolean | Yes      | —                               |
+
+### Example
+
+```bash
+curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth/providers/github" \
+  -b "$SESSION" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "clientId": "example",
+  "clientSecret": "example",
+  "enabled": true
+}'
+```
+
+### Responses
+
+| Status | Description                                                |
+| ------ | ---------------------------------------------------------- |
+| `200`  | Provider status without its secret.                        |
+| `404`  | No such project or app-auth resource in this organization. |
+| `422`  | Invalid configuration or request.                          |
+
+### Response body (200)
+
+| Field              | Type            | Description          |
+| ------------------ | --------------- | -------------------- |
+| `enabled`          | boolean         | —                    |
+| `clientId`         | string or null  | —                    |
+| `secretConfigured` | boolean         | —                    |
+| `secretVersion`    | integer or null | —                    |
+| `rotatedAt`        | string or null  | Format: `date-time`. |
+
+## appauth.rotateGithubSecret
+
+Replace the encrypted GitHub OAuth secret and increment its rotation version.
+
+```text
+POST /v1/orgs/{orgId}/projects/{projectId}/auth/providers/github/rotate
+```
+
+- **Auth:** Dashboard session only — organization API keys are rejected.
+- **Minimum role:** `owner`
+- **Risk:** `dangerous` · sensitive (elevated blast radius)
+
+### Request body
+
+| Field          | Type   | Required | Description                     |
+| -------------- | ------ | -------- | ------------------------------- |
+| `clientSecret` | string | Yes      | Write-only OAuth client secret. |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth/providers/github/rotate" \
+  -b "$SESSION" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "clientSecret": "example"
+}'
+```
+
+### Responses
+
+| Status | Description                                                |
+| ------ | ---------------------------------------------------------- |
+| `200`  | Provider status without its secret.                        |
+| `404`  | No such project or app-auth resource in this organization. |
+| `422`  | Invalid configuration or request.                          |
+
+### Response body (200)
+
+| Field              | Type            | Description          |
+| ------------------ | --------------- | -------------------- |
+| `enabled`          | boolean         | —                    |
+| `clientId`         | string or null  | —                    |
+| `secretConfigured` | boolean         | —                    |
+| `secretVersion`    | integer or null | —                    |
+| `rotatedAt`        | string or null  | Format: `date-time`. |
+
 ## appauth.listUsers
 
 Search and page customer-app users, newest first.
@@ -346,31 +458,31 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth/users/$USE
 
 ### Response body (200)
 
-| Field                        | Type           | Description                                   |
-| ---------------------------- | -------------- | --------------------------------------------- |
-| `user`                       | object         | —                                             |
-| `user.id`                    | string         | —                                             |
-| `user.email`                 | string         | Format: `email`.                              |
-| `user.emailVerified`         | boolean        | —                                             |
-| `user.name`                  | string or null | —                                             |
-| `user.image`                 | string or null | —                                             |
-| `user.disabledAt`            | string or null | Format: `date-time`.                          |
-| `user.createdAt`             | string         | Format: `date-time`.                          |
-| `user.lastSignInAt`          | string or null | Format: `date-time`.                          |
-| `user.lastActiveAt`          | string or null | Format: `date-time`.                          |
-| `identities`                 | object[]       | —                                             |
-| `identities[].provider`      | string         | One of: `google`, `credential`, `magic_link`. |
-| `identities[].providerEmail` | string         | Format: `email`.                              |
-| `identities[].emailVerified` | boolean        | —                                             |
-| `identities[].createdAt`     | string         | Format: `date-time`.                          |
-| `identities[].lastSignInAt`  | string or null | Format: `date-time`.                          |
-| `sessions`                   | object[]       | —                                             |
-| `sessions[].id`              | string         | —                                             |
-| `sessions[].createdAt`       | string         | Format: `date-time`.                          |
-| `sessions[].lastActiveAt`    | string         | Format: `date-time`.                          |
-| `sessions[].expiresAt`       | string         | Format: `date-time`.                          |
-| `sessions[].revokedAt`       | string or null | Format: `date-time`.                          |
-| `sessions[].userAgent`       | string or null | —                                             |
+| Field                        | Type           | Description                                             |
+| ---------------------------- | -------------- | ------------------------------------------------------- |
+| `user`                       | object         | —                                                       |
+| `user.id`                    | string         | —                                                       |
+| `user.email`                 | string         | Format: `email`.                                        |
+| `user.emailVerified`         | boolean        | —                                                       |
+| `user.name`                  | string or null | —                                                       |
+| `user.image`                 | string or null | —                                                       |
+| `user.disabledAt`            | string or null | Format: `date-time`.                                    |
+| `user.createdAt`             | string         | Format: `date-time`.                                    |
+| `user.lastSignInAt`          | string or null | Format: `date-time`.                                    |
+| `user.lastActiveAt`          | string or null | Format: `date-time`.                                    |
+| `identities`                 | object[]       | —                                                       |
+| `identities[].provider`      | string         | One of: `google`, `github`, `credential`, `magic_link`. |
+| `identities[].providerEmail` | string         | Format: `email`.                                        |
+| `identities[].emailVerified` | boolean        | —                                                       |
+| `identities[].createdAt`     | string         | Format: `date-time`.                                    |
+| `identities[].lastSignInAt`  | string or null | Format: `date-time`.                                    |
+| `sessions`                   | object[]       | —                                                       |
+| `sessions[].id`              | string         | —                                                       |
+| `sessions[].createdAt`       | string         | Format: `date-time`.                                    |
+| `sessions[].lastActiveAt`    | string         | Format: `date-time`.                                    |
+| `sessions[].expiresAt`       | string         | Format: `date-time`.                                    |
+| `sessions[].revokedAt`       | string or null | Format: `date-time`.                                    |
+| `sessions[].userAgent`       | string or null | —                                                       |
 
 ## appauth.revokeUserSessions
 
@@ -595,6 +707,55 @@ POST /v1/apps/{projectId}/auth/oauth/google/start
 
 ```bash
 curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/oauth/google/start" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "redirectUrl": "https://app.acme.com/auth/callback"
+}'
+```
+
+### Responses
+
+| Status | Description                                                |
+| ------ | ---------------------------------------------------------- |
+| `200`  | Authorization URL and browser state value.                 |
+| `404`  | No such project or app-auth resource in this organization. |
+| `422`  | Invalid configuration or request.                          |
+| `429`  | Too many sign-in attempts.                                 |
+
+### Response body (200)
+
+| Field              | Type   | Description |
+| ------------------ | ------ | ----------- |
+| `authorizationUrl` | string | —           |
+| `state`            | string | —           |
+
+## appauth.startGithub
+
+Create a single-use provider-bound state and PKCE challenge for an exact allowed redirect URL.
+
+```text
+POST /v1/apps/{projectId}/auth/oauth/github/start
+```
+
+- **Auth:** None — public endpoint.
+- **Risk:** `write`
+
+### Path parameters
+
+| Name        | Type   | Required | Description |
+| ----------- | ------ | -------- | ----------- |
+| `projectId` | string | Yes      | —           |
+
+### Request body
+
+| Field         | Type   | Required | Description |
+| ------------- | ------ | -------- | ----------- |
+| `redirectUrl` | string | Yes      | —           |
+
+### Example
+
+```bash
+curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/oauth/github/start" \
   -H "Content-Type: application/json" \
   -d '{
   "redirectUrl": "https://app.acme.com/auth/callback"
@@ -945,6 +1106,44 @@ GET /v1/apps/{projectId}/auth/oauth/google/callback
 
 ```bash
 curl "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/oauth/google/callback?state=example"
+```
+
+### Responses
+
+| Status | Description                                          |
+| ------ | ---------------------------------------------------- |
+| `302`  | Exact configured application redirect.               |
+| `400`  | Invalid, expired, consumed, or failed OAuth attempt. |
+
+## appauth.githubCallback
+
+Validate the provider-bound one-time OAuth state and GitHub response, then redirect with a short-lived exchange code.
+
+```text
+GET /v1/apps/{projectId}/auth/oauth/github/callback
+```
+
+- **Auth:** None — public endpoint.
+- **Risk:** `read`
+
+### Path parameters
+
+| Name        | Type   | Required | Description |
+| ----------- | ------ | -------- | ----------- |
+| `projectId` | string | Yes      | —           |
+
+### Query parameters
+
+| Name    | Type   | Required | Description |
+| ------- | ------ | -------- | ----------- |
+| `state` | string | Yes      | —           |
+| `code`  | string | No       | —           |
+| `error` | string | No       | —           |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/oauth/github/callback?state=example"
 ```
 
 ### Responses
