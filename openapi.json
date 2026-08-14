@@ -35951,7 +35951,7 @@
                           },
                           "action": {
                             "type": "string",
-                            "enum": ["scale-up", "scale-down", "hold"]
+                            "enum": ["scale-up", "scale-down"]
                           },
                           "reason": {
                             "type": "string",

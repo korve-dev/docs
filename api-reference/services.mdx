@@ -204,7 +204,7 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/services/$SERVI
 | ----------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `items`                       | object[]       | —                                                                                                                                                            |
 | `items[].id`                  | string         | Opaque scale event id.                                                                                                                                       |
-| `items[].action`              | string         | One of: `scale-up`, `scale-down`, `hold`.                                                                                                                    |
+| `items[].action`              | string         | One of: `scale-up`, `scale-down`.                                                                                                                            |
 | `items[].reason`              | string         | Customer-facing reason for the scaling decision. One of: `request-demand`, `concurrency`, `idle`, `policy-change`, `deployment`, `recovery`, `budget-limit`. |
 | `items[].fromReplicas`        | integer        | —                                                                                                                                                            |
 | `items[].toReplicas`          | integer        | —                                                                                                                                                            |
