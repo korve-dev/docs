@@ -1,0 +1,214 @@
+---
+title: "services"
+description: "Request-driven web services that Korve places and scales automatically. Customers set safety limits, not infrastructure sizes. Background consumers, scheduled jobs, and state on local disk are outside this contract."
+---
+
+{/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
+
+Request-driven web services that Korve places and scales automatically. Customers set safety limits, not infrastructure sizes. Background consumers, scheduled jobs, and state on local disk are outside this contract.
+
+## services.list
+
+List the project's services with their current scaling policy and state.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/services
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/services" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                           |
+| ------ | ------------------------------------- |
+| `200`  | Project services.                     |
+| `404`  | No such project in this organization. |
+
+### Response body (200)
+
+An array of objects with these fields:
+
+| Field                              | Type           | Description                                                                                                      |
+| ---------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `id`                               | string         | Opaque service id.                                                                                               |
+| `name`                             | string         | Stable customer-facing service name.                                                                             |
+| `kind`                             | string         | One of: `web`.                                                                                                   |
+| `scaling`                          | object         | Customer limits for automatic scaling. Korve selects capacity and changes replica count within these limits.     |
+| `scaling.minimumReady`             | integer        | Minimum ready replicas. Zero lets an idle service stop so that it does not create compute charges.               |
+| `scaling.maximumReplicas`          | integer        | Maximum replicas Korve can run for this service. The default limits unexpected cost while traffic grows.         |
+| `scaling.targetConcurrency`        | integer        | Target number of active requests per ready replica. Korve scales out before sustained demand exceeds this value. |
+| `scalingState`                     | object         | Latest observed automatic-scaling state. It is operational data, not a billing meter.                            |
+| `scalingState.status`              | string         | One of: `idle`, `starting`, `ready`, `scaling`, `draining`, `degraded`.                                          |
+| `scalingState.desiredReplicas`     | integer        | —                                                                                                                |
+| `scalingState.readyReplicas`       | integer        | —                                                                                                                |
+| `scalingState.pendingRequests`     | integer        | —                                                                                                                |
+| `scalingState.observedConcurrency` | integer        | Active requests across all ready replicas at the last evaluation.                                                |
+| `scalingState.lastEvaluatedAt`     | string or null | Time of the latest scaling evaluation; null before the first evaluation. Format: `date-time`.                    |
+| `createdAt`                        | string         | Format: `date-time`.                                                                                             |
+| `updatedAt`                        | string         | Format: `date-time`.                                                                                             |
+
+## services.get
+
+Get one service with its current scaling policy and observed state.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/services/{serviceId}
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/services/$SERVICE_ID" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                      |
+| ------ | -------------------------------- |
+| `200`  | The service.                     |
+| `404`  | No such service in this project. |
+
+### Response body (200)
+
+| Field                              | Type           | Description                                                                                                      |
+| ---------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `id`                               | string         | Opaque service id.                                                                                               |
+| `name`                             | string         | Stable customer-facing service name.                                                                             |
+| `kind`                             | string         | One of: `web`.                                                                                                   |
+| `scaling`                          | object         | Customer limits for automatic scaling. Korve selects capacity and changes replica count within these limits.     |
+| `scaling.minimumReady`             | integer        | Minimum ready replicas. Zero lets an idle service stop so that it does not create compute charges.               |
+| `scaling.maximumReplicas`          | integer        | Maximum replicas Korve can run for this service. The default limits unexpected cost while traffic grows.         |
+| `scaling.targetConcurrency`        | integer        | Target number of active requests per ready replica. Korve scales out before sustained demand exceeds this value. |
+| `scalingState`                     | object         | Latest observed automatic-scaling state. It is operational data, not a billing meter.                            |
+| `scalingState.status`              | string         | One of: `idle`, `starting`, `ready`, `scaling`, `draining`, `degraded`.                                          |
+| `scalingState.desiredReplicas`     | integer        | —                                                                                                                |
+| `scalingState.readyReplicas`       | integer        | —                                                                                                                |
+| `scalingState.pendingRequests`     | integer        | —                                                                                                                |
+| `scalingState.observedConcurrency` | integer        | Active requests across all ready replicas at the last evaluation.                                                |
+| `scalingState.lastEvaluatedAt`     | string or null | Time of the latest scaling evaluation; null before the first evaluation. Format: `date-time`.                    |
+| `createdAt`                        | string         | Format: `date-time`.                                                                                             |
+| `updatedAt`                        | string         | Format: `date-time`.                                                                                             |
+
+## services.updateScaling
+
+Change automatic-scaling safety limits. Omitted fields keep their current values. minimumReady must not exceed maximumReplicas.
+
+```text
+PATCH /v1/orgs/{orgId}/projects/{projectId}/services/{serviceId}/scaling
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `admin`
+- **Billing:** requires active organization billing — returns `402` otherwise.
+- **Risk:** `write`
+
+### Request body
+
+| Field               | Type    | Required | Description                                                                                                      |
+| ------------------- | ------- | -------- | ---------------------------------------------------------------------------------------------------------------- |
+| `minimumReady`      | integer | No       | Minimum ready replicas. Zero lets an idle service stop so that it does not create compute charges.               |
+| `maximumReplicas`   | integer | No       | Maximum replicas Korve can run for this service. The default limits unexpected cost while traffic grows.         |
+| `targetConcurrency` | integer | No       | Target number of active requests per ready replica. Korve scales out before sustained demand exceeds this value. |
+
+### Example
+
+```bash
+curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/services/$SERVICE_ID/scaling" \
+  -H "Authorization: Bearer korve_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+  "minimumReady": 0
+}'
+```
+
+### Responses
+
+| Status | Description                                                                           |
+| ------ | ------------------------------------------------------------------------------------- |
+| `200`  | Updated service.                                                                      |
+| `402`  | Organization billing is not active.                                                   |
+| `404`  | No such service in this project.                                                      |
+| `422`  | Invalid scaling limits, no fields to update, or minimumReady exceeds maximumReplicas. |
+
+### Response body (200)
+
+| Field                              | Type           | Description                                                                                                      |
+| ---------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `id`                               | string         | Opaque service id.                                                                                               |
+| `name`                             | string         | Stable customer-facing service name.                                                                             |
+| `kind`                             | string         | One of: `web`.                                                                                                   |
+| `scaling`                          | object         | Customer limits for automatic scaling. Korve selects capacity and changes replica count within these limits.     |
+| `scaling.minimumReady`             | integer        | Minimum ready replicas. Zero lets an idle service stop so that it does not create compute charges.               |
+| `scaling.maximumReplicas`          | integer        | Maximum replicas Korve can run for this service. The default limits unexpected cost while traffic grows.         |
+| `scaling.targetConcurrency`        | integer        | Target number of active requests per ready replica. Korve scales out before sustained demand exceeds this value. |
+| `scalingState`                     | object         | Latest observed automatic-scaling state. It is operational data, not a billing meter.                            |
+| `scalingState.status`              | string         | One of: `idle`, `starting`, `ready`, `scaling`, `draining`, `degraded`.                                          |
+| `scalingState.desiredReplicas`     | integer        | —                                                                                                                |
+| `scalingState.readyReplicas`       | integer        | —                                                                                                                |
+| `scalingState.pendingRequests`     | integer        | —                                                                                                                |
+| `scalingState.observedConcurrency` | integer        | Active requests across all ready replicas at the last evaluation.                                                |
+| `scalingState.lastEvaluatedAt`     | string or null | Time of the latest scaling evaluation; null before the first evaluation. Format: `date-time`.                    |
+| `createdAt`                        | string         | Format: `date-time`.                                                                                             |
+| `updatedAt`                        | string         | Format: `date-time`.                                                                                             |
+
+## services.listScaleEvents
+
+List recent automatic-scaling decisions for diagnosis and cost review.
+
+```text
+GET /v1/orgs/{orgId}/projects/{projectId}/services/{serviceId}/scale-events
+```
+
+- **Auth:** Organization API key (`Authorization: Bearer korve_...`) or dashboard session.
+- **Minimum role:** `member`
+- **Risk:** `read`
+
+### Query parameters
+
+| Name     | Type    | Required | Description |
+| -------- | ------- | -------- | ----------- |
+| `limit`  | integer | No       | —           |
+| `cursor` | string  | No       | —           |
+
+### Example
+
+```bash
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/services/$SERVICE_ID/scale-events?limit=100" \
+  -H "Authorization: Bearer korve_..."
+```
+
+### Responses
+
+| Status | Description                      |
+| ------ | -------------------------------- |
+| `200`  | Scale events, newest first.      |
+| `404`  | No such service in this project. |
+
+### Response body (200)
+
+| Field                         | Type           | Description                                                                                                                                                  |
+| ----------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `items`                       | object[]       | —                                                                                                                                                            |
+| `items[].id`                  | string         | Opaque scale event id.                                                                                                                                       |
+| `items[].action`              | string         | One of: `scale-up`, `scale-down`, `hold`.                                                                                                                    |
+| `items[].reason`              | string         | Customer-facing reason for the scaling decision. One of: `request-demand`, `concurrency`, `idle`, `policy-change`, `deployment`, `recovery`, `budget-limit`. |
+| `items[].fromReplicas`        | integer        | —                                                                                                                                                            |
+| `items[].toReplicas`          | integer        | —                                                                                                                                                            |
+| `items[].observedConcurrency` | integer        | —                                                                                                                                                            |
+| `items[].pendingRequests`     | integer        | —                                                                                                                                                            |
+| `items[].createdAt`           | string         | Format: `date-time`.                                                                                                                                         |
+| `nextCursor`                  | string or null | —                                                                                                                                                            |

@@ -35869,6 +35869,674 @@
         "x-korve-required-role": "member"
       }
     },
+    "/v1/orgs/{orgId}/projects/{projectId}/services/{serviceId}/scale-events": {
+      "get": {
+        "operationId": "services.listScaleEvents",
+        "summary": "List Scale Events",
+        "description": "List recent automatic-scaling decisions for diagnosis and cost review.",
+        "tags": ["services"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "serviceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            },
+            "description": "Maximum events to return. Defaults to 50."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Opaque cursor from the previous response."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Scale events, newest first.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Opaque scale event id."
+                          },
+                          "action": {
+                            "type": "string",
+                            "enum": ["scale-up", "scale-down", "hold"]
+                          },
+                          "reason": {
+                            "type": "string",
+                            "enum": [
+                              "request-demand",
+                              "concurrency",
+                              "idle",
+                              "policy-change",
+                              "deployment",
+                              "recovery",
+                              "budget-limit"
+                            ],
+                            "description": "Customer-facing reason for the scaling decision."
+                          },
+                          "fromReplicas": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "toReplicas": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "observedConcurrency": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "pendingRequests": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "action",
+                          "reason",
+                          "fromReplicas",
+                          "toReplicas",
+                          "observedConcurrency",
+                          "pendingRequests",
+                          "createdAt"
+                        ]
+                      }
+                    },
+                    "nextCursor": {
+                      "type": ["string", "null"]
+                    }
+                  },
+                  "required": ["items", "nextCursor"]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such service in this project."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/services/{serviceId}/scaling": {
+      "patch": {
+        "operationId": "services.updateScaling",
+        "summary": "Update Scaling",
+        "description": "Change automatic-scaling safety limits. Omitted fields keep their current values. minimumReady must not exceed maximumReplicas.",
+        "tags": ["services"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "serviceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Updated service.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Opaque service id."
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Stable customer-facing service name."
+                    },
+                    "kind": {
+                      "type": "string",
+                      "enum": ["web"]
+                    },
+                    "scaling": {
+                      "type": "object",
+                      "description": "Customer limits for automatic scaling. Korve selects capacity and changes replica count within these limits.",
+                      "properties": {
+                        "minimumReady": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 20,
+                          "default": 0,
+                          "description": "Minimum ready replicas. Zero lets an idle service stop so that it does not create compute charges."
+                        },
+                        "maximumReplicas": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 20,
+                          "default": 10,
+                          "description": "Maximum replicas Korve can run for this service. The default limits unexpected cost while traffic grows."
+                        },
+                        "targetConcurrency": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 1000,
+                          "default": 40,
+                          "description": "Target number of active requests per ready replica. Korve scales out before sustained demand exceeds this value."
+                        }
+                      },
+                      "required": ["minimumReady", "maximumReplicas", "targetConcurrency"]
+                    },
+                    "scalingState": {
+                      "type": "object",
+                      "description": "Latest observed automatic-scaling state. It is operational data, not a billing meter.",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "enum": ["idle", "starting", "ready", "scaling", "draining", "degraded"]
+                        },
+                        "desiredReplicas": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "readyReplicas": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "pendingRequests": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "observedConcurrency": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "description": "Active requests across all ready replicas at the last evaluation."
+                        },
+                        "lastEvaluatedAt": {
+                          "type": ["string", "null"],
+                          "format": "date-time",
+                          "description": "Time of the latest scaling evaluation; null before the first evaluation."
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "desiredReplicas",
+                        "readyReplicas",
+                        "pendingRequests",
+                        "observedConcurrency",
+                        "lastEvaluatedAt"
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "kind",
+                    "scaling",
+                    "scalingState",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "No such service in this project."
+          },
+          "422": {
+            "description": "Invalid scaling limits, no fields to update, or minimumReady exceeds maximumReplicas."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "admin",
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "minimumReady": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 20,
+                    "default": 0,
+                    "description": "Minimum ready replicas. Zero lets an idle service stop so that it does not create compute charges."
+                  },
+                  "maximumReplicas": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 20,
+                    "default": 10,
+                    "description": "Maximum replicas Korve can run for this service. The default limits unexpected cost while traffic grows."
+                  },
+                  "targetConcurrency": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000,
+                    "default": 40,
+                    "description": "Target number of active requests per ready replica. Korve scales out before sustained demand exceeds this value."
+                  }
+                },
+                "additionalProperties": false,
+                "minProperties": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/services/{serviceId}": {
+      "get": {
+        "operationId": "services.get",
+        "summary": "Get",
+        "description": "Get one service with its current scaling policy and observed state.",
+        "tags": ["services"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "serviceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The service.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Opaque service id."
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Stable customer-facing service name."
+                    },
+                    "kind": {
+                      "type": "string",
+                      "enum": ["web"]
+                    },
+                    "scaling": {
+                      "type": "object",
+                      "description": "Customer limits for automatic scaling. Korve selects capacity and changes replica count within these limits.",
+                      "properties": {
+                        "minimumReady": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 20,
+                          "default": 0,
+                          "description": "Minimum ready replicas. Zero lets an idle service stop so that it does not create compute charges."
+                        },
+                        "maximumReplicas": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 20,
+                          "default": 10,
+                          "description": "Maximum replicas Korve can run for this service. The default limits unexpected cost while traffic grows."
+                        },
+                        "targetConcurrency": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 1000,
+                          "default": 40,
+                          "description": "Target number of active requests per ready replica. Korve scales out before sustained demand exceeds this value."
+                        }
+                      },
+                      "required": ["minimumReady", "maximumReplicas", "targetConcurrency"]
+                    },
+                    "scalingState": {
+                      "type": "object",
+                      "description": "Latest observed automatic-scaling state. It is operational data, not a billing meter.",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "enum": ["idle", "starting", "ready", "scaling", "draining", "degraded"]
+                        },
+                        "desiredReplicas": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "readyReplicas": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "pendingRequests": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "observedConcurrency": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "description": "Active requests across all ready replicas at the last evaluation."
+                        },
+                        "lastEvaluatedAt": {
+                          "type": ["string", "null"],
+                          "format": "date-time",
+                          "description": "Time of the latest scaling evaluation; null before the first evaluation."
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "desiredReplicas",
+                        "readyReplicas",
+                        "pendingRequests",
+                        "observedConcurrency",
+                        "lastEvaluatedAt"
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "kind",
+                    "scaling",
+                    "scalingState",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such service in this project."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/services": {
+      "get": {
+        "operationId": "services.list",
+        "summary": "List",
+        "description": "List the project's services with their current scaling policy and state.",
+        "tags": ["services"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Project services.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "Opaque service id."
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "Stable customer-facing service name."
+                      },
+                      "kind": {
+                        "type": "string",
+                        "enum": ["web"]
+                      },
+                      "scaling": {
+                        "type": "object",
+                        "description": "Customer limits for automatic scaling. Korve selects capacity and changes replica count within these limits.",
+                        "properties": {
+                          "minimumReady": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 20,
+                            "default": 0,
+                            "description": "Minimum ready replicas. Zero lets an idle service stop so that it does not create compute charges."
+                          },
+                          "maximumReplicas": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 20,
+                            "default": 10,
+                            "description": "Maximum replicas Korve can run for this service. The default limits unexpected cost while traffic grows."
+                          },
+                          "targetConcurrency": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 1000,
+                            "default": 40,
+                            "description": "Target number of active requests per ready replica. Korve scales out before sustained demand exceeds this value."
+                          }
+                        },
+                        "required": ["minimumReady", "maximumReplicas", "targetConcurrency"]
+                      },
+                      "scalingState": {
+                        "type": "object",
+                        "description": "Latest observed automatic-scaling state. It is operational data, not a billing meter.",
+                        "properties": {
+                          "status": {
+                            "type": "string",
+                            "enum": ["idle", "starting", "ready", "scaling", "draining", "degraded"]
+                          },
+                          "desiredReplicas": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "readyReplicas": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "pendingRequests": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "observedConcurrency": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Active requests across all ready replicas at the last evaluation."
+                          },
+                          "lastEvaluatedAt": {
+                            "type": ["string", "null"],
+                            "format": "date-time",
+                            "description": "Time of the latest scaling evaluation; null before the first evaluation."
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "desiredReplicas",
+                          "readyReplicas",
+                          "pendingRequests",
+                          "observedConcurrency",
+                          "lastEvaluatedAt"
+                        ]
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name",
+                      "kind",
+                      "scaling",
+                      "scalingState",
+                      "createdAt",
+                      "updatedAt"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such project in this organization."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      }
+    },
     "/v1/orgs/{orgId}/projects/{projectId}/speed-insights/query": {
       "post": {
         "operationId": "speedInsights.query",
@@ -37568,7 +38236,8 @@
                   },
                   "runtimeClass": {
                     "type": "string",
-                    "enum": ["scale-to-zero", "always-on"]
+                    "enum": ["scale-to-zero", "always-on"],
+                    "description": "Deprecated compatibility input. New projects use automatic scaling when omitted."
                   },
                   "region": {
                     "type": "string",
@@ -37584,7 +38253,7 @@
                     "description": "Production branch for push-to-deploy. Defaults to main."
                   }
                 },
-                "required": ["name", "slug", "runtimeClass"]
+                "required": ["name", "slug"]
               }
             }
           }

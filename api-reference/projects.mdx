@@ -67,7 +67,7 @@ POST /v1/orgs/{orgId}/projects
 | -------------- | ------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `name`         | string | Yes      | —                                                                                                                                                                       |
 | `slug`         | string | Yes      | Managed subdomain label — globally unique. Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                                           |
-| `runtimeClass` | string | Yes      | One of: `scale-to-zero`, `always-on`.                                                                                                                                   |
+| `runtimeClass` | string | No       | Deprecated compatibility input. New projects use automatic scaling when omitted. One of: `scale-to-zero`, `always-on`.                                                  |
 | `region`       | string | No       | Compute region id for always-on apps (see regions.list); defaults to the platform default region. Scale-to-zero apps run on the global edge and must not pick a region. |
 | `gitRepo`      | string | No       | Repository to connect as "owner/repo" — enables push-to-deploy and pull-request previews. Pattern: `^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$`.                                 |
 | `gitRef`       | string | No       | Production branch for push-to-deploy. Defaults to main.                                                                                                                 |
@@ -80,8 +80,7 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects" \
   -H "Content-Type: application/json" \
   -d '{
   "name": "Storefront",
-  "slug": "example",
-  "runtimeClass": "scale-to-zero"
+  "slug": "example"
 }'
 ```
 

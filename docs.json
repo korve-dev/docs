@@ -107,6 +107,7 @@
           "api-reference/apikeys",
           "api-reference/billing",
           "api-reference/projects",
+          "api-reference/services",
           "api-reference/appAccess",
           "api-reference/projectOperator",
           "api-reference/projectMaintenance",
