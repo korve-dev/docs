@@ -28,22 +28,22 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/environments" \
 
 ### Responses
 
-| Status | Description                           |
-| ------ | ------------------------------------- |
-| `200`  | Environments, implicit ones first.    |
-| `404`  | No such project in this organization. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Environments, implicit ones first. |
+| `404` | No such project in this organization. |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field       | Type   | Description                                                                                                                                 |
-| ----------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `id`        | string | —                                                                                                                                           |
-| `name`      | string | —                                                                                                                                           |
-| `slug`      | string | Environment address — unique per project. Pattern: `^[a-z][a-z0-9-]{0,38}$`.                                                                |
-| `kind`      | string | The implicit environments carry kind "production"/"preview"; customer-created ones are "custom". One of: `production`, `preview`, `custom`. |
-| `createdAt` | string | Format: `date-time`.                                                                                                                        |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | — |
+| `slug` | string | Environment address — unique per project. Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `kind` | string | The implicit environments carry kind "production"/"preview"; customer-created ones are "custom". One of: `production`, `preview`, `custom`. |
+| `createdAt` | string | Format: `date-time`. |
 
 ## environments.create
 
@@ -60,10 +60,10 @@ POST /v1/orgs/{orgId}/projects/{projectId}/environments
 
 ### Request body
 
-| Field  | Type   | Required | Description                                                                                                     |
-| ------ | ------ | -------- | --------------------------------------------------------------------------------------------------------------- |
-| `name` | string | Yes      | Display name, 1-100 characters.                                                                                 |
-| `slug` | string | No       | Environment address, unique per project. Derived from the name when omitted. Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `name` | string | Yes | Display name, 1-100 characters. |
+| `slug` | string | No | Environment address, unique per project. Derived from the name when omitted. Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Example
 
@@ -78,23 +78,23 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/environ
 
 ### Responses
 
-| Status | Description                                                         |
-| ------ | ------------------------------------------------------------------- |
-| `201`  | Environment created.                                                |
-| `402`  | Organization billing is not active.                                 |
-| `404`  | No such project in this organization.                               |
-| `409`  | An environment with that slug already exists on this project.       |
-| `422`  | Invalid name or slug — or a reserved slug ("production"/"preview"). |
+| Status | Description |
+| ------ | ----------- |
+| `201` | Environment created. |
+| `402` | Organization billing is not active. |
+| `404` | No such project in this organization. |
+| `409` | An environment with that slug already exists on this project. |
+| `422` | Invalid name or slug — or a reserved slug ("production"/"preview"). |
 
 ### Response body (201)
 
-| Field       | Type   | Description                                                                                                                                 |
-| ----------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `id`        | string | —                                                                                                                                           |
-| `name`      | string | —                                                                                                                                           |
-| `slug`      | string | Environment address — unique per project. Pattern: `^[a-z][a-z0-9-]{0,38}$`.                                                                |
-| `kind`      | string | The implicit environments carry kind "production"/"preview"; customer-created ones are "custom". One of: `production`, `preview`, `custom`. |
-| `createdAt` | string | Format: `date-time`.                                                                                                                        |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | — |
+| `slug` | string | Environment address — unique per project. Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `kind` | string | The implicit environments carry kind "production"/"preview"; customer-created ones are "custom". One of: `production`, `preview`, `custom`. |
+| `createdAt` | string | Format: `date-time`. |
 
 ## environments.delete
 
@@ -117,8 +117,8 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/envir
 
 ### Responses
 
-| Status | Description                              |
-| ------ | ---------------------------------------- |
-| `200`  | Environment deleted.                     |
-| `404`  | No such environment in this project.     |
-| `422`  | Implicit environments cannot be deleted. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Environment deleted. |
+| `404` | No such environment in this project. |
+| `422` | Implicit environments cannot be deleted. |

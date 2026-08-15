@@ -21,11 +21,11 @@ GET /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/backups
 
 ### Query parameters
 
-| Name     | Type    | Required | Description                                                |
-| -------- | ------- | -------- | ---------------------------------------------------------- |
-| `cursor` | string  | No       | —                                                          |
-| `limit`  | integer | No       | —                                                          |
-| `status` | string  | No       | One of: `queued`, `running`, `ready`, `failed`, `expired`. |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `cursor` | string | No | — |
+| `limit` | integer | No | — |
+| `status` | string | No | One of: `queued`, `running`, `ready`, `failed`, `expired`. |
 
 ### Example
 
@@ -36,30 +36,30 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATA
 
 ### Responses
 
-| Status | Description                       |
-| ------ | --------------------------------- |
-| `200`  | Backup page.                      |
-| `404`  | No such database in this project. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Backup page. |
+| `404` | No such database in this project. |
 
 ### Response body (200)
 
-| Field                   | Type            | Description                                                                                                                                                                              |
-| ----------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `items`                 | object[]        | —                                                                                                                                                                                        |
-| `items[].id`            | string          | —                                                                                                                                                                                        |
-| `items[].databaseId`    | string          | —                                                                                                                                                                                        |
-| `items[].kind`          | string          | One of: `continuous`, `manual`, `daily`, `weekly`, `monthly`.                                                                                                                            |
-| `items[].status`        | string          | One of: `queued`, `running`, `ready`, `failed`, `expired`.                                                                                                                               |
-| `items[].recoveryPoint` | string or null  | Format: `date-time`.                                                                                                                                                                     |
-| `items[].sizeBytes`     | integer or null | —                                                                                                                                                                                        |
-| `items[].destinationId` | string or null  | —                                                                                                                                                                                        |
-| `items[].copyRegion`    | string or null  | Korve storage area holding this managed disaster-recovery copy; null for the primary managed repository or a customer destination. One of: `enam`, `weur`, `eeur`, `apac`, `oc`, `null`. |
-| `items[].error`         | string or null  | —                                                                                                                                                                                        |
-| `items[].expiresAt`     | string or null  | Format: `date-time`.                                                                                                                                                                     |
-| `items[].createdAt`     | string          | Format: `date-time`.                                                                                                                                                                     |
-| `items[].completedAt`   | string or null  | Format: `date-time`.                                                                                                                                                                     |
-| `items[].purgedAt`      | string or null  | Set after the backing repository confirms physical deletion of this recovery point. Format: `date-time`.                                                                                 |
-| `nextCursor`            | string or null  | —                                                                                                                                                                                        |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `items` | object[] | — |
+| `items[].id` | string | — |
+| `items[].databaseId` | string | — |
+| `items[].kind` | string | One of: `continuous`, `manual`, `daily`, `weekly`, `monthly`. |
+| `items[].status` | string | One of: `queued`, `running`, `ready`, `failed`, `expired`. |
+| `items[].recoveryPoint` | string or null | Format: `date-time`. |
+| `items[].sizeBytes` | integer or null | — |
+| `items[].destinationId` | string or null | — |
+| `items[].copyRegion` | string or null | Korve storage area holding this managed disaster-recovery copy; null for the primary managed repository or a customer destination. One of: `enam`, `weur`, `eeur`, `apac`, `oc`, `null`. |
+| `items[].error` | string or null | — |
+| `items[].expiresAt` | string or null | Format: `date-time`. |
+| `items[].createdAt` | string | Format: `date-time`. |
+| `items[].completedAt` | string or null | Format: `date-time`. |
+| `items[].purgedAt` | string or null | Set after the backing repository confirms physical deletion of this recovery point. Format: `date-time`. |
+| `nextCursor` | string or null | — |
 
 ## databaseBackups.create
 
@@ -76,11 +76,11 @@ POST /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/backups
 
 ### Request body
 
-| Field           | Type           | Required | Description                                                                                                                                                    |
-| --------------- | -------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `destinationId` | string or null | No       | Configured customer destination. Omit or set null for the primary managed repository. Mutually exclusive with copyRegion.                                      |
-| `copyRegion`    | string         | No       | Managed disaster-recovery storage area for this on-demand recovery point. Mutually exclusive with destinationId. One of: `enam`, `weur`, `eeur`, `apac`, `oc`. |
-| `retentionDays` | integer        | No       | —                                                                                                                                                              |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `destinationId` | string or null | No | Configured customer destination. Omit or set null for the primary managed repository. Mutually exclusive with copyRegion. |
+| `copyRegion` | string | No | Managed disaster-recovery storage area for this on-demand recovery point. Mutually exclusive with destinationId. One of: `enam`, `weur`, `eeur`, `apac`, `oc`. |
+| `retentionDays` | integer | No | — |
 
 ### Example
 
@@ -93,30 +93,30 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databas
 
 ### Responses
 
-| Status | Description                                                                                      |
-| ------ | ------------------------------------------------------------------------------------------------ |
-| `202`  | Backup queued.                                                                                   |
-| `404`  | No such database or destination.                                                                 |
-| `409`  | A backup is already running.                                                                     |
-| `422`  | Database is not ready, retention is invalid, or the managed copy area is invalid or unavailable. |
+| Status | Description |
+| ------ | ----------- |
+| `202` | Backup queued. |
+| `404` | No such database or destination. |
+| `409` | A backup is already running. |
+| `422` | Database is not ready, retention is invalid, or the managed copy area is invalid or unavailable. |
 
 ### Response body (202)
 
-| Field           | Type            | Description                                                                                                                                                                              |
-| --------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `id`            | string          | —                                                                                                                                                                                        |
-| `databaseId`    | string          | —                                                                                                                                                                                        |
-| `kind`          | string          | One of: `continuous`, `manual`, `daily`, `weekly`, `monthly`.                                                                                                                            |
-| `status`        | string          | One of: `queued`, `running`, `ready`, `failed`, `expired`.                                                                                                                               |
-| `recoveryPoint` | string or null  | Format: `date-time`.                                                                                                                                                                     |
-| `sizeBytes`     | integer or null | —                                                                                                                                                                                        |
-| `destinationId` | string or null  | —                                                                                                                                                                                        |
-| `copyRegion`    | string or null  | Korve storage area holding this managed disaster-recovery copy; null for the primary managed repository or a customer destination. One of: `enam`, `weur`, `eeur`, `apac`, `oc`, `null`. |
-| `error`         | string or null  | —                                                                                                                                                                                        |
-| `expiresAt`     | string or null  | Format: `date-time`.                                                                                                                                                                     |
-| `createdAt`     | string          | Format: `date-time`.                                                                                                                                                                     |
-| `completedAt`   | string or null  | Format: `date-time`.                                                                                                                                                                     |
-| `purgedAt`      | string or null  | Set after the backing repository confirms physical deletion of this recovery point. Format: `date-time`.                                                                                 |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `databaseId` | string | — |
+| `kind` | string | One of: `continuous`, `manual`, `daily`, `weekly`, `monthly`. |
+| `status` | string | One of: `queued`, `running`, `ready`, `failed`, `expired`. |
+| `recoveryPoint` | string or null | Format: `date-time`. |
+| `sizeBytes` | integer or null | — |
+| `destinationId` | string or null | — |
+| `copyRegion` | string or null | Korve storage area holding this managed disaster-recovery copy; null for the primary managed repository or a customer destination. One of: `enam`, `weur`, `eeur`, `apac`, `oc`, `null`. |
+| `error` | string or null | — |
+| `expiresAt` | string or null | Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
+| `completedAt` | string or null | Format: `date-time`. |
+| `purgedAt` | string or null | Set after the backing repository confirms physical deletion of this recovery point. Format: `date-time`. |
 
 ## databaseBackups.get
 
@@ -139,28 +139,28 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATA
 
 ### Responses
 
-| Status | Description                       |
-| ------ | --------------------------------- |
-| `200`  | Backup.                           |
-| `404`  | No such backup for this database. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Backup. |
+| `404` | No such backup for this database. |
 
 ### Response body (200)
 
-| Field           | Type            | Description                                                                                                                                                                              |
-| --------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `id`            | string          | —                                                                                                                                                                                        |
-| `databaseId`    | string          | —                                                                                                                                                                                        |
-| `kind`          | string          | One of: `continuous`, `manual`, `daily`, `weekly`, `monthly`.                                                                                                                            |
-| `status`        | string          | One of: `queued`, `running`, `ready`, `failed`, `expired`.                                                                                                                               |
-| `recoveryPoint` | string or null  | Format: `date-time`.                                                                                                                                                                     |
-| `sizeBytes`     | integer or null | —                                                                                                                                                                                        |
-| `destinationId` | string or null  | —                                                                                                                                                                                        |
-| `copyRegion`    | string or null  | Korve storage area holding this managed disaster-recovery copy; null for the primary managed repository or a customer destination. One of: `enam`, `weur`, `eeur`, `apac`, `oc`, `null`. |
-| `error`         | string or null  | —                                                                                                                                                                                        |
-| `expiresAt`     | string or null  | Format: `date-time`.                                                                                                                                                                     |
-| `createdAt`     | string          | Format: `date-time`.                                                                                                                                                                     |
-| `completedAt`   | string or null  | Format: `date-time`.                                                                                                                                                                     |
-| `purgedAt`      | string or null  | Set after the backing repository confirms physical deletion of this recovery point. Format: `date-time`.                                                                                 |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `databaseId` | string | — |
+| `kind` | string | One of: `continuous`, `manual`, `daily`, `weekly`, `monthly`. |
+| `status` | string | One of: `queued`, `running`, `ready`, `failed`, `expired`. |
+| `recoveryPoint` | string or null | Format: `date-time`. |
+| `sizeBytes` | integer or null | — |
+| `destinationId` | string or null | — |
+| `copyRegion` | string or null | Korve storage area holding this managed disaster-recovery copy; null for the primary managed repository or a customer destination. One of: `enam`, `weur`, `eeur`, `apac`, `oc`, `null`. |
+| `error` | string or null | — |
+| `expiresAt` | string or null | Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
+| `completedAt` | string or null | Format: `date-time`. |
+| `purgedAt` | string or null | Set after the backing repository confirms physical deletion of this recovery point. Format: `date-time`. |
 
 ## databaseBackups.delete
 
@@ -183,12 +183,12 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/datab
 
 ### Responses
 
-| Status | Description                                                                                                                    |
-| ------ | ------------------------------------------------------------------------------------------------------------------------------ |
-| `200`  | Backup deleted.                                                                                                                |
-| `404`  | No such backup for this database.                                                                                              |
-| `409`  | The capture is still active, its physical deletion cannot yet be confirmed, or another recovery operation still depends on it. |
-| `422`  | Policy-managed recovery points cannot be deleted individually.                                                                 |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Backup deleted. |
+| `404` | No such backup for this database. |
+| `409` | The capture is still active, its physical deletion cannot yet be confirmed, or another recovery operation still depends on it. |
+| `422` | Policy-managed recovery points cannot be deleted individually. |
 
 ## databaseBackups.getPolicy
 
@@ -211,21 +211,21 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATA
 
 ### Responses
 
-| Status | Description                       |
-| ------ | --------------------------------- |
-| `200`  | Backup policy.                    |
-| `404`  | No such database in this project. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Backup policy. |
+| `404` | No such database in this project. |
 
 ### Response body (200)
 
-| Field            | Type     | Description                                                                                                                                                                                                           |
-| ---------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pitrDays`       | integer  | Continuous point-in-time recovery window. Defaults to 14 days.                                                                                                                                                        |
-| `dailyDays`      | integer  | Daily recovery-point retention. Defaults to 30 days.                                                                                                                                                                  |
-| `weeklyWeeks`    | integer  | Weekly recovery-point retention. Defaults to 12 weeks.                                                                                                                                                                |
-| `monthlyMonths`  | integer  | Monthly recovery-point retention. Defaults to 12 months.                                                                                                                                                              |
-| `destinationIds` | string[] | Optional additional customer-managed copies.                                                                                                                                                                          |
-| `copyRegions`    | string[] | Additional managed disaster-recovery snapshots requesting best-effort placement near each selected area. Area hints are not data-residency guarantees. The primary managed repository requests Western North America. |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `pitrDays` | integer | Continuous point-in-time recovery window. Defaults to 14 days. |
+| `dailyDays` | integer | Daily recovery-point retention. Defaults to 30 days. |
+| `weeklyWeeks` | integer | Weekly recovery-point retention. Defaults to 12 weeks. |
+| `monthlyMonths` | integer | Monthly recovery-point retention. Defaults to 12 months. |
+| `destinationIds` | string[] | Optional additional customer-managed copies. |
+| `copyRegions` | string[] | Additional managed disaster-recovery snapshots requesting best-effort placement near each selected area. Area hints are not data-residency guarantees. The primary managed repository requests Western North America. |
 
 ## databaseBackups.updatePolicy
 
@@ -242,14 +242,14 @@ PUT /v1/orgs/{orgId}/projects/{projectId}/databases/{databaseId}/backup-policy
 
 ### Request body
 
-| Field            | Type     | Required | Description                                                                                                                                                                                                           |
-| ---------------- | -------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pitrDays`       | integer  | Yes      | Continuous point-in-time recovery window. Defaults to 14 days.                                                                                                                                                        |
-| `dailyDays`      | integer  | Yes      | Daily recovery-point retention. Defaults to 30 days.                                                                                                                                                                  |
-| `weeklyWeeks`    | integer  | Yes      | Weekly recovery-point retention. Defaults to 12 weeks.                                                                                                                                                                |
-| `monthlyMonths`  | integer  | Yes      | Monthly recovery-point retention. Defaults to 12 months.                                                                                                                                                              |
-| `destinationIds` | string[] | Yes      | Optional additional customer-managed copies.                                                                                                                                                                          |
-| `copyRegions`    | string[] | Yes      | Additional managed disaster-recovery snapshots requesting best-effort placement near each selected area. Area hints are not data-residency guarantees. The primary managed repository requests Western North America. |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `pitrDays` | integer | Yes | Continuous point-in-time recovery window. Defaults to 14 days. |
+| `dailyDays` | integer | Yes | Daily recovery-point retention. Defaults to 30 days. |
+| `weeklyWeeks` | integer | Yes | Weekly recovery-point retention. Defaults to 12 weeks. |
+| `monthlyMonths` | integer | Yes | Monthly recovery-point retention. Defaults to 12 months. |
+| `destinationIds` | string[] | Yes | Optional additional customer-managed copies. |
+| `copyRegions` | string[] | Yes | Additional managed disaster-recovery snapshots requesting best-effort placement near each selected area. Area hints are not data-residency guarantees. The primary managed repository requests Western North America. |
 
 ### Example
 
@@ -273,22 +273,22 @@ curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/database
 
 ### Responses
 
-| Status | Description                      |
-| ------ | -------------------------------- |
-| `200`  | Updated backup policy.           |
-| `404`  | No such database or destination. |
-| `422`  | Invalid retention or copy area.  |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Updated backup policy. |
+| `404` | No such database or destination. |
+| `422` | Invalid retention or copy area. |
 
 ### Response body (200)
 
-| Field            | Type     | Description                                                                                                                                                                                                           |
-| ---------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pitrDays`       | integer  | Continuous point-in-time recovery window. Defaults to 14 days.                                                                                                                                                        |
-| `dailyDays`      | integer  | Daily recovery-point retention. Defaults to 30 days.                                                                                                                                                                  |
-| `weeklyWeeks`    | integer  | Weekly recovery-point retention. Defaults to 12 weeks.                                                                                                                                                                |
-| `monthlyMonths`  | integer  | Monthly recovery-point retention. Defaults to 12 months.                                                                                                                                                              |
-| `destinationIds` | string[] | Optional additional customer-managed copies.                                                                                                                                                                          |
-| `copyRegions`    | string[] | Additional managed disaster-recovery snapshots requesting best-effort placement near each selected area. Area hints are not data-residency guarantees. The primary managed repository requests Western North America. |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `pitrDays` | integer | Continuous point-in-time recovery window. Defaults to 14 days. |
+| `dailyDays` | integer | Daily recovery-point retention. Defaults to 30 days. |
+| `weeklyWeeks` | integer | Weekly recovery-point retention. Defaults to 12 weeks. |
+| `monthlyMonths` | integer | Monthly recovery-point retention. Defaults to 12 months. |
+| `destinationIds` | string[] | Optional additional customer-managed copies. |
+| `copyRegions` | string[] | Additional managed disaster-recovery snapshots requesting best-effort placement near each selected area. Area hints are not data-residency guarantees. The primary managed repository requests Western North America. |
 
 ## databaseBackups.recoveryWindow
 
@@ -311,17 +311,17 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/databases/$DATA
 
 ### Responses
 
-| Status | Description                       |
-| ------ | --------------------------------- |
-| `200`  | Continuous recovery window.       |
-| `404`  | No such database in this project. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Continuous recovery window. |
+| `404` | No such database in this project. |
 
 ### Response body (200)
 
-| Field          | Type           | Description          |
-| -------------- | -------------- | -------------------- |
-| `oldest`       | string or null | Format: `date-time`. |
-| `newest`       | string or null | Format: `date-time`. |
-| `gaps`         | object[]       | —                    |
-| `gaps[].from`  | string         | Format: `date-time`. |
-| `gaps[].until` | string         | Format: `date-time`. |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `oldest` | string or null | Format: `date-time`. |
+| `newest` | string or null | Format: `date-time`. |
+| `gaps` | object[] | — |
+| `gaps[].from` | string | Format: `date-time`. |
+| `gaps[].until` | string | Format: `date-time`. |

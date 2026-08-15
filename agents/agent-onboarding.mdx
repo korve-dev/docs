@@ -26,12 +26,14 @@ For CI, request a separate organization API key rather than copying the local re
 ## 3. Ship the repository
 
 ```bash
-korve init
+korve projects create --name Storefront --slug storefront \
+  --repo acme/storefront --ref main
+korve link storefront
 ```
 
-Inspect the generated `korve.toml`, plan, detected repository/ref, runtime class, and pricing before
-confirming. `init` applies, writes `.korve.toml`, deploys, and follows the build. It never overwrites a
-different existing manifest or project link.
+Review the repository, ref, project slug, scaling limits, spend policy, and pricing first. Project
+creation does not require compute placement or machine-size options. It queues the first
+deploy, and `link` stores the project context for later commands.
 
 ## 4. Verify instead of assuming
 

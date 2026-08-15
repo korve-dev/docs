@@ -171,6 +171,22 @@ describe("Korve public docs", () => {
     }
   });
 
+  it("uses automatic compute in common guides and documents service scaling commands", () => {
+    const commonGuides = ["quickstart", "cli/commands", "concepts/runtime-and-regions"]
+      .map((page) => fs.readFileSync(path.join(root, `${page}.mdx`), "utf8"))
+      .join("\n");
+
+    expect(commonGuides).not.toContain("--runtime-class");
+    expect(commonGuides).not.toMatch(/runtime class/i);
+    for (const command of [
+      "korve services scaling show",
+      "korve services scaling set",
+      "korve services scaling events",
+    ]) {
+      expect(commonGuides).toContain(command);
+    }
+  });
+
   it("does not claim the unreleased TypeScript packages are anonymously installable", () => {
     for (const page of ["sdk/runtime", "sdk/app-auth", "primitives/app-auth"]) {
       const source = fs.readFileSync(path.join(root, `${page}.mdx`), "utf8");

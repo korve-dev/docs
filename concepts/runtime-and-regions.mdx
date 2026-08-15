@@ -1,20 +1,24 @@
 ---
-title: "Runtime and regions"
-description: "Choose the runtime class and locality that match an application's workload."
+title: "Automatic compute and regions"
+description: "Understand automatic application scaling and locality for stateful resources."
 ---
 
-Choose `scale-to-zero` for request-driven web applications and APIs. It runs at the global edge and
-does not accept a compute region. Choose `always-on` for long-lived processes, WebSockets, or steady
-background work; it runs in a selected compute region.
+Korve automatically places and scales request-driven web applications and APIs. New projects do not
+select a compute mode, machine size, compute provider, or compute region. An idle service can stop
+all replicas. The next request starts capacity again.
 
-Databases, caches, storage, and always-on compute each publish their own supported locality catalog.
-Never copy region ids from another resource type: discover the current catalog instead.
+Use service limits to control availability, capacity, and cost:
 
 ```bash
-korve regions
-korve projects create --name Worker --slug worker --runtime-class always-on --region us-east
+korve projects create --name Storefront --slug storefront
+korve services list --project storefront
+korve services scaling show <service-id> --project storefront
+korve services scaling set <service-id> --minimum-ready 0 \
+  --maximum-replicas 10 --target-concurrency 40 --project storefront
+korve services scaling events <service-id> --project storefront
 ```
 
-Project runtime class and initial region are immutable. Plan locality before creating stateful
-resources, and keep compute near its database when request latency matters. See the
-[Regions API](/api-reference/regions).
+Databases, caches, and storage still use their own locality catalogs. Never copy a region id from
+another resource type. Discover the current catalog with `korve regions`, and see the
+[Regions API](/api-reference/regions). See the [Services API](/api-reference/services) for the
+web-service contract and workload restrictions.

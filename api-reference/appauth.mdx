@@ -28,44 +28,44 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth" \
 
 ### Responses
 
-| Status | Description                                                |
-| ------ | ---------------------------------------------------------- |
-| `200`  | App-auth configuration.                                    |
-| `404`  | No such project or app-auth resource in this organization. |
-| `422`  | Invalid configuration or request.                          |
+| Status | Description |
+| ------ | ----------- |
+| `200` | App-auth configuration. |
+| `404` | No such project or app-auth resource in this organization. |
+| `422` | Invalid configuration or request. |
 
 ### Response body (200)
 
-| Field                     | Type            | Description                                                                             |
-| ------------------------- | --------------- | --------------------------------------------------------------------------------------- |
-| `enabled`                 | boolean         | —                                                                                       |
-| `allowedOrigins`          | string[]        | Exact browser origins. Wildcards are not accepted.                                      |
-| `redirectUrls`            | string[]        | Exact post-sign-in redirect URLs. HTTPS is required except for loopback localhost URLs. |
-| `accessTokenTtlSeconds`   | integer         | —                                                                                       |
-| `refreshTokenTtlSeconds`  | integer         | —                                                                                       |
-| `sessionIdleTtlSeconds`   | integer         | —                                                                                       |
-| `sessionMaxTtlSeconds`    | integer         | —                                                                                       |
-| `emailPasswordEnabled`    | boolean         | —                                                                                       |
-| `magicLinkEnabled`        | boolean         | —                                                                                       |
-| `passwordMinLength`       | integer         | —                                                                                       |
-| `magicLinkTtlSeconds`     | integer         | —                                                                                       |
-| `passwordResetTtlSeconds` | integer         | —                                                                                       |
-| `google`                  | object          | —                                                                                       |
-| `google.enabled`          | boolean         | —                                                                                       |
-| `google.clientId`         | string or null  | —                                                                                       |
-| `google.secretConfigured` | boolean         | —                                                                                       |
-| `google.secretVersion`    | integer or null | —                                                                                       |
-| `google.rotatedAt`        | string or null  | Format: `date-time`.                                                                    |
-| `github`                  | object          | —                                                                                       |
-| `github.enabled`          | boolean         | —                                                                                       |
-| `github.clientId`         | string or null  | —                                                                                       |
-| `github.secretConfigured` | boolean         | —                                                                                       |
-| `github.secretVersion`    | integer or null | —                                                                                       |
-| `github.rotatedAt`        | string or null  | Format: `date-time`.                                                                    |
-| `callbackUrl`             | string          | Exact Google OAuth callback URL to register for this project.                           |
-| `githubCallbackUrl`       | string          | Exact GitHub OAuth callback URL to register for this project.                           |
-| `createdAt`               | string          | Format: `date-time`.                                                                    |
-| `updatedAt`               | string          | Format: `date-time`.                                                                    |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `enabled` | boolean | — |
+| `allowedOrigins` | string[] | Exact browser origins. Wildcards are not accepted. |
+| `redirectUrls` | string[] | Exact post-sign-in redirect URLs. HTTPS is required except for loopback localhost URLs. |
+| `accessTokenTtlSeconds` | integer | — |
+| `refreshTokenTtlSeconds` | integer | — |
+| `sessionIdleTtlSeconds` | integer | — |
+| `sessionMaxTtlSeconds` | integer | — |
+| `emailPasswordEnabled` | boolean | — |
+| `magicLinkEnabled` | boolean | — |
+| `passwordMinLength` | integer | — |
+| `magicLinkTtlSeconds` | integer | — |
+| `passwordResetTtlSeconds` | integer | — |
+| `google` | object | — |
+| `google.enabled` | boolean | — |
+| `google.clientId` | string or null | — |
+| `google.secretConfigured` | boolean | — |
+| `google.secretVersion` | integer or null | — |
+| `google.rotatedAt` | string or null | Format: `date-time`. |
+| `github` | object | — |
+| `github.enabled` | boolean | — |
+| `github.clientId` | string or null | — |
+| `github.secretConfigured` | boolean | — |
+| `github.secretVersion` | integer or null | — |
+| `github.rotatedAt` | string or null | Format: `date-time`. |
+| `callbackUrl` | string | Exact Google OAuth callback URL to register for this project. |
+| `githubCallbackUrl` | string | Exact GitHub OAuth callback URL to register for this project. |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
 
 ## appauth.updateConfig
 
@@ -81,20 +81,20 @@ PUT /v1/orgs/{orgId}/projects/{projectId}/auth
 
 ### Request body
 
-| Field                     | Type     | Required | Description                                                                             |
-| ------------------------- | -------- | -------- | --------------------------------------------------------------------------------------- |
-| `enabled`                 | boolean  | Yes      | —                                                                                       |
-| `allowedOrigins`          | string[] | Yes      | Exact browser origins. Wildcards are not accepted.                                      |
-| `redirectUrls`            | string[] | Yes      | Exact post-sign-in redirect URLs. HTTPS is required except for loopback localhost URLs. |
-| `accessTokenTtlSeconds`   | integer  | No       | 300-3600 seconds.                                                                       |
-| `refreshTokenTtlSeconds`  | integer  | No       | 3600-2592000 seconds.                                                                   |
-| `sessionIdleTtlSeconds`   | integer  | No       | 900-604800 seconds.                                                                     |
-| `sessionMaxTtlSeconds`    | integer  | No       | 3600-2592000 seconds.                                                                   |
-| `emailPasswordEnabled`    | boolean  | No       | Allow verified users to sign in with an application password.                           |
-| `magicLinkEnabled`        | boolean  | No       | Allow passwordless email sign-in and email verification links.                          |
-| `passwordMinLength`       | integer  | No       | 10-64 characters.                                                                       |
-| `magicLinkTtlSeconds`     | integer  | No       | 300-3600 seconds.                                                                       |
-| `passwordResetTtlSeconds` | integer  | No       | 300-3600 seconds.                                                                       |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `enabled` | boolean | Yes | — |
+| `allowedOrigins` | string[] | Yes | Exact browser origins. Wildcards are not accepted. |
+| `redirectUrls` | string[] | Yes | Exact post-sign-in redirect URLs. HTTPS is required except for loopback localhost URLs. |
+| `accessTokenTtlSeconds` | integer | No | 300-3600 seconds. |
+| `refreshTokenTtlSeconds` | integer | No | 3600-2592000 seconds. |
+| `sessionIdleTtlSeconds` | integer | No | 900-604800 seconds. |
+| `sessionMaxTtlSeconds` | integer | No | 3600-2592000 seconds. |
+| `emailPasswordEnabled` | boolean | No | Allow verified users to sign in with an application password. |
+| `magicLinkEnabled` | boolean | No | Allow passwordless email sign-in and email verification links. |
+| `passwordMinLength` | integer | No | 10-64 characters. |
+| `magicLinkTtlSeconds` | integer | No | 300-3600 seconds. |
+| `passwordResetTtlSeconds` | integer | No | 300-3600 seconds. |
 
 ### Example
 
@@ -115,44 +115,44 @@ curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth" \
 
 ### Responses
 
-| Status | Description                                                |
-| ------ | ---------------------------------------------------------- |
-| `200`  | Updated app-auth configuration.                            |
-| `404`  | No such project or app-auth resource in this organization. |
-| `422`  | Invalid configuration or request.                          |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Updated app-auth configuration. |
+| `404` | No such project or app-auth resource in this organization. |
+| `422` | Invalid configuration or request. |
 
 ### Response body (200)
 
-| Field                     | Type            | Description                                                                             |
-| ------------------------- | --------------- | --------------------------------------------------------------------------------------- |
-| `enabled`                 | boolean         | —                                                                                       |
-| `allowedOrigins`          | string[]        | Exact browser origins. Wildcards are not accepted.                                      |
-| `redirectUrls`            | string[]        | Exact post-sign-in redirect URLs. HTTPS is required except for loopback localhost URLs. |
-| `accessTokenTtlSeconds`   | integer         | —                                                                                       |
-| `refreshTokenTtlSeconds`  | integer         | —                                                                                       |
-| `sessionIdleTtlSeconds`   | integer         | —                                                                                       |
-| `sessionMaxTtlSeconds`    | integer         | —                                                                                       |
-| `emailPasswordEnabled`    | boolean         | —                                                                                       |
-| `magicLinkEnabled`        | boolean         | —                                                                                       |
-| `passwordMinLength`       | integer         | —                                                                                       |
-| `magicLinkTtlSeconds`     | integer         | —                                                                                       |
-| `passwordResetTtlSeconds` | integer         | —                                                                                       |
-| `google`                  | object          | —                                                                                       |
-| `google.enabled`          | boolean         | —                                                                                       |
-| `google.clientId`         | string or null  | —                                                                                       |
-| `google.secretConfigured` | boolean         | —                                                                                       |
-| `google.secretVersion`    | integer or null | —                                                                                       |
-| `google.rotatedAt`        | string or null  | Format: `date-time`.                                                                    |
-| `github`                  | object          | —                                                                                       |
-| `github.enabled`          | boolean         | —                                                                                       |
-| `github.clientId`         | string or null  | —                                                                                       |
-| `github.secretConfigured` | boolean         | —                                                                                       |
-| `github.secretVersion`    | integer or null | —                                                                                       |
-| `github.rotatedAt`        | string or null  | Format: `date-time`.                                                                    |
-| `callbackUrl`             | string          | Exact Google OAuth callback URL to register for this project.                           |
-| `githubCallbackUrl`       | string          | Exact GitHub OAuth callback URL to register for this project.                           |
-| `createdAt`               | string          | Format: `date-time`.                                                                    |
-| `updatedAt`               | string          | Format: `date-time`.                                                                    |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `enabled` | boolean | — |
+| `allowedOrigins` | string[] | Exact browser origins. Wildcards are not accepted. |
+| `redirectUrls` | string[] | Exact post-sign-in redirect URLs. HTTPS is required except for loopback localhost URLs. |
+| `accessTokenTtlSeconds` | integer | — |
+| `refreshTokenTtlSeconds` | integer | — |
+| `sessionIdleTtlSeconds` | integer | — |
+| `sessionMaxTtlSeconds` | integer | — |
+| `emailPasswordEnabled` | boolean | — |
+| `magicLinkEnabled` | boolean | — |
+| `passwordMinLength` | integer | — |
+| `magicLinkTtlSeconds` | integer | — |
+| `passwordResetTtlSeconds` | integer | — |
+| `google` | object | — |
+| `google.enabled` | boolean | — |
+| `google.clientId` | string or null | — |
+| `google.secretConfigured` | boolean | — |
+| `google.secretVersion` | integer or null | — |
+| `google.rotatedAt` | string or null | Format: `date-time`. |
+| `github` | object | — |
+| `github.enabled` | boolean | — |
+| `github.clientId` | string or null | — |
+| `github.secretConfigured` | boolean | — |
+| `github.secretVersion` | integer or null | — |
+| `github.rotatedAt` | string or null | Format: `date-time`. |
+| `callbackUrl` | string | Exact Google OAuth callback URL to register for this project. |
+| `githubCallbackUrl` | string | Exact GitHub OAuth callback URL to register for this project. |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
 
 ## appauth.deleteConfig
 
@@ -175,11 +175,11 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth"
 
 ### Responses
 
-| Status | Description                                                |
-| ------ | ---------------------------------------------------------- |
-| `200`  | Application auth deleted.                                  |
-| `404`  | No such project or app-auth resource in this organization. |
-| `422`  | Invalid configuration or request.                          |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Application auth deleted. |
+| `404` | No such project or app-auth resource in this organization. |
+| `422` | Invalid configuration or request. |
 
 ## appauth.setGoogleProvider
 
@@ -195,11 +195,11 @@ PUT /v1/orgs/{orgId}/projects/{projectId}/auth/providers/google
 
 ### Request body
 
-| Field          | Type    | Required | Description                     |
-| -------------- | ------- | -------- | ------------------------------- |
-| `clientId`     | string  | Yes      | —                               |
-| `clientSecret` | string  | Yes      | Write-only OAuth client secret. |
-| `enabled`      | boolean | Yes      | —                               |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `clientId` | string | Yes | — |
+| `clientSecret` | string | Yes | Write-only OAuth client secret. |
+| `enabled` | boolean | Yes | — |
 
 ### Example
 
@@ -216,21 +216,21 @@ curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth/pro
 
 ### Responses
 
-| Status | Description                                                |
-| ------ | ---------------------------------------------------------- |
-| `200`  | Provider status without its secret.                        |
-| `404`  | No such project or app-auth resource in this organization. |
-| `422`  | Invalid configuration or request.                          |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Provider status without its secret. |
+| `404` | No such project or app-auth resource in this organization. |
+| `422` | Invalid configuration or request. |
 
 ### Response body (200)
 
-| Field              | Type            | Description          |
-| ------------------ | --------------- | -------------------- |
-| `enabled`          | boolean         | —                    |
-| `clientId`         | string or null  | —                    |
-| `secretConfigured` | boolean         | —                    |
-| `secretVersion`    | integer or null | —                    |
-| `rotatedAt`        | string or null  | Format: `date-time`. |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `enabled` | boolean | — |
+| `clientId` | string or null | — |
+| `secretConfigured` | boolean | — |
+| `secretVersion` | integer or null | — |
+| `rotatedAt` | string or null | Format: `date-time`. |
 
 ## appauth.rotateGoogleSecret
 
@@ -246,9 +246,9 @@ POST /v1/orgs/{orgId}/projects/{projectId}/auth/providers/google/rotate
 
 ### Request body
 
-| Field          | Type   | Required | Description                     |
-| -------------- | ------ | -------- | ------------------------------- |
-| `clientSecret` | string | Yes      | Write-only OAuth client secret. |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `clientSecret` | string | Yes | Write-only OAuth client secret. |
 
 ### Example
 
@@ -263,21 +263,21 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth/pr
 
 ### Responses
 
-| Status | Description                                                |
-| ------ | ---------------------------------------------------------- |
-| `200`  | Provider status without its secret.                        |
-| `404`  | No such project or app-auth resource in this organization. |
-| `422`  | Invalid configuration or request.                          |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Provider status without its secret. |
+| `404` | No such project or app-auth resource in this organization. |
+| `422` | Invalid configuration or request. |
 
 ### Response body (200)
 
-| Field              | Type            | Description          |
-| ------------------ | --------------- | -------------------- |
-| `enabled`          | boolean         | —                    |
-| `clientId`         | string or null  | —                    |
-| `secretConfigured` | boolean         | —                    |
-| `secretVersion`    | integer or null | —                    |
-| `rotatedAt`        | string or null  | Format: `date-time`. |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `enabled` | boolean | — |
+| `clientId` | string or null | — |
+| `secretConfigured` | boolean | — |
+| `secretVersion` | integer or null | — |
+| `rotatedAt` | string or null | Format: `date-time`. |
 
 ## appauth.setGithubProvider
 
@@ -293,11 +293,11 @@ PUT /v1/orgs/{orgId}/projects/{projectId}/auth/providers/github
 
 ### Request body
 
-| Field          | Type    | Required | Description                     |
-| -------------- | ------- | -------- | ------------------------------- |
-| `clientId`     | string  | Yes      | —                               |
-| `clientSecret` | string  | Yes      | Write-only OAuth client secret. |
-| `enabled`      | boolean | Yes      | —                               |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `clientId` | string | Yes | — |
+| `clientSecret` | string | Yes | Write-only OAuth client secret. |
+| `enabled` | boolean | Yes | — |
 
 ### Example
 
@@ -314,21 +314,21 @@ curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth/pro
 
 ### Responses
 
-| Status | Description                                                |
-| ------ | ---------------------------------------------------------- |
-| `200`  | Provider status without its secret.                        |
-| `404`  | No such project or app-auth resource in this organization. |
-| `422`  | Invalid configuration or request.                          |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Provider status without its secret. |
+| `404` | No such project or app-auth resource in this organization. |
+| `422` | Invalid configuration or request. |
 
 ### Response body (200)
 
-| Field              | Type            | Description          |
-| ------------------ | --------------- | -------------------- |
-| `enabled`          | boolean         | —                    |
-| `clientId`         | string or null  | —                    |
-| `secretConfigured` | boolean         | —                    |
-| `secretVersion`    | integer or null | —                    |
-| `rotatedAt`        | string or null  | Format: `date-time`. |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `enabled` | boolean | — |
+| `clientId` | string or null | — |
+| `secretConfigured` | boolean | — |
+| `secretVersion` | integer or null | — |
+| `rotatedAt` | string or null | Format: `date-time`. |
 
 ## appauth.rotateGithubSecret
 
@@ -344,9 +344,9 @@ POST /v1/orgs/{orgId}/projects/{projectId}/auth/providers/github/rotate
 
 ### Request body
 
-| Field          | Type   | Required | Description                     |
-| -------------- | ------ | -------- | ------------------------------- |
-| `clientSecret` | string | Yes      | Write-only OAuth client secret. |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `clientSecret` | string | Yes | Write-only OAuth client secret. |
 
 ### Example
 
@@ -361,21 +361,21 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth/pr
 
 ### Responses
 
-| Status | Description                                                |
-| ------ | ---------------------------------------------------------- |
-| `200`  | Provider status without its secret.                        |
-| `404`  | No such project or app-auth resource in this organization. |
-| `422`  | Invalid configuration or request.                          |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Provider status without its secret. |
+| `404` | No such project or app-auth resource in this organization. |
+| `422` | Invalid configuration or request. |
 
 ### Response body (200)
 
-| Field              | Type            | Description          |
-| ------------------ | --------------- | -------------------- |
-| `enabled`          | boolean         | —                    |
-| `clientId`         | string or null  | —                    |
-| `secretConfigured` | boolean         | —                    |
-| `secretVersion`    | integer or null | —                    |
-| `rotatedAt`        | string or null  | Format: `date-time`. |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `enabled` | boolean | — |
+| `clientId` | string or null | — |
+| `secretConfigured` | boolean | — |
+| `secretVersion` | integer or null | — |
+| `rotatedAt` | string or null | Format: `date-time`. |
 
 ## appauth.listUsers
 
@@ -391,12 +391,12 @@ GET /v1/orgs/{orgId}/projects/{projectId}/auth/users
 
 ### Query parameters
 
-| Name     | Type    | Required | Description                   |
-| -------- | ------- | -------- | ----------------------------- |
-| `cursor` | string  | No       | —                             |
-| `limit`  | integer | No       | —                             |
-| `search` | string  | No       | —                             |
-| `status` | string  | No       | One of: `active`, `disabled`. |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `cursor` | string | No | — |
+| `limit` | integer | No | — |
+| `search` | string | No | — |
+| `status` | string | No | One of: `active`, `disabled`. |
 
 ### Example
 
@@ -407,27 +407,27 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth/users?curs
 
 ### Responses
 
-| Status | Description                                                |
-| ------ | ---------------------------------------------------------- |
-| `200`  | A page of app users.                                       |
-| `404`  | No such project or app-auth resource in this organization. |
-| `422`  | Invalid configuration or request.                          |
+| Status | Description |
+| ------ | ----------- |
+| `200` | A page of app users. |
+| `404` | No such project or app-auth resource in this organization. |
+| `422` | Invalid configuration or request. |
 
 ### Response body (200)
 
-| Field                   | Type           | Description          |
-| ----------------------- | -------------- | -------------------- |
-| `items`                 | object[]       | —                    |
-| `items[].id`            | string         | —                    |
-| `items[].email`         | string         | Format: `email`.     |
-| `items[].emailVerified` | boolean        | —                    |
-| `items[].name`          | string or null | —                    |
-| `items[].image`         | string or null | —                    |
-| `items[].disabledAt`    | string or null | Format: `date-time`. |
-| `items[].createdAt`     | string         | Format: `date-time`. |
-| `items[].lastSignInAt`  | string or null | Format: `date-time`. |
-| `items[].lastActiveAt`  | string or null | Format: `date-time`. |
-| `nextCursor`            | string or null | —                    |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `items` | object[] | — |
+| `items[].id` | string | — |
+| `items[].email` | string | Format: `email`. |
+| `items[].emailVerified` | boolean | — |
+| `items[].name` | string or null | — |
+| `items[].image` | string or null | — |
+| `items[].disabledAt` | string or null | Format: `date-time`. |
+| `items[].createdAt` | string | Format: `date-time`. |
+| `items[].lastSignInAt` | string or null | Format: `date-time`. |
+| `items[].lastActiveAt` | string or null | Format: `date-time`. |
+| `nextCursor` | string or null | — |
 
 ## appauth.getUser
 
@@ -450,39 +450,39 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth/users/$USE
 
 ### Responses
 
-| Status | Description                                                |
-| ------ | ---------------------------------------------------------- |
-| `200`  | App-user detail.                                           |
-| `404`  | No such project or app-auth resource in this organization. |
-| `422`  | Invalid configuration or request.                          |
+| Status | Description |
+| ------ | ----------- |
+| `200` | App-user detail. |
+| `404` | No such project or app-auth resource in this organization. |
+| `422` | Invalid configuration or request. |
 
 ### Response body (200)
 
-| Field                        | Type           | Description                                             |
-| ---------------------------- | -------------- | ------------------------------------------------------- |
-| `user`                       | object         | —                                                       |
-| `user.id`                    | string         | —                                                       |
-| `user.email`                 | string         | Format: `email`.                                        |
-| `user.emailVerified`         | boolean        | —                                                       |
-| `user.name`                  | string or null | —                                                       |
-| `user.image`                 | string or null | —                                                       |
-| `user.disabledAt`            | string or null | Format: `date-time`.                                    |
-| `user.createdAt`             | string         | Format: `date-time`.                                    |
-| `user.lastSignInAt`          | string or null | Format: `date-time`.                                    |
-| `user.lastActiveAt`          | string or null | Format: `date-time`.                                    |
-| `identities`                 | object[]       | —                                                       |
-| `identities[].provider`      | string         | One of: `google`, `github`, `credential`, `magic_link`. |
-| `identities[].providerEmail` | string         | Format: `email`.                                        |
-| `identities[].emailVerified` | boolean        | —                                                       |
-| `identities[].createdAt`     | string         | Format: `date-time`.                                    |
-| `identities[].lastSignInAt`  | string or null | Format: `date-time`.                                    |
-| `sessions`                   | object[]       | —                                                       |
-| `sessions[].id`              | string         | —                                                       |
-| `sessions[].createdAt`       | string         | Format: `date-time`.                                    |
-| `sessions[].lastActiveAt`    | string         | Format: `date-time`.                                    |
-| `sessions[].expiresAt`       | string         | Format: `date-time`.                                    |
-| `sessions[].revokedAt`       | string or null | Format: `date-time`.                                    |
-| `sessions[].userAgent`       | string or null | —                                                       |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `user` | object | — |
+| `user.id` | string | — |
+| `user.email` | string | Format: `email`. |
+| `user.emailVerified` | boolean | — |
+| `user.name` | string or null | — |
+| `user.image` | string or null | — |
+| `user.disabledAt` | string or null | Format: `date-time`. |
+| `user.createdAt` | string | Format: `date-time`. |
+| `user.lastSignInAt` | string or null | Format: `date-time`. |
+| `user.lastActiveAt` | string or null | Format: `date-time`. |
+| `identities` | object[] | — |
+| `identities[].provider` | string | One of: `google`, `github`, `credential`, `magic_link`. |
+| `identities[].providerEmail` | string | Format: `email`. |
+| `identities[].emailVerified` | boolean | — |
+| `identities[].createdAt` | string | Format: `date-time`. |
+| `identities[].lastSignInAt` | string or null | Format: `date-time`. |
+| `sessions` | object[] | — |
+| `sessions[].id` | string | — |
+| `sessions[].createdAt` | string | Format: `date-time`. |
+| `sessions[].lastActiveAt` | string | Format: `date-time`. |
+| `sessions[].expiresAt` | string | Format: `date-time`. |
+| `sessions[].revokedAt` | string or null | Format: `date-time`. |
+| `sessions[].userAgent` | string or null | — |
 
 ## appauth.revokeUserSessions
 
@@ -505,11 +505,11 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth/us
 
 ### Responses
 
-| Status | Description                                                |
-| ------ | ---------------------------------------------------------- |
-| `200`  | Sessions revoked.                                          |
-| `404`  | No such project or app-auth resource in this organization. |
-| `422`  | Invalid configuration or request.                          |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Sessions revoked. |
+| `404` | No such project or app-auth resource in this organization. |
+| `422` | Invalid configuration or request. |
 
 ## appauth.disableUser
 
@@ -532,25 +532,25 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth/us
 
 ### Responses
 
-| Status | Description                                                |
-| ------ | ---------------------------------------------------------- |
-| `200`  | Disabled user.                                             |
-| `404`  | No such project or app-auth resource in this organization. |
-| `422`  | Invalid configuration or request.                          |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Disabled user. |
+| `404` | No such project or app-auth resource in this organization. |
+| `422` | Invalid configuration or request. |
 
 ### Response body (200)
 
-| Field           | Type           | Description          |
-| --------------- | -------------- | -------------------- |
-| `id`            | string         | —                    |
-| `email`         | string         | Format: `email`.     |
-| `emailVerified` | boolean        | —                    |
-| `name`          | string or null | —                    |
-| `image`         | string or null | —                    |
-| `disabledAt`    | string or null | Format: `date-time`. |
-| `createdAt`     | string         | Format: `date-time`. |
-| `lastSignInAt`  | string or null | Format: `date-time`. |
-| `lastActiveAt`  | string or null | Format: `date-time`. |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `email` | string | Format: `email`. |
+| `emailVerified` | boolean | — |
+| `name` | string or null | — |
+| `image` | string or null | — |
+| `disabledAt` | string or null | Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
+| `lastSignInAt` | string or null | Format: `date-time`. |
+| `lastActiveAt` | string or null | Format: `date-time`. |
 
 ## appauth.enableUser
 
@@ -573,25 +573,25 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth/us
 
 ### Responses
 
-| Status | Description                                                |
-| ------ | ---------------------------------------------------------- |
-| `200`  | Enabled user.                                              |
-| `404`  | No such project or app-auth resource in this organization. |
-| `422`  | Invalid configuration or request.                          |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Enabled user. |
+| `404` | No such project or app-auth resource in this organization. |
+| `422` | Invalid configuration or request. |
 
 ### Response body (200)
 
-| Field           | Type           | Description          |
-| --------------- | -------------- | -------------------- |
-| `id`            | string         | —                    |
-| `email`         | string         | Format: `email`.     |
-| `emailVerified` | boolean        | —                    |
-| `name`          | string or null | —                    |
-| `image`         | string or null | —                    |
-| `disabledAt`    | string or null | Format: `date-time`. |
-| `createdAt`     | string         | Format: `date-time`. |
-| `lastSignInAt`  | string or null | Format: `date-time`. |
-| `lastActiveAt`  | string or null | Format: `date-time`. |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `email` | string | Format: `email`. |
+| `emailVerified` | boolean | — |
+| `name` | string or null | — |
+| `image` | string or null | — |
+| `disabledAt` | string or null | Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
+| `lastSignInAt` | string or null | Format: `date-time`. |
+| `lastActiveAt` | string or null | Format: `date-time`. |
 
 ## appauth.listAuditEvents
 
@@ -607,10 +607,10 @@ GET /v1/orgs/{orgId}/projects/{projectId}/auth/audit-events
 
 ### Query parameters
 
-| Name     | Type    | Required | Description |
-| -------- | ------- | -------- | ----------- |
-| `cursor` | string  | No       | —           |
-| `limit`  | integer | No       | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `cursor` | string | No | — |
+| `limit` | integer | No | — |
 
 ### Example
 
@@ -621,25 +621,25 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/auth/audit-even
 
 ### Responses
 
-| Status | Description                                                |
-| ------ | ---------------------------------------------------------- |
-| `200`  | A page of app-auth audit events.                           |
-| `404`  | No such project or app-auth resource in this organization. |
-| `422`  | Invalid configuration or request.                          |
+| Status | Description |
+| ------ | ----------- |
+| `200` | A page of app-auth audit events. |
+| `404` | No such project or app-auth resource in this organization. |
+| `422` | Invalid configuration or request. |
 
 ### Response body (200)
 
-| Field               | Type           | Description                               |
-| ------------------- | -------------- | ----------------------------------------- |
-| `items`             | object[]       | —                                         |
-| `items[].id`        | string         | —                                         |
-| `items[].action`    | string         | —                                         |
-| `items[].actorType` | string         | One of: `app_user`, `operator`, `system`. |
-| `items[].userId`    | string or null | —                                         |
-| `items[].targetId`  | string or null | —                                         |
-| `items[].outcome`   | string         | One of: `success`, `denied`, `error`.     |
-| `items[].createdAt` | string         | Format: `date-time`.                      |
-| `nextCursor`        | string or null | —                                         |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `items` | object[] | — |
+| `items[].id` | string | — |
+| `items[].action` | string | — |
+| `items[].actorType` | string | One of: `app_user`, `operator`, `system`. |
+| `items[].userId` | string or null | — |
+| `items[].targetId` | string or null | — |
+| `items[].outcome` | string | One of: `success`, `denied`, `error`. |
+| `items[].createdAt` | string | Format: `date-time`. |
+| `nextCursor` | string or null | — |
 
 ## appauth.getPublicConfig
 
@@ -654,9 +654,9 @@ GET /v1/apps/{projectId}/auth/config
 
 ### Path parameters
 
-| Name        | Type   | Required | Description |
-| ----------- | ------ | -------- | ----------- |
-| `projectId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `projectId` | string | Yes | — |
 
 ### Example
 
@@ -666,19 +666,19 @@ curl "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/config"
 
 ### Responses
 
-| Status | Description                           |
-| ------ | ------------------------------------- |
-| `200`  | Public app-auth settings.             |
-| `404`  | No enabled app auth for this project. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Public app-auth settings. |
+| `404` | No enabled app auth for this project. |
 
 ### Response body (200)
 
-| Field                   | Type     | Description |
-| ----------------------- | -------- | ----------- |
-| `enabled`               | boolean  | —           |
-| `providers`             | string[] | —           |
-| `passwordMinLength`     | integer  | —           |
-| `accessTokenTtlSeconds` | integer  | —           |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `enabled` | boolean | — |
+| `providers` | string[] | — |
+| `passwordMinLength` | integer | — |
+| `accessTokenTtlSeconds` | integer | — |
 
 ## appauth.startGoogle
 
@@ -693,15 +693,15 @@ POST /v1/apps/{projectId}/auth/oauth/google/start
 
 ### Path parameters
 
-| Name        | Type   | Required | Description |
-| ----------- | ------ | -------- | ----------- |
-| `projectId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `projectId` | string | Yes | — |
 
 ### Request body
 
-| Field         | Type   | Required | Description |
-| ------------- | ------ | -------- | ----------- |
-| `redirectUrl` | string | Yes      | —           |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `redirectUrl` | string | Yes | — |
 
 ### Example
 
@@ -715,19 +715,19 @@ curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/oauth/google/start"
 
 ### Responses
 
-| Status | Description                                                |
-| ------ | ---------------------------------------------------------- |
-| `200`  | Authorization URL and browser state value.                 |
-| `404`  | No such project or app-auth resource in this organization. |
-| `422`  | Invalid configuration or request.                          |
-| `429`  | Too many sign-in attempts.                                 |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Authorization URL and browser state value. |
+| `404` | No such project or app-auth resource in this organization. |
+| `422` | Invalid configuration or request. |
+| `429` | Too many sign-in attempts. |
 
 ### Response body (200)
 
-| Field              | Type   | Description |
-| ------------------ | ------ | ----------- |
-| `authorizationUrl` | string | —           |
-| `state`            | string | —           |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `authorizationUrl` | string | — |
+| `state` | string | — |
 
 ## appauth.startGithub
 
@@ -742,15 +742,15 @@ POST /v1/apps/{projectId}/auth/oauth/github/start
 
 ### Path parameters
 
-| Name        | Type   | Required | Description |
-| ----------- | ------ | -------- | ----------- |
-| `projectId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `projectId` | string | Yes | — |
 
 ### Request body
 
-| Field         | Type   | Required | Description |
-| ------------- | ------ | -------- | ----------- |
-| `redirectUrl` | string | Yes      | —           |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `redirectUrl` | string | Yes | — |
 
 ### Example
 
@@ -764,19 +764,19 @@ curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/oauth/github/start"
 
 ### Responses
 
-| Status | Description                                                |
-| ------ | ---------------------------------------------------------- |
-| `200`  | Authorization URL and browser state value.                 |
-| `404`  | No such project or app-auth resource in this organization. |
-| `422`  | Invalid configuration or request.                          |
-| `429`  | Too many sign-in attempts.                                 |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Authorization URL and browser state value. |
+| `404` | No such project or app-auth resource in this organization. |
+| `422` | Invalid configuration or request. |
+| `429` | Too many sign-in attempts. |
 
 ### Response body (200)
 
-| Field              | Type   | Description |
-| ------------------ | ------ | ----------- |
-| `authorizationUrl` | string | —           |
-| `state`            | string | —           |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `authorizationUrl` | string | — |
+| `state` | string | — |
 
 ## appauth.signUpPassword
 
@@ -791,18 +791,18 @@ POST /v1/apps/{projectId}/auth/sign-up/password
 
 ### Path parameters
 
-| Name        | Type   | Required | Description |
-| ----------- | ------ | -------- | ----------- |
-| `projectId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `projectId` | string | Yes | — |
 
 ### Request body
 
-| Field         | Type   | Required | Description      |
-| ------------- | ------ | -------- | ---------------- |
-| `email`       | string | Yes      | Format: `email`. |
-| `password`    | string | Yes      | —                |
-| `name`        | string | No       | —                |
-| `redirectUrl` | string | Yes      | —                |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `email` | string | Yes | Format: `email`. |
+| `password` | string | Yes | — |
+| `name` | string | No | — |
+| `redirectUrl` | string | Yes | — |
 
 ### Example
 
@@ -818,12 +818,12 @@ curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/sign-up/password" \
 
 ### Responses
 
-| Status | Description                                                |
-| ------ | ---------------------------------------------------------- |
-| `202`  | The verification request was accepted.                     |
-| `404`  | No such project or app-auth resource in this organization. |
-| `422`  | Invalid configuration or request.                          |
-| `429`  | Too many authentication attempts.                          |
+| Status | Description |
+| ------ | ----------- |
+| `202` | The verification request was accepted. |
+| `404` | No such project or app-auth resource in this organization. |
+| `422` | Invalid configuration or request. |
+| `429` | Too many authentication attempts. |
 
 ## appauth.signInPassword
 
@@ -838,16 +838,16 @@ POST /v1/apps/{projectId}/auth/sign-in/password
 
 ### Path parameters
 
-| Name        | Type   | Required | Description |
-| ----------- | ------ | -------- | ----------- |
-| `projectId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `projectId` | string | Yes | — |
 
 ### Request body
 
-| Field      | Type   | Required | Description      |
-| ---------- | ------ | -------- | ---------------- |
-| `email`    | string | Yes      | Format: `email`. |
-| `password` | string | Yes      | —                |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `email` | string | Yes | Format: `email`. |
+| `password` | string | Yes | — |
 
 ### Example
 
@@ -862,29 +862,29 @@ curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/sign-in/password" \
 
 ### Responses
 
-| Status | Description                                               |
-| ------ | --------------------------------------------------------- |
-| `200`  | New app session.                                          |
-| `401`  | The credentials are invalid or the email is not verified. |
-| `429`  | Too many authentication attempts.                         |
+| Status | Description |
+| ------ | ----------- |
+| `200` | New app session. |
+| `401` | The credentials are invalid or the email is not verified. |
+| `429` | Too many authentication attempts. |
 
 ### Response body (200)
 
-| Field                | Type           | Description                                                                |
-| -------------------- | -------------- | -------------------------------------------------------------------------- |
-| `accessToken`        | string         | Short-lived opaque bearer token. Only a SHA-256 digest is stored by Korve. |
-| `refreshToken`       | string         | One-time rotating token. Only a SHA-256 digest is stored by Korve.         |
-| `expiresAt`          | string         | Format: `date-time`.                                                       |
-| `user`               | object         | —                                                                          |
-| `user.id`            | string         | —                                                                          |
-| `user.email`         | string         | Format: `email`.                                                           |
-| `user.emailVerified` | boolean        | —                                                                          |
-| `user.name`          | string or null | —                                                                          |
-| `user.image`         | string or null | —                                                                          |
-| `user.disabledAt`    | string or null | Format: `date-time`.                                                       |
-| `user.createdAt`     | string         | Format: `date-time`.                                                       |
-| `user.lastSignInAt`  | string or null | Format: `date-time`.                                                       |
-| `user.lastActiveAt`  | string or null | Format: `date-time`.                                                       |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `accessToken` | string | Short-lived opaque bearer token. Only a SHA-256 digest is stored by Korve. |
+| `refreshToken` | string | One-time rotating token. Only a SHA-256 digest is stored by Korve. |
+| `expiresAt` | string | Format: `date-time`. |
+| `user` | object | — |
+| `user.id` | string | — |
+| `user.email` | string | Format: `email`. |
+| `user.emailVerified` | boolean | — |
+| `user.name` | string or null | — |
+| `user.image` | string or null | — |
+| `user.disabledAt` | string or null | Format: `date-time`. |
+| `user.createdAt` | string | Format: `date-time`. |
+| `user.lastSignInAt` | string or null | Format: `date-time`. |
+| `user.lastActiveAt` | string or null | Format: `date-time`. |
 
 ## appauth.requestMagicLink
 
@@ -899,16 +899,16 @@ POST /v1/apps/{projectId}/auth/magic-link
 
 ### Path parameters
 
-| Name        | Type   | Required | Description |
-| ----------- | ------ | -------- | ----------- |
-| `projectId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `projectId` | string | Yes | — |
 
 ### Request body
 
-| Field         | Type   | Required | Description      |
-| ------------- | ------ | -------- | ---------------- |
-| `email`       | string | Yes      | Format: `email`. |
-| `redirectUrl` | string | Yes      | —                |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `email` | string | Yes | Format: `email`. |
+| `redirectUrl` | string | Yes | — |
 
 ### Example
 
@@ -923,12 +923,12 @@ curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/magic-link" \
 
 ### Responses
 
-| Status | Description                                                |
-| ------ | ---------------------------------------------------------- |
-| `202`  | The sign-in request was accepted.                          |
-| `404`  | No such project or app-auth resource in this organization. |
-| `422`  | Invalid configuration or request.                          |
-| `429`  | Too many authentication attempts.                          |
+| Status | Description |
+| ------ | ----------- |
+| `202` | The sign-in request was accepted. |
+| `404` | No such project or app-auth resource in this organization. |
+| `422` | Invalid configuration or request. |
+| `429` | Too many authentication attempts. |
 
 ## appauth.completeMagicLink
 
@@ -943,15 +943,15 @@ POST /v1/apps/{projectId}/auth/magic-link/verify
 
 ### Path parameters
 
-| Name        | Type   | Required | Description |
-| ----------- | ------ | -------- | ----------- |
-| `projectId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `projectId` | string | Yes | — |
 
 ### Request body
 
-| Field   | Type   | Required | Description |
-| ------- | ------ | -------- | ----------- |
-| `token` | string | Yes      | —           |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `token` | string | Yes | — |
 
 ### Example
 
@@ -965,29 +965,29 @@ curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/magic-link/verify" 
 
 ### Responses
 
-| Status | Description                                        |
-| ------ | -------------------------------------------------- |
-| `200`  | New app session.                                   |
-| `401`  | The link is invalid, expired, or already consumed. |
-| `429`  | Too many authentication attempts.                  |
+| Status | Description |
+| ------ | ----------- |
+| `200` | New app session. |
+| `401` | The link is invalid, expired, or already consumed. |
+| `429` | Too many authentication attempts. |
 
 ### Response body (200)
 
-| Field                | Type           | Description                                                                |
-| -------------------- | -------------- | -------------------------------------------------------------------------- |
-| `accessToken`        | string         | Short-lived opaque bearer token. Only a SHA-256 digest is stored by Korve. |
-| `refreshToken`       | string         | One-time rotating token. Only a SHA-256 digest is stored by Korve.         |
-| `expiresAt`          | string         | Format: `date-time`.                                                       |
-| `user`               | object         | —                                                                          |
-| `user.id`            | string         | —                                                                          |
-| `user.email`         | string         | Format: `email`.                                                           |
-| `user.emailVerified` | boolean        | —                                                                          |
-| `user.name`          | string or null | —                                                                          |
-| `user.image`         | string or null | —                                                                          |
-| `user.disabledAt`    | string or null | Format: `date-time`.                                                       |
-| `user.createdAt`     | string         | Format: `date-time`.                                                       |
-| `user.lastSignInAt`  | string or null | Format: `date-time`.                                                       |
-| `user.lastActiveAt`  | string or null | Format: `date-time`.                                                       |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `accessToken` | string | Short-lived opaque bearer token. Only a SHA-256 digest is stored by Korve. |
+| `refreshToken` | string | One-time rotating token. Only a SHA-256 digest is stored by Korve. |
+| `expiresAt` | string | Format: `date-time`. |
+| `user` | object | — |
+| `user.id` | string | — |
+| `user.email` | string | Format: `email`. |
+| `user.emailVerified` | boolean | — |
+| `user.name` | string or null | — |
+| `user.image` | string or null | — |
+| `user.disabledAt` | string or null | Format: `date-time`. |
+| `user.createdAt` | string | Format: `date-time`. |
+| `user.lastSignInAt` | string or null | Format: `date-time`. |
+| `user.lastActiveAt` | string or null | Format: `date-time`. |
 
 ## appauth.requestPasswordReset
 
@@ -1002,16 +1002,16 @@ POST /v1/apps/{projectId}/auth/password/reset
 
 ### Path parameters
 
-| Name        | Type   | Required | Description |
-| ----------- | ------ | -------- | ----------- |
-| `projectId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `projectId` | string | Yes | — |
 
 ### Request body
 
-| Field         | Type   | Required | Description      |
-| ------------- | ------ | -------- | ---------------- |
-| `email`       | string | Yes      | Format: `email`. |
-| `redirectUrl` | string | Yes      | —                |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `email` | string | Yes | Format: `email`. |
+| `redirectUrl` | string | Yes | — |
 
 ### Example
 
@@ -1026,12 +1026,12 @@ curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/password/reset" \
 
 ### Responses
 
-| Status | Description                                                |
-| ------ | ---------------------------------------------------------- |
-| `202`  | The reset request was accepted.                            |
-| `404`  | No such project or app-auth resource in this organization. |
-| `422`  | Invalid configuration or request.                          |
-| `429`  | Too many authentication attempts.                          |
+| Status | Description |
+| ------ | ----------- |
+| `202` | The reset request was accepted. |
+| `404` | No such project or app-auth resource in this organization. |
+| `422` | Invalid configuration or request. |
+| `429` | Too many authentication attempts. |
 
 ## appauth.completePasswordReset
 
@@ -1046,16 +1046,16 @@ POST /v1/apps/{projectId}/auth/password/reset/verify
 
 ### Path parameters
 
-| Name        | Type   | Required | Description |
-| ----------- | ------ | -------- | ----------- |
-| `projectId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `projectId` | string | Yes | — |
 
 ### Request body
 
-| Field      | Type   | Required | Description |
-| ---------- | ------ | -------- | ----------- |
-| `token`    | string | Yes      | —           |
-| `password` | string | Yes      | —           |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `token` | string | Yes | — |
+| `password` | string | Yes | — |
 
 ### Example
 
@@ -1070,12 +1070,12 @@ curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/password/reset/veri
 
 ### Responses
 
-| Status | Description                                              |
-| ------ | -------------------------------------------------------- |
-| `200`  | Password replaced and sessions revoked.                  |
-| `401`  | The reset link is invalid, expired, or already consumed. |
-| `422`  | The password does not satisfy project policy.            |
-| `429`  | Too many authentication attempts.                        |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Password replaced and sessions revoked. |
+| `401` | The reset link is invalid, expired, or already consumed. |
+| `422` | The password does not satisfy project policy. |
+| `429` | Too many authentication attempts. |
 
 ## appauth.googleCallback
 
@@ -1090,17 +1090,17 @@ GET /v1/apps/{projectId}/auth/oauth/google/callback
 
 ### Path parameters
 
-| Name        | Type   | Required | Description |
-| ----------- | ------ | -------- | ----------- |
-| `projectId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `projectId` | string | Yes | — |
 
 ### Query parameters
 
-| Name    | Type   | Required | Description |
-| ------- | ------ | -------- | ----------- |
-| `state` | string | Yes      | —           |
-| `code`  | string | No       | —           |
-| `error` | string | No       | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `state` | string | Yes | — |
+| `code` | string | No | — |
+| `error` | string | No | — |
 
 ### Example
 
@@ -1110,10 +1110,10 @@ curl "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/oauth/google/callback?state
 
 ### Responses
 
-| Status | Description                                          |
-| ------ | ---------------------------------------------------- |
-| `302`  | Exact configured application redirect.               |
-| `400`  | Invalid, expired, consumed, or failed OAuth attempt. |
+| Status | Description |
+| ------ | ----------- |
+| `302` | Exact configured application redirect. |
+| `400` | Invalid, expired, consumed, or failed OAuth attempt. |
 
 ## appauth.githubCallback
 
@@ -1128,17 +1128,17 @@ GET /v1/apps/{projectId}/auth/oauth/github/callback
 
 ### Path parameters
 
-| Name        | Type   | Required | Description |
-| ----------- | ------ | -------- | ----------- |
-| `projectId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `projectId` | string | Yes | — |
 
 ### Query parameters
 
-| Name    | Type   | Required | Description |
-| ------- | ------ | -------- | ----------- |
-| `state` | string | Yes      | —           |
-| `code`  | string | No       | —           |
-| `error` | string | No       | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `state` | string | Yes | — |
+| `code` | string | No | — |
+| `error` | string | No | — |
 
 ### Example
 
@@ -1148,10 +1148,10 @@ curl "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/oauth/github/callback?state
 
 ### Responses
 
-| Status | Description                                          |
-| ------ | ---------------------------------------------------- |
-| `302`  | Exact configured application redirect.               |
-| `400`  | Invalid, expired, consumed, or failed OAuth attempt. |
+| Status | Description |
+| ------ | ----------- |
+| `302` | Exact configured application redirect. |
+| `400` | Invalid, expired, consumed, or failed OAuth attempt. |
 
 ## appauth.exchangeCode
 
@@ -1166,15 +1166,15 @@ POST /v1/apps/{projectId}/auth/token
 
 ### Path parameters
 
-| Name        | Type   | Required | Description |
-| ----------- | ------ | -------- | ----------- |
-| `projectId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `projectId` | string | Yes | — |
 
 ### Request body
 
-| Field  | Type   | Required | Description |
-| ------ | ------ | -------- | ----------- |
-| `code` | string | Yes      | —           |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `code` | string | Yes | — |
 
 ### Example
 
@@ -1188,29 +1188,29 @@ curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/token" \
 
 ### Responses
 
-| Status | Description                         |
-| ------ | ----------------------------------- |
-| `200`  | New app session.                    |
-| `400`  | Invalid, expired, or consumed code. |
-| `429`  | Too many token exchanges.           |
+| Status | Description |
+| ------ | ----------- |
+| `200` | New app session. |
+| `400` | Invalid, expired, or consumed code. |
+| `429` | Too many token exchanges. |
 
 ### Response body (200)
 
-| Field                | Type           | Description                                                                |
-| -------------------- | -------------- | -------------------------------------------------------------------------- |
-| `accessToken`        | string         | Short-lived opaque bearer token. Only a SHA-256 digest is stored by Korve. |
-| `refreshToken`       | string         | One-time rotating token. Only a SHA-256 digest is stored by Korve.         |
-| `expiresAt`          | string         | Format: `date-time`.                                                       |
-| `user`               | object         | —                                                                          |
-| `user.id`            | string         | —                                                                          |
-| `user.email`         | string         | Format: `email`.                                                           |
-| `user.emailVerified` | boolean        | —                                                                          |
-| `user.name`          | string or null | —                                                                          |
-| `user.image`         | string or null | —                                                                          |
-| `user.disabledAt`    | string or null | Format: `date-time`.                                                       |
-| `user.createdAt`     | string         | Format: `date-time`.                                                       |
-| `user.lastSignInAt`  | string or null | Format: `date-time`.                                                       |
-| `user.lastActiveAt`  | string or null | Format: `date-time`.                                                       |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `accessToken` | string | Short-lived opaque bearer token. Only a SHA-256 digest is stored by Korve. |
+| `refreshToken` | string | One-time rotating token. Only a SHA-256 digest is stored by Korve. |
+| `expiresAt` | string | Format: `date-time`. |
+| `user` | object | — |
+| `user.id` | string | — |
+| `user.email` | string | Format: `email`. |
+| `user.emailVerified` | boolean | — |
+| `user.name` | string or null | — |
+| `user.image` | string or null | — |
+| `user.disabledAt` | string or null | Format: `date-time`. |
+| `user.createdAt` | string | Format: `date-time`. |
+| `user.lastSignInAt` | string or null | Format: `date-time`. |
+| `user.lastActiveAt` | string or null | Format: `date-time`. |
 
 ## appauth.getSession
 
@@ -1225,9 +1225,9 @@ GET /v1/apps/{projectId}/auth/session
 
 ### Path parameters
 
-| Name        | Type   | Required | Description |
-| ----------- | ------ | -------- | ----------- |
-| `projectId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `projectId` | string | Yes | — |
 
 ### Example
 
@@ -1238,26 +1238,26 @@ curl "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/session" \
 
 ### Responses
 
-| Status | Description                                                          |
-| ------ | -------------------------------------------------------------------- |
-| `200`  | Current app session.                                                 |
-| `401`  | Missing, expired, revoked, idle, disabled, or cross-project session. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Current app session. |
+| `401` | Missing, expired, revoked, idle, disabled, or cross-project session. |
 
 ### Response body (200)
 
-| Field                | Type           | Description          |
-| -------------------- | -------------- | -------------------- |
-| `user`               | object         | —                    |
-| `user.id`            | string         | —                    |
-| `user.email`         | string         | Format: `email`.     |
-| `user.emailVerified` | boolean        | —                    |
-| `user.name`          | string or null | —                    |
-| `user.image`         | string or null | —                    |
-| `user.disabledAt`    | string or null | Format: `date-time`. |
-| `user.createdAt`     | string         | Format: `date-time`. |
-| `user.lastSignInAt`  | string or null | Format: `date-time`. |
-| `user.lastActiveAt`  | string or null | Format: `date-time`. |
-| `expiresAt`          | string         | Format: `date-time`. |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `user` | object | — |
+| `user.id` | string | — |
+| `user.email` | string | Format: `email`. |
+| `user.emailVerified` | boolean | — |
+| `user.name` | string or null | — |
+| `user.image` | string or null | — |
+| `user.disabledAt` | string or null | Format: `date-time`. |
+| `user.createdAt` | string | Format: `date-time`. |
+| `user.lastSignInAt` | string or null | Format: `date-time`. |
+| `user.lastActiveAt` | string or null | Format: `date-time`. |
+| `expiresAt` | string | Format: `date-time`. |
 
 ## appauth.refreshSession
 
@@ -1272,15 +1272,15 @@ POST /v1/apps/{projectId}/auth/refresh
 
 ### Path parameters
 
-| Name        | Type   | Required | Description |
-| ----------- | ------ | -------- | ----------- |
-| `projectId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `projectId` | string | Yes | — |
 
 ### Request body
 
-| Field          | Type   | Required | Description |
-| -------------- | ------ | -------- | ----------- |
-| `refreshToken` | string | Yes      | —           |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `refreshToken` | string | Yes | — |
 
 ### Example
 
@@ -1294,29 +1294,29 @@ curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/refresh" \
 
 ### Responses
 
-| Status | Description                                                                      |
-| ------ | -------------------------------------------------------------------------------- |
-| `200`  | Rotated app session.                                                             |
-| `401`  | Invalid, expired, reused, idle-expired, revoked, or cross-project refresh token. |
-| `429`  | Too many refresh attempts.                                                       |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Rotated app session. |
+| `401` | Invalid, expired, reused, idle-expired, revoked, or cross-project refresh token. |
+| `429` | Too many refresh attempts. |
 
 ### Response body (200)
 
-| Field                | Type           | Description                                                                |
-| -------------------- | -------------- | -------------------------------------------------------------------------- |
-| `accessToken`        | string         | Short-lived opaque bearer token. Only a SHA-256 digest is stored by Korve. |
-| `refreshToken`       | string         | One-time rotating token. Only a SHA-256 digest is stored by Korve.         |
-| `expiresAt`          | string         | Format: `date-time`.                                                       |
-| `user`               | object         | —                                                                          |
-| `user.id`            | string         | —                                                                          |
-| `user.email`         | string         | Format: `email`.                                                           |
-| `user.emailVerified` | boolean        | —                                                                          |
-| `user.name`          | string or null | —                                                                          |
-| `user.image`         | string or null | —                                                                          |
-| `user.disabledAt`    | string or null | Format: `date-time`.                                                       |
-| `user.createdAt`     | string         | Format: `date-time`.                                                       |
-| `user.lastSignInAt`  | string or null | Format: `date-time`.                                                       |
-| `user.lastActiveAt`  | string or null | Format: `date-time`.                                                       |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `accessToken` | string | Short-lived opaque bearer token. Only a SHA-256 digest is stored by Korve. |
+| `refreshToken` | string | One-time rotating token. Only a SHA-256 digest is stored by Korve. |
+| `expiresAt` | string | Format: `date-time`. |
+| `user` | object | — |
+| `user.id` | string | — |
+| `user.email` | string | Format: `email`. |
+| `user.emailVerified` | boolean | — |
+| `user.name` | string or null | — |
+| `user.image` | string or null | — |
+| `user.disabledAt` | string or null | Format: `date-time`. |
+| `user.createdAt` | string | Format: `date-time`. |
+| `user.lastSignInAt` | string or null | Format: `date-time`. |
+| `user.lastActiveAt` | string or null | Format: `date-time`. |
 
 ## appauth.signOut
 
@@ -1331,9 +1331,9 @@ POST /v1/apps/{projectId}/auth/sign-out
 
 ### Path parameters
 
-| Name        | Type   | Required | Description |
-| ----------- | ------ | -------- | ----------- |
-| `projectId` | string | Yes      | —           |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `projectId` | string | Yes | — |
 
 ### Example
 
@@ -1344,7 +1344,7 @@ curl -X POST "https://api.korve.dev/v1/apps/$PROJECT_ID/auth/sign-out" \
 
 ### Responses
 
-| Status | Description                           |
-| ------ | ------------------------------------- |
-| `200`  | Session revoked.                      |
-| `401`  | Invalid or cross-project app session. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Session revoked. |
+| `401` | Invalid or cross-project app session. |

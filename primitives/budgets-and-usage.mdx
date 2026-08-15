@@ -23,6 +23,8 @@ korve budget show --project storefront
 
 Setting replaces the previous budget; omitted options return to defaults. Removing a budget does not
 remove usage or resources—it allows spend to continue uncapped. Put hard-stop budgets on projects
-operated by unattended agents, and alert before the cap so a human can intervene.
+operated by unattended agents, and alert before the cap so a human can intervene. An alert-only
+budget never blocks automatic scale-out. At the cap, a hard-stop budget blocks new billable work and
+automatic scale-out. Running workloads keep serving and can continue to create usage charges.
 
 See the [Usage API](/api-reference/usage) and [Budgets API](/api-reference/budgets).

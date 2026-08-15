@@ -9,7 +9,9 @@ return `402` until billing is active.
 
 Use organization billing for payment state and invoices, project usage for attribution, and project
 budgets for autonomous-work guardrails. A budget can alert at a threshold and can enforce a hard
-stop where the resource contract supports it.
+stop where the resource contract supports it. Alert-only budgets do not block automatic scale-out.
+A hard stop blocks new billable work and automatic scale-out at the cap. Running workloads keep
+serving.
 
 ```bash
 korve billing show

@@ -11,7 +11,7 @@ machine-readable output. Project commands accept `--project <slug|id>` and other
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | Session and bootstrap  | `login`, `logout`, `whoami`, `init`, `link`, `health`, `spec`, `regions`, `completions`                             |
 | Organization           | `orgs`, `billing`, `webhooks`, `api-keys`                                                                           |
-| Application            | `projects`, `environments`, `deploy`, `deploys`, `previews`, `env`, `domains`, `access`                             |
+| Application            | `projects`, `services`, `environments`, `deploy`, `deploys`, `previews`, `env`, `domains`, `access`                 |
 | Data                   | `databases`, `branches`, `backups`, `storage`, `buckets`, `caches`                                                  |
 | Work                   | `queues`, `crons`                                                                                                   |
 | Operations             | `operator`, `maintenance`, `logs`, `analytics`, `metrics`, `speed-insights`, `alerts`, `advisor`, `budget`, `usage` |
@@ -28,6 +28,12 @@ korve deploys list
 korve logs --level error --limit 100
 korve analytics
 korve speed-insights query --device mobile --granularity day
+
+# inspect and bound automatic compute
+korve services list
+korve services scaling show <service-id>
+korve services scaling set <service-id> --minimum-ready 0 --maximum-replicas 10
+korve services scaling events <service-id>
 
 # declare and reconcile an organization
 korve manifest export -o korve.toml

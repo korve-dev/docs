@@ -25,7 +25,7 @@ and instant — the response carries `cached: true`.
 ## What it sees
 
 The platform agent reasons over the failed deploy's build log and recorded
-error, the project's runtime class, recent deployment history (flaky vs
+error, the service configuration, recent deployment history (flaky vs
 persistent failures), and the **names** of configured environment
 variables. Env var **values are never read** — they stay encrypted; the
 agent only knows which keys exist (enough to notice a missing

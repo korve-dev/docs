@@ -8,6 +8,14 @@ environments, domains, storage, queues, crons, databases, caches, realtime chann
 App Auth policy, preview database-branch policy, alerts, app access, and project maintenance. The
 same versioned contract drives CLI, API, dashboard, and MCP.
 
+<Warning>
+  The current public manifest apply operation accepts the version 1 compatibility contract. That
+  contract includes the old `runtimeClass` field because it must round-trip existing projects. New
+  projects use automatic compute and do not need a customer-selected runtime. Create the project
+  without a runtime field, then manage its limits with `korve services scaling` or the [Services
+  API](/api-reference/services).
+</Warning>
+
 ```yaml
 version: 1
 organization: acme

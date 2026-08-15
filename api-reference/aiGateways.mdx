@@ -21,9 +21,9 @@ GET /v1/orgs/{orgId}/projects/{projectId}/ai-gateways
 
 ### Query parameters
 
-| Name          | Type   | Required | Description                        |
-| ------------- | ------ | -------- | ---------------------------------- |
-| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Example
 
@@ -34,34 +34,34 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-gateways?env
 
 ### Responses
 
-| Status | Description                                   |
-| ------ | --------------------------------------------- |
-| `200`  | AI gateways with batched current-month usage. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | AI gateways with batched current-month usage. |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field                | Type     | Description          |
-| -------------------- | -------- | -------------------- |
-| `id`                 | string   | —                    |
-| `name`               | string   | —                    |
-| `environment`        | string   | —                    |
-| `allowedModels`      | string[] | —                    |
-| `monthlyBudgetUsd`   | number   | —                    |
-| `timeoutMs`          | integer  | —                    |
-| `maxRetries`         | integer  | —                    |
-| `redactPrompts`      | boolean  | —                    |
-| `createdAt`          | string   | Format: `date-time`. |
-| `updatedAt`          | string   | Format: `date-time`. |
-| `usage`              | object   | —                    |
-| `usage.month`        | string   | Format: `date-time`. |
-| `usage.requests`     | integer  | —                    |
-| `usage.inputTokens`  | integer  | —                    |
-| `usage.outputTokens` | integer  | —                    |
-| `usage.spentUsd`     | number   | —                    |
-| `usage.budgetUsd`    | number   | —                    |
-| `usage.remainingUsd` | number   | —                    |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | — |
+| `environment` | string | — |
+| `allowedModels` | string[] | — |
+| `monthlyBudgetUsd` | number | — |
+| `timeoutMs` | integer | — |
+| `maxRetries` | integer | — |
+| `redactPrompts` | boolean | — |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
+| `usage` | object | — |
+| `usage.month` | string | Format: `date-time`. |
+| `usage.requests` | integer | — |
+| `usage.inputTokens` | integer | — |
+| `usage.outputTokens` | integer | — |
+| `usage.spentUsd` | number | — |
+| `usage.budgetUsd` | number | — |
+| `usage.remainingUsd` | number | — |
 
 ## aiGateways.create
 
@@ -78,20 +78,20 @@ POST /v1/orgs/{orgId}/projects/{projectId}/ai-gateways
 
 ### Query parameters
 
-| Name          | Type   | Required | Description                        |
-| ------------- | ------ | -------- | ---------------------------------- |
-| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Request body
 
-| Field              | Type     | Required | Description                        |
-| ------------------ | -------- | -------- | ---------------------------------- |
-| `name`             | string   | Yes      | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
-| `allowedModels`    | string[] | Yes      | —                                  |
-| `monthlyBudgetUsd` | number   | Yes      | —                                  |
-| `timeoutMs`        | integer  | No       | —                                  |
-| `maxRetries`       | integer  | No       | —                                  |
-| `redactPrompts`    | boolean  | No       | —                                  |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `name` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `allowedModels` | string[] | Yes | — |
+| `monthlyBudgetUsd` | number | Yes | — |
+| `timeoutMs` | integer | No | — |
+| `maxRetries` | integer | No | — |
+| `redactPrompts` | boolean | No | — |
 
 ### Example
 
@@ -110,26 +110,26 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-gate
 
 ### Responses
 
-| Status | Description                      |
-| ------ | -------------------------------- |
-| `201`  | AI gateway created.              |
-| `409`  | The gateway name already exists. |
-| `422`  | Invalid gateway configuration.   |
+| Status | Description |
+| ------ | ----------- |
+| `201` | AI gateway created. |
+| `409` | The gateway name already exists. |
+| `422` | Invalid gateway configuration. |
 
 ### Response body (201)
 
-| Field              | Type     | Description          |
-| ------------------ | -------- | -------------------- |
-| `id`               | string   | —                    |
-| `name`             | string   | —                    |
-| `environment`      | string   | —                    |
-| `allowedModels`    | string[] | —                    |
-| `monthlyBudgetUsd` | number   | —                    |
-| `timeoutMs`        | integer  | —                    |
-| `maxRetries`       | integer  | —                    |
-| `redactPrompts`    | boolean  | —                    |
-| `createdAt`        | string   | Format: `date-time`. |
-| `updatedAt`        | string   | Format: `date-time`. |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | — |
+| `environment` | string | — |
+| `allowedModels` | string[] | — |
+| `monthlyBudgetUsd` | number | — |
+| `timeoutMs` | integer | — |
+| `maxRetries` | integer | — |
+| `redactPrompts` | boolean | — |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
 
 ## aiGateways.get
 
@@ -152,25 +152,25 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-gateways/$GA
 
 ### Responses
 
-| Status | Description      |
-| ------ | ---------------- |
-| `200`  | AI gateway.      |
-| `404`  | No such gateway. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | AI gateway. |
+| `404` | No such gateway. |
 
 ### Response body (200)
 
-| Field              | Type     | Description          |
-| ------------------ | -------- | -------------------- |
-| `id`               | string   | —                    |
-| `name`             | string   | —                    |
-| `environment`      | string   | —                    |
-| `allowedModels`    | string[] | —                    |
-| `monthlyBudgetUsd` | number   | —                    |
-| `timeoutMs`        | integer  | —                    |
-| `maxRetries`       | integer  | —                    |
-| `redactPrompts`    | boolean  | —                    |
-| `createdAt`        | string   | Format: `date-time`. |
-| `updatedAt`        | string   | Format: `date-time`. |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | — |
+| `environment` | string | — |
+| `allowedModels` | string[] | — |
+| `monthlyBudgetUsd` | number | — |
+| `timeoutMs` | integer | — |
+| `maxRetries` | integer | — |
+| `redactPrompts` | boolean | — |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
 
 ## aiGateways.update
 
@@ -187,14 +187,14 @@ PATCH /v1/orgs/{orgId}/projects/{projectId}/ai-gateways/{gatewayId}
 
 ### Request body
 
-| Field              | Type     | Required | Description                        |
-| ------------------ | -------- | -------- | ---------------------------------- |
-| `name`             | string   | No       | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
-| `allowedModels`    | string[] | No       | —                                  |
-| `monthlyBudgetUsd` | number   | No       | —                                  |
-| `timeoutMs`        | integer  | No       | —                                  |
-| `maxRetries`       | integer  | No       | —                                  |
-| `redactPrompts`    | boolean  | No       | —                                  |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `name` | string | No | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `allowedModels` | string[] | No | — |
+| `monthlyBudgetUsd` | number | No | — |
+| `timeoutMs` | integer | No | — |
+| `maxRetries` | integer | No | — |
+| `redactPrompts` | boolean | No | — |
 
 ### Example
 
@@ -209,26 +209,26 @@ curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-gat
 
 ### Responses
 
-| Status | Description                    |
-| ------ | ------------------------------ |
-| `200`  | Updated AI gateway.            |
-| `404`  | No such gateway.               |
-| `422`  | Invalid gateway configuration. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Updated AI gateway. |
+| `404` | No such gateway. |
+| `422` | Invalid gateway configuration. |
 
 ### Response body (200)
 
-| Field              | Type     | Description          |
-| ------------------ | -------- | -------------------- |
-| `id`               | string   | —                    |
-| `name`             | string   | —                    |
-| `environment`      | string   | —                    |
-| `allowedModels`    | string[] | —                    |
-| `monthlyBudgetUsd` | number   | —                    |
-| `timeoutMs`        | integer  | —                    |
-| `maxRetries`       | integer  | —                    |
-| `redactPrompts`    | boolean  | —                    |
-| `createdAt`        | string   | Format: `date-time`. |
-| `updatedAt`        | string   | Format: `date-time`. |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | — |
+| `environment` | string | — |
+| `allowedModels` | string[] | — |
+| `monthlyBudgetUsd` | number | — |
+| `timeoutMs` | integer | — |
+| `maxRetries` | integer | — |
+| `redactPrompts` | boolean | — |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
 
 ## aiGateways.delete
 
@@ -251,16 +251,16 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-ga
 
 ### Responses
 
-| Status | Description         |
-| ------ | ------------------- |
-| `200`  | AI gateway deleted. |
-| `404`  | No such gateway.    |
+| Status | Description |
+| ------ | ----------- |
+| `200` | AI gateway deleted. |
+| `404` | No such gateway. |
 
 ### Response body (200)
 
-| Field | Type    | Description     |
-| ----- | ------- | --------------- |
-| `ok`  | boolean | One of: `true`. |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `ok` | boolean | One of: `true`. |
 
 ## aiGateways.models
 
@@ -283,9 +283,9 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-gateways/$GA
 
 ### Responses
 
-| Status | Description       |
-| ------ | ----------------- |
-| `200`  | Available models. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Available models. |
 
 ### Response body (200)
 
@@ -312,22 +312,22 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-gateways/$GA
 
 ### Responses
 
-| Status | Description   |
-| ------ | ------------- |
-| `200`  | Gateway keys. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Gateway keys. |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field        | Type           | Description          |
-| ------------ | -------------- | -------------------- |
-| `id`         | string         | Format: `uuid`.      |
-| `name`       | string         | —                    |
-| `keyPrefix`  | string         | —                    |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | Format: `uuid`. |
+| `name` | string | — |
+| `keyPrefix` | string | — |
 | `lastUsedAt` | string or null | Format: `date-time`. |
-| `revokedAt`  | string or null | Format: `date-time`. |
-| `createdAt`  | string         | Format: `date-time`. |
+| `revokedAt` | string or null | Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
 
 ## aiGateways.createKey
 
@@ -344,9 +344,9 @@ POST /v1/orgs/{orgId}/projects/{projectId}/ai-gateways/{gatewayId}/keys
 
 ### Request body
 
-| Field  | Type   | Required | Description |
-| ------ | ------ | -------- | ----------- |
-| `name` | string | Yes      | —           |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `name` | string | Yes | — |
 
 ### Example
 
@@ -361,19 +361,19 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-gate
 
 ### Responses
 
-| Status | Description                       |
-| ------ | --------------------------------- |
-| `201`  | Key metadata and one-time secret. |
-| `404`  | No such gateway.                  |
+| Status | Description |
+| ------ | ----------- |
+| `201` | Key metadata and one-time secret. |
+| `404` | No such gateway. |
 
 ### Response body (201)
 
-| Field       | Type   | Description                     |
-| ----------- | ------ | ------------------------------- |
-| `id`        | string | Format: `uuid`.                 |
-| `name`      | string | —                               |
-| `keyPrefix` | string | —                               |
-| `secret`    | string | Pattern: `^kvgw_[A-Za-z0-9]+$`. |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | Format: `uuid`. |
+| `name` | string | — |
+| `keyPrefix` | string | — |
+| `secret` | string | Pattern: `^kvgw_[A-Za-z0-9]+$`. |
 
 ## aiGateways.revokeKey
 
@@ -396,16 +396,16 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-ga
 
 ### Responses
 
-| Status | Description  |
-| ------ | ------------ |
-| `200`  | Key revoked. |
-| `404`  | No such key. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Key revoked. |
+| `404` | No such key. |
 
 ### Response body (200)
 
-| Field | Type    | Description     |
-| ----- | ------- | --------------- |
-| `ok`  | boolean | One of: `true`. |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `ok` | boolean | One of: `true`. |
 
 ## aiGateways.usage
 
@@ -428,21 +428,21 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/ai-gateways/$GA
 
 ### Responses
 
-| Status | Description                         |
-| ------ | ----------------------------------- |
-| `200`  | Gateway usage and remaining budget. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Gateway usage and remaining budget. |
 
 ### Response body (200)
 
-| Field          | Type    | Description          |
-| -------------- | ------- | -------------------- |
-| `month`        | string  | Format: `date-time`. |
-| `requests`     | integer | —                    |
-| `inputTokens`  | integer | —                    |
-| `outputTokens` | integer | —                    |
-| `spentUsd`     | number  | —                    |
-| `budgetUsd`    | number  | —                    |
-| `remainingUsd` | number  | —                    |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `month` | string | Format: `date-time`. |
+| `requests` | integer | — |
+| `inputTokens` | integer | — |
+| `outputTokens` | integer | — |
+| `spentUsd` | number | — |
+| `budgetUsd` | number | — |
+| `remainingUsd` | number | — |
 
 ## aiGateways.runtimeChatCompletions
 
@@ -458,15 +458,15 @@ POST /v1/runtime/ai/{gatewayName}/chat/completions
 
 ### Request body
 
-| Field                | Type     | Required | Description                                                |
-| -------------------- | -------- | -------- | ---------------------------------------------------------- |
-| `model`              | string   | Yes      | One of: `korve/fast`, `korve/balanced`, `korve/reasoning`. |
-| `messages`           | object[] | Yes      | —                                                          |
-| `messages[].role`    | string   | Yes      | One of: `system`, `user`, `assistant`, `tool`.             |
-| `messages[].content` | string   | Yes      | —                                                          |
-| `stream`             | boolean  | No       | —                                                          |
-| `max_tokens`         | integer  | No       | —                                                          |
-| `temperature`        | number   | No       | —                                                          |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `model` | string | Yes | One of: `korve/fast`, `korve/balanced`, `korve/reasoning`. |
+| `messages` | object[] | Yes | — |
+| `messages[].role` | string | Yes | One of: `system`, `user`, `assistant`, `tool`. |
+| `messages[].content` | string | Yes | — |
+| `stream` | boolean | No | — |
+| `max_tokens` | integer | No | — |
+| `temperature` | number | No | — |
 
 ### Example
 
@@ -487,29 +487,29 @@ curl -X POST "https://api.korve.dev/v1/runtime/ai/$GATEWAY_NAME/chat/completions
 
 ### Responses
 
-| Status | Description                                                                                                                                 |
-| ------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `200`  | OpenAI-compatible JSON response when stream is false; text/event-stream chunks use the same opaque Korve completion id when stream is true. |
-| `403`  | The requested model is not allowed.                                                                                                         |
-| `404`  | No such gateway in the runtime environment.                                                                                                 |
-| `429`  | The monthly gateway budget is exhausted.                                                                                                    |
-| `503`  | Model inference is temporarily unavailable.                                                                                                 |
+| Status | Description |
+| ------ | ----------- |
+| `200` | OpenAI-compatible JSON response when stream is false; text/event-stream chunks use the same opaque Korve completion id when stream is true. |
+| `403` | The requested model is not allowed. |
+| `404` | No such gateway in the runtime environment. |
+| `429` | The monthly gateway budget is exhausted. |
+| `503` | Model inference is temporarily unavailable. |
 
 ### Response body (200)
 
-| Field                       | Type     | Description                                                |
-| --------------------------- | -------- | ---------------------------------------------------------- |
-| `id`                        | string   | Pattern: `^kvc_[a-f0-9]{32}$`.                             |
-| `object`                    | string   | One of: `chat.completion`.                                 |
-| `created`                   | integer  | —                                                          |
-| `model`                     | string   | One of: `korve/fast`, `korve/balanced`, `korve/reasoning`. |
-| `choices`                   | object[] | —                                                          |
-| `choices[].index`           | integer  | One of: `0`.                                               |
-| `choices[].message`         | object   | —                                                          |
-| `choices[].message.role`    | string   | One of: `assistant`.                                       |
-| `choices[].message.content` | string   | —                                                          |
-| `choices[].finish_reason`   | string   | One of: `stop`, `length`, `tool_calls`.                    |
-| `usage`                     | object   | —                                                          |
-| `usage.prompt_tokens`       | integer  | —                                                          |
-| `usage.completion_tokens`   | integer  | —                                                          |
-| `usage.total_tokens`        | integer  | —                                                          |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | Pattern: `^kvc_[a-f0-9]{32}$`. |
+| `object` | string | One of: `chat.completion`. |
+| `created` | integer | — |
+| `model` | string | One of: `korve/fast`, `korve/balanced`, `korve/reasoning`. |
+| `choices` | object[] | — |
+| `choices[].index` | integer | One of: `0`. |
+| `choices[].message` | object | — |
+| `choices[].message.role` | string | One of: `assistant`. |
+| `choices[].message.content` | string | — |
+| `choices[].finish_reason` | string | One of: `stop`, `length`, `tool_calls`. |
+| `usage` | object | — |
+| `usage.prompt_tokens` | integer | — |
+| `usage.completion_tokens` | integer | — |
+| `usage.total_tokens` | integer | — |

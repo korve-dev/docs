@@ -47,17 +47,16 @@ membership work that requires a dashboard session stays intentionally human-gate
   [the deployment agent](/primitives/deployment-agent), which persists the
   conversation and requires approval before any mutation.
 
-## Runtime classes
+## Automatic compute
 
-Every project picks one of two runtime classes at creation:
+Every new project gets a request-driven web service. Korve adds and removes
+replicas with traffic, and it can stop all replicas while the service is idle.
+You set three safety limits: minimum ready replicas, maximum replicas, and
+target request concurrency. You do not select a machine size or compute region.
 
-| Class           | Best for                                          | Billing              |
-| --------------- | ------------------------------------------------- | -------------------- |
-| `scale-to-zero` | Most web apps and APIs                            | Per million requests |
-| `always-on`     | Long-lived processes, websockets, background work | Per compute-hour     |
-
-See [Deploys](/primitives/deploys) for what each class expects from your
-code.
+Application CPU, memory, and requests use separate public meters. See
+[Automatic compute](/primitives/automatic-compute) for scaling behavior,
+limits, and current workload restrictions.
 
 ## Next steps
 

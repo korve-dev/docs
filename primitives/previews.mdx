@@ -3,9 +3,8 @@ title: "Preview environments"
 description: "Every open pull request gets its own live URL. Close the PR, and it's gone."
 ---
 
-When a `scale-to-zero` project has a connected repository, every open pull
-request gets a preview environment: a full deployment of that PR's code on
-its own managed subdomain.
+When a project has a connected repository, every open pull request gets a preview environment: a
+full deployment of that pull request's code on its own managed subdomain.
 
 ```text
 https://<project-slug>-pr-<n>.korve.app
@@ -50,6 +49,6 @@ previews you want gone early (or whose PRs live forever).
 
 - Previews run with the project's current
   [environment variables](/primitives/environment-variables).
-- Preview traffic meters like any other scale-to-zero usage and counts
+- Preview traffic uses the public application meters and counts
   toward the project's [budget](/primitives/budgets-and-usage).
-- Previews currently apply to `scale-to-zero` projects.
+- Preview compute can stop while idle and starts again on request.

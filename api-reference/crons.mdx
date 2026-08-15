@@ -21,9 +21,9 @@ GET /v1/orgs/{orgId}/projects/{projectId}/crons
 
 ### Query parameters
 
-| Name          | Type   | Required | Description                        |
-| ------------- | ------ | -------- | ---------------------------------- |
-| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Example
 
@@ -34,39 +34,39 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/crons?environme
 
 ### Responses
 
-| Status | Description                     |
-| ------ | ------------------------------- |
-| `200`  | Cron jobs ordered by name.      |
-| `404`  | No such project or environment. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Cron jobs ordered by name. |
+| `404` | No such project or environment. |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field                       | Type             | Description                                                                                                   |
-| --------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| `id`                        | string           | —                                                                                                             |
-| `name`                      | string           | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                            |
-| `environment`               | string           | —                                                                                                             |
-| `schedule`                  | string           | Five-field cron expression.                                                                                   |
-| `timezone`                  | string           | IANA timezone name. Defaults to UTC.                                                                          |
-| `enabled`                   | boolean          | —                                                                                                             |
-| `catchUp`                   | boolean          | Missed invocations are skipped; catch-up is not performed at launch. One of: `false`.                         |
-| `target`                    | object or object | Exactly one same-environment target: a signed project-relative HTTP invocation or a queue publication.        |
-| `target.kind`               | string           | One of: `http`.                                                                                               |
-| `target.path`               | string           | Project-relative HTTP path that receives a signed invocation. Pattern: `^/`.                                  |
-| `target.method`             | string           | One of: `POST`, `PUT`, `PATCH`.                                                                               |
-| `target.body`               | object           | Optional JSON request body, at most 122,880 encoded bytes before the signed 128,000-byte invocation envelope. |
-| `retry`                     | object           | —                                                                                                             |
-| `retry.maxAttempts`         | integer          | Total attempts from 1 to 10.                                                                                  |
-| `retry.initialDelaySeconds` | integer          | Initial retry delay from 1 to 3,600 seconds.                                                                  |
-| `retry.maxDelaySeconds`     | integer          | Maximum retry delay from 1 to 86,400 seconds.                                                                 |
-| `concurrencyPolicy`         | string           | One of: `allow`, `skip`, `replace`.                                                                           |
-| `timeoutSeconds`            | integer          | Target timeout in seconds, bounded below the durable execution lease.                                         |
-| `lastRunAt`                 | string or null   | Format: `date-time`.                                                                                          |
-| `nextRunAt`                 | string or null   | Format: `date-time`.                                                                                          |
-| `createdAt`                 | string           | Format: `date-time`.                                                                                          |
-| `updatedAt`                 | string           | Format: `date-time`.                                                                                          |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `environment` | string | — |
+| `schedule` | string | Five-field cron expression. |
+| `timezone` | string | IANA timezone name. Defaults to UTC. |
+| `enabled` | boolean | — |
+| `catchUp` | boolean | Missed invocations are skipped; catch-up is not performed at launch. One of: `false`. |
+| `target` | object or object | Exactly one same-environment target: a signed project-relative HTTP invocation or a queue publication. |
+| `target.kind` | string | One of: `http`. |
+| `target.path` | string | Project-relative HTTP path that receives a signed invocation. Pattern: `^/`. |
+| `target.method` | string | One of: `POST`, `PUT`, `PATCH`. |
+| `target.body` | object | Optional JSON request body, at most 122,880 encoded bytes before the signed 128,000-byte invocation envelope. |
+| `retry` | object | — |
+| `retry.maxAttempts` | integer | Total attempts from 1 to 10. |
+| `retry.initialDelaySeconds` | integer | Initial retry delay from 1 to 3,600 seconds. |
+| `retry.maxDelaySeconds` | integer | Maximum retry delay from 1 to 86,400 seconds. |
+| `concurrencyPolicy` | string | One of: `allow`, `skip`, `replace`. |
+| `timeoutSeconds` | integer | Target timeout in seconds, bounded below the durable execution lease. |
+| `lastRunAt` | string or null | Format: `date-time`. |
+| `nextRunAt` | string or null | Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
 
 ## crons.create
 
@@ -83,29 +83,29 @@ POST /v1/orgs/{orgId}/projects/{projectId}/crons
 
 ### Query parameters
 
-| Name          | Type   | Required | Description                        |
-| ------------- | ------ | -------- | ---------------------------------- |
-| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
 
 ### Request body
 
-| Field                       | Type             | Required | Description                                                                                                   |
-| --------------------------- | ---------------- | -------- | ------------------------------------------------------------------------------------------------------------- |
-| `name`                      | string           | Yes      | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                            |
-| `schedule`                  | string           | Yes      | —                                                                                                             |
-| `timezone`                  | string           | No       | —                                                                                                             |
-| `enabled`                   | boolean          | No       | —                                                                                                             |
-| `target`                    | object or object | Yes      | Exactly one same-environment target: a signed project-relative HTTP invocation or a queue publication.        |
-| `target.kind`               | string           | Yes      | One of: `http`.                                                                                               |
-| `target.path`               | string           | Yes      | Project-relative HTTP path that receives a signed invocation. Pattern: `^/`.                                  |
-| `target.method`             | string           | No       | One of: `POST`, `PUT`, `PATCH`.                                                                               |
-| `target.body`               | object           | No       | Optional JSON request body, at most 122,880 encoded bytes before the signed 128,000-byte invocation envelope. |
-| `retry`                     | object           | No       | —                                                                                                             |
-| `retry.maxAttempts`         | integer          | No       | Total attempts from 1 to 10.                                                                                  |
-| `retry.initialDelaySeconds` | integer          | No       | Initial retry delay from 1 to 3,600 seconds.                                                                  |
-| `retry.maxDelaySeconds`     | integer          | No       | Maximum retry delay from 1 to 86,400 seconds.                                                                 |
-| `concurrencyPolicy`         | string           | No       | One of: `allow`, `skip`, `replace`.                                                                           |
-| `timeoutSeconds`            | integer          | No       | Target timeout in seconds, bounded below the durable execution lease.                                         |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `name` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `schedule` | string | Yes | — |
+| `timezone` | string | No | — |
+| `enabled` | boolean | No | — |
+| `target` | object or object | Yes | Exactly one same-environment target: a signed project-relative HTTP invocation or a queue publication. |
+| `target.kind` | string | Yes | One of: `http`. |
+| `target.path` | string | Yes | Project-relative HTTP path that receives a signed invocation. Pattern: `^/`. |
+| `target.method` | string | No | One of: `POST`, `PUT`, `PATCH`. |
+| `target.body` | object | No | Optional JSON request body, at most 122,880 encoded bytes before the signed 128,000-byte invocation envelope. |
+| `retry` | object | No | — |
+| `retry.maxAttempts` | integer | No | Total attempts from 1 to 10. |
+| `retry.initialDelaySeconds` | integer | No | Initial retry delay from 1 to 3,600 seconds. |
+| `retry.maxDelaySeconds` | integer | No | Maximum retry delay from 1 to 86,400 seconds. |
+| `concurrencyPolicy` | string | No | One of: `allow`, `skip`, `replace`. |
+| `timeoutSeconds` | integer | No | Target timeout in seconds, bounded below the durable execution lease. |
 
 ### Example
 
@@ -125,39 +125,39 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/crons?e
 
 ### Responses
 
-| Status | Description                                                       |
-| ------ | ----------------------------------------------------------------- |
-| `201`  | Cron job created.                                                 |
-| `404`  | No such project or environment.                                   |
-| `409`  | A cron job with that name already exists.                         |
-| `422`  | Invalid schedule, timezone, target, retry, or concurrency policy. |
+| Status | Description |
+| ------ | ----------- |
+| `201` | Cron job created. |
+| `404` | No such project or environment. |
+| `409` | A cron job with that name already exists. |
+| `422` | Invalid schedule, timezone, target, retry, or concurrency policy. |
 
 ### Response body (201)
 
-| Field                       | Type             | Description                                                                                                   |
-| --------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| `id`                        | string           | —                                                                                                             |
-| `name`                      | string           | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                            |
-| `environment`               | string           | —                                                                                                             |
-| `schedule`                  | string           | Five-field cron expression.                                                                                   |
-| `timezone`                  | string           | IANA timezone name. Defaults to UTC.                                                                          |
-| `enabled`                   | boolean          | —                                                                                                             |
-| `catchUp`                   | boolean          | Missed invocations are skipped; catch-up is not performed at launch. One of: `false`.                         |
-| `target`                    | object or object | Exactly one same-environment target: a signed project-relative HTTP invocation or a queue publication.        |
-| `target.kind`               | string           | One of: `http`.                                                                                               |
-| `target.path`               | string           | Project-relative HTTP path that receives a signed invocation. Pattern: `^/`.                                  |
-| `target.method`             | string           | One of: `POST`, `PUT`, `PATCH`.                                                                               |
-| `target.body`               | object           | Optional JSON request body, at most 122,880 encoded bytes before the signed 128,000-byte invocation envelope. |
-| `retry`                     | object           | —                                                                                                             |
-| `retry.maxAttempts`         | integer          | Total attempts from 1 to 10.                                                                                  |
-| `retry.initialDelaySeconds` | integer          | Initial retry delay from 1 to 3,600 seconds.                                                                  |
-| `retry.maxDelaySeconds`     | integer          | Maximum retry delay from 1 to 86,400 seconds.                                                                 |
-| `concurrencyPolicy`         | string           | One of: `allow`, `skip`, `replace`.                                                                           |
-| `timeoutSeconds`            | integer          | Target timeout in seconds, bounded below the durable execution lease.                                         |
-| `lastRunAt`                 | string or null   | Format: `date-time`.                                                                                          |
-| `nextRunAt`                 | string or null   | Format: `date-time`.                                                                                          |
-| `createdAt`                 | string           | Format: `date-time`.                                                                                          |
-| `updatedAt`                 | string           | Format: `date-time`.                                                                                          |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `environment` | string | — |
+| `schedule` | string | Five-field cron expression. |
+| `timezone` | string | IANA timezone name. Defaults to UTC. |
+| `enabled` | boolean | — |
+| `catchUp` | boolean | Missed invocations are skipped; catch-up is not performed at launch. One of: `false`. |
+| `target` | object or object | Exactly one same-environment target: a signed project-relative HTTP invocation or a queue publication. |
+| `target.kind` | string | One of: `http`. |
+| `target.path` | string | Project-relative HTTP path that receives a signed invocation. Pattern: `^/`. |
+| `target.method` | string | One of: `POST`, `PUT`, `PATCH`. |
+| `target.body` | object | Optional JSON request body, at most 122,880 encoded bytes before the signed 128,000-byte invocation envelope. |
+| `retry` | object | — |
+| `retry.maxAttempts` | integer | Total attempts from 1 to 10. |
+| `retry.initialDelaySeconds` | integer | Initial retry delay from 1 to 3,600 seconds. |
+| `retry.maxDelaySeconds` | integer | Maximum retry delay from 1 to 86,400 seconds. |
+| `concurrencyPolicy` | string | One of: `allow`, `skip`, `replace`. |
+| `timeoutSeconds` | integer | Target timeout in seconds, bounded below the durable execution lease. |
+| `lastRunAt` | string or null | Format: `date-time`. |
+| `nextRunAt` | string or null | Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
 
 ## crons.get
 
@@ -180,37 +180,37 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/crons/$CRON_ID"
 
 ### Responses
 
-| Status | Description                       |
-| ------ | --------------------------------- |
-| `200`  | Cron job.                         |
-| `404`  | No such cron job in this project. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Cron job. |
+| `404` | No such cron job in this project. |
 
 ### Response body (200)
 
-| Field                       | Type             | Description                                                                                                   |
-| --------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| `id`                        | string           | —                                                                                                             |
-| `name`                      | string           | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                            |
-| `environment`               | string           | —                                                                                                             |
-| `schedule`                  | string           | Five-field cron expression.                                                                                   |
-| `timezone`                  | string           | IANA timezone name. Defaults to UTC.                                                                          |
-| `enabled`                   | boolean          | —                                                                                                             |
-| `catchUp`                   | boolean          | Missed invocations are skipped; catch-up is not performed at launch. One of: `false`.                         |
-| `target`                    | object or object | Exactly one same-environment target: a signed project-relative HTTP invocation or a queue publication.        |
-| `target.kind`               | string           | One of: `http`.                                                                                               |
-| `target.path`               | string           | Project-relative HTTP path that receives a signed invocation. Pattern: `^/`.                                  |
-| `target.method`             | string           | One of: `POST`, `PUT`, `PATCH`.                                                                               |
-| `target.body`               | object           | Optional JSON request body, at most 122,880 encoded bytes before the signed 128,000-byte invocation envelope. |
-| `retry`                     | object           | —                                                                                                             |
-| `retry.maxAttempts`         | integer          | Total attempts from 1 to 10.                                                                                  |
-| `retry.initialDelaySeconds` | integer          | Initial retry delay from 1 to 3,600 seconds.                                                                  |
-| `retry.maxDelaySeconds`     | integer          | Maximum retry delay from 1 to 86,400 seconds.                                                                 |
-| `concurrencyPolicy`         | string           | One of: `allow`, `skip`, `replace`.                                                                           |
-| `timeoutSeconds`            | integer          | Target timeout in seconds, bounded below the durable execution lease.                                         |
-| `lastRunAt`                 | string or null   | Format: `date-time`.                                                                                          |
-| `nextRunAt`                 | string or null   | Format: `date-time`.                                                                                          |
-| `createdAt`                 | string           | Format: `date-time`.                                                                                          |
-| `updatedAt`                 | string           | Format: `date-time`.                                                                                          |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `environment` | string | — |
+| `schedule` | string | Five-field cron expression. |
+| `timezone` | string | IANA timezone name. Defaults to UTC. |
+| `enabled` | boolean | — |
+| `catchUp` | boolean | Missed invocations are skipped; catch-up is not performed at launch. One of: `false`. |
+| `target` | object or object | Exactly one same-environment target: a signed project-relative HTTP invocation or a queue publication. |
+| `target.kind` | string | One of: `http`. |
+| `target.path` | string | Project-relative HTTP path that receives a signed invocation. Pattern: `^/`. |
+| `target.method` | string | One of: `POST`, `PUT`, `PATCH`. |
+| `target.body` | object | Optional JSON request body, at most 122,880 encoded bytes before the signed 128,000-byte invocation envelope. |
+| `retry` | object | — |
+| `retry.maxAttempts` | integer | Total attempts from 1 to 10. |
+| `retry.initialDelaySeconds` | integer | Initial retry delay from 1 to 3,600 seconds. |
+| `retry.maxDelaySeconds` | integer | Maximum retry delay from 1 to 86,400 seconds. |
+| `concurrencyPolicy` | string | One of: `allow`, `skip`, `replace`. |
+| `timeoutSeconds` | integer | Target timeout in seconds, bounded below the durable execution lease. |
+| `lastRunAt` | string or null | Format: `date-time`. |
+| `nextRunAt` | string or null | Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
 
 ## crons.update
 
@@ -227,23 +227,23 @@ PATCH /v1/orgs/{orgId}/projects/{projectId}/crons/{cronId}
 
 ### Request body
 
-| Field                       | Type             | Required | Description                                                                                                   |
-| --------------------------- | ---------------- | -------- | ------------------------------------------------------------------------------------------------------------- |
-| `name`                      | string           | No       | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                            |
-| `schedule`                  | string           | No       | —                                                                                                             |
-| `timezone`                  | string           | No       | —                                                                                                             |
-| `enabled`                   | boolean          | No       | —                                                                                                             |
-| `target`                    | object or object | No       | Exactly one same-environment target: a signed project-relative HTTP invocation or a queue publication.        |
-| `target.kind`               | string           | Yes      | One of: `http`.                                                                                               |
-| `target.path`               | string           | Yes      | Project-relative HTTP path that receives a signed invocation. Pattern: `^/`.                                  |
-| `target.method`             | string           | No       | One of: `POST`, `PUT`, `PATCH`.                                                                               |
-| `target.body`               | object           | No       | Optional JSON request body, at most 122,880 encoded bytes before the signed 128,000-byte invocation envelope. |
-| `retry`                     | object           | No       | —                                                                                                             |
-| `retry.maxAttempts`         | integer          | No       | Total attempts from 1 to 10.                                                                                  |
-| `retry.initialDelaySeconds` | integer          | No       | Initial retry delay from 1 to 3,600 seconds.                                                                  |
-| `retry.maxDelaySeconds`     | integer          | No       | Maximum retry delay from 1 to 86,400 seconds.                                                                 |
-| `concurrencyPolicy`         | string           | No       | One of: `allow`, `skip`, `replace`.                                                                           |
-| `timeoutSeconds`            | integer          | No       | Target timeout in seconds, bounded below the durable execution lease.                                         |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `name` | string | No | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `schedule` | string | No | — |
+| `timezone` | string | No | — |
+| `enabled` | boolean | No | — |
+| `target` | object or object | No | Exactly one same-environment target: a signed project-relative HTTP invocation or a queue publication. |
+| `target.kind` | string | Yes | One of: `http`. |
+| `target.path` | string | Yes | Project-relative HTTP path that receives a signed invocation. Pattern: `^/`. |
+| `target.method` | string | No | One of: `POST`, `PUT`, `PATCH`. |
+| `target.body` | object | No | Optional JSON request body, at most 122,880 encoded bytes before the signed 128,000-byte invocation envelope. |
+| `retry` | object | No | — |
+| `retry.maxAttempts` | integer | No | Total attempts from 1 to 10. |
+| `retry.initialDelaySeconds` | integer | No | Initial retry delay from 1 to 3,600 seconds. |
+| `retry.maxDelaySeconds` | integer | No | Maximum retry delay from 1 to 86,400 seconds. |
+| `concurrencyPolicy` | string | No | One of: `allow`, `skip`, `replace`. |
+| `timeoutSeconds` | integer | No | Target timeout in seconds, bounded below the durable execution lease. |
 
 ### Example
 
@@ -256,38 +256,38 @@ curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/crons/
 
 ### Responses
 
-| Status | Description                       |
-| ------ | --------------------------------- |
-| `200`  | Updated cron job.                 |
-| `404`  | No such cron job in this project. |
-| `422`  | Invalid cron job configuration.   |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Updated cron job. |
+| `404` | No such cron job in this project. |
+| `422` | Invalid cron job configuration. |
 
 ### Response body (200)
 
-| Field                       | Type             | Description                                                                                                   |
-| --------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| `id`                        | string           | —                                                                                                             |
-| `name`                      | string           | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                            |
-| `environment`               | string           | —                                                                                                             |
-| `schedule`                  | string           | Five-field cron expression.                                                                                   |
-| `timezone`                  | string           | IANA timezone name. Defaults to UTC.                                                                          |
-| `enabled`                   | boolean          | —                                                                                                             |
-| `catchUp`                   | boolean          | Missed invocations are skipped; catch-up is not performed at launch. One of: `false`.                         |
-| `target`                    | object or object | Exactly one same-environment target: a signed project-relative HTTP invocation or a queue publication.        |
-| `target.kind`               | string           | One of: `http`.                                                                                               |
-| `target.path`               | string           | Project-relative HTTP path that receives a signed invocation. Pattern: `^/`.                                  |
-| `target.method`             | string           | One of: `POST`, `PUT`, `PATCH`.                                                                               |
-| `target.body`               | object           | Optional JSON request body, at most 122,880 encoded bytes before the signed 128,000-byte invocation envelope. |
-| `retry`                     | object           | —                                                                                                             |
-| `retry.maxAttempts`         | integer          | Total attempts from 1 to 10.                                                                                  |
-| `retry.initialDelaySeconds` | integer          | Initial retry delay from 1 to 3,600 seconds.                                                                  |
-| `retry.maxDelaySeconds`     | integer          | Maximum retry delay from 1 to 86,400 seconds.                                                                 |
-| `concurrencyPolicy`         | string           | One of: `allow`, `skip`, `replace`.                                                                           |
-| `timeoutSeconds`            | integer          | Target timeout in seconds, bounded below the durable execution lease.                                         |
-| `lastRunAt`                 | string or null   | Format: `date-time`.                                                                                          |
-| `nextRunAt`                 | string or null   | Format: `date-time`.                                                                                          |
-| `createdAt`                 | string           | Format: `date-time`.                                                                                          |
-| `updatedAt`                 | string           | Format: `date-time`.                                                                                          |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `environment` | string | — |
+| `schedule` | string | Five-field cron expression. |
+| `timezone` | string | IANA timezone name. Defaults to UTC. |
+| `enabled` | boolean | — |
+| `catchUp` | boolean | Missed invocations are skipped; catch-up is not performed at launch. One of: `false`. |
+| `target` | object or object | Exactly one same-environment target: a signed project-relative HTTP invocation or a queue publication. |
+| `target.kind` | string | One of: `http`. |
+| `target.path` | string | Project-relative HTTP path that receives a signed invocation. Pattern: `^/`. |
+| `target.method` | string | One of: `POST`, `PUT`, `PATCH`. |
+| `target.body` | object | Optional JSON request body, at most 122,880 encoded bytes before the signed 128,000-byte invocation envelope. |
+| `retry` | object | — |
+| `retry.maxAttempts` | integer | Total attempts from 1 to 10. |
+| `retry.initialDelaySeconds` | integer | Initial retry delay from 1 to 3,600 seconds. |
+| `retry.maxDelaySeconds` | integer | Maximum retry delay from 1 to 86,400 seconds. |
+| `concurrencyPolicy` | string | One of: `allow`, `skip`, `replace`. |
+| `timeoutSeconds` | integer | Target timeout in seconds, bounded below the durable execution lease. |
+| `lastRunAt` | string or null | Format: `date-time`. |
+| `nextRunAt` | string or null | Format: `date-time`. |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
 
 ## crons.delete
 
@@ -310,10 +310,10 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/crons
 
 ### Responses
 
-| Status | Description                       |
-| ------ | --------------------------------- |
-| `200`  | Cron job deleted.                 |
-| `404`  | No such cron job in this project. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Cron job deleted. |
+| `404` | No such cron job in this project. |
 
 ## crons.trigger
 
@@ -330,9 +330,9 @@ POST /v1/orgs/{orgId}/projects/{projectId}/crons/{cronId}/runs
 
 ### Request body
 
-| Field            | Type   | Required | Description |
-| ---------------- | ------ | -------- | ----------- |
-| `idempotencyKey` | string | No       | —           |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `idempotencyKey` | string | No | — |
 
 ### Example
 
@@ -345,27 +345,27 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/crons/$
 
 ### Responses
 
-| Status | Description                                               |
-| ------ | --------------------------------------------------------- |
-| `202`  | Manual run queued.                                        |
-| `404`  | No such cron job in this project.                         |
-| `409`  | Concurrency policy skipped or replaced the requested run. |
+| Status | Description |
+| ------ | ----------- |
+| `202` | Manual run queued. |
+| `404` | No such cron job in this project. |
+| `409` | Concurrency policy skipped or replaced the requested run. |
 
 ### Response body (202)
 
-| Field            | Type            | Description                                                                                  |
-| ---------------- | --------------- | -------------------------------------------------------------------------------------------- |
-| `id`             | string          | —                                                                                            |
-| `cronId`         | string          | —                                                                                            |
-| `source`         | string          | One of: `scheduled`, `manual`.                                                               |
-| `status`         | string          | One of: `queued`, `running`, `succeeded`, `failed`, `skipped`.                               |
-| `scheduledFor`   | string          | Format: `date-time`.                                                                         |
-| `startedAt`      | string or null  | Format: `date-time`.                                                                         |
-| `completedAt`    | string or null  | Format: `date-time`.                                                                         |
-| `durationMs`     | integer or null | Elapsed execution time in milliseconds, or null when the run is queued, running, or skipped. |
-| `attemptCount`   | integer         | —                                                                                            |
-| `responseStatus` | integer or null | —                                                                                            |
-| `error`          | string or null  | —                                                                                            |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `cronId` | string | — |
+| `source` | string | One of: `scheduled`, `manual`. |
+| `status` | string | One of: `queued`, `running`, `succeeded`, `failed`, `skipped`. |
+| `scheduledFor` | string | Format: `date-time`. |
+| `startedAt` | string or null | Format: `date-time`. |
+| `completedAt` | string or null | Format: `date-time`. |
+| `durationMs` | integer or null | Elapsed execution time in milliseconds, or null when the run is queued, running, or skipped. |
+| `attemptCount` | integer | — |
+| `responseStatus` | integer or null | — |
+| `error` | string or null | — |
 
 ## crons.listRuns
 
@@ -381,11 +381,11 @@ GET /v1/orgs/{orgId}/projects/{projectId}/crons/{cronId}/runs
 
 ### Query parameters
 
-| Name     | Type    | Required | Description                                                    |
-| -------- | ------- | -------- | -------------------------------------------------------------- |
-| `cursor` | string  | No       | —                                                              |
-| `limit`  | integer | No       | —                                                              |
-| `status` | string  | No       | One of: `queued`, `running`, `succeeded`, `failed`, `skipped`. |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `cursor` | string | No | — |
+| `limit` | integer | No | — |
+| `status` | string | No | One of: `queued`, `running`, `succeeded`, `failed`, `skipped`. |
 
 ### Example
 
@@ -396,28 +396,28 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/crons/$CRON_ID/
 
 ### Responses
 
-| Status | Description                       |
-| ------ | --------------------------------- |
-| `200`  | Run history page.                 |
-| `404`  | No such cron job in this project. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Run history page. |
+| `404` | No such cron job in this project. |
 
 ### Response body (200)
 
-| Field                    | Type            | Description                                                                                  |
-| ------------------------ | --------------- | -------------------------------------------------------------------------------------------- |
-| `items`                  | object[]        | —                                                                                            |
-| `items[].id`             | string          | —                                                                                            |
-| `items[].cronId`         | string          | —                                                                                            |
-| `items[].source`         | string          | One of: `scheduled`, `manual`.                                                               |
-| `items[].status`         | string          | One of: `queued`, `running`, `succeeded`, `failed`, `skipped`.                               |
-| `items[].scheduledFor`   | string          | Format: `date-time`.                                                                         |
-| `items[].startedAt`      | string or null  | Format: `date-time`.                                                                         |
-| `items[].completedAt`    | string or null  | Format: `date-time`.                                                                         |
-| `items[].durationMs`     | integer or null | Elapsed execution time in milliseconds, or null when the run is queued, running, or skipped. |
-| `items[].attemptCount`   | integer         | —                                                                                            |
-| `items[].responseStatus` | integer or null | —                                                                                            |
-| `items[].error`          | string or null  | —                                                                                            |
-| `nextCursor`             | string or null  | —                                                                                            |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `items` | object[] | — |
+| `items[].id` | string | — |
+| `items[].cronId` | string | — |
+| `items[].source` | string | One of: `scheduled`, `manual`. |
+| `items[].status` | string | One of: `queued`, `running`, `succeeded`, `failed`, `skipped`. |
+| `items[].scheduledFor` | string | Format: `date-time`. |
+| `items[].startedAt` | string or null | Format: `date-time`. |
+| `items[].completedAt` | string or null | Format: `date-time`. |
+| `items[].durationMs` | integer or null | Elapsed execution time in milliseconds, or null when the run is queued, running, or skipped. |
+| `items[].attemptCount` | integer | — |
+| `items[].responseStatus` | integer or null | — |
+| `items[].error` | string or null | — |
+| `nextCursor` | string or null | — |
 
 ## crons.getRun
 
@@ -440,34 +440,34 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/crons/$CRON_ID/
 
 ### Responses
 
-| Status | Description                       |
-| ------ | --------------------------------- |
-| `200`  | Cron run inspection.              |
-| `404`  | No such cron run in this project. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Cron run inspection. |
+| `404` | No such cron run in this project. |
 
 ### Response body (200)
 
-| Field                       | Type                                                   | Description                                                                                                                                     |
-| --------------------------- | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `id`                        | string                                                 | —                                                                                                                                               |
-| `cronId`                    | string                                                 | —                                                                                                                                               |
-| `source`                    | string                                                 | One of: `scheduled`, `manual`.                                                                                                                  |
-| `status`                    | string                                                 | One of: `queued`, `running`, `succeeded`, `failed`, `skipped`.                                                                                  |
-| `scheduledFor`              | string                                                 | Format: `date-time`.                                                                                                                            |
-| `startedAt`                 | string or null                                         | Format: `date-time`.                                                                                                                            |
-| `completedAt`               | string or null                                         | Format: `date-time`.                                                                                                                            |
-| `durationMs`                | integer or null                                        | Elapsed execution time in milliseconds, or null when the run is queued, running, or skipped.                                                    |
-| `attemptCount`              | integer                                                | —                                                                                                                                               |
-| `responseStatus`            | integer or null                                        | —                                                                                                                                               |
-| `error`                     | string or null                                         | —                                                                                                                                               |
-| `responseBody`              | object or array or string or number or boolean or null | Bounded target response body retained for inspection as parsed JSON, sanitized text, or null when unavailable. Secret-like values are redacted. |
-| `responseBodyIsJson`        | boolean                                                | Whether the retained response body was complete, valid JSON before it was sanitized.                                                            |
-| `responseBodyTruncated`     | boolean                                                | Whether the retained response body exceeded the 32,768-byte limit.                                                                              |
-| `responseBodyUnavailable`   | boolean                                                | Whether the target response body could not be retained for inspection.                                                                          |
-| `responseContentType`       | string or null                                         | Target response content type when one was supplied.                                                                                             |
-| `attempts`                  | object[]                                               | Append-only run transitions in recorded order.                                                                                                  |
-| `attempts[].attempt`        | integer                                                | —                                                                                                                                               |
-| `attempts[].status`         | string                                                 | One of: `queued`, `running`, `succeeded`, `failed`, `skipped`.                                                                                  |
-| `attempts[].responseStatus` | integer or null                                        | —                                                                                                                                               |
-| `attempts[].error`          | string or null                                         | —                                                                                                                                               |
-| `attempts[].recordedAt`     | string                                                 | Format: `date-time`.                                                                                                                            |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `cronId` | string | — |
+| `source` | string | One of: `scheduled`, `manual`. |
+| `status` | string | One of: `queued`, `running`, `succeeded`, `failed`, `skipped`. |
+| `scheduledFor` | string | Format: `date-time`. |
+| `startedAt` | string or null | Format: `date-time`. |
+| `completedAt` | string or null | Format: `date-time`. |
+| `durationMs` | integer or null | Elapsed execution time in milliseconds, or null when the run is queued, running, or skipped. |
+| `attemptCount` | integer | — |
+| `responseStatus` | integer or null | — |
+| `error` | string or null | — |
+| `responseBody` | object or array or string or number or boolean or null | Bounded target response body retained for inspection as parsed JSON, sanitized text, or null when unavailable. Secret-like values are redacted. |
+| `responseBodyIsJson` | boolean | Whether the retained response body was complete, valid JSON before it was sanitized. |
+| `responseBodyTruncated` | boolean | Whether the retained response body exceeded the 32,768-byte limit. |
+| `responseBodyUnavailable` | boolean | Whether the target response body could not be retained for inspection. |
+| `responseContentType` | string or null | Target response content type when one was supplied. |
+| `attempts` | object[] | Append-only run transitions in recorded order. |
+| `attempts[].attempt` | integer | — |
+| `attempts[].status` | string | One of: `queued`, `running`, `succeeded`, `failed`, `skipped`. |
+| `attempts[].responseStatus` | integer or null | — |
+| `attempts[].error` | string or null | — |
+| `attempts[].recordedAt` | string | Format: `date-time`. |

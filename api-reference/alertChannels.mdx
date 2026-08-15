@@ -28,24 +28,24 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/alert-channels" \
 
 ### Responses
 
-| Status | Description                            |
-| ------ | -------------------------------------- |
-| `200`  | Masked alert channels ordered by name. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Masked alert channels ordered by name. |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field               | Type           | Description                                                             |
-| ------------------- | -------------- | ----------------------------------------------------------------------- |
-| `id`                | string         | —                                                                       |
-| `name`              | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                      |
-| `kind`              | string         | One of: `email`, `signed_webhook`, `slack`.                             |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `kind` | string | One of: `email`, `signed_webhook`, `slack`. |
 | `destinationMasked` | string or null | Masked email address or endpoint. Full destinations are never returned. |
-| `secretHint`        | string or null | Non-secret suffix that identifies which stored credential is active.    |
-| `verified`          | boolean        | —                                                                       |
-| `createdAt`         | string         | Format: `date-time`.                                                    |
-| `updatedAt`         | string         | Format: `date-time`.                                                    |
+| `secretHint` | string or null | Non-secret suffix that identifies which stored credential is active. |
+| `verified` | boolean | — |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
 
 ## alertChannels.create
 
@@ -62,12 +62,12 @@ POST /v1/orgs/{orgId}/alert-channels
 
 ### Request body
 
-| Field        | Type   | Required | Description                                                                                   |
-| ------------ | ------ | -------- | --------------------------------------------------------------------------------------------- |
-| `name`       | string | Yes      | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                            |
-| `kind`       | string | Yes      | One of: `email`, `signed_webhook`, `slack`.                                                   |
-| `email`      | string | No       | Format: `email`.                                                                              |
-| `webhookUrl` | string | No       | HTTPS endpoint or incoming Slack webhook. Stored encrypted and never returned. Format: `uri`. |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `name` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `kind` | string | Yes | One of: `email`, `signed_webhook`, `slack`. |
+| `email` | string | No | Format: `email`. |
+| `webhookUrl` | string | No | HTTPS endpoint or incoming Slack webhook. Stored encrypted and never returned. Format: `uri`. |
 
 ### Example
 
@@ -83,25 +83,25 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/alert-channels" \
 
 ### Responses
 
-| Status | Description                                                           |
-| ------ | --------------------------------------------------------------------- |
-| `201`  | Alert channel created. A signed webhook secret is shown exactly once. |
-| `409`  | An alert channel with that name already exists.                       |
-| `422`  | Channel kind and destination do not match or are invalid.             |
+| Status | Description |
+| ------ | ----------- |
+| `201` | Alert channel created. A signed webhook secret is shown exactly once. |
+| `409` | An alert channel with that name already exists. |
+| `422` | Channel kind and destination do not match or are invalid. |
 
 ### Response body (201)
 
-| Field               | Type           | Description                                                                                              |
-| ------------------- | -------------- | -------------------------------------------------------------------------------------------------------- |
-| `id`                | string         | —                                                                                                        |
-| `name`              | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                                       |
-| `kind`              | string         | One of: `email`, `signed_webhook`, `slack`.                                                              |
-| `destinationMasked` | string or null | Masked email address or endpoint. Full destinations are never returned.                                  |
-| `secretHint`        | string or null | Non-secret suffix that identifies which stored credential is active.                                     |
-| `verified`          | boolean        | —                                                                                                        |
-| `createdAt`         | string         | Format: `date-time`.                                                                                     |
-| `updatedAt`         | string         | Format: `date-time`.                                                                                     |
-| `signingSecret`     | string or null | For a signed webhook, the delivery verification secret shown exactly once; null for other channel kinds. |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `kind` | string | One of: `email`, `signed_webhook`, `slack`. |
+| `destinationMasked` | string or null | Masked email address or endpoint. Full destinations are never returned. |
+| `secretHint` | string or null | Non-secret suffix that identifies which stored credential is active. |
+| `verified` | boolean | — |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
+| `signingSecret` | string or null | For a signed webhook, the delivery verification secret shown exactly once; null for other channel kinds. |
 
 ## alertChannels.get
 
@@ -124,23 +124,23 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/alert-channels/$CHANNEL_ID" \
 
 ### Responses
 
-| Status | Description                                 |
-| ------ | ------------------------------------------- |
-| `200`  | Masked alert channel.                       |
-| `404`  | No such alert channel in this organization. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Masked alert channel. |
+| `404` | No such alert channel in this organization. |
 
 ### Response body (200)
 
-| Field               | Type           | Description                                                             |
-| ------------------- | -------------- | ----------------------------------------------------------------------- |
-| `id`                | string         | —                                                                       |
-| `name`              | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                      |
-| `kind`              | string         | One of: `email`, `signed_webhook`, `slack`.                             |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `kind` | string | One of: `email`, `signed_webhook`, `slack`. |
 | `destinationMasked` | string or null | Masked email address or endpoint. Full destinations are never returned. |
-| `secretHint`        | string or null | Non-secret suffix that identifies which stored credential is active.    |
-| `verified`          | boolean        | —                                                                       |
-| `createdAt`         | string         | Format: `date-time`.                                                    |
-| `updatedAt`         | string         | Format: `date-time`.                                                    |
+| `secretHint` | string or null | Non-secret suffix that identifies which stored credential is active. |
+| `verified` | boolean | — |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
 
 ## alertChannels.update
 
@@ -157,12 +157,12 @@ PATCH /v1/orgs/{orgId}/alert-channels/{channelId}
 
 ### Request body
 
-| Field        | Type   | Required | Description                                                                                   |
-| ------------ | ------ | -------- | --------------------------------------------------------------------------------------------- |
-| `name`       | string | No       | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                            |
-| `kind`       | string | No       | One of: `email`, `signed_webhook`, `slack`.                                                   |
-| `email`      | string | No       | Format: `email`.                                                                              |
-| `webhookUrl` | string | No       | HTTPS endpoint or incoming Slack webhook. Stored encrypted and never returned. Format: `uri`. |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `name` | string | No | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `kind` | string | No | One of: `email`, `signed_webhook`, `slack`. |
+| `email` | string | No | Format: `email`. |
+| `webhookUrl` | string | No | HTTPS endpoint or incoming Slack webhook. Stored encrypted and never returned. Format: `uri`. |
 
 ### Example
 
@@ -175,24 +175,24 @@ curl -X PATCH "https://api.korve.dev/v1/orgs/$ORG_ID/alert-channels/$CHANNEL_ID"
 
 ### Responses
 
-| Status | Description                                               |
-| ------ | --------------------------------------------------------- |
-| `200`  | Updated masked alert channel.                             |
-| `404`  | No such alert channel in this organization.               |
-| `422`  | Channel kind and destination do not match or are invalid. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Updated masked alert channel. |
+| `404` | No such alert channel in this organization. |
+| `422` | Channel kind and destination do not match or are invalid. |
 
 ### Response body (200)
 
-| Field               | Type           | Description                                                             |
-| ------------------- | -------------- | ----------------------------------------------------------------------- |
-| `id`                | string         | —                                                                       |
-| `name`              | string         | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                      |
-| `kind`              | string         | One of: `email`, `signed_webhook`, `slack`.                             |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | — |
+| `name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `kind` | string | One of: `email`, `signed_webhook`, `slack`. |
 | `destinationMasked` | string or null | Masked email address or endpoint. Full destinations are never returned. |
-| `secretHint`        | string or null | Non-secret suffix that identifies which stored credential is active.    |
-| `verified`          | boolean        | —                                                                       |
-| `createdAt`         | string         | Format: `date-time`.                                                    |
-| `updatedAt`         | string         | Format: `date-time`.                                                    |
+| `secretHint` | string or null | Non-secret suffix that identifies which stored credential is active. |
+| `verified` | boolean | — |
+| `createdAt` | string | Format: `date-time`. |
+| `updatedAt` | string | Format: `date-time`. |
 
 ## alertChannels.delete
 
@@ -215,11 +215,11 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/alert-channels/$CHANNEL_ID
 
 ### Responses
 
-| Status | Description                                 |
-| ------ | ------------------------------------------- |
-| `200`  | Alert channel deleted.                      |
-| `404`  | No such alert channel in this organization. |
-| `409`  | An alert policy still uses this channel.    |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Alert channel deleted. |
+| `404` | No such alert channel in this organization. |
+| `409` | An alert policy still uses this channel. |
 
 ## alertChannels.test
 
@@ -248,8 +248,8 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/alert-channels/$CHANNEL_ID/t
 
 ### Responses
 
-| Status | Description                                              |
-| ------ | -------------------------------------------------------- |
-| `202`  | Test delivery accepted.                                  |
-| `404`  | No such alert channel in this organization.              |
-| `422`  | Channel is unverified or its delivery failed validation. |
+| Status | Description |
+| ------ | ----------- |
+| `202` | Test delivery accepted. |
+| `404` | No such alert channel in this organization. |
+| `422` | Channel is unverified or its delivery failed validation. |

@@ -10,6 +10,10 @@ P75, P90, P95, and P99 values by device, environment, time, and normalized route
 
 Add a collection policy to `korve.yaml`:
 
+The example uses the version 1 manifest compatibility contract. Its `runtimeClass` field is required
+only because that old contract must round-trip existing projects. New project creation does not ask
+you to select a runtime class.
+
 ```yaml
 version: 1
 organization: acme

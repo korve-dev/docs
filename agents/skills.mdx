@@ -27,14 +27,14 @@ The supported values are `--agent agents`, `--agent codex`, and `--agent claude`
 
 ## What's in the box
 
-| Skill                     | What it teaches                                                                                          |
-| ------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `korve-platform`          | Organizations, projects, runtime classes, optional primitives, billing, and equivalent control surfaces. |
-| `korve-quickstart-deploy` | The concise create, connect, deploy, verify, and troubleshoot path.                                      |
-| `korve-ship-app`          | The agent execution loop from repository inspection through a production smoke test.                     |
-| `korve-mcp-setup`         | Connecting MCP clients and using the `search` and `execute` Code Mode tools safely.                      |
-| `korve-cli-setup`         | CLI installation, authentication, configuration precedence, commands, and exit codes.                    |
-| `korve-iac`               | TOML, JSON, and YAML manifests with plan, apply, export, drift, and immutability semantics.              |
+| Skill                     | What it teaches                                                                                            |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `korve-platform`          | Organizations, projects, automatic compute, optional primitives, billing, and equivalent control surfaces. |
+| `korve-quickstart-deploy` | The concise create, connect, deploy, verify, and troubleshoot path.                                        |
+| `korve-ship-app`          | The agent execution loop from repository inspection through a production smoke test.                       |
+| `korve-mcp-setup`         | Connecting MCP clients and using the `search` and `execute` Code Mode tools safely.                        |
+| `korve-cli-setup`         | CLI installation, authentication, configuration precedence, commands, and exit codes.                      |
+| `korve-iac`               | TOML, JSON, and YAML manifests with plan, apply, export, drift, and immutability semantics.                |
 
 Skills are versioned with the platform; re-run the installer to update.
 The public machine-readable release catalog and file checksums are in the
@@ -48,6 +48,6 @@ environment-file workflow.
 ## Do I need skills if I have MCP?
 
 No — they're complementary. [MCP](/agents/mcp-setup) gives an agent live,
-typed access to the API; skills give it the judgment layer: which runtime
-class to pick, what to check before creating resources, how to read a
+typed access to the API; skills give it the judgment layer: which scaling
+limits to set, what to check before creating resources, how to read a
 failed deploy. Use both for best results.
