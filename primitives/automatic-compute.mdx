@@ -1,0 +1,38 @@
+---
+title: "Automatic compute"
+description: "Scale request-driven web services from usage while you control capacity and cost limits."
+---
+
+Every new project has one request-driven `web` service. Korve selects the compute resources and
+changes replica count as request demand changes. You do not choose a machine size or provider.
+
+The default policy is:
+
+- `minimumReady: 0` — stop idle replicas and idle compute charges.
+- `maximumReplicas: 10` — limit traffic growth and unexpected cost.
+- `targetConcurrency: 40` — add capacity as active requests approach this value per ready replica.
+
+The public maximum is 20 replicas. CPU, memory, and requests are separate usage meters.
+
+## Inspect and change scaling
+
+```bash
+korve services list --project <project>
+korve services scaling show <service-id> --project <project>
+korve services scaling set <service-id> --minimum-ready 0 --maximum-replicas 10 \
+  --target-concurrency 40 --project <project>
+korve services scaling events <service-id> --project <project>
+```
+
+Use `minimum-ready 1` only when the service needs one replica ready before a request arrives. Use
+the event list to review scale-up, scale-down, policy, recovery, and budget-limit decisions.
+
+## Workload contract
+
+Automatic compute is for HTTP web applications and APIs. Each request must finish within 30
+seconds. WebSocket, SSE, streaming responses, background consumers, scheduled jobs, and durable
+state on the container file system are outside this service contract. Use managed queues, crons,
+databases, caches, and object storage for those needs.
+
+See the [Services API](/api-reference/services) for policy fields, roles, and response shapes. See
+[Budgets and usage](/primitives/budgets-and-usage) for spend controls and meter reporting.

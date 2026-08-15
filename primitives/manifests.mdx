@@ -3,79 +3,27 @@ title: "Infrastructure as code"
 description: "Export, plan, and apply organization state from TOML, JSON, or YAML."
 ---
 
-Korve manifests reconcile projects and their runtime, Git source, environment variables, named
-environments, domains, storage, queues, crons, databases, caches, realtime channels, AI gateways,
-App Auth policy, preview database-branch policy, alerts, app access, and project maintenance. The
-same versioned contract drives CLI, API, dashboard, and MCP.
+Korve manifests reconcile projects, Git source, automatic scaling limits, and spend limits. The
+same versioned contract drives CLI, API, dashboard, and MCP. Version 2 is the default for export and
+new files. Version 1 remains available only to read and reconcile legacy manifests.
 
 ```yaml
-version: 1
+version: 2
 organization: acme
 projects:
   - name: Storefront
     slug: storefront
-    runtimeClass: scale-to-zero
-    git: { repo: acme/storefront, ref: main }
-    env: { NODE_ENV: production }
-    storage:
-      - { name: uploads, region: us-east }
-    queues:
-      - name: emails
-        consumer: { path: /jobs/email, maxRetries: 3 }
-    crons:
-      - name: nightly
-        schedule: "0 2 * * *"
-        timezone: UTC
-        target: { kind: queue, queue: emails, body: { kind: nightly } }
-    databases:
-      - name: primary
-        sku: db-s1
-        region: us-east
-        backup:
-          pitrDays: 14
-          dailyDays: 30
-          weeklyWeeks: 12
-          monthlyMonths: 12
-          copyRegions: [weur, apac]
-    caches:
-      - { name: sessions, sku: cache-n1, region: us-east, persistence: aof }
-    realtime:
-      - name: updates
-        environment: production
-        region: global
-        retentionSeconds: 3600
-        presenceEnabled: true
-    aiGateways:
-      - name: primary-ai
-        environment: production
-        allowedModels: [korve/fast]
-        monthlyBudgetUsd: 25
-        redactPrompts: true
-    auth:
-      enabled: true
-      allowedOrigins: [https://storefront.example.com]
-      redirectUrls: [https://storefront.example.com/auth/callback]
-      emailPassword: true
-      magicLink: true
-    access:
-      mode: organization
-      previewMode: invite_only
-      environments: { staging: authenticated }
-    maintenance:
-      enabled: true
-      schedule: daily
-      categories: [reliability]
-      environments: [production]
-      autoRemediation:
-        enabled: false
-        maximumRisk: read
-        allowedOperationIds: []
-        maxActionsPerRun: 5
+    source: { repo: acme/storefront, ref: main }
+    scaling:
+      minimumReady: 0
+      maximumReplicas: 10
+      targetConcurrency: 40
+    spend:
+      monthlyScaleCeilingUsd: 100
 ```
 
-The exact supported region and SKU values come from `korve regions` and the live API contract.
-Scale-to-zero projects must not declare a compute region. `production` and `preview` are implicit,
-so named `environments` must use other slugs.
+Korve selects compute placement and machine capacity. You set outcomes: the minimum ready capacity,
+the maximum replica count, target request concurrency, and an optional spend ceiling.
 
 ```bash
 korve manifest export -o korve.toml
@@ -87,12 +35,6 @@ Format follows the `.toml`, `.json`, `.yaml`, or `.yml` extension. Plans classif
 update, no-op, deferred, invalid, or orphaned. Apply creates and updates declared resources but does
 not delete live resources omitted from the file.
 
-Omitting `auth`, `access`, or `maintenance` leaves that live policy unmanaged. Payment credentials,
-App Auth provider secrets, AI gateway keys, and object data never belong in a manifest. A protected
-access policy cannot apply until the access gateway reports enforcement `ready`. The current
-maintenance contract accepts only `reliability`, and its only remediation operation is
-`deploys.create`. Dangerous and destructive actions remain human-gated.
-
-Exports replace secret values and encrypted destinations with `********`. Applying that placeholder
-preserves the live value. Never replace it with plaintext in version control. See the
-[Manifest API](/api-reference/manifest).
+Secrets and object data never belong in a manifest. Plans do not delete undeclared resources.
+Dangerous and destructive actions remain human-gated. See the [Manifest
+API](/api-reference/manifest).

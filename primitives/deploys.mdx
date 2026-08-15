@@ -27,37 +27,17 @@ Deploying requires active billing (`402` otherwise).
 
 ## What the build expects from your code
 
-Builds clone the ref, and if a `package.json` exists run an npm install
-(lockfile optional) followed by `npm run build` when one is defined. Then
-the runtime classes diverge:
-
-### `scale-to-zero`
-
-Your app ships as an edge isolate that handles requests. The build looks
-for an entry module, in this order:
-
-1. `dist/index.js`
-2. `dist/worker.js`
-3. `build/index.js`
-4. `src/index.js`
-5. `index.js`
-6. `worker.js`
-
-The first match wins; if none exists the deploy fails with a message
-listing the candidates. **Bundling is provided** — the platform bundles
-your entry module and its dependencies into a single artifact, so regular
-npm dependencies just work.
-
-### `always-on`
-
-Your app ships as a dedicated instance behind the same managed hostname.
+Builds clone the ref. Your app ships as an automatically scaled web service behind the managed
+hostname.
 
 - If the repo has a `Dockerfile`, it's used as-is.
 - Otherwise the platform supplies a default Node 22 recipe: production npm
   install, then `npm start`.
 
-Either way, your app **must listen on `$PORT` (8080)** — the platform
-routes traffic there and injects the variable.
+Your app **must listen on `$PORT` (8080)** and serve bounded HTTP requests. The platform routes
+traffic there and injects the variable. Do not depend on local persistent state, unbounded
+WebSocket or server-sent event connections, background daemons, or scheduled processes. See
+[Automatic compute](/primitives/automatic-compute).
 
 ## Build logs and diagnosis
 

@@ -4989,15 +4989,12 @@
                                   "storage",
                                   "queue",
                                   "cron",
-                                  "database",
-                                  "cache",
                                   "realtime",
                                   "ai-gateway",
-                                  "backup",
-                                  "preview-database",
                                   "alert",
                                   "access",
                                   "auth",
+                                  "speed-insights",
                                   "maintenance",
                                   "customer-payments"
                                 ]
@@ -5042,11 +5039,11 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "description": "Korve manifest (infrastructure as code): the desired state of an organization's projects, environment, and platform resources.",
+                "description": "Korve manifest v2 for provider-neutral, automatically scaled application compute.",
                 "properties": {
                   "version": {
                     "type": "integer",
-                    "enum": [1]
+                    "enum": [2]
                   },
                   "organization": {
                     "type": "string",
@@ -5063,29 +5060,6 @@
                         "slug": {
                           "type": "string",
                           "pattern": "^[a-z][a-z0-9-]{1,61}$"
-                        },
-                        "runtimeClass": {
-                          "type": "string",
-                          "enum": ["scale-to-zero", "always-on"]
-                        },
-                        "region": {
-                          "type": "string",
-                          "description": "Compute region for an always-on project. Omit for the global scale-to-zero runtime."
-                        },
-                        "git": {
-                          "type": "object",
-                          "properties": {
-                            "repo": {
-                              "type": "string",
-                              "pattern": "^[\\w.-]+/[\\w.-]+$"
-                            },
-                            "ref": {
-                              "type": "string",
-                              "minLength": 1,
-                              "maxLength": 255
-                            }
-                          },
-                          "required": ["repo"]
                         },
                         "env": {
                           "type": "object",
@@ -5288,101 +5262,6 @@
                             "additionalProperties": false
                           }
                         },
-                        "databases": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "name": {
-                                "type": "string",
-                                "pattern": "^[a-z][a-z0-9-]{1,61}$"
-                              },
-                              "environment": {
-                                "type": "string",
-                                "pattern": "^[a-z][a-z0-9-]{0,38}$"
-                              },
-                              "sku": {
-                                "type": "string"
-                              },
-                              "region": {
-                                "type": "string"
-                              },
-                              "replicas": {
-                                "type": "integer",
-                                "enum": [0, 2]
-                              },
-                              "backup": {
-                                "type": "object",
-                                "properties": {
-                                  "pitrDays": {
-                                    "type": "integer"
-                                  },
-                                  "dailyDays": {
-                                    "type": "integer"
-                                  },
-                                  "weeklyWeeks": {
-                                    "type": "integer"
-                                  },
-                                  "monthlyMonths": {
-                                    "type": "integer"
-                                  },
-                                  "destinationIds": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "string"
-                                    }
-                                  },
-                                  "copyRegions": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "string",
-                                      "enum": ["enam", "weur", "eeur", "apac", "oc"]
-                                    },
-                                    "maxItems": 5,
-                                    "uniqueItems": true,
-                                    "description": "Managed disaster-recovery snapshots with best-effort area placement; area hints are not data-residency guarantees."
-                                  }
-                                },
-                                "additionalProperties": false
-                              }
-                            },
-                            "required": ["name", "sku", "region"],
-                            "additionalProperties": false
-                          }
-                        },
-                        "caches": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "name": {
-                                "type": "string",
-                                "pattern": "^[a-z][a-z0-9-]{1,61}$"
-                              },
-                              "environment": {
-                                "type": "string",
-                                "pattern": "^[a-z][a-z0-9-]{0,38}$"
-                              },
-                              "sku": {
-                                "type": "string",
-                                "enum": ["cache-n1", "cache-s1", "cache-s2"]
-                              },
-                              "region": {
-                                "type": "string"
-                              },
-                              "persistence": {
-                                "type": "string",
-                                "enum": ["none", "aof"]
-                              },
-                              "evictionPolicy": {
-                                "type": "string",
-                                "enum": ["allkeys-lru", "allkeys-lfu", "volatile-lru", "noeviction"]
-                              }
-                            },
-                            "required": ["name", "region"],
-                            "additionalProperties": false
-                          }
-                        },
                         "realtime": {
                           "type": "array",
                           "items": {
@@ -5539,27 +5418,6 @@
                             ],
                             "additionalProperties": false
                           }
-                        },
-                        "databaseBranch": {
-                          "type": "object",
-                          "properties": {
-                            "sourceEnvironment": {
-                              "type": "string",
-                              "pattern": "^[a-z][a-z0-9-]{0,38}$"
-                            },
-                            "sourceDatabase": {
-                              "type": "string",
-                              "pattern": "^[a-z][a-z0-9-]{1,61}$"
-                            },
-                            "expiresInDays": {
-                              "type": ["integer", "null"]
-                            },
-                            "deleteOnPreviewClose": {
-                              "type": "boolean"
-                            }
-                          },
-                          "required": ["sourceEnvironment", "sourceDatabase"],
-                          "additionalProperties": false
                         },
                         "alerts": {
                           "type": "array",
@@ -5868,9 +5726,89 @@
                           },
                           "required": ["enabled"],
                           "additionalProperties": false
+                        },
+                        "speedInsights": {
+                          "type": "object",
+                          "description": "Privacy-first real-user performance policy. Omit to leave it unmanaged.",
+                          "properties": {
+                            "enabled": {
+                              "type": "boolean"
+                            },
+                            "sampleRate": {
+                              "type": "number",
+                              "minimum": 0.01,
+                              "maximum": 1,
+                              "default": 1
+                            },
+                            "allowedOrigins": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "format": "uri"
+                              },
+                              "maxItems": 20
+                            }
+                          },
+                          "required": ["enabled"],
+                          "additionalProperties": false
+                        },
+                        "source": {
+                          "type": "object",
+                          "properties": {
+                            "repo": {
+                              "type": "string",
+                              "pattern": "^[\\w.-]+/[\\w.-]+$"
+                            },
+                            "ref": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 255,
+                              "default": "main"
+                            }
+                          },
+                          "required": ["repo"],
+                          "additionalProperties": false
+                        },
+                        "scaling": {
+                          "type": "object",
+                          "description": "Automatic web scaling outcomes. minimumReady must not exceed maximumReplicas.",
+                          "properties": {
+                            "minimumReady": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 20,
+                              "default": 0
+                            },
+                            "maximumReplicas": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 20,
+                              "default": 10
+                            },
+                            "targetConcurrency": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 1000,
+                              "default": 40
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        "spend": {
+                          "type": "object",
+                          "properties": {
+                            "monthlyScaleCeilingUsd": {
+                              "type": "number",
+                              "minimum": 0.01,
+                              "maximum": 1000000,
+                              "description": "Monthly project usage amount after which automatic scale-out stops."
+                            }
+                          },
+                          "required": ["monthlyScaleCeilingUsd"],
+                          "additionalProperties": false
                         }
                       },
-                      "required": ["name", "slug", "runtimeClass"],
+                      "required": ["name", "slug"],
                       "additionalProperties": false
                     }
                   }
@@ -5939,15 +5877,12 @@
                               "storage",
                               "queue",
                               "cron",
-                              "database",
-                              "cache",
                               "realtime",
                               "ai-gateway",
-                              "backup",
-                              "preview-database",
                               "alert",
                               "access",
                               "auth",
+                              "speed-insights",
                               "maintenance",
                               "customer-payments"
                             ]
@@ -5988,11 +5923,11 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "description": "Korve manifest (infrastructure as code): the desired state of an organization's projects, environment, and platform resources.",
+                "description": "Korve manifest v2 for provider-neutral, automatically scaled application compute.",
                 "properties": {
                   "version": {
                     "type": "integer",
-                    "enum": [1]
+                    "enum": [2]
                   },
                   "organization": {
                     "type": "string",
@@ -6009,29 +5944,6 @@
                         "slug": {
                           "type": "string",
                           "pattern": "^[a-z][a-z0-9-]{1,61}$"
-                        },
-                        "runtimeClass": {
-                          "type": "string",
-                          "enum": ["scale-to-zero", "always-on"]
-                        },
-                        "region": {
-                          "type": "string",
-                          "description": "Compute region for an always-on project. Omit for the global scale-to-zero runtime."
-                        },
-                        "git": {
-                          "type": "object",
-                          "properties": {
-                            "repo": {
-                              "type": "string",
-                              "pattern": "^[\\w.-]+/[\\w.-]+$"
-                            },
-                            "ref": {
-                              "type": "string",
-                              "minLength": 1,
-                              "maxLength": 255
-                            }
-                          },
-                          "required": ["repo"]
                         },
                         "env": {
                           "type": "object",
@@ -6234,101 +6146,6 @@
                             "additionalProperties": false
                           }
                         },
-                        "databases": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "name": {
-                                "type": "string",
-                                "pattern": "^[a-z][a-z0-9-]{1,61}$"
-                              },
-                              "environment": {
-                                "type": "string",
-                                "pattern": "^[a-z][a-z0-9-]{0,38}$"
-                              },
-                              "sku": {
-                                "type": "string"
-                              },
-                              "region": {
-                                "type": "string"
-                              },
-                              "replicas": {
-                                "type": "integer",
-                                "enum": [0, 2]
-                              },
-                              "backup": {
-                                "type": "object",
-                                "properties": {
-                                  "pitrDays": {
-                                    "type": "integer"
-                                  },
-                                  "dailyDays": {
-                                    "type": "integer"
-                                  },
-                                  "weeklyWeeks": {
-                                    "type": "integer"
-                                  },
-                                  "monthlyMonths": {
-                                    "type": "integer"
-                                  },
-                                  "destinationIds": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "string"
-                                    }
-                                  },
-                                  "copyRegions": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "string",
-                                      "enum": ["enam", "weur", "eeur", "apac", "oc"]
-                                    },
-                                    "maxItems": 5,
-                                    "uniqueItems": true,
-                                    "description": "Managed disaster-recovery snapshots with best-effort area placement; area hints are not data-residency guarantees."
-                                  }
-                                },
-                                "additionalProperties": false
-                              }
-                            },
-                            "required": ["name", "sku", "region"],
-                            "additionalProperties": false
-                          }
-                        },
-                        "caches": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "name": {
-                                "type": "string",
-                                "pattern": "^[a-z][a-z0-9-]{1,61}$"
-                              },
-                              "environment": {
-                                "type": "string",
-                                "pattern": "^[a-z][a-z0-9-]{0,38}$"
-                              },
-                              "sku": {
-                                "type": "string",
-                                "enum": ["cache-n1", "cache-s1", "cache-s2"]
-                              },
-                              "region": {
-                                "type": "string"
-                              },
-                              "persistence": {
-                                "type": "string",
-                                "enum": ["none", "aof"]
-                              },
-                              "evictionPolicy": {
-                                "type": "string",
-                                "enum": ["allkeys-lru", "allkeys-lfu", "volatile-lru", "noeviction"]
-                              }
-                            },
-                            "required": ["name", "region"],
-                            "additionalProperties": false
-                          }
-                        },
                         "realtime": {
                           "type": "array",
                           "items": {
@@ -6485,27 +6302,6 @@
                             ],
                             "additionalProperties": false
                           }
-                        },
-                        "databaseBranch": {
-                          "type": "object",
-                          "properties": {
-                            "sourceEnvironment": {
-                              "type": "string",
-                              "pattern": "^[a-z][a-z0-9-]{0,38}$"
-                            },
-                            "sourceDatabase": {
-                              "type": "string",
-                              "pattern": "^[a-z][a-z0-9-]{1,61}$"
-                            },
-                            "expiresInDays": {
-                              "type": ["integer", "null"]
-                            },
-                            "deleteOnPreviewClose": {
-                              "type": "boolean"
-                            }
-                          },
-                          "required": ["sourceEnvironment", "sourceDatabase"],
-                          "additionalProperties": false
                         },
                         "alerts": {
                           "type": "array",
@@ -6814,9 +6610,89 @@
                           },
                           "required": ["enabled"],
                           "additionalProperties": false
+                        },
+                        "speedInsights": {
+                          "type": "object",
+                          "description": "Privacy-first real-user performance policy. Omit to leave it unmanaged.",
+                          "properties": {
+                            "enabled": {
+                              "type": "boolean"
+                            },
+                            "sampleRate": {
+                              "type": "number",
+                              "minimum": 0.01,
+                              "maximum": 1,
+                              "default": 1
+                            },
+                            "allowedOrigins": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "format": "uri"
+                              },
+                              "maxItems": 20
+                            }
+                          },
+                          "required": ["enabled"],
+                          "additionalProperties": false
+                        },
+                        "source": {
+                          "type": "object",
+                          "properties": {
+                            "repo": {
+                              "type": "string",
+                              "pattern": "^[\\w.-]+/[\\w.-]+$"
+                            },
+                            "ref": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 255,
+                              "default": "main"
+                            }
+                          },
+                          "required": ["repo"],
+                          "additionalProperties": false
+                        },
+                        "scaling": {
+                          "type": "object",
+                          "description": "Automatic web scaling outcomes. minimumReady must not exceed maximumReplicas.",
+                          "properties": {
+                            "minimumReady": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 20,
+                              "default": 0
+                            },
+                            "maximumReplicas": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 20,
+                              "default": 10
+                            },
+                            "targetConcurrency": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 1000,
+                              "default": 40
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        "spend": {
+                          "type": "object",
+                          "properties": {
+                            "monthlyScaleCeilingUsd": {
+                              "type": "number",
+                              "minimum": 0.01,
+                              "maximum": 1000000,
+                              "description": "Monthly project usage amount after which automatic scale-out stops."
+                            }
+                          },
+                          "required": ["monthlyScaleCeilingUsd"],
+                          "additionalProperties": false
                         }
                       },
-                      "required": ["name", "slug", "runtimeClass"],
+                      "required": ["name", "slug"],
                       "additionalProperties": false
                     }
                   }
@@ -6861,11 +6737,11 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "description": "Korve manifest (infrastructure as code): the desired state of an organization's projects, environment, and platform resources.",
+                  "description": "Korve manifest v2 for provider-neutral, automatically scaled application compute.",
                   "properties": {
                     "version": {
                       "type": "integer",
-                      "enum": [1]
+                      "enum": [2]
                     },
                     "organization": {
                       "type": "string",
@@ -6882,29 +6758,6 @@
                           "slug": {
                             "type": "string",
                             "pattern": "^[a-z][a-z0-9-]{1,61}$"
-                          },
-                          "runtimeClass": {
-                            "type": "string",
-                            "enum": ["scale-to-zero", "always-on"]
-                          },
-                          "region": {
-                            "type": "string",
-                            "description": "Compute region for an always-on project. Omit for the global scale-to-zero runtime."
-                          },
-                          "git": {
-                            "type": "object",
-                            "properties": {
-                              "repo": {
-                                "type": "string",
-                                "pattern": "^[\\w.-]+/[\\w.-]+$"
-                              },
-                              "ref": {
-                                "type": "string",
-                                "minLength": 1,
-                                "maxLength": 255
-                              }
-                            },
-                            "required": ["repo"]
                           },
                           "env": {
                             "type": "object",
@@ -7107,106 +6960,6 @@
                               "additionalProperties": false
                             }
                           },
-                          "databases": {
-                            "type": "array",
-                            "items": {
-                              "type": "object",
-                              "properties": {
-                                "name": {
-                                  "type": "string",
-                                  "pattern": "^[a-z][a-z0-9-]{1,61}$"
-                                },
-                                "environment": {
-                                  "type": "string",
-                                  "pattern": "^[a-z][a-z0-9-]{0,38}$"
-                                },
-                                "sku": {
-                                  "type": "string"
-                                },
-                                "region": {
-                                  "type": "string"
-                                },
-                                "replicas": {
-                                  "type": "integer",
-                                  "enum": [0, 2]
-                                },
-                                "backup": {
-                                  "type": "object",
-                                  "properties": {
-                                    "pitrDays": {
-                                      "type": "integer"
-                                    },
-                                    "dailyDays": {
-                                      "type": "integer"
-                                    },
-                                    "weeklyWeeks": {
-                                      "type": "integer"
-                                    },
-                                    "monthlyMonths": {
-                                      "type": "integer"
-                                    },
-                                    "destinationIds": {
-                                      "type": "array",
-                                      "items": {
-                                        "type": "string"
-                                      }
-                                    },
-                                    "copyRegions": {
-                                      "type": "array",
-                                      "items": {
-                                        "type": "string",
-                                        "enum": ["enam", "weur", "eeur", "apac", "oc"]
-                                      },
-                                      "maxItems": 5,
-                                      "uniqueItems": true,
-                                      "description": "Managed disaster-recovery snapshots with best-effort area placement; area hints are not data-residency guarantees."
-                                    }
-                                  },
-                                  "additionalProperties": false
-                                }
-                              },
-                              "required": ["name", "sku", "region"],
-                              "additionalProperties": false
-                            }
-                          },
-                          "caches": {
-                            "type": "array",
-                            "items": {
-                              "type": "object",
-                              "properties": {
-                                "name": {
-                                  "type": "string",
-                                  "pattern": "^[a-z][a-z0-9-]{1,61}$"
-                                },
-                                "environment": {
-                                  "type": "string",
-                                  "pattern": "^[a-z][a-z0-9-]{0,38}$"
-                                },
-                                "sku": {
-                                  "type": "string",
-                                  "enum": ["cache-n1", "cache-s1", "cache-s2"]
-                                },
-                                "region": {
-                                  "type": "string"
-                                },
-                                "persistence": {
-                                  "type": "string",
-                                  "enum": ["none", "aof"]
-                                },
-                                "evictionPolicy": {
-                                  "type": "string",
-                                  "enum": [
-                                    "allkeys-lru",
-                                    "allkeys-lfu",
-                                    "volatile-lru",
-                                    "noeviction"
-                                  ]
-                                }
-                              },
-                              "required": ["name", "region"],
-                              "additionalProperties": false
-                            }
-                          },
                           "realtime": {
                             "type": "array",
                             "items": {
@@ -7363,27 +7116,6 @@
                               ],
                               "additionalProperties": false
                             }
-                          },
-                          "databaseBranch": {
-                            "type": "object",
-                            "properties": {
-                              "sourceEnvironment": {
-                                "type": "string",
-                                "pattern": "^[a-z][a-z0-9-]{0,38}$"
-                              },
-                              "sourceDatabase": {
-                                "type": "string",
-                                "pattern": "^[a-z][a-z0-9-]{1,61}$"
-                              },
-                              "expiresInDays": {
-                                "type": ["integer", "null"]
-                              },
-                              "deleteOnPreviewClose": {
-                                "type": "boolean"
-                              }
-                            },
-                            "required": ["sourceEnvironment", "sourceDatabase"],
-                            "additionalProperties": false
                           },
                           "alerts": {
                             "type": "array",
@@ -7697,9 +7429,89 @@
                             },
                             "required": ["enabled"],
                             "additionalProperties": false
+                          },
+                          "speedInsights": {
+                            "type": "object",
+                            "description": "Privacy-first real-user performance policy. Omit to leave it unmanaged.",
+                            "properties": {
+                              "enabled": {
+                                "type": "boolean"
+                              },
+                              "sampleRate": {
+                                "type": "number",
+                                "minimum": 0.01,
+                                "maximum": 1,
+                                "default": 1
+                              },
+                              "allowedOrigins": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "format": "uri"
+                                },
+                                "maxItems": 20
+                              }
+                            },
+                            "required": ["enabled"],
+                            "additionalProperties": false
+                          },
+                          "source": {
+                            "type": "object",
+                            "properties": {
+                              "repo": {
+                                "type": "string",
+                                "pattern": "^[\\w.-]+/[\\w.-]+$"
+                              },
+                              "ref": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255,
+                                "default": "main"
+                              }
+                            },
+                            "required": ["repo"],
+                            "additionalProperties": false
+                          },
+                          "scaling": {
+                            "type": "object",
+                            "description": "Automatic web scaling outcomes. minimumReady must not exceed maximumReplicas.",
+                            "properties": {
+                              "minimumReady": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 20,
+                                "default": 0
+                              },
+                              "maximumReplicas": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 20,
+                                "default": 10
+                              },
+                              "targetConcurrency": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 1000,
+                                "default": 40
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          "spend": {
+                            "type": "object",
+                            "properties": {
+                              "monthlyScaleCeilingUsd": {
+                                "type": "number",
+                                "minimum": 0.01,
+                                "maximum": 1000000,
+                                "description": "Monthly project usage amount after which automatic scale-out stops."
+                              }
+                            },
+                            "required": ["monthlyScaleCeilingUsd"],
+                            "additionalProperties": false
                           }
                         },
-                        "required": ["name", "slug", "runtimeClass"],
+                        "required": ["name", "slug"],
                         "additionalProperties": false
                       }
                     }
@@ -12138,11 +11950,11 @@
                           },
                           "cpuP50Us": {
                             "type": ["number", "null"],
-                            "description": "Median CPU time per request in microseconds — execution time, not wall-clock latency. Null when the bucket reports none; always-on apps never do."
+                            "description": "Median CPU time per request in microseconds — execution time, not wall-clock latency. Null when the bucket reports no CPU-time sample."
                           },
                           "cpuP99Us": {
                             "type": ["number", "null"],
-                            "description": "99th-percentile CPU time per request in microseconds — execution time, not wall-clock latency. Null when the bucket reports none; always-on apps never do."
+                            "description": "99th-percentile CPU time per request in microseconds — execution time, not wall-clock latency. Null when the bucket reports none; null when the bucket reports no CPU-time sample."
                           }
                         },
                         "required": ["bucket", "requests", "errors", "cpuP50Us", "cpuP99Us"]
@@ -14200,7 +14012,7 @@
                     },
                     "hardStop": {
                       "type": "boolean",
-                      "description": "Whether spend past the cap suspends the project's paid activity."
+                      "description": "Whether spend past the cap blocks new deployments and automatic scale-out. Running workloads and storage continue."
                     },
                     "alertAtPercent": {
                       "type": "integer",
@@ -14270,7 +14082,7 @@
                     },
                     "hardStop": {
                       "type": "boolean",
-                      "description": "Whether spend past the cap suspends the project's paid activity."
+                      "description": "Whether spend past the cap blocks new deployments and automatic scale-out. Running workloads and storage continue."
                     },
                     "alertAtPercent": {
                       "type": "integer",
@@ -14313,7 +14125,7 @@
                   },
                   "hardStop": {
                     "type": "boolean",
-                    "description": "Defaults to false."
+                    "description": "Defaults to false. When true, the cap blocks new deployments and automatic scale-out. Running workloads and storage continue."
                   },
                   "alertAtPercent": {
                     "type": "integer",
@@ -35869,6 +35681,677 @@
         "x-korve-required-role": "member"
       }
     },
+    "/v1/orgs/{orgId}/projects/{projectId}/services/{serviceId}/scale-events": {
+      "get": {
+        "operationId": "services.listScaleEvents",
+        "summary": "List Scale Events",
+        "description": "List recent automatic-scaling decisions for diagnosis and cost review.",
+        "tags": ["services"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "serviceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            },
+            "description": "Maximum events to return. Defaults to 50."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Opaque cursor from the previous response."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Scale events, newest first.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Opaque scale event id."
+                          },
+                          "action": {
+                            "type": "string",
+                            "enum": ["scale-up", "scale-down"]
+                          },
+                          "reason": {
+                            "type": "string",
+                            "enum": [
+                              "request-demand",
+                              "concurrency",
+                              "idle",
+                              "policy-change",
+                              "deployment",
+                              "recovery",
+                              "budget-limit"
+                            ],
+                            "description": "Customer-facing reason for the scaling decision."
+                          },
+                          "fromReplicas": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "toReplicas": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "observedConcurrency": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "pendingRequests": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "action",
+                          "reason",
+                          "fromReplicas",
+                          "toReplicas",
+                          "observedConcurrency",
+                          "pendingRequests",
+                          "createdAt"
+                        ]
+                      }
+                    },
+                    "nextCursor": {
+                      "type": ["string", "null"]
+                    }
+                  },
+                  "required": ["items", "nextCursor"]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such service in this project."
+          },
+          "422": {
+            "description": "The cursor or limit is invalid."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/services/{serviceId}/scaling": {
+      "patch": {
+        "operationId": "services.updateScaling",
+        "summary": "Update Scaling",
+        "description": "Change automatic-scaling safety limits. Omitted fields keep their current values. minimumReady must not exceed maximumReplicas.",
+        "tags": ["services"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "serviceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Updated service.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Opaque service id."
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Stable customer-facing service name."
+                    },
+                    "kind": {
+                      "type": "string",
+                      "enum": ["web"]
+                    },
+                    "scaling": {
+                      "type": "object",
+                      "description": "Customer limits for automatic scaling. Korve selects capacity and changes replica count within these limits.",
+                      "properties": {
+                        "minimumReady": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 20,
+                          "default": 0,
+                          "description": "Minimum ready replicas. Zero lets an idle service stop so that it does not create compute charges."
+                        },
+                        "maximumReplicas": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 20,
+                          "default": 10,
+                          "description": "Maximum replicas Korve can run for this service. The default limits unexpected cost while traffic grows."
+                        },
+                        "targetConcurrency": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 1000,
+                          "default": 40,
+                          "description": "Target number of active requests per ready replica. Korve scales out before sustained demand exceeds this value."
+                        }
+                      },
+                      "required": ["minimumReady", "maximumReplicas", "targetConcurrency"]
+                    },
+                    "scalingState": {
+                      "type": "object",
+                      "description": "Latest observed automatic-scaling state. It is operational data, not a billing meter.",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "enum": ["idle", "starting", "ready", "scaling", "draining", "degraded"]
+                        },
+                        "desiredReplicas": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "readyReplicas": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "pendingRequests": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "observedConcurrency": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "description": "Active requests across all ready replicas at the last evaluation."
+                        },
+                        "lastEvaluatedAt": {
+                          "type": ["string", "null"],
+                          "format": "date-time",
+                          "description": "Time of the latest scaling evaluation; null before the first evaluation."
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "desiredReplicas",
+                        "readyReplicas",
+                        "pendingRequests",
+                        "observedConcurrency",
+                        "lastEvaluatedAt"
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "kind",
+                    "scaling",
+                    "scalingState",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Organization billing is not active."
+          },
+          "404": {
+            "description": "No such service in this project."
+          },
+          "422": {
+            "description": "Invalid scaling limits, no fields to update, or minimumReady exceeds maximumReplicas."
+          }
+        },
+        "x-korve-risk": "write",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "admin",
+        "requestBody": {
+          "required": true,
+          "x-korve-max-bytes": 1048576,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "minimumReady": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 20,
+                    "default": 0,
+                    "description": "Minimum ready replicas. Zero lets an idle service stop so that it does not create compute charges."
+                  },
+                  "maximumReplicas": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 20,
+                    "default": 10,
+                    "description": "Maximum replicas Korve can run for this service. The default limits unexpected cost while traffic grows."
+                  },
+                  "targetConcurrency": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000,
+                    "default": 40,
+                    "description": "Target number of active requests per ready replica. Korve scales out before sustained demand exceeds this value."
+                  }
+                },
+                "additionalProperties": false,
+                "minProperties": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/services/{serviceId}": {
+      "get": {
+        "operationId": "services.get",
+        "summary": "Get",
+        "description": "Get one service with its current scaling policy and observed state.",
+        "tags": ["services"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "serviceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The service.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Opaque service id."
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Stable customer-facing service name."
+                    },
+                    "kind": {
+                      "type": "string",
+                      "enum": ["web"]
+                    },
+                    "scaling": {
+                      "type": "object",
+                      "description": "Customer limits for automatic scaling. Korve selects capacity and changes replica count within these limits.",
+                      "properties": {
+                        "minimumReady": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 20,
+                          "default": 0,
+                          "description": "Minimum ready replicas. Zero lets an idle service stop so that it does not create compute charges."
+                        },
+                        "maximumReplicas": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 20,
+                          "default": 10,
+                          "description": "Maximum replicas Korve can run for this service. The default limits unexpected cost while traffic grows."
+                        },
+                        "targetConcurrency": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 1000,
+                          "default": 40,
+                          "description": "Target number of active requests per ready replica. Korve scales out before sustained demand exceeds this value."
+                        }
+                      },
+                      "required": ["minimumReady", "maximumReplicas", "targetConcurrency"]
+                    },
+                    "scalingState": {
+                      "type": "object",
+                      "description": "Latest observed automatic-scaling state. It is operational data, not a billing meter.",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "enum": ["idle", "starting", "ready", "scaling", "draining", "degraded"]
+                        },
+                        "desiredReplicas": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "readyReplicas": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "pendingRequests": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "observedConcurrency": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "description": "Active requests across all ready replicas at the last evaluation."
+                        },
+                        "lastEvaluatedAt": {
+                          "type": ["string", "null"],
+                          "format": "date-time",
+                          "description": "Time of the latest scaling evaluation; null before the first evaluation."
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "desiredReplicas",
+                        "readyReplicas",
+                        "pendingRequests",
+                        "observedConcurrency",
+                        "lastEvaluatedAt"
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "kind",
+                    "scaling",
+                    "scalingState",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such service in this project."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      }
+    },
+    "/v1/orgs/{orgId}/projects/{projectId}/services": {
+      "get": {
+        "operationId": "services.list",
+        "summary": "List",
+        "description": "List the project's services with their current scaling policy and state.",
+        "tags": ["services"],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The organization's id (UUID) or slug — either form is accepted."
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The project's id (UUID) or slug — either form is accepted."
+          }
+        ],
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Project services.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "Opaque service id."
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "Stable customer-facing service name."
+                      },
+                      "kind": {
+                        "type": "string",
+                        "enum": ["web"]
+                      },
+                      "scaling": {
+                        "type": "object",
+                        "description": "Customer limits for automatic scaling. Korve selects capacity and changes replica count within these limits.",
+                        "properties": {
+                          "minimumReady": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 20,
+                            "default": 0,
+                            "description": "Minimum ready replicas. Zero lets an idle service stop so that it does not create compute charges."
+                          },
+                          "maximumReplicas": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 20,
+                            "default": 10,
+                            "description": "Maximum replicas Korve can run for this service. The default limits unexpected cost while traffic grows."
+                          },
+                          "targetConcurrency": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 1000,
+                            "default": 40,
+                            "description": "Target number of active requests per ready replica. Korve scales out before sustained demand exceeds this value."
+                          }
+                        },
+                        "required": ["minimumReady", "maximumReplicas", "targetConcurrency"]
+                      },
+                      "scalingState": {
+                        "type": "object",
+                        "description": "Latest observed automatic-scaling state. It is operational data, not a billing meter.",
+                        "properties": {
+                          "status": {
+                            "type": "string",
+                            "enum": ["idle", "starting", "ready", "scaling", "draining", "degraded"]
+                          },
+                          "desiredReplicas": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "readyReplicas": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "pendingRequests": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "observedConcurrency": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Active requests across all ready replicas at the last evaluation."
+                          },
+                          "lastEvaluatedAt": {
+                            "type": ["string", "null"],
+                            "format": "date-time",
+                            "description": "Time of the latest scaling evaluation; null before the first evaluation."
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "desiredReplicas",
+                          "readyReplicas",
+                          "pendingRequests",
+                          "observedConcurrency",
+                          "lastEvaluatedAt"
+                        ]
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name",
+                      "kind",
+                      "scaling",
+                      "scalingState",
+                      "createdAt",
+                      "updatedAt"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such project in this organization."
+          }
+        },
+        "x-korve-risk": "read",
+        "x-korve-project-scoped": true,
+        "x-korve-required-role": "member"
+      }
+    },
     "/v1/orgs/{orgId}/projects/{projectId}/speed-insights/query": {
       "post": {
         "operationId": "speedInsights.query",
@@ -37110,14 +37593,6 @@
                       "type": "string",
                       "pattern": "^[a-z][a-z0-9-]{1,61}$"
                     },
-                    "runtimeClass": {
-                      "type": "string",
-                      "enum": ["scale-to-zero", "always-on"]
-                    },
-                    "region": {
-                      "type": "string",
-                      "description": "Where the app runs: a compute region id for always-on apps, \"global\" for scale-to-zero apps (they run on the global edge). Always-on projects can change regions with projects.update; the catalog lives at regions.list."
-                    },
                     "gitRepo": {
                       "type": ["string", "null"],
                       "description": "Connected repository as \"owner/repo\" — pushes and pull requests there drive deploys and previews; null when no repository is connected."
@@ -37209,13 +37684,12 @@
                     "id",
                     "name",
                     "slug",
-                    "runtimeClass",
-                    "region",
                     "gitRepo",
                     "gitRef",
                     "url",
                     "latestDeployment"
-                  ]
+                  ],
+                  "additionalProperties": false
                 }
               }
             }
@@ -37231,7 +37705,7 @@
       "patch": {
         "operationId": "projects.update",
         "summary": "Update",
-        "description": "Update project settings: rename it, connect or disconnect a repository, or change the production branch or compute region. Renaming never changes the slug or the public URL. Region changes apply to the next deployment for always-on projects.",
+        "description": "Update project settings: rename it, connect or disconnect a repository, or change the production branch. Renaming never changes the slug or the public URL.",
         "tags": ["projects"],
         "parameters": [
           {
@@ -37279,14 +37753,6 @@
                       "type": "string",
                       "pattern": "^[a-z][a-z0-9-]{1,61}$"
                     },
-                    "runtimeClass": {
-                      "type": "string",
-                      "enum": ["scale-to-zero", "always-on"]
-                    },
-                    "region": {
-                      "type": "string",
-                      "description": "Where the app runs: a compute region id for always-on apps, \"global\" for scale-to-zero apps (they run on the global edge). Always-on projects can change regions with projects.update; the catalog lives at regions.list."
-                    },
                     "gitRepo": {
                       "type": ["string", "null"],
                       "description": "Connected repository as \"owner/repo\" — pushes and pull requests there drive deploys and previews; null when no repository is connected."
@@ -37304,16 +37770,8 @@
                       "format": "date-time"
                     }
                   },
-                  "required": [
-                    "id",
-                    "name",
-                    "slug",
-                    "runtimeClass",
-                    "region",
-                    "gitRepo",
-                    "gitRef",
-                    "url"
-                  ]
+                  "required": ["id", "name", "slug", "gitRepo", "gitRef", "url"],
+                  "additionalProperties": false
                 }
               }
             }
@@ -37322,7 +37780,7 @@
             "description": "No such project in this organization."
           },
           "422": {
-            "description": "Invalid name, gitRepo, gitRef, region, or repository access — or no fields to update."
+            "description": "Invalid project or repository settings, or no fields to update."
           },
           "502": {
             "description": "Repository access could not be verified — try again."
@@ -37351,12 +37809,9 @@
                   "gitRef": {
                     "type": "string",
                     "description": "Production branch for push-to-deploy, 1-100 characters."
-                  },
-                  "region": {
-                    "type": "string",
-                    "description": "Compute region id for an always-on project (see regions.list). Scale-to-zero projects run globally and cannot set a region."
                   }
-                }
+                },
+                "additionalProperties": false
               }
             }
           }
@@ -37408,14 +37863,6 @@
                         "type": "string",
                         "pattern": "^[a-z][a-z0-9-]{1,61}$"
                       },
-                      "runtimeClass": {
-                        "type": "string",
-                        "enum": ["scale-to-zero", "always-on"]
-                      },
-                      "region": {
-                        "type": "string",
-                        "description": "Where the app runs: a compute region id for always-on apps, \"global\" for scale-to-zero apps (they run on the global edge). Always-on projects can change regions with projects.update; the catalog lives at regions.list."
-                      },
                       "gitRepo": {
                         "type": ["string", "null"],
                         "description": "Connected repository as \"owner/repo\" — pushes and pull requests there drive deploys and previews; null when no repository is connected."
@@ -37433,16 +37880,8 @@
                         "format": "date-time"
                       }
                     },
-                    "required": [
-                      "id",
-                      "name",
-                      "slug",
-                      "runtimeClass",
-                      "region",
-                      "gitRepo",
-                      "gitRef",
-                      "url"
-                    ]
+                    "required": ["id", "name", "slug", "gitRepo", "gitRef", "url"],
+                    "additionalProperties": false
                   }
                 }
               }
@@ -37495,14 +37934,6 @@
                       "type": "string",
                       "pattern": "^[a-z][a-z0-9-]{1,61}$"
                     },
-                    "runtimeClass": {
-                      "type": "string",
-                      "enum": ["scale-to-zero", "always-on"]
-                    },
-                    "region": {
-                      "type": "string",
-                      "description": "Where the app runs: a compute region id for always-on apps, \"global\" for scale-to-zero apps (they run on the global edge). Always-on projects can change regions with projects.update; the catalog lives at regions.list."
-                    },
                     "gitRepo": {
                       "type": ["string", "null"],
                       "description": "Connected repository as \"owner/repo\" — pushes and pull requests there drive deploys and previews; null when no repository is connected."
@@ -37520,16 +37951,8 @@
                       "format": "date-time"
                     }
                   },
-                  "required": [
-                    "id",
-                    "name",
-                    "slug",
-                    "runtimeClass",
-                    "region",
-                    "gitRepo",
-                    "gitRef",
-                    "url"
-                  ]
+                  "required": ["id", "name", "slug", "gitRepo", "gitRef", "url"],
+                  "additionalProperties": false
                 }
               }
             }
@@ -37541,7 +37964,7 @@
             "description": "Slug already taken."
           },
           "422": {
-            "description": "Invalid name, slug, runtime class, region, or repository access — including any region on a scale-to-zero project. A repository installed for another organization is never accepted."
+            "description": "Invalid name, slug, repository settings, or repository access. A repository installed for another organization is never accepted."
           },
           "502": {
             "description": "Repository access could not be verified — try again."
@@ -37566,14 +37989,6 @@
                     "pattern": "^[a-z][a-z0-9-]{1,61}$",
                     "description": "Managed subdomain label — globally unique."
                   },
-                  "runtimeClass": {
-                    "type": "string",
-                    "enum": ["scale-to-zero", "always-on"]
-                  },
-                  "region": {
-                    "type": "string",
-                    "description": "Compute region id for always-on apps (see regions.list); defaults to the platform default region. Scale-to-zero apps run on the global edge and must not pick a region."
-                  },
                   "gitRepo": {
                     "type": "string",
                     "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$",
@@ -37584,7 +37999,8 @@
                     "description": "Production branch for push-to-deploy. Defaults to main."
                   }
                 },
-                "required": ["name", "slug", "runtimeClass"]
+                "required": ["name", "slug"],
+                "additionalProperties": false
               }
             }
           }

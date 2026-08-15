@@ -1,15 +1,15 @@
 ---
 title: "Quickstart"
-description: "Turn a Git repository into a live, linked Korve project with one reviewed command."
+description: "Turn a Git repository into a live, linked Korve project with automatic compute."
 ---
 
-This path creates a reviewable manifest, shows the infrastructure plan, applies it, links the current
-directory, deploys the selected Git ref, and follows the deployment to a terminal state.
+This path creates a project with automatic compute, links the current directory, and queues the first
+deployment from Git.
 
 ## 1. Create an account and activate billing
 
-Sign in at [korve.dev](https://korve.dev). Provisioning requires active organization billing; the CLI
-shows the published rate card before applying the first plan.
+Sign in at [korve.dev](https://korve.dev). Provisioning requires active organization billing. Review
+the [published rate card](/primitives/budgets-and-usage) before you create the project.
 
 ## 2. Install and authorize the CLI
 
@@ -21,41 +21,26 @@ korve login
 `korve login` opens a browser authorization page and uses OAuth 2.1 with PKCE. Review the organization,
 requested role, and exact operation scopes, then approve. See [Agent OAuth](/agents/oauth).
 
-## 3. Initialize from the repository
+## 3. Create and link the project
 
-Run this from a Git checkout whose `origin` points to `github.com/<owner>/<repo>`:
-
-```bash
-korve init
-```
-
-Korve detects the repository, current branch, directory-derived project name and slug, and whether
-the checkout resembles Next.js, Remix, TanStack Start, Vite, Rust, a Dockerfile app, or a generic
-application. Detection is informational: the generated manifest currently chooses the `always-on`
-runtime. Edit and plan the manifest first if you need another runtime class.
-
-The command writes `korve.toml`, prints the complete plan and pricing guidance, and asks:
-
-```text
-Apply this plan and deploy it now?
-```
-
-Confirm only after reviewing the repository, slug, ref, and plan. In CI, provide every value and use
-`--yes` only after that review is encoded in the workflow:
+Run this from the repository:
 
 ```bash
-korve init --name Storefront --slug storefront --repo acme/storefront \
-  --ref main --manifest korve.toml --yes
+korve projects create --name Storefront --slug storefront \
+  --repo acme/storefront --ref main
+korve link storefront
 ```
 
-If `korve.toml` or `.korve.toml` already contains different state, init stops instead of overwriting
-it. A matching manifest and link are safe to resume. If the matching deployment is already ready,
-the command prints its URL; if it is still active, the command resumes following it.
+The create command sends no compute placement or machine-size options. It uses automatic compute
+defaults and queues the first deployment. `korve link` writes `.korve.toml` and installs the agent
+files for later project-scoped commands.
 
 ## 4. Verify the live application
 
 ```bash
 korve deploys list
+korve services list
+korve services scaling show <service-id>
 korve logs --level error --limit 100
 curl -fsS https://storefront.korve.app/
 ```
@@ -67,8 +52,19 @@ korve deploys get <deploy-id> --json
 korve operator create --title "Investigate first deploy" --deployment <deploy-id>
 ```
 
+Set only the capacity and cost limits that the workload needs. Zero minimum replicas stops idle
+compute charges. The public maximum is 20 replicas.
+
+```bash
+korve services scaling set <service-id> --minimum-ready 0 --maximum-replicas 10 \
+  --target-concurrency 40
+korve services scaling events <service-id>
+```
+
 ## 5. Add infrastructure deliberately
 
-Edit `korve.toml`, then run `korve manifest plan -f korve.toml` before applying. Add only the
-databases, storage, queues, crons, caches, alerts, access policy, and maintenance policy the app
-actually needs. See [Infrastructure as code](/primitives/manifests).
+Add only the databases, storage, queues, crons, caches, alerts, access policy, and maintenance policy
+the app actually needs. Manage these optional primitives with their CLI or API operations. Public
+manifests use version 2 and never expose compute placement. See
+[Automatic compute](/primitives/automatic-compute) and
+[Infrastructure as code](/primitives/manifests).

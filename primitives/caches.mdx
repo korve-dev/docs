@@ -4,8 +4,8 @@ description: "Create an isolated TLS-compatible cache beside your application an
 ---
 
 Managed caches are environment-scoped and expose a shown-once TLS connection string. Choose a
-supported cache region independently from the project's compute region; co-locate latency-sensitive
-workloads when possible.
+supported cache region independently from automatic application compute placement. Select a cache
+location close to other latency-sensitive state when possible.
 
 ```bash
 korve caches create sessions --env production --sku cache-n1 --region us-east \

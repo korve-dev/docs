@@ -1,11 +1,11 @@
 ---
 title: "Budgets"
-description: "Monthly spend caps per project. Budgets watch month-to-date usage at rate-card prices and flag (or, with hard stop, will suspend) overruns."
+description: "Monthly spend caps per project. Budgets watch month-to-date usage at rate-card prices. A hard stop blocks new deployments and automatic scale-out at the cap. Running workloads and storage continue."
 ---
 
 {/* Generated from the Korve API spec by `bun run generate:docs` in packages/api-spec-gen — do not edit by hand. */}
 
-Monthly spend caps per project. Budgets watch month-to-date usage at rate-card prices and flag (or, with hard stop, will suspend) overruns.
+Monthly spend caps per project. Budgets watch month-to-date usage at rate-card prices. A hard stop blocks new deployments and automatic scale-out at the cap. Running workloads and storage continue.
 
 ## budgets.get
 
@@ -35,12 +35,12 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/budget" \
 
 ### Response body (200)
 
-| Field             | Type    | Description                                                      |
-| ----------------- | ------- | ---------------------------------------------------------------- |
-| `monthlyCapUsd`   | number  | —                                                                |
-| `hardStop`        | boolean | Whether spend past the cap suspends the project's paid activity. |
-| `alertAtPercent`  | integer | Alert threshold as a percent of the cap.                         |
-| `currentSpendUsd` | number  | Month-to-date spend at rate-card prices.                         |
+| Field             | Type    | Description                                                                                                        |
+| ----------------- | ------- | ------------------------------------------------------------------------------------------------------------------ |
+| `monthlyCapUsd`   | number  | —                                                                                                                  |
+| `hardStop`        | boolean | Whether spend past the cap blocks new deployments and automatic scale-out. Running workloads and storage continue. |
+| `alertAtPercent`  | integer | Alert threshold as a percent of the cap.                                                                           |
+| `currentSpendUsd` | number  | Month-to-date spend at rate-card prices.                                                                           |
 
 ## budgets.set
 
@@ -57,11 +57,11 @@ PUT /v1/orgs/{orgId}/projects/{projectId}/budget
 
 ### Request body
 
-| Field            | Type    | Required | Description                      |
-| ---------------- | ------- | -------- | -------------------------------- |
-| `monthlyCapUsd`  | number  | Yes      | Monthly cap in USD. Must be > 0. |
-| `hardStop`       | boolean | No       | Defaults to false.               |
-| `alertAtPercent` | integer | No       | 1-100. Defaults to 80.           |
+| Field            | Type    | Required | Description                                                                                                                   |
+| ---------------- | ------- | -------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `monthlyCapUsd`  | number  | Yes      | Monthly cap in USD. Must be > 0.                                                                                              |
+| `hardStop`       | boolean | No       | Defaults to false. When true, the cap blocks new deployments and automatic scale-out. Running workloads and storage continue. |
+| `alertAtPercent` | integer | No       | 1-100. Defaults to 80.                                                                                                        |
 
 ### Example
 
@@ -85,12 +85,12 @@ curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/budget" 
 
 ### Response body (200)
 
-| Field             | Type    | Description                                                      |
-| ----------------- | ------- | ---------------------------------------------------------------- |
-| `monthlyCapUsd`   | number  | —                                                                |
-| `hardStop`        | boolean | Whether spend past the cap suspends the project's paid activity. |
-| `alertAtPercent`  | integer | Alert threshold as a percent of the cap.                         |
-| `currentSpendUsd` | number  | Month-to-date spend at rate-card prices.                         |
+| Field             | Type    | Description                                                                                                        |
+| ----------------- | ------- | ------------------------------------------------------------------------------------------------------------------ |
+| `monthlyCapUsd`   | number  | —                                                                                                                  |
+| `hardStop`        | boolean | Whether spend past the cap blocks new deployments and automatic scale-out. Running workloads and storage continue. |
+| `alertAtPercent`  | integer | Alert threshold as a percent of the cap.                                                                           |
+| `currentSpendUsd` | number  | Month-to-date spend at rate-card prices.                                                                           |
 
 ## budgets.delete
 
