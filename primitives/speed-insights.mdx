@@ -8,39 +8,12 @@ P75, P90, P95, and P99 values by device, environment, time, and normalized route
 
 ## Enable collection
 
-Add a collection policy to `korve.yaml`:
-
-The example uses the version 1 manifest compatibility contract. Its `runtimeClass` field is required
-only because that old contract must round-trip existing projects. New project creation does not ask
-you to select a runtime class.
-
-```yaml
-version: 1
-organization: acme
-projects:
-  - name: Storefront
-    slug: storefront
-    runtimeClass: scale-to-zero
-    speedInsights:
-      enabled: true
-      sampleRate: 1
-      allowedOrigins:
-        - https://www.example.com
-```
-
-Korve always allows the managed project origin and active custom domains. Use `allowedOrigins` only
-for other exact HTTPS origins. Apply the manifest as usual:
-
-```bash
-korve manifest plan
-korve manifest apply
-```
-
-You can also manage the policy from the CLI:
+Enable collection with the CLI. Korve always allows the managed project origin and active custom
+domains. Use `--origin` only for another exact HTTPS origin:
 
 ```bash
 korve speed-insights show --project storefront
-korve speed-insights set --state enabled --sample-rate 0.5 \
+korve speed-insights set --state enabled --sample-rate 1 \
   --origin https://www.example.com --project storefront
 ```
 

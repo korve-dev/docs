@@ -5044,6 +5044,96 @@
                 "oneOf": [
                   {
                     "type": "object",
+                    "description": "Korve manifest v2 for provider-neutral, automatically scaled application compute.",
+                    "properties": {
+                      "version": {
+                        "type": "integer",
+                        "enum": [2]
+                      },
+                      "organization": {
+                        "type": "string",
+                        "description": "Organization slug the manifest targets."
+                      },
+                      "projects": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 255
+                            },
+                            "slug": {
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{1,61}$"
+                            },
+                            "source": {
+                              "type": "object",
+                              "properties": {
+                                "repo": {
+                                  "type": "string",
+                                  "pattern": "^[\\w.-]+/[\\w.-]+$"
+                                },
+                                "ref": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 255,
+                                  "default": "main"
+                                }
+                              },
+                              "required": ["repo"],
+                              "additionalProperties": false
+                            },
+                            "scaling": {
+                              "type": "object",
+                              "description": "Automatic web scaling outcomes. minimumReady must not exceed maximumReplicas.",
+                              "properties": {
+                                "minimumReady": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 20,
+                                  "default": 0
+                                },
+                                "maximumReplicas": {
+                                  "type": "integer",
+                                  "minimum": 1,
+                                  "maximum": 20,
+                                  "default": 10
+                                },
+                                "targetConcurrency": {
+                                  "type": "integer",
+                                  "minimum": 1,
+                                  "maximum": 1000,
+                                  "default": 40
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            "spend": {
+                              "type": "object",
+                              "properties": {
+                                "monthlyScaleCeilingUsd": {
+                                  "type": "number",
+                                  "minimum": 0.01,
+                                  "maximum": 1000000,
+                                  "description": "Monthly project usage amount after which automatic scale-out stops."
+                                }
+                              },
+                              "required": ["monthlyScaleCeilingUsd"],
+                              "additionalProperties": false
+                            }
+                          },
+                          "required": ["name", "slug"],
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "required": ["version", "organization"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
                     "description": "Korve manifest (infrastructure as code): the desired state of an organization's projects, environment, and platform resources.",
                     "properties": {
                       "version": {
@@ -5888,96 +5978,6 @@
                             }
                           },
                           "required": ["name", "slug", "runtimeClass"],
-                          "additionalProperties": false
-                        }
-                      }
-                    },
-                    "required": ["version", "organization"],
-                    "additionalProperties": false
-                  },
-                  {
-                    "type": "object",
-                    "description": "Korve manifest v2 for provider-neutral, automatically scaled application compute.",
-                    "properties": {
-                      "version": {
-                        "type": "integer",
-                        "enum": [2]
-                      },
-                      "organization": {
-                        "type": "string",
-                        "description": "Organization slug the manifest targets."
-                      },
-                      "projects": {
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "name": {
-                              "type": "string",
-                              "minLength": 1,
-                              "maxLength": 255
-                            },
-                            "slug": {
-                              "type": "string",
-                              "pattern": "^[a-z][a-z0-9-]{1,61}$"
-                            },
-                            "source": {
-                              "type": "object",
-                              "properties": {
-                                "repo": {
-                                  "type": "string",
-                                  "pattern": "^[\\w.-]+/[\\w.-]+$"
-                                },
-                                "ref": {
-                                  "type": "string",
-                                  "minLength": 1,
-                                  "maxLength": 255,
-                                  "default": "main"
-                                }
-                              },
-                              "required": ["repo"],
-                              "additionalProperties": false
-                            },
-                            "scaling": {
-                              "type": "object",
-                              "description": "Automatic web scaling outcomes. minimumReady must not exceed maximumReplicas.",
-                              "properties": {
-                                "minimumReady": {
-                                  "type": "integer",
-                                  "minimum": 0,
-                                  "maximum": 20,
-                                  "default": 0
-                                },
-                                "maximumReplicas": {
-                                  "type": "integer",
-                                  "minimum": 1,
-                                  "maximum": 20,
-                                  "default": 10
-                                },
-                                "targetConcurrency": {
-                                  "type": "integer",
-                                  "minimum": 1,
-                                  "maximum": 1000,
-                                  "default": 40
-                                }
-                              },
-                              "additionalProperties": false
-                            },
-                            "spend": {
-                              "type": "object",
-                              "properties": {
-                                "monthlyScaleCeilingUsd": {
-                                  "type": "number",
-                                  "minimum": 0.01,
-                                  "maximum": 1000000,
-                                  "description": "Monthly project usage amount after which automatic scale-out stops."
-                                }
-                              },
-                              "required": ["monthlyScaleCeilingUsd"],
-                              "additionalProperties": false
-                            }
-                          },
-                          "required": ["name", "slug"],
                           "additionalProperties": false
                         }
                       }
@@ -6099,6 +6099,96 @@
                 "oneOf": [
                   {
                     "type": "object",
+                    "description": "Korve manifest v2 for provider-neutral, automatically scaled application compute.",
+                    "properties": {
+                      "version": {
+                        "type": "integer",
+                        "enum": [2]
+                      },
+                      "organization": {
+                        "type": "string",
+                        "description": "Organization slug the manifest targets."
+                      },
+                      "projects": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 255
+                            },
+                            "slug": {
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{1,61}$"
+                            },
+                            "source": {
+                              "type": "object",
+                              "properties": {
+                                "repo": {
+                                  "type": "string",
+                                  "pattern": "^[\\w.-]+/[\\w.-]+$"
+                                },
+                                "ref": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 255,
+                                  "default": "main"
+                                }
+                              },
+                              "required": ["repo"],
+                              "additionalProperties": false
+                            },
+                            "scaling": {
+                              "type": "object",
+                              "description": "Automatic web scaling outcomes. minimumReady must not exceed maximumReplicas.",
+                              "properties": {
+                                "minimumReady": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 20,
+                                  "default": 0
+                                },
+                                "maximumReplicas": {
+                                  "type": "integer",
+                                  "minimum": 1,
+                                  "maximum": 20,
+                                  "default": 10
+                                },
+                                "targetConcurrency": {
+                                  "type": "integer",
+                                  "minimum": 1,
+                                  "maximum": 1000,
+                                  "default": 40
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            "spend": {
+                              "type": "object",
+                              "properties": {
+                                "monthlyScaleCeilingUsd": {
+                                  "type": "number",
+                                  "minimum": 0.01,
+                                  "maximum": 1000000,
+                                  "description": "Monthly project usage amount after which automatic scale-out stops."
+                                }
+                              },
+                              "required": ["monthlyScaleCeilingUsd"],
+                              "additionalProperties": false
+                            }
+                          },
+                          "required": ["name", "slug"],
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "required": ["version", "organization"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
                     "description": "Korve manifest (infrastructure as code): the desired state of an organization's projects, environment, and platform resources.",
                     "properties": {
                       "version": {
@@ -6949,96 +7039,6 @@
                     },
                     "required": ["version", "organization"],
                     "additionalProperties": false
-                  },
-                  {
-                    "type": "object",
-                    "description": "Korve manifest v2 for provider-neutral, automatically scaled application compute.",
-                    "properties": {
-                      "version": {
-                        "type": "integer",
-                        "enum": [2]
-                      },
-                      "organization": {
-                        "type": "string",
-                        "description": "Organization slug the manifest targets."
-                      },
-                      "projects": {
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "name": {
-                              "type": "string",
-                              "minLength": 1,
-                              "maxLength": 255
-                            },
-                            "slug": {
-                              "type": "string",
-                              "pattern": "^[a-z][a-z0-9-]{1,61}$"
-                            },
-                            "source": {
-                              "type": "object",
-                              "properties": {
-                                "repo": {
-                                  "type": "string",
-                                  "pattern": "^[\\w.-]+/[\\w.-]+$"
-                                },
-                                "ref": {
-                                  "type": "string",
-                                  "minLength": 1,
-                                  "maxLength": 255,
-                                  "default": "main"
-                                }
-                              },
-                              "required": ["repo"],
-                              "additionalProperties": false
-                            },
-                            "scaling": {
-                              "type": "object",
-                              "description": "Automatic web scaling outcomes. minimumReady must not exceed maximumReplicas.",
-                              "properties": {
-                                "minimumReady": {
-                                  "type": "integer",
-                                  "minimum": 0,
-                                  "maximum": 20,
-                                  "default": 0
-                                },
-                                "maximumReplicas": {
-                                  "type": "integer",
-                                  "minimum": 1,
-                                  "maximum": 20,
-                                  "default": 10
-                                },
-                                "targetConcurrency": {
-                                  "type": "integer",
-                                  "minimum": 1,
-                                  "maximum": 1000,
-                                  "default": 40
-                                }
-                              },
-                              "additionalProperties": false
-                            },
-                            "spend": {
-                              "type": "object",
-                              "properties": {
-                                "monthlyScaleCeilingUsd": {
-                                  "type": "number",
-                                  "minimum": 0.01,
-                                  "maximum": 1000000,
-                                  "description": "Monthly project usage amount after which automatic scale-out stops."
-                                }
-                              },
-                              "required": ["monthlyScaleCeilingUsd"],
-                              "additionalProperties": false
-                            }
-                          },
-                          "required": ["name", "slug"],
-                          "additionalProperties": false
-                        }
-                      }
-                    },
-                    "required": ["version", "organization"],
-                    "additionalProperties": false
                   }
                 ]
               }
@@ -7070,9 +7070,9 @@
             "schema": {
               "type": "integer",
               "enum": [1, 2],
-              "default": 1
+              "default": 2
             },
-            "description": "Manifest format version. Version 1 remains the default for compatibility."
+            "description": "Manifest format version. Version 2 is the default; version 1 is legacy."
           }
         ],
         "security": [
@@ -7090,6 +7090,96 @@
               "application/json": {
                 "schema": {
                   "oneOf": [
+                    {
+                      "type": "object",
+                      "description": "Korve manifest v2 for provider-neutral, automatically scaled application compute.",
+                      "properties": {
+                        "version": {
+                          "type": "integer",
+                          "enum": [2]
+                        },
+                        "organization": {
+                          "type": "string",
+                          "description": "Organization slug the manifest targets."
+                        },
+                        "projects": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255
+                              },
+                              "slug": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9-]{1,61}$"
+                              },
+                              "source": {
+                                "type": "object",
+                                "properties": {
+                                  "repo": {
+                                    "type": "string",
+                                    "pattern": "^[\\w.-]+/[\\w.-]+$"
+                                  },
+                                  "ref": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 255,
+                                    "default": "main"
+                                  }
+                                },
+                                "required": ["repo"],
+                                "additionalProperties": false
+                              },
+                              "scaling": {
+                                "type": "object",
+                                "description": "Automatic web scaling outcomes. minimumReady must not exceed maximumReplicas.",
+                                "properties": {
+                                  "minimumReady": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 20,
+                                    "default": 0
+                                  },
+                                  "maximumReplicas": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 20,
+                                    "default": 10
+                                  },
+                                  "targetConcurrency": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 1000,
+                                    "default": 40
+                                  }
+                                },
+                                "additionalProperties": false
+                              },
+                              "spend": {
+                                "type": "object",
+                                "properties": {
+                                  "monthlyScaleCeilingUsd": {
+                                    "type": "number",
+                                    "minimum": 0.01,
+                                    "maximum": 1000000,
+                                    "description": "Monthly project usage amount after which automatic scale-out stops."
+                                  }
+                                },
+                                "required": ["monthlyScaleCeilingUsd"],
+                                "additionalProperties": false
+                              }
+                            },
+                            "required": ["name", "slug"],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": ["version", "organization"],
+                      "additionalProperties": false
+                    },
                     {
                       "type": "object",
                       "description": "Korve manifest (infrastructure as code): the desired state of an organization's projects, environment, and platform resources.",
@@ -7947,96 +8037,6 @@
                               }
                             },
                             "required": ["name", "slug", "runtimeClass"],
-                            "additionalProperties": false
-                          }
-                        }
-                      },
-                      "required": ["version", "organization"],
-                      "additionalProperties": false
-                    },
-                    {
-                      "type": "object",
-                      "description": "Korve manifest v2 for provider-neutral, automatically scaled application compute.",
-                      "properties": {
-                        "version": {
-                          "type": "integer",
-                          "enum": [2]
-                        },
-                        "organization": {
-                          "type": "string",
-                          "description": "Organization slug the manifest targets."
-                        },
-                        "projects": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "name": {
-                                "type": "string",
-                                "minLength": 1,
-                                "maxLength": 255
-                              },
-                              "slug": {
-                                "type": "string",
-                                "pattern": "^[a-z][a-z0-9-]{1,61}$"
-                              },
-                              "source": {
-                                "type": "object",
-                                "properties": {
-                                  "repo": {
-                                    "type": "string",
-                                    "pattern": "^[\\w.-]+/[\\w.-]+$"
-                                  },
-                                  "ref": {
-                                    "type": "string",
-                                    "minLength": 1,
-                                    "maxLength": 255,
-                                    "default": "main"
-                                  }
-                                },
-                                "required": ["repo"],
-                                "additionalProperties": false
-                              },
-                              "scaling": {
-                                "type": "object",
-                                "description": "Automatic web scaling outcomes. minimumReady must not exceed maximumReplicas.",
-                                "properties": {
-                                  "minimumReady": {
-                                    "type": "integer",
-                                    "minimum": 0,
-                                    "maximum": 20,
-                                    "default": 0
-                                  },
-                                  "maximumReplicas": {
-                                    "type": "integer",
-                                    "minimum": 1,
-                                    "maximum": 20,
-                                    "default": 10
-                                  },
-                                  "targetConcurrency": {
-                                    "type": "integer",
-                                    "minimum": 1,
-                                    "maximum": 1000,
-                                    "default": 40
-                                  }
-                                },
-                                "additionalProperties": false
-                              },
-                              "spend": {
-                                "type": "object",
-                                "properties": {
-                                  "monthlyScaleCeilingUsd": {
-                                    "type": "number",
-                                    "minimum": 0.01,
-                                    "maximum": 1000000,
-                                    "description": "Monthly project usage amount after which automatic scale-out stops."
-                                  }
-                                },
-                                "required": ["monthlyScaleCeilingUsd"],
-                                "additionalProperties": false
-                              }
-                            },
-                            "required": ["name", "slug"],
                             "additionalProperties": false
                           }
                         }
@@ -12477,11 +12477,11 @@
                           },
                           "cpuP50Us": {
                             "type": ["number", "null"],
-                            "description": "Median CPU time per request in microseconds — execution time, not wall-clock latency. Null when the bucket reports none; always-on apps never do."
+                            "description": "Median CPU time per request in microseconds — execution time, not wall-clock latency. Null when the bucket reports no CPU-time sample."
                           },
                           "cpuP99Us": {
                             "type": ["number", "null"],
-                            "description": "99th-percentile CPU time per request in microseconds — execution time, not wall-clock latency. Null when the bucket reports none; always-on apps never do."
+                            "description": "99th-percentile CPU time per request in microseconds — execution time, not wall-clock latency. Null when the bucket reports none; null when the bucket reports no CPU-time sample."
                           }
                         },
                         "required": ["bucket", "requests", "errors", "cpuP50Us", "cpuP99Us"]
@@ -14539,7 +14539,7 @@
                     },
                     "hardStop": {
                       "type": "boolean",
-                      "description": "Whether spend past the cap suspends the project's paid activity."
+                      "description": "Whether spend past the cap blocks new deployments and automatic scale-out. Running workloads and storage continue."
                     },
                     "alertAtPercent": {
                       "type": "integer",
@@ -14609,7 +14609,7 @@
                     },
                     "hardStop": {
                       "type": "boolean",
-                      "description": "Whether spend past the cap suspends the project's paid activity."
+                      "description": "Whether spend past the cap blocks new deployments and automatic scale-out. Running workloads and storage continue."
                     },
                     "alertAtPercent": {
                       "type": "integer",
@@ -14652,7 +14652,7 @@
                   },
                   "hardStop": {
                     "type": "boolean",
-                    "description": "Defaults to false."
+                    "description": "Defaults to false. When true, the cap blocks new deployments and automatic scale-out. Running workloads and storage continue."
                   },
                   "alertAtPercent": {
                     "type": "integer",
@@ -38120,14 +38120,6 @@
                       "type": "string",
                       "pattern": "^[a-z][a-z0-9-]{1,61}$"
                     },
-                    "runtimeClass": {
-                      "type": "string",
-                      "enum": ["scale-to-zero", "always-on"]
-                    },
-                    "region": {
-                      "type": "string",
-                      "description": "Where the app runs: a compute region id for always-on apps, \"global\" for scale-to-zero apps (they run on the global edge). Always-on projects can change regions with projects.update; the catalog lives at regions.list."
-                    },
                     "gitRepo": {
                       "type": ["string", "null"],
                       "description": "Connected repository as \"owner/repo\" — pushes and pull requests there drive deploys and previews; null when no repository is connected."
@@ -38219,13 +38211,12 @@
                     "id",
                     "name",
                     "slug",
-                    "runtimeClass",
-                    "region",
                     "gitRepo",
                     "gitRef",
                     "url",
                     "latestDeployment"
-                  ]
+                  ],
+                  "additionalProperties": false
                 }
               }
             }
@@ -38241,7 +38232,7 @@
       "patch": {
         "operationId": "projects.update",
         "summary": "Update",
-        "description": "Update project settings: rename it, connect or disconnect a repository, or change the production branch or compute region. Renaming never changes the slug or the public URL. Region changes apply to the next deployment for always-on projects.",
+        "description": "Update project settings: rename it, connect or disconnect a repository, or change the production branch. Renaming never changes the slug or the public URL.",
         "tags": ["projects"],
         "parameters": [
           {
@@ -38289,14 +38280,6 @@
                       "type": "string",
                       "pattern": "^[a-z][a-z0-9-]{1,61}$"
                     },
-                    "runtimeClass": {
-                      "type": "string",
-                      "enum": ["scale-to-zero", "always-on"]
-                    },
-                    "region": {
-                      "type": "string",
-                      "description": "Where the app runs: a compute region id for always-on apps, \"global\" for scale-to-zero apps (they run on the global edge). Always-on projects can change regions with projects.update; the catalog lives at regions.list."
-                    },
                     "gitRepo": {
                       "type": ["string", "null"],
                       "description": "Connected repository as \"owner/repo\" — pushes and pull requests there drive deploys and previews; null when no repository is connected."
@@ -38314,16 +38297,8 @@
                       "format": "date-time"
                     }
                   },
-                  "required": [
-                    "id",
-                    "name",
-                    "slug",
-                    "runtimeClass",
-                    "region",
-                    "gitRepo",
-                    "gitRef",
-                    "url"
-                  ]
+                  "required": ["id", "name", "slug", "gitRepo", "gitRef", "url"],
+                  "additionalProperties": false
                 }
               }
             }
@@ -38332,7 +38307,7 @@
             "description": "No such project in this organization."
           },
           "422": {
-            "description": "Invalid name, gitRepo, gitRef, region, or repository access — or no fields to update."
+            "description": "Invalid project or repository settings, or no fields to update."
           },
           "502": {
             "description": "Repository access could not be verified — try again."
@@ -38361,12 +38336,9 @@
                   "gitRef": {
                     "type": "string",
                     "description": "Production branch for push-to-deploy, 1-100 characters."
-                  },
-                  "region": {
-                    "type": "string",
-                    "description": "Compute region id for an always-on project (see regions.list). Scale-to-zero projects run globally and cannot set a region."
                   }
-                }
+                },
+                "additionalProperties": false
               }
             }
           }
@@ -38418,14 +38390,6 @@
                         "type": "string",
                         "pattern": "^[a-z][a-z0-9-]{1,61}$"
                       },
-                      "runtimeClass": {
-                        "type": "string",
-                        "enum": ["scale-to-zero", "always-on"]
-                      },
-                      "region": {
-                        "type": "string",
-                        "description": "Where the app runs: a compute region id for always-on apps, \"global\" for scale-to-zero apps (they run on the global edge). Always-on projects can change regions with projects.update; the catalog lives at regions.list."
-                      },
                       "gitRepo": {
                         "type": ["string", "null"],
                         "description": "Connected repository as \"owner/repo\" — pushes and pull requests there drive deploys and previews; null when no repository is connected."
@@ -38443,16 +38407,8 @@
                         "format": "date-time"
                       }
                     },
-                    "required": [
-                      "id",
-                      "name",
-                      "slug",
-                      "runtimeClass",
-                      "region",
-                      "gitRepo",
-                      "gitRef",
-                      "url"
-                    ]
+                    "required": ["id", "name", "slug", "gitRepo", "gitRef", "url"],
+                    "additionalProperties": false
                   }
                 }
               }
@@ -38505,14 +38461,6 @@
                       "type": "string",
                       "pattern": "^[a-z][a-z0-9-]{1,61}$"
                     },
-                    "runtimeClass": {
-                      "type": "string",
-                      "enum": ["scale-to-zero", "always-on"]
-                    },
-                    "region": {
-                      "type": "string",
-                      "description": "Where the app runs: a compute region id for always-on apps, \"global\" for scale-to-zero apps (they run on the global edge). Always-on projects can change regions with projects.update; the catalog lives at regions.list."
-                    },
                     "gitRepo": {
                       "type": ["string", "null"],
                       "description": "Connected repository as \"owner/repo\" — pushes and pull requests there drive deploys and previews; null when no repository is connected."
@@ -38530,16 +38478,8 @@
                       "format": "date-time"
                     }
                   },
-                  "required": [
-                    "id",
-                    "name",
-                    "slug",
-                    "runtimeClass",
-                    "region",
-                    "gitRepo",
-                    "gitRef",
-                    "url"
-                  ]
+                  "required": ["id", "name", "slug", "gitRepo", "gitRef", "url"],
+                  "additionalProperties": false
                 }
               }
             }
@@ -38551,7 +38491,7 @@
             "description": "Slug already taken."
           },
           "422": {
-            "description": "Invalid name, slug, runtime class, region, or repository access — including any region on a scale-to-zero project. A repository installed for another organization is never accepted."
+            "description": "Invalid name, slug, repository settings, or repository access. A repository installed for another organization is never accepted."
           },
           "502": {
             "description": "Repository access could not be verified — try again."
@@ -38576,15 +38516,6 @@
                     "pattern": "^[a-z][a-z0-9-]{1,61}$",
                     "description": "Managed subdomain label — globally unique."
                   },
-                  "runtimeClass": {
-                    "type": "string",
-                    "enum": ["scale-to-zero", "always-on"],
-                    "description": "Deprecated compatibility input. New projects use automatic scaling when omitted."
-                  },
-                  "region": {
-                    "type": "string",
-                    "description": "Compute region id for always-on apps (see regions.list); defaults to the platform default region. Scale-to-zero apps run on the global edge and must not pick a region."
-                  },
                   "gitRepo": {
                     "type": "string",
                     "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$",
@@ -38595,7 +38526,8 @@
                     "description": "Production branch for push-to-deploy. Defaults to main."
                   }
                 },
-                "required": ["name", "slug"]
+                "required": ["name", "slug"],
+                "additionalProperties": false
               }
             }
           }
