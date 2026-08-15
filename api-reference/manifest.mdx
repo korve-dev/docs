@@ -28,28 +28,137 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/manifest" \
 
 ### Responses
 
-| Status | Description                      |
-| ------ | -------------------------------- |
-| `200`  | The current state as a manifest. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | The current state as a manifest. |
 
 ### Response body (200)
 
-| Field                                     | Type     | Description                                                                   |
-| ----------------------------------------- | -------- | ----------------------------------------------------------------------------- |
-| `version`                                 | integer  | One of: `2`.                                                                  |
-| `organization`                            | string   | Organization slug the manifest targets.                                       |
-| `projects`                                | object[] | —                                                                             |
-| `projects[].name`                         | string   | —                                                                             |
-| `projects[].slug`                         | string   | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                            |
-| `projects[].source`                       | object   | —                                                                             |
-| `projects[].source.repo`                  | string   | Pattern: `^[\w.-]+/[\w.-]+$`.                                                 |
-| `projects[].source.ref`                   | string   | —                                                                             |
-| `projects[].scaling`                      | object   | Automatic web scaling outcomes. minimumReady must not exceed maximumReplicas. |
-| `projects[].scaling.minimumReady`         | integer  | —                                                                             |
-| `projects[].scaling.maximumReplicas`      | integer  | —                                                                             |
-| `projects[].scaling.targetConcurrency`    | integer  | —                                                                             |
-| `projects[].spend`                        | object   | —                                                                             |
-| `projects[].spend.monthlyScaleCeilingUsd` | number   | Monthly project usage amount after which automatic scale-out stops.           |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `version` | integer | One of: `2`. |
+| `organization` | string | Organization slug the manifest targets. |
+| `projects` | object[] | — |
+| `projects[].name` | string | — |
+| `projects[].slug` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].env` | object | The production environment's variables. Masked values ("********") are ignored on apply. Map of string values. |
+| `projects[].environments` | object | Custom environments by slug. "production" and "preview" are implicit and never declared here. Map of object values. |
+| `projects[].domains` | string[] | — |
+| `projects[].storage` | object[] | — |
+| `projects[].storage[].name` | string | — |
+| `projects[].storage[].region` | string | Storage area for a new bucket; immutable after creation. |
+| `projects[].queues` | object[] | — |
+| `projects[].queues[].name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].queues[].environment` | string | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `projects[].queues[].retentionSeconds` | integer | — |
+| `projects[].queues[].deliveryDelaySeconds` | integer | — |
+| `projects[].queues[].deadLetterQueue` | string or null | — |
+| `projects[].queues[].paused` | boolean | — |
+| `projects[].queues[].consumer` | object | — |
+| `projects[].queues[].consumer.path` | string | Pattern: `^/(?!/)`. |
+| `projects[].queues[].consumer.maxBatchSize` | integer | — |
+| `projects[].queues[].consumer.maxBatchWaitSeconds` | integer | — |
+| `projects[].queues[].consumer.maxRetries` | integer | — |
+| `projects[].queues[].consumer.retryDelaySeconds` | integer | — |
+| `projects[].queues[].consumer.maxConcurrency` | integer or null | — |
+| `projects[].crons` | object[] | — |
+| `projects[].crons[].name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].crons[].environment` | string | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `projects[].crons[].schedule` | string | — |
+| `projects[].crons[].timezone` | string | — |
+| `projects[].crons[].enabled` | boolean | — |
+| `projects[].crons[].target` | object or object | — |
+| `projects[].crons[].target.kind` | string | One of: `http`. |
+| `projects[].crons[].target.path` | string | Pattern: `^/(?!/)`. |
+| `projects[].crons[].target.method` | string | One of: `POST`, `PUT`, `PATCH`. |
+| `projects[].crons[].target.body` | object | Optional JSON request body, at most 122,880 encoded bytes before the signed 128,000-byte invocation envelope. |
+| `projects[].crons[].retry` | object | — |
+| `projects[].crons[].retry.maxAttempts` | integer | — |
+| `projects[].crons[].retry.initialDelaySeconds` | integer | — |
+| `projects[].crons[].retry.maxDelaySeconds` | integer | — |
+| `projects[].crons[].concurrencyPolicy` | string | One of: `allow`, `skip`, `replace`. |
+| `projects[].crons[].timeoutSeconds` | integer | Target timeout in seconds. Defaults to 300. |
+| `projects[].realtime` | object[] | — |
+| `projects[].realtime[].name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].realtime[].environment` | string | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `projects[].realtime[].region` | string | One of: `global`. |
+| `projects[].realtime[].retentionSeconds` | integer | — |
+| `projects[].realtime[].presenceEnabled` | boolean | — |
+| `projects[].realtime[].maxConnections` | integer | — |
+| `projects[].realtime[].maxMessagesPerSecond` | integer | — |
+| `projects[].realtime[].paused` | boolean | — |
+| `projects[].aiGateways` | object[] | — |
+| `projects[].aiGateways[].name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].aiGateways[].environment` | string | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `projects[].aiGateways[].allowedModels` | string[] | — |
+| `projects[].aiGateways[].monthlyBudgetUsd` | number | — |
+| `projects[].aiGateways[].timeoutMs` | integer | — |
+| `projects[].aiGateways[].maxRetries` | integer | — |
+| `projects[].aiGateways[].redactPrompts` | boolean | — |
+| `projects[].customerPayments` | object[] | — |
+| `projects[].customerPayments[].environment` | string | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `projects[].customerPayments[].secretKey` | string or string | — |
+| `projects[].customerPayments[].webhookSecret` | string or string | — |
+| `projects[].customerPayments[].credentialScopes` | string[] | — |
+| `projects[].customerPayments[].allowedRedirectOrigins` | string[] | — |
+| `projects[].alerts` | object[] | — |
+| `projects[].alerts[].name` | string | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].alerts[].enabled` | boolean | — |
+| `projects[].alerts[].severity` | string | One of: `info`, `warning`, `critical`. |
+| `projects[].alerts[].scope` | object | — |
+| `projects[].alerts[].scope.environment` | string | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `projects[].alerts[].scope.database` | string or null | — |
+| `projects[].alerts[].scope.queue` | string or null | — |
+| `projects[].alerts[].scope.cron` | string or null | — |
+| `projects[].alerts[].condition` | object | — |
+| `projects[].alerts[].condition.signal` | string | One of: `database.unavailable`, `backup.archive_failed`, `storage.capacity`, `cpu.pressure`, `memory.pressure`, `database.pool_saturation`, `queue.backlog`, `cpu.percent`, `memory.used_bytes`, `memory.limit_bytes`, `disk.used_bytes`, `disk.limit_bytes`, `disk.read_iops`, `disk.write_iops`, `network.receive_bytes`, `network.transmit_bytes`, `runtime.restarts`, `runtime.uptime_seconds`, `http.requests`, `http.errors`, `database.connections`, `database.pool_waiting`, `database.queries_per_second`, `database.query_latency_avg_ms`, `database.query_latency_p50_ms`, `database.query_latency_p90_ms`, `database.query_latency_p95_ms`, `database.query_latency_p99_ms`, `queue.backlog_messages`, `queue.oldest_message_age_seconds`, `cron.failures`. |
+| `projects[].alerts[].condition.operator` | string | One of: `gt`, `gte`, `lt`, `lte`, `eq`. |
+| `projects[].alerts[].condition.threshold` | number or null | — |
+| `projects[].alerts[].condition.durationSeconds` | integer | — |
+| `projects[].alerts[].channels` | object or object or object[] | — |
+| `projects[].alerts[].channels[].kind` | string | One of: `dashboard`. |
+| `projects[].alerts[].channels[].destination` | null | — |
+| `projects[].alerts[].cooldownSeconds` | integer | — |
+| `projects[].access` | object | Application sharing policy. Omit to leave the live policy unmanaged. |
+| `projects[].access.mode` | string | One of: `public`, `authenticated`, `organization`, `invite_only`. |
+| `projects[].access.previewMode` | string | One of: `inherit`, `public`, `authenticated`, `organization`, `invite_only`. |
+| `projects[].access.environments` | object | Explicit environment-mode overrides by environment slug. Map of string values. |
+| `projects[].auth` | object | — |
+| `projects[].auth.enabled` | boolean | — |
+| `projects[].auth.allowedOrigins` | string[] | — |
+| `projects[].auth.redirectUrls` | string[] | — |
+| `projects[].auth.emailPassword` | boolean | — |
+| `projects[].auth.magicLink` | boolean | — |
+| `projects[].auth.passwordMinLength` | integer | — |
+| `projects[].auth.accessTokenTtlSeconds` | integer | — |
+| `projects[].auth.refreshTokenTtlSeconds` | integer | — |
+| `projects[].auth.sessionIdleTtlSeconds` | integer | — |
+| `projects[].auth.sessionMaxTtlSeconds` | integer | — |
+| `projects[].auth.magicLinkTtlSeconds` | integer | — |
+| `projects[].auth.passwordResetTtlSeconds` | integer | — |
+| `projects[].maintenance` | object | Continuous evidence-backed project maintenance policy. |
+| `projects[].maintenance.enabled` | boolean | — |
+| `projects[].maintenance.schedule` | string | One of: `hourly`, `daily`, `weekly`. |
+| `projects[].maintenance.categories` | string[] | — |
+| `projects[].maintenance.environments` | string[] | — |
+| `projects[].maintenance.autoRemediation` | object | — |
+| `projects[].maintenance.autoRemediation.enabled` | boolean | — |
+| `projects[].maintenance.autoRemediation.maximumRisk` | string | One of: `read`, `write`. |
+| `projects[].maintenance.autoRemediation.allowedOperationIds` | string[] | — |
+| `projects[].maintenance.autoRemediation.maxActionsPerRun` | integer | — |
+| `projects[].speedInsights` | object | Privacy-first real-user performance policy. Omit to leave it unmanaged. |
+| `projects[].speedInsights.enabled` | boolean | — |
+| `projects[].speedInsights.sampleRate` | number | — |
+| `projects[].speedInsights.allowedOrigins` | string[] | — |
+| `projects[].source` | object | — |
+| `projects[].source.repo` | string | Pattern: `^[\w.-]+/[\w.-]+$`. |
+| `projects[].source.ref` | string | — |
+| `projects[].scaling` | object | Automatic web scaling outcomes. minimumReady must not exceed maximumReplicas. |
+| `projects[].scaling.minimumReady` | integer | — |
+| `projects[].scaling.maximumReplicas` | integer | — |
+| `projects[].scaling.targetConcurrency` | integer | — |
+| `projects[].spend` | object | — |
+| `projects[].spend.monthlyScaleCeilingUsd` | number | Monthly project usage amount after which automatic scale-out stops. |
 
 ## manifest.plan
 
@@ -65,22 +174,131 @@ POST /v1/orgs/{orgId}/manifest/plan
 
 ### Request body
 
-| Field                                     | Type     | Required | Description                                                                   |
-| ----------------------------------------- | -------- | -------- | ----------------------------------------------------------------------------- |
-| `version`                                 | integer  | Yes      | One of: `2`.                                                                  |
-| `organization`                            | string   | Yes      | Organization slug the manifest targets.                                       |
-| `projects`                                | object[] | No       | —                                                                             |
-| `projects[].name`                         | string   | Yes      | —                                                                             |
-| `projects[].slug`                         | string   | Yes      | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                            |
-| `projects[].source`                       | object   | No       | —                                                                             |
-| `projects[].source.repo`                  | string   | Yes      | Pattern: `^[\w.-]+/[\w.-]+$`.                                                 |
-| `projects[].source.ref`                   | string   | No       | —                                                                             |
-| `projects[].scaling`                      | object   | No       | Automatic web scaling outcomes. minimumReady must not exceed maximumReplicas. |
-| `projects[].scaling.minimumReady`         | integer  | No       | —                                                                             |
-| `projects[].scaling.maximumReplicas`      | integer  | No       | —                                                                             |
-| `projects[].scaling.targetConcurrency`    | integer  | No       | —                                                                             |
-| `projects[].spend`                        | object   | No       | —                                                                             |
-| `projects[].spend.monthlyScaleCeilingUsd` | number   | Yes      | Monthly project usage amount after which automatic scale-out stops.           |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `version` | integer | Yes | One of: `2`. |
+| `organization` | string | Yes | Organization slug the manifest targets. |
+| `projects` | object[] | No | — |
+| `projects[].name` | string | Yes | — |
+| `projects[].slug` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].env` | object | No | The production environment's variables. Masked values ("********") are ignored on apply. Map of string values. |
+| `projects[].environments` | object | No | Custom environments by slug. "production" and "preview" are implicit and never declared here. Map of object values. |
+| `projects[].domains` | string[] | No | — |
+| `projects[].storage` | object[] | No | — |
+| `projects[].storage[].name` | string | Yes | — |
+| `projects[].storage[].region` | string | No | Storage area for a new bucket; immutable after creation. |
+| `projects[].queues` | object[] | No | — |
+| `projects[].queues[].name` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].queues[].environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `projects[].queues[].retentionSeconds` | integer | No | — |
+| `projects[].queues[].deliveryDelaySeconds` | integer | No | — |
+| `projects[].queues[].deadLetterQueue` | string or null | No | — |
+| `projects[].queues[].paused` | boolean | No | — |
+| `projects[].queues[].consumer` | object | No | — |
+| `projects[].queues[].consumer.path` | string | Yes | Pattern: `^/(?!/)`. |
+| `projects[].queues[].consumer.maxBatchSize` | integer | No | — |
+| `projects[].queues[].consumer.maxBatchWaitSeconds` | integer | No | — |
+| `projects[].queues[].consumer.maxRetries` | integer | No | — |
+| `projects[].queues[].consumer.retryDelaySeconds` | integer | No | — |
+| `projects[].queues[].consumer.maxConcurrency` | integer or null | No | — |
+| `projects[].crons` | object[] | No | — |
+| `projects[].crons[].name` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].crons[].environment` | string | Yes | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `projects[].crons[].schedule` | string | Yes | — |
+| `projects[].crons[].timezone` | string | No | — |
+| `projects[].crons[].enabled` | boolean | No | — |
+| `projects[].crons[].target` | object or object | Yes | — |
+| `projects[].crons[].target.kind` | string | Yes | One of: `http`. |
+| `projects[].crons[].target.path` | string | Yes | Pattern: `^/(?!/)`. |
+| `projects[].crons[].target.method` | string | No | One of: `POST`, `PUT`, `PATCH`. |
+| `projects[].crons[].target.body` | object | No | Optional JSON request body, at most 122,880 encoded bytes before the signed 128,000-byte invocation envelope. |
+| `projects[].crons[].retry` | object | No | — |
+| `projects[].crons[].retry.maxAttempts` | integer | No | — |
+| `projects[].crons[].retry.initialDelaySeconds` | integer | No | — |
+| `projects[].crons[].retry.maxDelaySeconds` | integer | No | — |
+| `projects[].crons[].concurrencyPolicy` | string | No | One of: `allow`, `skip`, `replace`. |
+| `projects[].crons[].timeoutSeconds` | integer | No | Target timeout in seconds. Defaults to 300. |
+| `projects[].realtime` | object[] | No | — |
+| `projects[].realtime[].name` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].realtime[].environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `projects[].realtime[].region` | string | No | One of: `global`. |
+| `projects[].realtime[].retentionSeconds` | integer | No | — |
+| `projects[].realtime[].presenceEnabled` | boolean | No | — |
+| `projects[].realtime[].maxConnections` | integer | No | — |
+| `projects[].realtime[].maxMessagesPerSecond` | integer | No | — |
+| `projects[].realtime[].paused` | boolean | No | — |
+| `projects[].aiGateways` | object[] | No | — |
+| `projects[].aiGateways[].name` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].aiGateways[].environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `projects[].aiGateways[].allowedModels` | string[] | Yes | — |
+| `projects[].aiGateways[].monthlyBudgetUsd` | number | Yes | — |
+| `projects[].aiGateways[].timeoutMs` | integer | No | — |
+| `projects[].aiGateways[].maxRetries` | integer | No | — |
+| `projects[].aiGateways[].redactPrompts` | boolean | No | — |
+| `projects[].customerPayments` | object[] | No | — |
+| `projects[].customerPayments[].environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `projects[].customerPayments[].secretKey` | string or string | Yes | — |
+| `projects[].customerPayments[].webhookSecret` | string or string | Yes | — |
+| `projects[].customerPayments[].credentialScopes` | string[] | Yes | — |
+| `projects[].customerPayments[].allowedRedirectOrigins` | string[] | Yes | — |
+| `projects[].alerts` | object[] | No | — |
+| `projects[].alerts[].name` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].alerts[].enabled` | boolean | No | — |
+| `projects[].alerts[].severity` | string | Yes | One of: `info`, `warning`, `critical`. |
+| `projects[].alerts[].scope` | object | Yes | — |
+| `projects[].alerts[].scope.environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `projects[].alerts[].scope.database` | string or null | No | — |
+| `projects[].alerts[].scope.queue` | string or null | No | — |
+| `projects[].alerts[].scope.cron` | string or null | No | — |
+| `projects[].alerts[].condition` | object | Yes | — |
+| `projects[].alerts[].condition.signal` | string | Yes | One of: `database.unavailable`, `backup.archive_failed`, `storage.capacity`, `cpu.pressure`, `memory.pressure`, `database.pool_saturation`, `queue.backlog`, `cpu.percent`, `memory.used_bytes`, `memory.limit_bytes`, `disk.used_bytes`, `disk.limit_bytes`, `disk.read_iops`, `disk.write_iops`, `network.receive_bytes`, `network.transmit_bytes`, `runtime.restarts`, `runtime.uptime_seconds`, `http.requests`, `http.errors`, `database.connections`, `database.pool_waiting`, `database.queries_per_second`, `database.query_latency_avg_ms`, `database.query_latency_p50_ms`, `database.query_latency_p90_ms`, `database.query_latency_p95_ms`, `database.query_latency_p99_ms`, `queue.backlog_messages`, `queue.oldest_message_age_seconds`, `cron.failures`. |
+| `projects[].alerts[].condition.operator` | string | Yes | One of: `gt`, `gte`, `lt`, `lte`, `eq`. |
+| `projects[].alerts[].condition.threshold` | number or null | Yes | — |
+| `projects[].alerts[].condition.durationSeconds` | integer | Yes | — |
+| `projects[].alerts[].channels` | object or object or object[] | Yes | — |
+| `projects[].alerts[].channels[].kind` | string | Yes | One of: `dashboard`. |
+| `projects[].alerts[].channels[].destination` | null | Yes | — |
+| `projects[].alerts[].cooldownSeconds` | integer | No | — |
+| `projects[].access` | object | No | Application sharing policy. Omit to leave the live policy unmanaged. |
+| `projects[].access.mode` | string | Yes | One of: `public`, `authenticated`, `organization`, `invite_only`. |
+| `projects[].access.previewMode` | string | No | One of: `inherit`, `public`, `authenticated`, `organization`, `invite_only`. |
+| `projects[].access.environments` | object | No | Explicit environment-mode overrides by environment slug. Map of string values. |
+| `projects[].auth` | object | No | — |
+| `projects[].auth.enabled` | boolean | Yes | — |
+| `projects[].auth.allowedOrigins` | string[] | No | — |
+| `projects[].auth.redirectUrls` | string[] | No | — |
+| `projects[].auth.emailPassword` | boolean | No | — |
+| `projects[].auth.magicLink` | boolean | No | — |
+| `projects[].auth.passwordMinLength` | integer | No | — |
+| `projects[].auth.accessTokenTtlSeconds` | integer | No | — |
+| `projects[].auth.refreshTokenTtlSeconds` | integer | No | — |
+| `projects[].auth.sessionIdleTtlSeconds` | integer | No | — |
+| `projects[].auth.sessionMaxTtlSeconds` | integer | No | — |
+| `projects[].auth.magicLinkTtlSeconds` | integer | No | — |
+| `projects[].auth.passwordResetTtlSeconds` | integer | No | — |
+| `projects[].maintenance` | object | No | Continuous evidence-backed project maintenance policy. |
+| `projects[].maintenance.enabled` | boolean | Yes | — |
+| `projects[].maintenance.schedule` | string | No | One of: `hourly`, `daily`, `weekly`. |
+| `projects[].maintenance.categories` | string[] | No | — |
+| `projects[].maintenance.environments` | string[] | No | — |
+| `projects[].maintenance.autoRemediation` | object | No | — |
+| `projects[].maintenance.autoRemediation.enabled` | boolean | No | — |
+| `projects[].maintenance.autoRemediation.maximumRisk` | string | No | One of: `read`, `write`. |
+| `projects[].maintenance.autoRemediation.allowedOperationIds` | string[] | No | — |
+| `projects[].maintenance.autoRemediation.maxActionsPerRun` | integer | No | — |
+| `projects[].speedInsights` | object | No | Privacy-first real-user performance policy. Omit to leave it unmanaged. |
+| `projects[].speedInsights.enabled` | boolean | Yes | — |
+| `projects[].speedInsights.sampleRate` | number | No | — |
+| `projects[].speedInsights.allowedOrigins` | string[] | No | — |
+| `projects[].source` | object | No | — |
+| `projects[].source.repo` | string | Yes | Pattern: `^[\w.-]+/[\w.-]+$`. |
+| `projects[].source.ref` | string | No | — |
+| `projects[].scaling` | object | No | Automatic web scaling outcomes. minimumReady must not exceed maximumReplicas. |
+| `projects[].scaling.minimumReady` | integer | No | — |
+| `projects[].scaling.maximumReplicas` | integer | No | — |
+| `projects[].scaling.targetConcurrency` | integer | No | — |
+| `projects[].spend` | object | No | — |
+| `projects[].spend.monthlyScaleCeilingUsd` | number | Yes | Monthly project usage amount after which automatic scale-out stops. |
 
 ### Example
 
@@ -96,22 +314,22 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/manifest/plan" \
 
 ### Responses
 
-| Status | Description                 |
-| ------ | --------------------------- |
-| `200`  | The reconciliation plan.    |
-| `422`  | Manifest failed validation. |
+| Status | Description |
+| ------ | ----------- |
+| `200` | The reconciliation plan. |
+| `422` | Manifest failed validation. |
 
 ### Response body (200)
 
-| Field                | Type     | Description                                                                                                                                                                                                                       |
-| -------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `organization`       | string   | —                                                                                                                                                                                                                                 |
-| `actions`            | object[] | —                                                                                                                                                                                                                                 |
-| `actions[].type`     | string   | One of: `create`, `update`, `noop`, `orphaned`, `deferred`, `invalid`.                                                                                                                                                            |
-| `actions[].resource` | string   | One of: `project`, `git`, `env`, `environment`, `domain`, `storage`, `queue`, `cron`, `database`, `cache`, `realtime`, `ai-gateway`, `backup`, `preview-database`, `alert`, `access`, `auth`, `maintenance`, `customer-payments`. |
-| `actions[].project`  | string   | —                                                                                                                                                                                                                                 |
-| `actions[].detail`   | string   | —                                                                                                                                                                                                                                 |
-| `summary`            | object   | Map of integer values.                                                                                                                                                                                                            |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `organization` | string | — |
+| `actions` | object[] | — |
+| `actions[].type` | string | One of: `create`, `update`, `noop`, `orphaned`, `deferred`, `invalid`. |
+| `actions[].resource` | string | One of: `project`, `git`, `env`, `environment`, `domain`, `storage`, `queue`, `cron`, `realtime`, `ai-gateway`, `alert`, `access`, `auth`, `speed-insights`, `maintenance`, `customer-payments`. |
+| `actions[].project` | string | — |
+| `actions[].detail` | string | — |
+| `summary` | object | Map of integer values. |
 
 ## manifest.apply
 
@@ -128,22 +346,131 @@ POST /v1/orgs/{orgId}/manifest/apply
 
 ### Request body
 
-| Field                                     | Type     | Required | Description                                                                   |
-| ----------------------------------------- | -------- | -------- | ----------------------------------------------------------------------------- |
-| `version`                                 | integer  | Yes      | One of: `2`.                                                                  |
-| `organization`                            | string   | Yes      | Organization slug the manifest targets.                                       |
-| `projects`                                | object[] | No       | —                                                                             |
-| `projects[].name`                         | string   | Yes      | —                                                                             |
-| `projects[].slug`                         | string   | Yes      | Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                            |
-| `projects[].source`                       | object   | No       | —                                                                             |
-| `projects[].source.repo`                  | string   | Yes      | Pattern: `^[\w.-]+/[\w.-]+$`.                                                 |
-| `projects[].source.ref`                   | string   | No       | —                                                                             |
-| `projects[].scaling`                      | object   | No       | Automatic web scaling outcomes. minimumReady must not exceed maximumReplicas. |
-| `projects[].scaling.minimumReady`         | integer  | No       | —                                                                             |
-| `projects[].scaling.maximumReplicas`      | integer  | No       | —                                                                             |
-| `projects[].scaling.targetConcurrency`    | integer  | No       | —                                                                             |
-| `projects[].spend`                        | object   | No       | —                                                                             |
-| `projects[].spend.monthlyScaleCeilingUsd` | number   | Yes      | Monthly project usage amount after which automatic scale-out stops.           |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `version` | integer | Yes | One of: `2`. |
+| `organization` | string | Yes | Organization slug the manifest targets. |
+| `projects` | object[] | No | — |
+| `projects[].name` | string | Yes | — |
+| `projects[].slug` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].env` | object | No | The production environment's variables. Masked values ("********") are ignored on apply. Map of string values. |
+| `projects[].environments` | object | No | Custom environments by slug. "production" and "preview" are implicit and never declared here. Map of object values. |
+| `projects[].domains` | string[] | No | — |
+| `projects[].storage` | object[] | No | — |
+| `projects[].storage[].name` | string | Yes | — |
+| `projects[].storage[].region` | string | No | Storage area for a new bucket; immutable after creation. |
+| `projects[].queues` | object[] | No | — |
+| `projects[].queues[].name` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].queues[].environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `projects[].queues[].retentionSeconds` | integer | No | — |
+| `projects[].queues[].deliveryDelaySeconds` | integer | No | — |
+| `projects[].queues[].deadLetterQueue` | string or null | No | — |
+| `projects[].queues[].paused` | boolean | No | — |
+| `projects[].queues[].consumer` | object | No | — |
+| `projects[].queues[].consumer.path` | string | Yes | Pattern: `^/(?!/)`. |
+| `projects[].queues[].consumer.maxBatchSize` | integer | No | — |
+| `projects[].queues[].consumer.maxBatchWaitSeconds` | integer | No | — |
+| `projects[].queues[].consumer.maxRetries` | integer | No | — |
+| `projects[].queues[].consumer.retryDelaySeconds` | integer | No | — |
+| `projects[].queues[].consumer.maxConcurrency` | integer or null | No | — |
+| `projects[].crons` | object[] | No | — |
+| `projects[].crons[].name` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].crons[].environment` | string | Yes | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `projects[].crons[].schedule` | string | Yes | — |
+| `projects[].crons[].timezone` | string | No | — |
+| `projects[].crons[].enabled` | boolean | No | — |
+| `projects[].crons[].target` | object or object | Yes | — |
+| `projects[].crons[].target.kind` | string | Yes | One of: `http`. |
+| `projects[].crons[].target.path` | string | Yes | Pattern: `^/(?!/)`. |
+| `projects[].crons[].target.method` | string | No | One of: `POST`, `PUT`, `PATCH`. |
+| `projects[].crons[].target.body` | object | No | Optional JSON request body, at most 122,880 encoded bytes before the signed 128,000-byte invocation envelope. |
+| `projects[].crons[].retry` | object | No | — |
+| `projects[].crons[].retry.maxAttempts` | integer | No | — |
+| `projects[].crons[].retry.initialDelaySeconds` | integer | No | — |
+| `projects[].crons[].retry.maxDelaySeconds` | integer | No | — |
+| `projects[].crons[].concurrencyPolicy` | string | No | One of: `allow`, `skip`, `replace`. |
+| `projects[].crons[].timeoutSeconds` | integer | No | Target timeout in seconds. Defaults to 300. |
+| `projects[].realtime` | object[] | No | — |
+| `projects[].realtime[].name` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].realtime[].environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `projects[].realtime[].region` | string | No | One of: `global`. |
+| `projects[].realtime[].retentionSeconds` | integer | No | — |
+| `projects[].realtime[].presenceEnabled` | boolean | No | — |
+| `projects[].realtime[].maxConnections` | integer | No | — |
+| `projects[].realtime[].maxMessagesPerSecond` | integer | No | — |
+| `projects[].realtime[].paused` | boolean | No | — |
+| `projects[].aiGateways` | object[] | No | — |
+| `projects[].aiGateways[].name` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].aiGateways[].environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `projects[].aiGateways[].allowedModels` | string[] | Yes | — |
+| `projects[].aiGateways[].monthlyBudgetUsd` | number | Yes | — |
+| `projects[].aiGateways[].timeoutMs` | integer | No | — |
+| `projects[].aiGateways[].maxRetries` | integer | No | — |
+| `projects[].aiGateways[].redactPrompts` | boolean | No | — |
+| `projects[].customerPayments` | object[] | No | — |
+| `projects[].customerPayments[].environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `projects[].customerPayments[].secretKey` | string or string | Yes | — |
+| `projects[].customerPayments[].webhookSecret` | string or string | Yes | — |
+| `projects[].customerPayments[].credentialScopes` | string[] | Yes | — |
+| `projects[].customerPayments[].allowedRedirectOrigins` | string[] | Yes | — |
+| `projects[].alerts` | object[] | No | — |
+| `projects[].alerts[].name` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `projects[].alerts[].enabled` | boolean | No | — |
+| `projects[].alerts[].severity` | string | Yes | One of: `info`, `warning`, `critical`. |
+| `projects[].alerts[].scope` | object | Yes | — |
+| `projects[].alerts[].scope.environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
+| `projects[].alerts[].scope.database` | string or null | No | — |
+| `projects[].alerts[].scope.queue` | string or null | No | — |
+| `projects[].alerts[].scope.cron` | string or null | No | — |
+| `projects[].alerts[].condition` | object | Yes | — |
+| `projects[].alerts[].condition.signal` | string | Yes | One of: `database.unavailable`, `backup.archive_failed`, `storage.capacity`, `cpu.pressure`, `memory.pressure`, `database.pool_saturation`, `queue.backlog`, `cpu.percent`, `memory.used_bytes`, `memory.limit_bytes`, `disk.used_bytes`, `disk.limit_bytes`, `disk.read_iops`, `disk.write_iops`, `network.receive_bytes`, `network.transmit_bytes`, `runtime.restarts`, `runtime.uptime_seconds`, `http.requests`, `http.errors`, `database.connections`, `database.pool_waiting`, `database.queries_per_second`, `database.query_latency_avg_ms`, `database.query_latency_p50_ms`, `database.query_latency_p90_ms`, `database.query_latency_p95_ms`, `database.query_latency_p99_ms`, `queue.backlog_messages`, `queue.oldest_message_age_seconds`, `cron.failures`. |
+| `projects[].alerts[].condition.operator` | string | Yes | One of: `gt`, `gte`, `lt`, `lte`, `eq`. |
+| `projects[].alerts[].condition.threshold` | number or null | Yes | — |
+| `projects[].alerts[].condition.durationSeconds` | integer | Yes | — |
+| `projects[].alerts[].channels` | object or object or object[] | Yes | — |
+| `projects[].alerts[].channels[].kind` | string | Yes | One of: `dashboard`. |
+| `projects[].alerts[].channels[].destination` | null | Yes | — |
+| `projects[].alerts[].cooldownSeconds` | integer | No | — |
+| `projects[].access` | object | No | Application sharing policy. Omit to leave the live policy unmanaged. |
+| `projects[].access.mode` | string | Yes | One of: `public`, `authenticated`, `organization`, `invite_only`. |
+| `projects[].access.previewMode` | string | No | One of: `inherit`, `public`, `authenticated`, `organization`, `invite_only`. |
+| `projects[].access.environments` | object | No | Explicit environment-mode overrides by environment slug. Map of string values. |
+| `projects[].auth` | object | No | — |
+| `projects[].auth.enabled` | boolean | Yes | — |
+| `projects[].auth.allowedOrigins` | string[] | No | — |
+| `projects[].auth.redirectUrls` | string[] | No | — |
+| `projects[].auth.emailPassword` | boolean | No | — |
+| `projects[].auth.magicLink` | boolean | No | — |
+| `projects[].auth.passwordMinLength` | integer | No | — |
+| `projects[].auth.accessTokenTtlSeconds` | integer | No | — |
+| `projects[].auth.refreshTokenTtlSeconds` | integer | No | — |
+| `projects[].auth.sessionIdleTtlSeconds` | integer | No | — |
+| `projects[].auth.sessionMaxTtlSeconds` | integer | No | — |
+| `projects[].auth.magicLinkTtlSeconds` | integer | No | — |
+| `projects[].auth.passwordResetTtlSeconds` | integer | No | — |
+| `projects[].maintenance` | object | No | Continuous evidence-backed project maintenance policy. |
+| `projects[].maintenance.enabled` | boolean | Yes | — |
+| `projects[].maintenance.schedule` | string | No | One of: `hourly`, `daily`, `weekly`. |
+| `projects[].maintenance.categories` | string[] | No | — |
+| `projects[].maintenance.environments` | string[] | No | — |
+| `projects[].maintenance.autoRemediation` | object | No | — |
+| `projects[].maintenance.autoRemediation.enabled` | boolean | No | — |
+| `projects[].maintenance.autoRemediation.maximumRisk` | string | No | One of: `read`, `write`. |
+| `projects[].maintenance.autoRemediation.allowedOperationIds` | string[] | No | — |
+| `projects[].maintenance.autoRemediation.maxActionsPerRun` | integer | No | — |
+| `projects[].speedInsights` | object | No | Privacy-first real-user performance policy. Omit to leave it unmanaged. |
+| `projects[].speedInsights.enabled` | boolean | Yes | — |
+| `projects[].speedInsights.sampleRate` | number | No | — |
+| `projects[].speedInsights.allowedOrigins` | string[] | No | — |
+| `projects[].source` | object | No | — |
+| `projects[].source.repo` | string | Yes | Pattern: `^[\w.-]+/[\w.-]+$`. |
+| `projects[].source.ref` | string | No | — |
+| `projects[].scaling` | object | No | Automatic web scaling outcomes. minimumReady must not exceed maximumReplicas. |
+| `projects[].scaling.minimumReady` | integer | No | — |
+| `projects[].scaling.maximumReplicas` | integer | No | — |
+| `projects[].scaling.targetConcurrency` | integer | No | — |
+| `projects[].spend` | object | No | — |
+| `projects[].spend.monthlyScaleCeilingUsd` | number | Yes | Monthly project usage amount after which automatic scale-out stops. |
 
 ### Example
 
@@ -159,25 +486,25 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/manifest/apply" \
 
 ### Responses
 
-| Status | Description                                                     |
-| ------ | --------------------------------------------------------------- |
-| `200`  | Apply results with the executed actions and the resulting plan. |
-| `422`  | Manifest failed validation or contains invalid changes.         |
+| Status | Description |
+| ------ | ----------- |
+| `200` | Apply results with the executed actions and the resulting plan. |
+| `422` | Manifest failed validation or contains invalid changes. |
 
 ### Response body (200)
 
-| Field                     | Type     | Description                                                                                                                                                                                                                       |
-| ------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `applied`                 | object[] | —                                                                                                                                                                                                                                 |
-| `applied[].action`        | string   | —                                                                                                                                                                                                                                 |
-| `applied[].project`       | string   | —                                                                                                                                                                                                                                 |
-| `applied[].ok`            | boolean  | —                                                                                                                                                                                                                                 |
-| `applied[].error`         | string   | —                                                                                                                                                                                                                                 |
-| `plan`                    | object   | —                                                                                                                                                                                                                                 |
-| `plan.organization`       | string   | —                                                                                                                                                                                                                                 |
-| `plan.actions`            | object[] | —                                                                                                                                                                                                                                 |
-| `plan.actions[].type`     | string   | One of: `create`, `update`, `noop`, `orphaned`, `deferred`, `invalid`.                                                                                                                                                            |
-| `plan.actions[].resource` | string   | One of: `project`, `git`, `env`, `environment`, `domain`, `storage`, `queue`, `cron`, `database`, `cache`, `realtime`, `ai-gateway`, `backup`, `preview-database`, `alert`, `access`, `auth`, `maintenance`, `customer-payments`. |
-| `plan.actions[].project`  | string   | —                                                                                                                                                                                                                                 |
-| `plan.actions[].detail`   | string   | —                                                                                                                                                                                                                                 |
-| `plan.summary`            | object   | Map of integer values.                                                                                                                                                                                                            |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `applied` | object[] | — |
+| `applied[].action` | string | — |
+| `applied[].project` | string | — |
+| `applied[].ok` | boolean | — |
+| `applied[].error` | string | — |
+| `plan` | object | — |
+| `plan.organization` | string | — |
+| `plan.actions` | object[] | — |
+| `plan.actions[].type` | string | One of: `create`, `update`, `noop`, `orphaned`, `deferred`, `invalid`. |
+| `plan.actions[].resource` | string | One of: `project`, `git`, `env`, `environment`, `domain`, `storage`, `queue`, `cron`, `realtime`, `ai-gateway`, `alert`, `access`, `auth`, `speed-insights`, `maintenance`, `customer-payments`. |
+| `plan.actions[].project` | string | — |
+| `plan.actions[].detail` | string | — |
+| `plan.summary` | object | Map of integer values. |
