@@ -19,16 +19,10 @@ GET /v1/orgs/{orgId}/manifest
 - **Minimum role:** `admin`
 - **Risk:** `read`
 
-### Query parameters
-
-| Name      | Type    | Required | Description       |
-| --------- | ------- | -------- | ----------------- |
-| `version` | integer | No       | One of: `1`, `2`. |
-
 ### Example
 
 ```bash
-curl "https://api.korve.dev/v1/orgs/$ORG_ID/manifest?version=1" \
+curl "https://api.korve.dev/v1/orgs/$ORG_ID/manifest" \
   -H "Authorization: Bearer korve_..."
 ```
 

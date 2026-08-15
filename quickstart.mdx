@@ -64,6 +64,7 @@ korve services scaling events <service-id>
 ## 5. Add infrastructure deliberately
 
 Add only the databases, storage, queues, crons, caches, alerts, access policy, and maintenance policy
-the app actually needs. The version 1 manifest remains available for that advanced compatibility
-surface. See [Automatic compute](/primitives/automatic-compute) and
+the app actually needs. Manage these optional primitives with their CLI or API operations. Public
+manifests use version 2 and never expose compute placement. See
+[Automatic compute](/primitives/automatic-compute) and
 [Infrastructure as code](/primitives/manifests).
