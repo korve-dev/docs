@@ -28,23 +28,23 @@ curl "https://api.korve.dev/v1/me" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | The authenticated principal. |
+| Status | Description                  |
+| ------ | ---------------------------- |
+| `200`  | The authenticated principal. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `user` | object | — |
-| `user.id` | string | — |
-| `user.email` | string | — |
-| `user.name` | string | — |
-| `user.emailVerified` | boolean | — |
-| `organizations` | object[] | — |
-| `organizations[].id` | string | — |
-| `organizations[].name` | string | — |
-| `organizations[].slug` | string | — |
-| `organizations[].role` | string | One of: `owner`, `admin`, `member`. |
-| `organizations[].isPersonal` | boolean | — |
-| `organizations[].billingStatus` | string | One of: `unpaid`, `active`, `past_due`, `canceled`. |
+| Field                           | Type     | Description                                         |
+| ------------------------------- | -------- | --------------------------------------------------- |
+| `user`                          | object   | —                                                   |
+| `user.id`                       | string   | —                                                   |
+| `user.email`                    | string   | —                                                   |
+| `user.name`                     | string   | —                                                   |
+| `user.emailVerified`            | boolean  | —                                                   |
+| `organizations`                 | object[] | —                                                   |
+| `organizations[].id`            | string   | —                                                   |
+| `organizations[].name`          | string   | —                                                   |
+| `organizations[].slug`          | string   | —                                                   |
+| `organizations[].role`          | string   | One of: `owner`, `admin`, `member`.                 |
+| `organizations[].isPersonal`    | boolean  | —                                                   |
+| `organizations[].billingStatus` | string   | One of: `unpaid`, `active`, `past_due`, `canceled`. |

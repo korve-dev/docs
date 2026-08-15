@@ -22,23 +22,23 @@ POST /v1/orgs/{orgId}/projects/{projectId}/executions
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `image` | string | Yes | — |
-| `command` | string[] | Yes | — |
-| `region` | string | Yes | — |
-| `resources` | object | No | — |
-| `resources.cpuKind` | string | No | One of: `shared`, `performance`. |
-| `resources.cpus` | integer | No | — |
-| `resources.memoryMb` | integer | No | — |
-| `runtime` | object | No | — |
-| `runtime.nestedContainers` | boolean | No | — |
-| `env` | object | No | Write-only environment variables supplied only to this execution. Map of string values. |
-| `imagePullCredentials` | object | No | Write-only credentials used to import this execution's private OCI image. The password may be a registry token or password and is never returned. |
-| `imagePullCredentials.registry` | string | Yes | Supported registry hostname advertised by executions.availability. It must match the registry in image; Docker Hub aliases are normalized. |
-| `imagePullCredentials.username` | string | Yes | — |
-| `imagePullCredentials.password` | string | Yes | — |
-| `timeoutSeconds` | integer | No | — |
+| Field                           | Type     | Required | Description                                                                                                                                       |
+| ------------------------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `image`                         | string   | Yes      | —                                                                                                                                                 |
+| `command`                       | string[] | Yes      | —                                                                                                                                                 |
+| `region`                        | string   | Yes      | —                                                                                                                                                 |
+| `resources`                     | object   | No       | —                                                                                                                                                 |
+| `resources.cpuKind`             | string   | No       | One of: `shared`, `performance`.                                                                                                                  |
+| `resources.cpus`                | integer  | No       | —                                                                                                                                                 |
+| `resources.memoryMb`            | integer  | No       | —                                                                                                                                                 |
+| `runtime`                       | object   | No       | —                                                                                                                                                 |
+| `runtime.nestedContainers`      | boolean  | No       | —                                                                                                                                                 |
+| `env`                           | object   | No       | Write-only environment variables supplied only to this execution. Map of string values.                                                           |
+| `imagePullCredentials`          | object   | No       | Write-only credentials used to import this execution's private OCI image. The password may be a registry token or password and is never returned. |
+| `imagePullCredentials.registry` | string   | Yes      | Supported registry hostname advertised by executions.availability. It must match the registry in image; Docker Hub aliases are normalized.        |
+| `imagePullCredentials.username` | string   | Yes      | —                                                                                                                                                 |
+| `imagePullCredentials.password` | string   | Yes      | —                                                                                                                                                 |
+| `timeoutSeconds`                | integer  | No       | —                                                                                                                                                 |
 
 ### Example
 
@@ -57,35 +57,35 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/executi
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `202` | Execution accepted and starting. |
-| `402` | The project hard-stop budget cannot reserve this execution. |
-| `404` | No such project. |
-| `422` | Invalid image, command, region, resources, runtime capability, or timeout. |
+| Status | Description                                                                |
+| ------ | -------------------------------------------------------------------------- |
+| `202`  | Execution accepted and starting.                                           |
+| `402`  | The project hard-stop budget cannot reserve this execution.                |
+| `404`  | No such project.                                                           |
+| `422`  | Invalid image, command, region, resources, runtime capability, or timeout. |
 
 ### Response body (202)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `status` | string | One of: `starting`, `running`, `succeeded`, `failed`, `cancelled`, `timed_out`. |
-| `image` | string | — |
-| `command` | string[] | — |
-| `region` | string | — |
-| `resources` | object | — |
-| `resources.cpuKind` | string | One of: `shared`, `performance`. |
-| `resources.cpus` | integer | — |
-| `resources.memoryMb` | integer | — |
-| `runtime` | object | — |
-| `runtime.nestedContainers` | boolean | — |
-| `timeoutSeconds` | integer | — |
-| `exitCode` | integer or null | — |
-| `errorCode` | string or null | — |
-| `cleanupStatus` | string | One of: `pending`, `confirmed`, `attention_required`. |
-| `createdAt` | string | Format: `date-time`. |
-| `startedAt` | string or null | Format: `date-time`. |
-| `finishedAt` | string or null | Format: `date-time`. |
+| Field                      | Type            | Description                                                                     |
+| -------------------------- | --------------- | ------------------------------------------------------------------------------- |
+| `id`                       | string          | —                                                                               |
+| `status`                   | string          | One of: `starting`, `running`, `succeeded`, `failed`, `cancelled`, `timed_out`. |
+| `image`                    | string          | —                                                                               |
+| `command`                  | string[]        | —                                                                               |
+| `region`                   | string          | —                                                                               |
+| `resources`                | object          | —                                                                               |
+| `resources.cpuKind`        | string          | One of: `shared`, `performance`.                                                |
+| `resources.cpus`           | integer         | —                                                                               |
+| `resources.memoryMb`       | integer         | —                                                                               |
+| `runtime`                  | object          | —                                                                               |
+| `runtime.nestedContainers` | boolean         | —                                                                               |
+| `timeoutSeconds`           | integer         | —                                                                               |
+| `exitCode`                 | integer or null | —                                                                               |
+| `errorCode`                | string or null  | —                                                                               |
+| `cleanupStatus`            | string          | One of: `pending`, `confirmed`, `attention_required`.                           |
+| `createdAt`                | string          | Format: `date-time`.                                                            |
+| `startedAt`                | string or null  | Format: `date-time`.                                                            |
+| `finishedAt`               | string or null  | Format: `date-time`.                                                            |
 
 ## executions.list
 
@@ -101,10 +101,10 @@ GET /v1/orgs/{orgId}/projects/{projectId}/executions
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `status` | string | No | One of: `starting`, `running`, `succeeded`, `failed`, `cancelled`, `timed_out`. |
-| `limit` | integer | No | — |
+| Name     | Type    | Required | Description                                                                     |
+| -------- | ------- | -------- | ------------------------------------------------------------------------------- |
+| `status` | string  | No       | One of: `starting`, `running`, `succeeded`, `failed`, `cancelled`, `timed_out`. |
+| `limit`  | integer | No       | —                                                                               |
 
 ### Example
 
@@ -115,36 +115,36 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/executions?stat
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Executions ordered newest first. |
-| `404` | No such project. |
-| `422` | Invalid lifecycle status or limit. |
+| Status | Description                        |
+| ------ | ---------------------------------- |
+| `200`  | Executions ordered newest first.   |
+| `404`  | No such project.                   |
+| `422`  | Invalid lifecycle status or limit. |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `status` | string | One of: `starting`, `running`, `succeeded`, `failed`, `cancelled`, `timed_out`. |
-| `image` | string | — |
-| `command` | string[] | — |
-| `region` | string | — |
-| `resources` | object | — |
-| `resources.cpuKind` | string | One of: `shared`, `performance`. |
-| `resources.cpus` | integer | — |
-| `resources.memoryMb` | integer | — |
-| `runtime` | object | — |
-| `runtime.nestedContainers` | boolean | — |
-| `timeoutSeconds` | integer | — |
-| `exitCode` | integer or null | — |
-| `errorCode` | string or null | — |
-| `cleanupStatus` | string | One of: `pending`, `confirmed`, `attention_required`. |
-| `createdAt` | string | Format: `date-time`. |
-| `startedAt` | string or null | Format: `date-time`. |
-| `finishedAt` | string or null | Format: `date-time`. |
+| Field                      | Type            | Description                                                                     |
+| -------------------------- | --------------- | ------------------------------------------------------------------------------- |
+| `id`                       | string          | —                                                                               |
+| `status`                   | string          | One of: `starting`, `running`, `succeeded`, `failed`, `cancelled`, `timed_out`. |
+| `image`                    | string          | —                                                                               |
+| `command`                  | string[]        | —                                                                               |
+| `region`                   | string          | —                                                                               |
+| `resources`                | object          | —                                                                               |
+| `resources.cpuKind`        | string          | One of: `shared`, `performance`.                                                |
+| `resources.cpus`           | integer         | —                                                                               |
+| `resources.memoryMb`       | integer         | —                                                                               |
+| `runtime`                  | object          | —                                                                               |
+| `runtime.nestedContainers` | boolean         | —                                                                               |
+| `timeoutSeconds`           | integer         | —                                                                               |
+| `exitCode`                 | integer or null | —                                                                               |
+| `errorCode`                | string or null  | —                                                                               |
+| `cleanupStatus`            | string          | One of: `pending`, `confirmed`, `attention_required`.                           |
+| `createdAt`                | string          | Format: `date-time`.                                                            |
+| `startedAt`                | string or null  | Format: `date-time`.                                                            |
+| `finishedAt`               | string or null  | Format: `date-time`.                                                            |
 
 ## executions.availability
 
@@ -167,39 +167,39 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/executions/avai
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Current execution scheduling envelope. |
-| `404` | No such project. |
+| Status | Description                            |
+| ------ | -------------------------------------- |
+| `200`  | Current execution scheduling envelope. |
+| `404`  | No such project.                       |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `ready` | boolean | — |
-| `regions` | object[] | — |
-| `regions[].id` | string | — |
-| `regions[].name` | string | — |
-| `regions[].city` | string | — |
-| `regions[].country` | string | — |
-| `regions[].continent` | string | — |
-| `architectures` | string[] | — |
-| `cpuKinds` | string[] | — |
-| `privateImageRegistries` | string[] | Registry hosts accepted for write-only private-image credentials. Wildcards describe supported customer-owned registry hostnames. |
-| `limits` | object | — |
-| `limits.cpus` | object | — |
-| `limits.cpus.min` | integer | — |
-| `limits.cpus.max` | integer | — |
-| `limits.memoryMb` | object | — |
-| `limits.memoryMb.min` | integer | — |
-| `limits.memoryMb.max` | integer | — |
-| `limits.timeoutSeconds` | object | — |
-| `limits.timeoutSeconds.min` | integer | — |
-| `limits.timeoutSeconds.max` | integer | — |
-| `limits.maxActiveExecutionsPerProject` | integer or null | — |
-| `limits.maxEnvVariables` | integer | — |
-| `runtime` | object | — |
-| `runtime.nestedContainers` | boolean | — |
+| Field                                  | Type            | Description                                                                                                                       |
+| -------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `ready`                                | boolean         | —                                                                                                                                 |
+| `regions`                              | object[]        | —                                                                                                                                 |
+| `regions[].id`                         | string          | —                                                                                                                                 |
+| `regions[].name`                       | string          | —                                                                                                                                 |
+| `regions[].city`                       | string          | —                                                                                                                                 |
+| `regions[].country`                    | string          | —                                                                                                                                 |
+| `regions[].continent`                  | string          | —                                                                                                                                 |
+| `architectures`                        | string[]        | —                                                                                                                                 |
+| `cpuKinds`                             | string[]        | —                                                                                                                                 |
+| `privateImageRegistries`               | string[]        | Registry hosts accepted for write-only private-image credentials. Wildcards describe supported customer-owned registry hostnames. |
+| `limits`                               | object          | —                                                                                                                                 |
+| `limits.cpus`                          | object          | —                                                                                                                                 |
+| `limits.cpus.min`                      | integer         | —                                                                                                                                 |
+| `limits.cpus.max`                      | integer         | —                                                                                                                                 |
+| `limits.memoryMb`                      | object          | —                                                                                                                                 |
+| `limits.memoryMb.min`                  | integer         | —                                                                                                                                 |
+| `limits.memoryMb.max`                  | integer         | —                                                                                                                                 |
+| `limits.timeoutSeconds`                | object          | —                                                                                                                                 |
+| `limits.timeoutSeconds.min`            | integer         | —                                                                                                                                 |
+| `limits.timeoutSeconds.max`            | integer         | —                                                                                                                                 |
+| `limits.maxActiveExecutionsPerProject` | integer or null | —                                                                                                                                 |
+| `limits.maxEnvVariables`               | integer         | —                                                                                                                                 |
+| `runtime`                              | object          | —                                                                                                                                 |
+| `runtime.nestedContainers`             | boolean         | —                                                                                                                                 |
 
 ## executions.resolve
 
@@ -215,9 +215,9 @@ GET /v1/orgs/{orgId}/projects/{projectId}/executions/resolve
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `idempotencyKey` | string | Yes | Pattern: `^[A-Za-z0-9._:-]+$`. |
+| Name             | Type   | Required | Description                    |
+| ---------------- | ------ | -------- | ------------------------------ |
+| `idempotencyKey` | string | Yes      | Pattern: `^[A-Za-z0-9._:-]+$`. |
 
 ### Example
 
@@ -228,35 +228,35 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/executions/reso
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | The execution created by that request. |
-| `202` | The create request is still in progress; retry resolution shortly. |
-| `404` | No matching request exists, or the completed or failed request created no execution. |
-| `422` | Invalid idempotency key. |
+| Status | Description                                                                          |
+| ------ | ------------------------------------------------------------------------------------ |
+| `200`  | The execution created by that request.                                               |
+| `202`  | The create request is still in progress; retry resolution shortly.                   |
+| `404`  | No matching request exists, or the completed or failed request created no execution. |
+| `422`  | Invalid idempotency key.                                                             |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `status` | string | One of: `starting`, `running`, `succeeded`, `failed`, `cancelled`, `timed_out`. |
-| `image` | string | — |
-| `command` | string[] | — |
-| `region` | string | — |
-| `resources` | object | — |
-| `resources.cpuKind` | string | One of: `shared`, `performance`. |
-| `resources.cpus` | integer | — |
-| `resources.memoryMb` | integer | — |
-| `runtime` | object | — |
-| `runtime.nestedContainers` | boolean | — |
-| `timeoutSeconds` | integer | — |
-| `exitCode` | integer or null | — |
-| `errorCode` | string or null | — |
-| `cleanupStatus` | string | One of: `pending`, `confirmed`, `attention_required`. |
-| `createdAt` | string | Format: `date-time`. |
-| `startedAt` | string or null | Format: `date-time`. |
-| `finishedAt` | string or null | Format: `date-time`. |
+| Field                      | Type            | Description                                                                     |
+| -------------------------- | --------------- | ------------------------------------------------------------------------------- |
+| `id`                       | string          | —                                                                               |
+| `status`                   | string          | One of: `starting`, `running`, `succeeded`, `failed`, `cancelled`, `timed_out`. |
+| `image`                    | string          | —                                                                               |
+| `command`                  | string[]        | —                                                                               |
+| `region`                   | string          | —                                                                               |
+| `resources`                | object          | —                                                                               |
+| `resources.cpuKind`        | string          | One of: `shared`, `performance`.                                                |
+| `resources.cpus`           | integer         | —                                                                               |
+| `resources.memoryMb`       | integer         | —                                                                               |
+| `runtime`                  | object          | —                                                                               |
+| `runtime.nestedContainers` | boolean         | —                                                                               |
+| `timeoutSeconds`           | integer         | —                                                                               |
+| `exitCode`                 | integer or null | —                                                                               |
+| `errorCode`                | string or null  | —                                                                               |
+| `cleanupStatus`            | string          | One of: `pending`, `confirmed`, `attention_required`.                           |
+| `createdAt`                | string          | Format: `date-time`.                                                            |
+| `startedAt`                | string or null  | Format: `date-time`.                                                            |
+| `finishedAt`               | string or null  | Format: `date-time`.                                                            |
 
 ## executions.get
 
@@ -279,33 +279,33 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/executions/$EXE
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Current execution state. |
-| `404` | No such execution. |
+| Status | Description              |
+| ------ | ------------------------ |
+| `200`  | Current execution state. |
+| `404`  | No such execution.       |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `status` | string | One of: `starting`, `running`, `succeeded`, `failed`, `cancelled`, `timed_out`. |
-| `image` | string | — |
-| `command` | string[] | — |
-| `region` | string | — |
-| `resources` | object | — |
-| `resources.cpuKind` | string | One of: `shared`, `performance`. |
-| `resources.cpus` | integer | — |
-| `resources.memoryMb` | integer | — |
-| `runtime` | object | — |
-| `runtime.nestedContainers` | boolean | — |
-| `timeoutSeconds` | integer | — |
-| `exitCode` | integer or null | — |
-| `errorCode` | string or null | — |
-| `cleanupStatus` | string | One of: `pending`, `confirmed`, `attention_required`. |
-| `createdAt` | string | Format: `date-time`. |
-| `startedAt` | string or null | Format: `date-time`. |
-| `finishedAt` | string or null | Format: `date-time`. |
+| Field                      | Type            | Description                                                                     |
+| -------------------------- | --------------- | ------------------------------------------------------------------------------- |
+| `id`                       | string          | —                                                                               |
+| `status`                   | string          | One of: `starting`, `running`, `succeeded`, `failed`, `cancelled`, `timed_out`. |
+| `image`                    | string          | —                                                                               |
+| `command`                  | string[]        | —                                                                               |
+| `region`                   | string          | —                                                                               |
+| `resources`                | object          | —                                                                               |
+| `resources.cpuKind`        | string          | One of: `shared`, `performance`.                                                |
+| `resources.cpus`           | integer         | —                                                                               |
+| `resources.memoryMb`       | integer         | —                                                                               |
+| `runtime`                  | object          | —                                                                               |
+| `runtime.nestedContainers` | boolean         | —                                                                               |
+| `timeoutSeconds`           | integer         | —                                                                               |
+| `exitCode`                 | integer or null | —                                                                               |
+| `errorCode`                | string or null  | —                                                                               |
+| `cleanupStatus`            | string          | One of: `pending`, `confirmed`, `attention_required`.                           |
+| `createdAt`                | string          | Format: `date-time`.                                                            |
+| `startedAt`                | string or null  | Format: `date-time`.                                                            |
+| `finishedAt`               | string or null  | Format: `date-time`.                                                            |
 
 ## executions.cancel
 
@@ -328,34 +328,34 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/executi
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Execution cancelled, or already terminal. |
-| `404` | No such execution. |
-| `409` | Execution lifecycle changed concurrently. |
+| Status | Description                               |
+| ------ | ----------------------------------------- |
+| `200`  | Execution cancelled, or already terminal. |
+| `404`  | No such execution.                        |
+| `409`  | Execution lifecycle changed concurrently. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `status` | string | One of: `starting`, `running`, `succeeded`, `failed`, `cancelled`, `timed_out`. |
-| `image` | string | — |
-| `command` | string[] | — |
-| `region` | string | — |
-| `resources` | object | — |
-| `resources.cpuKind` | string | One of: `shared`, `performance`. |
-| `resources.cpus` | integer | — |
-| `resources.memoryMb` | integer | — |
-| `runtime` | object | — |
-| `runtime.nestedContainers` | boolean | — |
-| `timeoutSeconds` | integer | — |
-| `exitCode` | integer or null | — |
-| `errorCode` | string or null | — |
-| `cleanupStatus` | string | One of: `pending`, `confirmed`, `attention_required`. |
-| `createdAt` | string | Format: `date-time`. |
-| `startedAt` | string or null | Format: `date-time`. |
-| `finishedAt` | string or null | Format: `date-time`. |
+| Field                      | Type            | Description                                                                     |
+| -------------------------- | --------------- | ------------------------------------------------------------------------------- |
+| `id`                       | string          | —                                                                               |
+| `status`                   | string          | One of: `starting`, `running`, `succeeded`, `failed`, `cancelled`, `timed_out`. |
+| `image`                    | string          | —                                                                               |
+| `command`                  | string[]        | —                                                                               |
+| `region`                   | string          | —                                                                               |
+| `resources`                | object          | —                                                                               |
+| `resources.cpuKind`        | string          | One of: `shared`, `performance`.                                                |
+| `resources.cpus`           | integer         | —                                                                               |
+| `resources.memoryMb`       | integer         | —                                                                               |
+| `runtime`                  | object          | —                                                                               |
+| `runtime.nestedContainers` | boolean         | —                                                                               |
+| `timeoutSeconds`           | integer         | —                                                                               |
+| `exitCode`                 | integer or null | —                                                                               |
+| `errorCode`                | string or null  | —                                                                               |
+| `cleanupStatus`            | string          | One of: `pending`, `confirmed`, `attention_required`.                           |
+| `createdAt`                | string          | Format: `date-time`.                                                            |
+| `startedAt`                | string or null  | Format: `date-time`.                                                            |
+| `finishedAt`               | string or null  | Format: `date-time`.                                                            |
 
 ## executions.logs
 
@@ -371,11 +371,11 @@ GET /v1/orgs/{orgId}/projects/{projectId}/executions/{executionId}/logs
 
 ### Query parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `since` | string | No | Format: `date-time`. |
-| `until` | string | No | Format: `date-time`. |
-| `limit` | integer | No | — |
+| Name    | Type    | Required | Description          |
+| ------- | ------- | -------- | -------------------- |
+| `since` | string  | No       | Format: `date-time`. |
+| `until` | string  | No       | Format: `date-time`. |
+| `limit` | integer | No       | —                    |
 
 ### Example
 
@@ -386,21 +386,21 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/executions/$EXE
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Execution log entries ordered oldest first. |
-| `404` | No such execution. |
-| `422` | Invalid log window or limit. |
-| `503` | Execution logs are temporarily unavailable. |
+| Status | Description                                 |
+| ------ | ------------------------------------------- |
+| `200`  | Execution log entries ordered oldest first. |
+| `404`  | No such execution.                          |
+| `422`  | Invalid log window or limit.                |
+| `503`  | Execution logs are temporarily unavailable. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `entries` | object[] | — |
-| `entries[].timestamp` | string | Format: `date-time`. |
-| `entries[].level` | string | One of: `debug`, `info`, `warn`, `error`. |
-| `entries[].message` | string | — |
+| Field                 | Type     | Description                               |
+| --------------------- | -------- | ----------------------------------------- |
+| `entries`             | object[] | —                                         |
+| `entries[].timestamp` | string   | Format: `date-time`.                      |
+| `entries[].level`     | string   | One of: `debug`, `info`, `warn`, `error`. |
+| `entries[].message`   | string   | —                                         |
 
 ## executions.metrics
 
@@ -423,17 +423,17 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/executions/$EXE
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Execution resource observations. |
-| `404` | No such execution. |
+| Status | Description                      |
+| ------ | -------------------------------- |
+| `200`  | Execution resource observations. |
+| `404`  | No such execution.               |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `wallTimeMs` | integer or null | — |
-| `cpuSeconds` | number or null | — |
-| `memoryPeakMb` | number or null | — |
-| `startedAt` | string or null | Format: `date-time`. |
-| `finishedAt` | string or null | Format: `date-time`. |
+| Field          | Type            | Description          |
+| -------------- | --------------- | -------------------- |
+| `wallTimeMs`   | integer or null | —                    |
+| `cpuSeconds`   | number or null  | —                    |
+| `memoryPeakMb` | number or null  | —                    |
+| `startedAt`    | string or null  | Format: `date-time`. |
+| `finishedAt`   | string or null  | Format: `date-time`. |

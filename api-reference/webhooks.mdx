@@ -28,20 +28,20 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/webhooks" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Webhook endpoints, oldest first. |
+| Status | Description                      |
+| ------ | -------------------------------- |
+| `200`  | Webhook endpoints, oldest first. |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `url` | string | HTTPS endpoint events are POSTed to. Unique per organization. |
-| `events` | string[] | Event types delivered to this endpoint, in canonical order. |
-| `createdAt` | string | Format: `date-time`. |
+| Field       | Type     | Description                                                   |
+| ----------- | -------- | ------------------------------------------------------------- |
+| `id`        | string   | —                                                             |
+| `url`       | string   | HTTPS endpoint events are POSTed to. Unique per organization. |
+| `events`    | string[] | Event types delivered to this endpoint, in canonical order.   |
+| `createdAt` | string   | Format: `date-time`.                                          |
 
 ## webhooks.create
 
@@ -57,10 +57,10 @@ POST /v1/orgs/{orgId}/webhooks
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `url` | string | Yes | HTTPS endpoint to deliver events to, e.g. "https://hooks.acme.com/korve". Plain http is refused. |
-| `events` | string[] | Yes | Event types to deliver. At least one; duplicates are ignored. |
+| Field    | Type     | Required | Description                                                                                      |
+| -------- | -------- | -------- | ------------------------------------------------------------------------------------------------ |
+| `url`    | string   | Yes      | HTTPS endpoint to deliver events to, e.g. "https://hooks.acme.com/korve". Plain http is refused. |
+| `events` | string[] | Yes      | Event types to deliver. At least one; duplicates are ignored.                                    |
 
 ### Example
 
@@ -78,21 +78,21 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/webhooks" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `201` | Webhook registered. `secret` is the signing secret — shown exactly once; store it securely. |
-| `409` | That URL already receives this organization's events. |
-| `422` | Not an https:// URL, or no valid event types. |
+| Status | Description                                                                                 |
+| ------ | ------------------------------------------------------------------------------------------- |
+| `201`  | Webhook registered. `secret` is the signing secret — shown exactly once; store it securely. |
+| `409`  | That URL already receives this organization's events.                                       |
+| `422`  | Not an https:// URL, or no valid event types.                                               |
 
 ### Response body (201)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `url` | string | HTTPS endpoint events are POSTed to. Unique per organization. |
-| `events` | string[] | Event types delivered to this endpoint, in canonical order. |
-| `createdAt` | string | Format: `date-time`. |
-| `secret` | string | The signing secret deliveries are HMAC'd with. Shown exactly once — it is never retrievable later. Store it with the receiving service. Pattern: `^whsec_[0-9a-f]{40}$`. |
+| Field       | Type     | Description                                                                                                                                                              |
+| ----------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `id`        | string   | —                                                                                                                                                                        |
+| `url`       | string   | HTTPS endpoint events are POSTed to. Unique per organization.                                                                                                            |
+| `events`    | string[] | Event types delivered to this endpoint, in canonical order.                                                                                                              |
+| `createdAt` | string   | Format: `date-time`.                                                                                                                                                     |
+| `secret`    | string   | The signing secret deliveries are HMAC'd with. Shown exactly once — it is never retrievable later. Store it with the receiving service. Pattern: `^whsec_[0-9a-f]{40}$`. |
 
 ## webhooks.delete
 
@@ -115,7 +115,7 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/webhooks/$WEBHOOK_ID" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Webhook deleted. |
-| `404` | No such webhook in this organization. |
+| Status | Description                           |
+| ------ | ------------------------------------- |
+| `200`  | Webhook deleted.                      |
+| `404`  | No such webhook in this organization. |

@@ -28,24 +28,24 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/buckets" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Buckets, ascending by name. |
+| Status | Description                 |
+| ------ | --------------------------- |
+| `200`  | Buckets, ascending by name. |
 
 ### Response body (200)
 
 An array of objects with these fields:
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `name` | string | Bucket name — unique within the organization. Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
-| `region` | string | The bucket's storage area id (see regions.list). Set at creation. |
-| `project` | string or null | Slug of the project the bucket is scoped to; null for an organization-level shared bucket usable from every project. |
-| `objectCount` | integer | Number of objects in the bucket. Refreshed hourly — recent uploads and deletes may not be reflected yet. 0 until the first refresh. |
-| `totalBytes` | integer | Total size of the bucket's objects in bytes. Refreshed hourly, like objectCount. |
-| `statsUpdatedAt` | string or null | When objectCount and totalBytes were last refreshed (hourly cadence); null until the first refresh. Format: `date-time`. |
-| `createdAt` | string | Format: `date-time`. |
+| Field            | Type           | Description                                                                                                                         |
+| ---------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `id`             | string         | —                                                                                                                                   |
+| `name`           | string         | Bucket name — unique within the organization. Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                    |
+| `region`         | string         | The bucket's storage area id (see regions.list). Set at creation.                                                                   |
+| `project`        | string or null | Slug of the project the bucket is scoped to; null for an organization-level shared bucket usable from every project.                |
+| `objectCount`    | integer        | Number of objects in the bucket. Refreshed hourly — recent uploads and deletes may not be reflected yet. 0 until the first refresh. |
+| `totalBytes`     | integer        | Total size of the bucket's objects in bytes. Refreshed hourly, like objectCount.                                                    |
+| `statsUpdatedAt` | string or null | When objectCount and totalBytes were last refreshed (hourly cadence); null until the first refresh. Format: `date-time`.            |
+| `createdAt`      | string         | Format: `date-time`.                                                                                                                |
 
 ## buckets.create
 
@@ -62,11 +62,11 @@ POST /v1/orgs/{orgId}/buckets
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `name` | string | Yes | Bucket name: 2-62 chars of lowercase letters, digits, and hyphens, starting with a letter. Unique within the organization. Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
-| `region` | string | No | Storage area id (see regions.list); defaults to the platform default. Set at creation. |
-| `project` | string | No | Project id (UUID) or slug to scope the bucket to. Omitted = organization-level shared bucket. |
+| Field     | Type   | Required | Description                                                                                                                                                   |
+| --------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`    | string | Yes      | Bucket name: 2-62 chars of lowercase letters, digits, and hyphens, starting with a letter. Unique within the organization. Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `region`  | string | No       | Storage area id (see regions.list); defaults to the platform default. Set at creation.                                                                        |
+| `project` | string | No       | Project id (UUID) or slug to scope the bucket to. Omitted = organization-level shared bucket.                                                                 |
 
 ### Example
 
@@ -81,26 +81,26 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/buckets" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `201` | Bucket created. |
-| `402` | Organization billing is not active. |
-| `404` | No such project in this organization. |
-| `409` | A bucket with that name already exists in this organization. |
-| `422` | Invalid bucket name or unknown storage area. |
+| Status | Description                                                  |
+| ------ | ------------------------------------------------------------ |
+| `201`  | Bucket created.                                              |
+| `402`  | Organization billing is not active.                          |
+| `404`  | No such project in this organization.                        |
+| `409`  | A bucket with that name already exists in this organization. |
+| `422`  | Invalid bucket name or unknown storage area.                 |
 
 ### Response body (201)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | string | — |
-| `name` | string | Bucket name — unique within the organization. Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
-| `region` | string | The bucket's storage area id (see regions.list). Set at creation. |
-| `project` | string or null | Slug of the project the bucket is scoped to; null for an organization-level shared bucket usable from every project. |
-| `objectCount` | integer | Number of objects in the bucket. Refreshed hourly — recent uploads and deletes may not be reflected yet. 0 until the first refresh. |
-| `totalBytes` | integer | Total size of the bucket's objects in bytes. Refreshed hourly, like objectCount. |
-| `statsUpdatedAt` | string or null | When objectCount and totalBytes were last refreshed (hourly cadence); null until the first refresh. Format: `date-time`. |
-| `createdAt` | string | Format: `date-time`. |
+| Field            | Type           | Description                                                                                                                         |
+| ---------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `id`             | string         | —                                                                                                                                   |
+| `name`           | string         | Bucket name — unique within the organization. Pattern: `^[a-z][a-z0-9-]{1,61}$`.                                                    |
+| `region`         | string         | The bucket's storage area id (see regions.list). Set at creation.                                                                   |
+| `project`        | string or null | Slug of the project the bucket is scoped to; null for an organization-level shared bucket usable from every project.                |
+| `objectCount`    | integer        | Number of objects in the bucket. Refreshed hourly — recent uploads and deletes may not be reflected yet. 0 until the first refresh. |
+| `totalBytes`     | integer        | Total size of the bucket's objects in bytes. Refreshed hourly, like objectCount.                                                    |
+| `statsUpdatedAt` | string or null | When objectCount and totalBytes were last refreshed (hourly cadence); null until the first refresh. Format: `date-time`.            |
+| `createdAt`      | string         | Format: `date-time`.                                                                                                                |
 
 ## buckets.delete
 
@@ -116,9 +116,9 @@ DELETE /v1/orgs/{orgId}/buckets/{bucketId}
 
 ### Path parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `bucketId` | string | Yes | — |
+| Name       | Type   | Required | Description |
+| ---------- | ------ | -------- | ----------- |
+| `bucketId` | string | Yes      | —           |
 
 ### Example
 
@@ -129,9 +129,9 @@ curl -X DELETE "https://api.korve.dev/v1/orgs/$ORG_ID/buckets/$BUCKET_ID" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Bucket deleted. |
-| `404` | No such bucket in this organization. |
-| `409` | The bucket is not empty (BUCKET_NOT_EMPTY). |
-| `502` | The emptiness check failed upstream — nothing was deleted. |
+| Status | Description                                                |
+| ------ | ---------------------------------------------------------- |
+| `200`  | Bucket deleted.                                            |
+| `404`  | No such bucket in this organization.                       |
+| `409`  | The bucket is not empty (BUCKET_NOT_EMPTY).                |
+| `502`  | The emptiness check failed upstream — nothing was deleted. |

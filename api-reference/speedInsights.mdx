@@ -28,21 +28,21 @@ curl "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/speed-insights"
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Speed Insights configuration. |
-| `404` | No such project. |
+| Status | Description                   |
+| ------ | ----------------------------- |
+| `200`  | Speed Insights configuration. |
+| `404`  | No such project.              |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `enabled` | boolean | — |
-| `projectRef` | string | Public project reference used by the browser SDK. Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
-| `endpoint` | string | Format: `uri`. |
-| `sampleRate` | number | Batch retention rate applied before telemetry storage and billing. |
-| `allowedOrigins` | string[] | — |
-| `retentionDays` | integer | One of: `30`. |
+| Field            | Type     | Description                                                                          |
+| ---------------- | -------- | ------------------------------------------------------------------------------------ |
+| `enabled`        | boolean  | —                                                                                    |
+| `projectRef`     | string   | Public project reference used by the browser SDK. Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `endpoint`       | string   | Format: `uri`.                                                                       |
+| `sampleRate`     | number   | Batch retention rate applied before telemetry storage and billing.                   |
+| `allowedOrigins` | string[] | —                                                                                    |
+| `retentionDays`  | integer  | One of: `30`.                                                                        |
 
 ## speedInsights.update
 
@@ -59,11 +59,11 @@ PUT /v1/orgs/{orgId}/projects/{projectId}/speed-insights
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `enabled` | boolean | Yes | — |
-| `sampleRate` | number | No | Batch retention rate applied before telemetry storage and billing. |
-| `allowedOrigins` | string[] | No | Extra HTTPS origins allowed to submit measurements. The managed project origin and verified domains are allowed automatically. |
+| Field            | Type     | Required | Description                                                                                                                    |
+| ---------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `enabled`        | boolean  | Yes      | —                                                                                                                              |
+| `sampleRate`     | number   | No       | Batch retention rate applied before telemetry storage and billing.                                                             |
+| `allowedOrigins` | string[] | No       | Extra HTTPS origins allowed to submit measurements. The managed project origin and verified domains are allowed automatically. |
 
 ### Example
 
@@ -78,22 +78,22 @@ curl -X PUT "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/speed-in
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Updated Speed Insights configuration. |
-| `404` | No such project. |
-| `422` | Invalid Speed Insights configuration. |
+| Status | Description                           |
+| ------ | ------------------------------------- |
+| `200`  | Updated Speed Insights configuration. |
+| `404`  | No such project.                      |
+| `422`  | Invalid Speed Insights configuration. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `enabled` | boolean | — |
-| `projectRef` | string | Public project reference used by the browser SDK. Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
-| `endpoint` | string | Format: `uri`. |
-| `sampleRate` | number | Batch retention rate applied before telemetry storage and billing. |
-| `allowedOrigins` | string[] | — |
-| `retentionDays` | integer | One of: `30`. |
+| Field            | Type     | Description                                                                          |
+| ---------------- | -------- | ------------------------------------------------------------------------------------ |
+| `enabled`        | boolean  | —                                                                                    |
+| `projectRef`     | string   | Public project reference used by the browser SDK. Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| `endpoint`       | string   | Format: `uri`.                                                                       |
+| `sampleRate`     | number   | Batch retention rate applied before telemetry storage and billing.                   |
+| `allowedOrigins` | string[] | —                                                                                    |
+| `retentionDays`  | integer  | One of: `30`.                                                                        |
 
 ## speedInsights.query
 
@@ -109,14 +109,14 @@ POST /v1/orgs/{orgId}/projects/{projectId}/speed-insights/query
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `from` | string | No | Format: `date-time`. |
-| `until` | string | No | Format: `date-time`. |
-| `environment` | string | No | Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
-| `device` | string | No | One of: `all`, `desktop`, `mobile`. |
-| `route` | string | No | Pattern: `^/[^?#]*$`. |
-| `granularity` | string | No | One of: `hour`, `day`. |
+| Field         | Type   | Required | Description                         |
+| ------------- | ------ | -------- | ----------------------------------- |
+| `from`        | string | No       | Format: `date-time`.                |
+| `until`       | string | No       | Format: `date-time`.                |
+| `environment` | string | No       | Pattern: `^[a-z][a-z0-9-]{0,38}$`.  |
+| `device`      | string | No       | One of: `all`, `desktop`, `mobile`. |
+| `route`       | string | No       | Pattern: `^/[^?#]*$`.               |
+| `granularity` | string | No       | One of: `hour`, `day`.              |
 
 ### Example
 
@@ -129,49 +129,49 @@ curl -X POST "https://api.korve.dev/v1/orgs/$ORG_ID/projects/$PROJECT_ID/speed-i
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `200` | Bounded Speed Insights report. |
-| `404` | No such project or environment. |
-| `422` | Invalid time window, filter, or granularity. |
-| `503` | Speed Insights data is temporarily unavailable. |
+| Status | Description                                     |
+| ------ | ----------------------------------------------- |
+| `200`  | Bounded Speed Insights report.                  |
+| `404`  | No such project or environment.                 |
+| `422`  | Invalid time window, filter, or granularity.    |
+| `503`  | Speed Insights data is temporarily unavailable. |
 
 ### Response body (200)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `from` | string | Format: `date-time`. |
-| `until` | string | Format: `date-time`. |
-| `retentionDays` | integer | One of: `30`. |
-| `summary` | object | — |
-| `summary.score` | number or null | — |
-| `summary.samples` | integer | — |
-| `summary.vitals` | object[] | — |
-| `summary.vitals[].metric` | string | One of: `CLS`, `FCP`, `INP`, `LCP`, `TTFB`. |
-| `summary.vitals[].unit` | string | One of: `milliseconds`, `score`. |
-| `summary.vitals[].rating` | string or null | One of: `good`, `needs-improvement`, `poor`, `null`. |
-| `summary.vitals[].samples` | integer | — |
-| `summary.vitals[].p75` | number or null | — |
-| `summary.vitals[].p90` | number or null | — |
-| `summary.vitals[].p95` | number or null | — |
-| `summary.vitals[].p99` | number or null | — |
-| `series` | object[] | — |
-| `series[].bucket` | string | Format: `date-time`. |
-| `series[].score` | number or null | — |
-| `series[].samples` | integer | — |
-| `routes` | object[] | — |
-| `routes[].route` | string | — |
-| `routes[].score` | number or null | — |
-| `routes[].samples` | integer | — |
-| `routes[].vitals` | object[] | — |
-| `routes[].vitals[].metric` | string | One of: `CLS`, `FCP`, `INP`, `LCP`, `TTFB`. |
-| `routes[].vitals[].unit` | string | One of: `milliseconds`, `score`. |
-| `routes[].vitals[].rating` | string or null | One of: `good`, `needs-improvement`, `poor`, `null`. |
-| `routes[].vitals[].samples` | integer | — |
-| `routes[].vitals[].p75` | number or null | — |
-| `routes[].vitals[].p90` | number or null | — |
-| `routes[].vitals[].p95` | number or null | — |
-| `routes[].vitals[].p99` | number or null | — |
+| Field                       | Type           | Description                                          |
+| --------------------------- | -------------- | ---------------------------------------------------- |
+| `from`                      | string         | Format: `date-time`.                                 |
+| `until`                     | string         | Format: `date-time`.                                 |
+| `retentionDays`             | integer        | One of: `30`.                                        |
+| `summary`                   | object         | —                                                    |
+| `summary.score`             | number or null | —                                                    |
+| `summary.samples`           | integer        | —                                                    |
+| `summary.vitals`            | object[]       | —                                                    |
+| `summary.vitals[].metric`   | string         | One of: `CLS`, `FCP`, `INP`, `LCP`, `TTFB`.          |
+| `summary.vitals[].unit`     | string         | One of: `milliseconds`, `score`.                     |
+| `summary.vitals[].rating`   | string or null | One of: `good`, `needs-improvement`, `poor`, `null`. |
+| `summary.vitals[].samples`  | integer        | —                                                    |
+| `summary.vitals[].p75`      | number or null | —                                                    |
+| `summary.vitals[].p90`      | number or null | —                                                    |
+| `summary.vitals[].p95`      | number or null | —                                                    |
+| `summary.vitals[].p99`      | number or null | —                                                    |
+| `series`                    | object[]       | —                                                    |
+| `series[].bucket`           | string         | Format: `date-time`.                                 |
+| `series[].score`            | number or null | —                                                    |
+| `series[].samples`          | integer        | —                                                    |
+| `routes`                    | object[]       | —                                                    |
+| `routes[].route`            | string         | —                                                    |
+| `routes[].score`            | number or null | —                                                    |
+| `routes[].samples`          | integer        | —                                                    |
+| `routes[].vitals`           | object[]       | —                                                    |
+| `routes[].vitals[].metric`  | string         | One of: `CLS`, `FCP`, `INP`, `LCP`, `TTFB`.          |
+| `routes[].vitals[].unit`    | string         | One of: `milliseconds`, `score`.                     |
+| `routes[].vitals[].rating`  | string or null | One of: `good`, `needs-improvement`, `poor`, `null`. |
+| `routes[].vitals[].samples` | integer        | —                                                    |
+| `routes[].vitals[].p75`     | number or null | —                                                    |
+| `routes[].vitals[].p90`     | number or null | —                                                    |
+| `routes[].vitals[].p95`     | number or null | —                                                    |
+| `routes[].vitals[].p99`     | number or null | —                                                    |
 
 ## speedInsights.collect
 
@@ -186,26 +186,26 @@ POST /v1/speed-insights/collect/{projectRef}
 
 ### Path parameters
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `projectRef` | string | Yes | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
+| Name         | Type   | Required | Description                        |
+| ------------ | ------ | -------- | ---------------------------------- |
+| `projectRef` | string | Yes      | Pattern: `^[a-z][a-z0-9-]{1,61}$`. |
 
 ### Request body
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `schemaVersion` | integer | Yes | One of: `1`. |
-| `batchId` | string | Yes | Pattern: `^[A-Za-z0-9_-]+$`. |
-| `environment` | string | Yes | Project environment. Defaults to production in the browser SDK. Pattern: `^[a-z][a-z0-9-]{0,38}$`. |
-| `sdkVersion` | string | Yes | — |
-| `events` | object[] | Yes | — |
-| `events[].eventId` | string | Yes | Pattern: `^[A-Za-z0-9_-]+$`. |
-| `events[].metric` | string | Yes | One of: `CLS`, `FCP`, `INP`, `LCP`, `TTFB`. |
-| `events[].value` | number | Yes | — |
-| `events[].timestamp` | string | Yes | Format: `date-time`. |
-| `events[].route` | string | Yes | A normalized route only. Browser SDKs remove query strings, fragments, and common dynamic identifiers before upload. Pattern: `^/[^?#]*$`. |
-| `events[].device` | string | Yes | One of: `desktop`, `mobile`. |
-| `events[].navigationType` | string | Yes | One of: `navigate`, `reload`, `back-forward`, `prerender`, `restore`, `other`. |
+| Field                     | Type     | Required | Description                                                                                                                                |
+| ------------------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `schemaVersion`           | integer  | Yes      | One of: `1`.                                                                                                                               |
+| `batchId`                 | string   | Yes      | Pattern: `^[A-Za-z0-9_-]+$`.                                                                                                               |
+| `environment`             | string   | Yes      | Project environment. Defaults to production in the browser SDK. Pattern: `^[a-z][a-z0-9-]{0,38}$`.                                         |
+| `sdkVersion`              | string   | Yes      | —                                                                                                                                          |
+| `events`                  | object[] | Yes      | —                                                                                                                                          |
+| `events[].eventId`        | string   | Yes      | Pattern: `^[A-Za-z0-9_-]+$`.                                                                                                               |
+| `events[].metric`         | string   | Yes      | One of: `CLS`, `FCP`, `INP`, `LCP`, `TTFB`.                                                                                                |
+| `events[].value`          | number   | Yes      | —                                                                                                                                          |
+| `events[].timestamp`      | string   | Yes      | Format: `date-time`.                                                                                                                       |
+| `events[].route`          | string   | Yes      | A normalized route only. Browser SDKs remove query strings, fragments, and common dynamic identifiers before upload. Pattern: `^/[^?#]*$`. |
+| `events[].device`         | string   | Yes      | One of: `desktop`, `mobile`.                                                                                                               |
+| `events[].navigationType` | string   | Yes      | One of: `navigate`, `reload`, `back-forward`, `prerender`, `restore`, `other`.                                                             |
 
 ### Example
 
@@ -233,20 +233,20 @@ curl -X POST "https://api.korve.dev/v1/speed-insights/collect/$PROJECT_REF" \
 
 ### Responses
 
-| Status | Description |
-| ------ | ----------- |
-| `202` | Measurement batch accepted, deduplicated, or sampled out before storage and billing. |
-| `403` | Speed Insights is disabled or the request origin is not allowed. |
-| `404` | No such project. |
-| `413` | Encoded request exceeds 32,768 bytes. |
-| `422` | The measurement batch is invalid. |
-| `429` | The browser intake limit was reached. |
-| `503` | Speed Insights intake is temporarily unavailable. |
+| Status | Description                                                                          |
+| ------ | ------------------------------------------------------------------------------------ |
+| `202`  | Measurement batch accepted, deduplicated, or sampled out before storage and billing. |
+| `403`  | Speed Insights is disabled or the request origin is not allowed.                     |
+| `404`  | No such project.                                                                     |
+| `413`  | Encoded request exceeds 32,768 bytes.                                                |
+| `422`  | The measurement batch is invalid.                                                    |
+| `429`  | The browser intake limit was reached.                                                |
+| `503`  | Speed Insights intake is temporarily unavailable.                                    |
 
 ### Response body (202)
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `accepted` | integer | — |
-| `duplicate` | boolean | — |
-| `sampledOut` | boolean | — |
+| Field        | Type    | Description |
+| ------------ | ------- | ----------- |
+| `accepted`   | integer | —           |
+| `duplicate`  | boolean | —           |
+| `sampledOut` | boolean | —           |
